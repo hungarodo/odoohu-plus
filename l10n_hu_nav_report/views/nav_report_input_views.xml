@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="nav_report_input_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.input.view.form</field>
+        <field name="model">l10n.hu.nav.report.input</field>
+        <field name="priority">8</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <span class="float-start">
+                            <field name="display_name"
+                                   class="p-3 font-weight-bold"
+                                   readonly="1"
+                            />
+                        </span>
+                    </div>
+                    <h2>
+                        <field name="name"
+                               placeholder="Name..."
+                        />
+                    </h2>
+                    <group name="base">
+                        <group>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="common">
+                                <group>
+                                </group>
+                                <group>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                              string="Audit"
+                        >
+                            <group>
+                                <group name="audit_base">
+                                    <field name="id"/>
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                    <field name="report"
+                                           force_save="1"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="audit_crud">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="nav_report_input_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.input.view.list</field>
+        <field name="model">l10n.hu.nav.report.input</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree>
+                <field name="report"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <!-- List view report -->
+    <record id="nav_report_input_view_list_report"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.input.view.list.report</field>
+        <field name="model">l10n.hu.nav.report.input</field>
+        <field name="priority">32</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree>
+                <field name="id"
+                       invisible="1"
+                />
+                <field name="name"
+                       required="1"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="nav_report_input_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.input.view.search</field>
+        <field name="model">l10n.hu.nav.report.input</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="name"/>
+                <separator/>
+                <group name="filter_group_by"
+                       expand="0"
+                       string="Group By"
+                >
+                    <filter name="report_group_by"
+                            context="{'group_by': 'report'}"
+                            string="Report"
+                    />
+                    <filter name="company_group_by"
+                            context="{'group_by': 'company'}"
+                            string="Company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

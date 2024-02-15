@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- NAV Report -->
+    <record id="nav_report_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU NAV Report Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_nav_report"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- NAV Report Element -->
+    <record id="nav_report_element_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU NAV Report Element Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_nav_report_element"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- NAV Report Input -->
+    <record id="nav_report_input_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU NAV Report Input Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_nav_report_input"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- NAV Report Output -->
+    <record id="nav_report_output_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU NAV Report Output Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_nav_report_output"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- NAV Report Rule -->
+    <record id="nav_report_rule_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU NAV Report Rule Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_nav_report_rule"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- NAV Report Template -->
+    <record id="nav_report_template_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU NAV Report Template Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_nav_report_template"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+</odoo>

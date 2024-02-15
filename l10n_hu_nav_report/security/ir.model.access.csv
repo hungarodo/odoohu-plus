@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+l10n_hu_nav_report_user_access,l10n.hu.nav.report.user.access,model_l10n_hu_nav_report,l10n_hu_nav_report.nav_report_user_group,1,1,1,0
+l10n_hu_nav_report_manager_access,l10n.hu.nav.report.manager.access,model_l10n_hu_nav_report,l10n_hu_nav_report.nav_report_manager_group,1,1,1,1
+l10n_hu_nav_report_element_user_access,l10n.hu.nav.report.element.user.access,model_l10n_hu_nav_report_element,l10n_hu_nav_report.nav_report_user_group,1,0,0,0
+l10n_hu_nav_report_element_manager_access,l10n.hu.nav.report.element.manager.access,model_l10n_hu_nav_report_element,l10n_hu_nav_report.nav_report_manager_group,1,1,1,1
+l10n_hu_nav_report_input_user_access,l10n.hu.nav.report.input.user.access,model_l10n_hu_nav_report_input,l10n_hu_nav_report.nav_report_user_group,1,0,0,0
+l10n_hu_nav_report_input_manager_access,l10n.hu.nav.report.input.manager.access,model_l10n_hu_nav_report_input,l10n_hu_nav_report.nav_report_manager_group,1,1,1,1
+l10n_hu_nav_report_output_user_access,l10n.hu.nav.report.output.user.access,model_l10n_hu_nav_report_output,l10n_hu_nav_report.nav_report_user_group,1,0,0,0
+l10n_hu_nav_report_output_manager_access,l10n.hu.nav.report.output.manager.access,model_l10n_hu_nav_report_output,l10n_hu_nav_report.nav_report_manager_group,1,1,1,1
+l10n_hu_nav_report_rule_user_access,l10n.hu.nav.report.rule.user.access,model_l10n_hu_nav_report_rule,l10n_hu_nav_report.nav_report_user_group,1,0,0,0
+l10n_hu_nav_report_rule_manager_access,l10n.hu.nav.report.rule.manager.access,model_l10n_hu_nav_report_rule,l10n_hu_nav_report.nav_report_manager_group,1,1,1,1
+l10n_hu_nav_report_template_user_access,l10n.hu.nav.report.template.user.access,model_l10n_hu_nav_report_template,l10n_hu_nav_report.nav_report_user_group,1,0,0,0
+l10n_hu_nav_report_template_manager_access,l10n.hu.nav.report.template.manager.access,model_l10n_hu_nav_report_template,l10n_hu_nav_report.nav_report_manager_group,1,1,1,1

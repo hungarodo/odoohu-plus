@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="nav_report_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.view.form</field>
+        <field name="model">l10n.hu.nav.report</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="1"
+                  delete="1"
+                  edit="1"
+            >
+                <header>
+                    <button name="action_wizard_report"
+                            attrs="{'invisible': [
+                                ('id', '=', False),
+                            ]}"
+                            class="btn btn-primary"
+                            icon="fa-magic"
+                            string="Wizard"
+                            type="object"
+                    />
+                    <field name="status"
+                           clickable="0"
+                           widget="statusbar"
+                    />
+                </header>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <span class="float-start">
+                            <field name="display_name"
+                                   class="p-3 font-weight-bold"
+                                   readonly="1"
+                            />
+                        </span>
+                        <button name="action_list_inputs"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                type="object"
+                        >
+                            <field name="input_count"
+                                   string="Input"
+                                   widget="statinfo"
+                            />
+                        </button>
+                        <button name="action_list_outputs"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                type="object"
+                        >
+                            <field name="output_count"
+                                   string="Output"
+                                   widget="statinfo"
+                            />
+                        </button>
+                        <button name="toggle_active"
+                                class="oe_stat_button"
+                                type="object"
+                        >
+                            <field name="active"
+                                   widget="boolean_toggle"
+                            />
+                            <span class="o_stat_text">Active</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                            bg_color="bg-danger"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h2>
+                            <field name="name"
+                                   placeholder="Name..."
+                            />
+                        </h2>
+                    </div>
+                    <field name="description"
+                           placeholder="Description..."
+                    />
+                    <group>
+                        <group>
+                            <field name="template"
+                                   options="{'no_create': True,}"
+                            />
+                            <field name="period_start"
+                                   required="1"
+                            />
+                            <field name="period_end"
+                                   required="1"
+                            />
+                        </group>
+                        <group>
+                            <div name="information"
+                                 class="card bg-info"
+                                 colspan="2"
+                            >
+                                <div class="card-header text-white">
+                                    <i class="fa fa-info-circle"/> Information
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        NAV report
+                                    </p>
+                                </div>
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                              string="Audit"
+                        >
+                            <group name="audit">
+                                <group name="id_company">
+                                    <field name="id"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           force_save="1"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="create_write">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids"
+                           widget="mail_activity"
+                    />
+                    <field name="message_follower_ids"
+                           widget="mail_followers"
+                    />
+                    <field name="message_ids"
+                           widget="mail_thread"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="nav_report_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.view.list</field>
+        <field name="model">l10n.hu.nav.report</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree>
+                <field name="display_name"/>
+                <field name="template"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="status"/>
+                <field name="write_date"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="nav_report_view_search"
+            model="ir.ui.view">
+        <field name="name">l10n.hu.nav.report.view.search</field>
+        <field name="model">l10n.hu.nav.report</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="name"/>
+                <field name="template"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <separator/>
+                <group name="filter_group_by"
+                       expand="0"
+                       string="Group By"
+                >
+                    <filter name="period_start_filter_group_by"
+                            context="{'group_by': 'period_start'}"
+                            string="Period Start"
+                    />
+                    <filter name="period_end_filter_group_by"
+                            context="{'group_by': 'period_end'}"
+                            string="Period End"
+                    />
+                    <filter name="template_filter_group_by"
+                            context="{'group_by': 'template'}"
+                            string="Template"
+                    />
+                    <filter name="status_filter_group_by"
+                            context="{'group_by': 'status'}"
+                            string="Status"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

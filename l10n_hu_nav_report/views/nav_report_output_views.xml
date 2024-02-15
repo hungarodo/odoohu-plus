@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="nav_report_output_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.output.view.form</field>
+        <field name="model">l10n.hu.nav.report.output</field>
+        <field name="priority">8</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <span class="float-start">
+                            <field name="display_name"
+                                   class="p-3 font-weight-bold"
+                                   readonly="1"
+                            />
+                        </span>
+                        <button name="toggle_active"
+                                class="oe_stat_button"
+                                type="object"
+                        >
+                            <field name="active"
+                                   widget="boolean_toggle"
+                            />
+                            <span class="o_stat_text">Active</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                            bg_color="bg-danger"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h2>
+                            <field name="name"
+                                   placeholder="Name..."
+                            />
+                        </h2>
+                    </div>
+                    <group name="base">
+                        <group>
+                            <field name="output_type"
+                                   required="1"
+                            />
+                            <field name="is_locked"
+                                   widget="boolean_toggle"
+                            />
+                        </group>
+                        <group>
+                            <field name="code"
+                                   required="1"
+                            />
+                            <field name="sequence"
+                                   class="oe_inline"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="common">
+                                <group>
+                                    <field name="value_type"/>
+                                    <field name="page_break"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="notes"
+                                           placeholder="Internal notes..."
+                                    />
+                                </group>
+                            </group>
+                            <group name="value_base"
+                                   attrs="{'invisible': [('output_type', 'not in', ['integer', 'float', 'date', 'datetime'])]}"
+                                   string="Value"
+                            >
+                                <field name="value_char"
+                                       attrs="{'invisible': [('output_type', '!=', 'char')]}"
+                                       placeholder="Enter text..."
+                                       string="String"
+                                />
+                                <field name="value_date"
+                                       attrs="{'invisible': [('output_type', '!=', 'date')]}"
+                                       string="Date"
+                                />
+                                <field name="value_datetime"
+                                       attrs="{'invisible': [('output_type', '!=', 'datetime')]}"
+                                       string="Datetime"
+                                />
+                                <field name="value_integer"
+                                       attrs="{'invisible': [('output_type', '!=', 'integer')]}"
+                                       string="Integer"
+                                />
+                                <field name="value_float"
+                                       attrs="{'invisible': [('output_type', '!=', 'float')]}"
+                                       string="Float"
+                                />
+                            </group>
+                            <group name="char_text"
+                                   attrs="{'invisible': [('output_type', 'not in', ['char', 'text'])]}"
+                                   string="Text"
+                            >
+                                <field name="value_char"
+                                       attrs="{'invisible': [('output_type', '!=', 'char')]}"
+                                       placeholder="Enter text..."
+                                />
+                                <field name="value_text"
+                                       attrs="{'invisible': [('output_type', '!=', 'text')]}"
+                                       placeholder="Enter text..."
+                                />
+                            </group>
+                            <group name="html"
+                                   attrs="{'invisible': [('output_type', '!=', 'html')]}"
+                                   string="HTML"
+                            >
+                                <field name="value_html"
+                                       placeholder="Enter text..."
+                                />
+                            </group>
+                            <group name="description">
+                                <field name="description"
+                                       placeholder="Public description..."
+                                />
+                            </group>
+                        </page>
+                        <page name="audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                              string="Audit"
+                        >
+                            <group name="audit">
+                                <group name="audit_base">
+                                    <field name="id"/>
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                    <field name="report"
+                                           readonly="1"
+                                    />
+                                    <field name="template"
+                                           readonly="1"
+                                    />
+                                    <field name="element"
+                                           readonly="1"
+                                    />
+                                    <field name="technical_name"/>
+                                </group>
+                                <group name="audit_create_write">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="nav_report_output_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.output.view.list</field>
+        <field name="model">l10n.hu.nav.report.output</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0">
+                <field name="report"/>
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="output_type"/>
+                <field name="code"
+                       optional="show"
+                />
+                <field name="technical_name"
+                       optional="show"
+                />
+                <field name="value_display"
+                       optional="show"
+                />
+                <field name="is_locked"
+                       widget="boolean_toggle"
+                />
+                <field name="active"
+                       widget="boolean_toggle"
+                />
+                <field name="notes"/>
+                <field name="template"
+                       optional="hide"
+                />
+                <field name="element"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view report -->
+    <record id="nav_report_output_view_list_report"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.output.view.list.report</field>
+        <field name="model">l10n.hu.nav.report.output</field>
+        <field name="priority">32</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0">
+                <field name="id"
+                       invisible="1"
+                />
+                <field name="sequence"
+                       widget="handle"
+                />
+                <field name="name"/>
+                <field name="code"/>
+                <field name="technical_name"
+                       optional="show"
+                />
+                <field name="template"
+                       optional="hide"
+                />
+                <field name="element"
+                       optional="hide"
+                />
+                <field name="output_type"
+                       optional="hide"
+                />
+                <field name="value_display"
+                       optional="show"
+                />
+                <field name="is_locked"
+                       widget="boolean_toggle"
+                />
+                <field name="active"
+                       widget="boolean_toggle"
+                />
+                <field name="notes"/>
+                <field name="report"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="nav_report_output_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.output.view.search</field>
+        <field name="model">l10n.hu.nav.report.output</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="name"/>
+                <field name="technical_name"/>
+                <field name="code"/>
+                <field name="element"/>
+                <field name="template"/>
+                <separator/>
+                <filter name="active_filter"
+                        domain="[('active','=', True)]"
+                        string="Active"
+                />
+                <filter name="not_active_filter"
+                        domain="[('active','=', False)]"
+                        string="Archived"
+                />
+                <separator/>
+                <filter name="locked_filter"
+                        domain="[('is_locked','=', True)]"
+                        string="Locked"
+                />
+                <filter name="not_locked_filter"
+                        domain="[('is_locked','=', False)]"
+                        string="Not Locked"
+                />
+                <separator/>
+                <group name="filter_group_by"
+                       expand="0"
+                       string="Group By"
+                >
+                    <filter name="output_type_group_by"
+                            context="{'group_by': 'output_type'}"
+                            string="Output Type"
+                    />
+                    <filter name="report_group_by"
+                            context="{'group_by': 'report'}"
+                            string="Report"
+                    />
+                    <filter name="element_group_by"
+                            context="{'group_by': 'element'}"
+                            string="Element"
+                    />
+                    <filter name="template_group_by"
+                            context="{'group_by': 'template'}"
+                            string="Template"
+                    />
+                    <filter name="company_group_by"
+                            context="{'group_by': 'company'}"
+                            string="Company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

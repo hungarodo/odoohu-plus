@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- HU > Reporting > NAV  -->
+    <record id="hu_reporting_nav_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">NAV Reporting</field>
+        <field name="groups_id"
+               eval="[(4, ref('l10n_hu_nav_report.nav_report_user_group'))]"
+        />
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_reporting_menu"
+        />
+        <field name="sequence">48</field>
+    </record>
+    <!-- HU > Reporting > NAV > Reports -->
+    <record id="hu_reporting_nav_report_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Reports</field>
+        <field name="action"
+               ref="nav_report_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_nav_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU > Reporting > NAV > Report Inputs -->
+    <record id="hu_reporting_nav_report_input_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Report Inputs</field>
+        <field name="action"
+               ref="nav_report_input_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_nav_menu"
+        />
+        <field name="sequence">24</field>
+    </record>
+    <!-- HU > Reporting > NAV > Report Outputs -->
+    <record id="hu_reporting_nav_report_output_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Report Outputs</field>
+        <field name="action"
+               ref="nav_report_output_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_nav_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU > Reporting > NAV > Report Wizard -->
+    <record id="hu_reporting_nav_report_wizard_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Report Wizard</field>
+        <field name="action"
+               ref="report_wizard_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_nav_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+    <!-- HU > Configuration > NAV Reporting -->
+    <record id="hu_configuration_nav_reporting_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">NAV Reporting</field>
+        <field name="groups_id"
+               eval="[(4, ref('l10n_hu_nav_report.nav_report_manager_group'))]"
+        />
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_configuration_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+    <!-- HU > Configuration > NAV Reporting > Elements -->
+    <record id="hu_configuration_nav_reporting_element_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Elements</field>
+        <field name="action"
+               ref="nav_report_element_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_nav_reporting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- NAV > Configuration > Reporting > Rules -->
+    <record id="nav_configuration_reporting_rule_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Rules</field>
+        <field name="action"
+               ref="nav_report_rule_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_nav_reporting_menu"
+        />
+        <field name="sequence">24</field>
+    </record>
+    <!-- HU > Configuration > NAV Reporting > Templates -->
+    <record id="hu_configuration_nav_reporting_template_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Templates</field>
+        <field name="action"
+               ref="nav_report_template_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_nav_reporting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+</odoo>

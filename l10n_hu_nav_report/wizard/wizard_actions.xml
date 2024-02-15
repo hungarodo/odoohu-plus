@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Wizard action -->
+    <record id="report_wizard_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">HU Wizard</field>
+        <field name="res_model">l10n.hu.wizard</field>
+        <field name="target">new</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

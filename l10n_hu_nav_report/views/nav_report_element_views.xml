@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="nav_report_element_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.element.view.form</field>
+        <field name="model">l10n.hu.nav.report.element</field>
+        <field name="priority">8</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <header>
+                    <button name="action_report_wizard"
+                            attrs="{'invisible': [
+                                ('id', '=', False),
+                            ]}"
+                            class="btn btn-primary"
+                            icon="fa-magic"
+                            string="Wizard"
+                            type="object"
+                    />
+                </header>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <span class="float-start">
+                            <field name="display_name"
+                                   class="p-3 font-weight-bold"
+                                   readonly="1"
+                            />
+                        </span>
+                        <button name="toggle_active"
+                                class="oe_stat_button"
+                                type="object"
+                        >
+                            <field name="active"
+                                   widget="boolean_toggle"
+                            />
+                            <span class="o_stat_text">Active</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                            bg_color="bg-danger"
+                            title="Archived"
+                    />
+                    <h4 class="oe_title">
+                        <field name="name"
+                               placeholder="Name..."
+                        />
+                    </h4>
+                    <group name="base">
+                        <group>
+                            <field name="element_type"
+                                   required="1"
+                                   string="Type"
+                            />
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="sequence"
+                                   class="oe_inline"
+                            />
+                            <field name="description"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="details">
+                                <group name="value"
+                                       string="Value"
+                                >
+                                    <field name="value_method"
+                                           required="1"
+                                           string="Method"
+                                    />
+                                    <field name="value_rule"
+                                           attrs="{'invisible': [('value_method', '!=', 'rule')]}"
+                                           options="{'no_quick_create': True,}"
+                                           string="Rule"
+                                    />
+                                    <field name="value_type"
+                                           attrs="{'invisible': [('value_method', '=', 'rule')]}"
+                                           string="Type"
+                                    />
+                                    <field name="value_boolean"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'boolean'),
+                                               ]
+                                           }"
+                                           string="Value"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="value_char"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'char'),
+                                               ]
+                                           }"
+                                           placeholder="Enter value..."
+                                           string="Value"
+                                    />
+                                    <field name="value_date"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'date'),
+                                               ]
+                                           }"
+                                           string="Value"
+                                    />
+                                    <field name="value_datetime"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'datetime'),
+                                               ]
+                                           }"
+                                           string="Value"
+                                    />
+                                    <field name="value_float"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'float'),
+                                               ]
+                                           }"
+                                           string="Value"
+                                    />
+                                    <field name="value_html"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'html'),
+                                               ]
+                                           }"
+                                           string="Value"
+                                    />
+                                    <field name="value_integer"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'integer'),
+                                               ]
+                                           }"
+                                           string="Value"
+                                    />
+                                    <field name="value_text"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_method', '!=', 'fixed'),
+                                                   ('value_type', '!=', 'text'),
+                                               ]
+                                           }"
+                                           placeholder="Enter value..."
+                                           string="Value"
+                                    />
+                                    <field name="notes"
+                                           placeholder="Internal notes..."
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                                <group name="nav"
+                                       string="NAV"
+                                >
+                                    <field name="nav_editable"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="nav_form"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Form"
+                                    />
+                                    <field name="nav_code"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Code"
+                                    />
+                                    <field name="nav_name"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Name"
+                                    />
+                                    <field name="nav_data_type"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Data Type"
+                                    />
+                                    <field name="nav_max_length"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Max. Length"
+                                    />
+                                    <field name="nav_page"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Page"
+                                    />
+                                    <field name="nav_row"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Row"
+                                    />
+                                    <field name="nav_column"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Column"
+                                    />
+                                    <field name="nav_dynamic"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="Dynamic"
+                                    />
+                                    <field name="nav_eazon"
+                                           attrs="{
+                                               'readonly': [('nav_editable', '=', False)],
+                                           }"
+                                           string="EAzon"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                              string="Audit"
+                        >
+                            <group>
+                                <group name="company">
+                                    <field name="reference"
+                                           readonly="1"
+                                    />
+                                    <field name="id"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                    <field name="template"
+                                           force_save="1"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="audit">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   groups="base.group_no_one"
+                                   string="Technical"
+                            >
+                                <group>
+                                    <field name="technical_name"
+                                           style="word-break: break-word;"
+                                    />
+                                    <field name="technical_type"/>
+                                </group>
+                                <group>
+                                    <field name="technical_status"/>
+                                    <field name="technical_timestamp"/>
+                                </group>
+                                <group colspan="2">
+                                    <field name="technical_data"
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="nav_report_element_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.element.view.list</field>
+        <field name="model">l10n.hu.nav.report.element</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree>
+                <field name="sequence"
+                       widget="handle"
+                />
+                <field name="template"/>
+                <field name="name"/>
+                <field name="description"
+                       optional="hide"
+                />
+                <field name="code"/>
+                <field name="element_type"/>
+                <field name="value_type"/>
+                <field name="value_method"/>
+                <field name="value_rule"
+                       optional="hide"
+                />
+                <field name="section_object"
+                       optional="hide"
+                />
+                <field name="nav_form"
+                       optional="hide"
+                />
+                <field name="nav_code"
+                       optional="hide"
+                />
+                <field name="nav_page"
+                       optional="hide"
+                />
+                <field name="nav_eazon"
+                       optional="show"
+                />
+                <field name="notes"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view template -->
+    <record id="nav_report_element_view_list_template"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.element.view.list.template</field>
+        <field name="model">l10n.hu.nav.report.element</field>
+        <field name="priority">32</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree multi_edit="1">
+                <field name="sequence"
+                       widget="handle"
+                />
+                <field name="id"
+                       optional="hide"
+                />
+                <field name="template"
+                       optional="hide"
+                />
+                <field name="name"/>
+                <field name="description"
+                       optional="hide"
+                />
+                <field name="code"/>
+                <field name="element_type"/>
+                <field name="value_type"/>
+                <field name="value_method"/>
+                <field name="value_rule"
+                       optional="hide"
+                />
+                <field name="section_object"
+                       optional="hide"
+                />
+                <field name="nav_form"
+                       optional="hide"
+                />
+                <field name="nav_code"
+                       optional="hide"
+                />
+                <field name="nav_page"
+                       optional="hide"
+                />
+                <field name="nav_eazon"
+                       optional="show"
+                />
+                <field name="notes"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="nav_report_element_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.nav.report.element.view.search</field>
+        <field name="model">l10n.hu.nav.report.element</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="nav_form"/>
+                <field name="nav_eazon"/>
+                <separator/>
+                <group name="filter_group_by"
+                       expand="0"
+                       string="Group By"
+                >
+                    <filter name="element_type_group_by"
+                            context="{'group_by': 'element_type'}"
+                            string="Element Type"
+                    />
+                    <filter name="value_method_group_by"
+                            context="{'group_by': 'value_method'}"
+                            string="Value Method"
+                    />
+                    <filter name="value_rule_group_by"
+                            context="{'group_by': 'value_rule'}"
+                            string="Value Rule"
+                    />
+                    <filter name="value_type_group_by"
+                            context="{'group_by': 'value_type'}"
+                            string="Value Type"
+                    />
+                    <filter name="nav_form_group_by"
+                            context="{'group_by': 'nav_form'}"
+                            string="NAV Form"
+                    />
+                    <filter name="nav_page_group_by"
+                            context="{'group_by': 'nav_page'}"
+                            string="NAV Page"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

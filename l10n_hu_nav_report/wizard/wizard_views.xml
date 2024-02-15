@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="report_wizard_view_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10.hu.nav.report.wizard.view.form.inherit</field>
+        <field name="model">l10n.hu.wizard</field>
+        <field name="inherit_id"
+			   ref="l10n_hu_base.wizard_view_form"
+		/>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Actions -->
+            <xpath expr="//field[@name='action_type']"
+                   position="after"
+            >
+                <field name="action_nav_report_editable"
+                       invisible="1"
+                />
+                <field name="action_nav_report_required"
+                       invisible="1"
+                />
+                <field name="action_nav_report_visible"
+                       invisible="1"
+                />
+                <field name="action_nav_report"
+                       attrs="{
+                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('action_nav_report_visible', '=', False)],
+                           'readonly': [('action_nav_report_editable', '=', False)],
+                           'required': ['|', ('action_type', '=', 'nav_report'), ('action_nav_report_required', '=', True)],
+                       }"
+                       force_save="1"
+                       string="Action"
+                />
+                <field name="nav_report_print_locked"
+                       attrs="{
+                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('action_nav_report', '!=', 'print_report')],
+                       }"
+                       string="Print Locked"
+                       widget="boolean_toggle"
+                />
+            </xpath>
+            <!-- Cards -->
+            <xpath expr="//group[@name='cards']"
+                   position="inside"
+            >
+                <div name="nav_report_info"
+                     attrs="{'invisible': [
+                         ('action_type', '!=', 'nav_report'),
+                     ]}"
+                     class="card text-white bg-info"
+                     colspan="2"
+                >
+                    <div class="card-header">
+                        <i class="fa fa-info-circle mr-1"/>
+                        Information
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"
+                           attrs="{'invisible': [
+                               ('action_nav_report', '!=', 'run_report')
+                           ]}"
+                        >
+                            Run NAV report
+                        </p>
+                    </div>
+                </div>
+            </xpath>
+            <!-- Notebook page -->
+            <xpath expr="//notebook"
+                   position="inside"
+            >
+                <page name="nav_report"
+                      attrs="{
+                          'invisible': [
+                              '|',
+                              ('action_type', '!=', 'nav_report'),
+                              ('nav_report_visible', '=', False),
+                          ],
+                      }"
+                      string="NAV Report"
+                >
+                    <group>
+                        <field name="nav_report_editable"
+                               invisible="1"
+                        />
+                        <field name="nav_report_required"
+                               invisible="1"
+                        />
+                        <field name="nav_report_visible"
+                               invisible="1"
+                        />
+                        <field name="nav_report"
+                               attrs="{
+                                   'readonly': [
+                                       ('nav_report_editable', '=', False),
+                                   ],
+                                   'required': [
+                                       ('nav_report_required', '=', True),
+                                   ],
+                               }"
+                               colspan="2"
+                               nolabel="1"
+                               options="{'no_create': True,}"
+                               widget="many2many_tags"
+                        />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

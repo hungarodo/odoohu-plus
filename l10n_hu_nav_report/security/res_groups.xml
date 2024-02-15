@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- NAV report user group -->
+    <record id="nav_report_user_group"
+            model="res.groups"
+    >
+        <field name="name">User</field>
+        <field name="category_id"
+               ref="nav_report_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('base.group_user'))]"
+        />
+    </record>
+    <!-- NAV report manager group -->
+    <record id="nav_report_manager_group"
+            forcecreate="1"
+            model="res.groups"
+    >
+        <field name="name">Manager</field>
+        <field name="category_id"
+               ref="nav_report_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('nav_report_user_group'))]"
+        />
+        <field name="users"
+               eval="[(4, ref('base.user_admin'))]"
+        />
+    </record>
+</odoo>

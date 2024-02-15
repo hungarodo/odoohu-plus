@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="period_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs"
+               t-as="o"
+            >
+                <t t-call="web.internal_layout">
+                    <t t-if="o and 'company' in o">
+                        <t t-set="company"
+                           t-value="o.company"
+                        />
+                    </t>
+                    <t t-if="not o or not 'company_id' in o">
+                        <t t-set="company"
+                           t-value="res_company"
+                        />
+                    </t>
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12 justify-content-center">
+                                    <h4 class="text-center">
+                                        <span t-esc="o.template.name"/>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="row"
+                                 style="padding-top: 16px;"
+                            >
+                                <div class="col-12">
+                                    <table class="table table-sm table-bordered"
+                                           style="font-size:8pt;"
+                                    >
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Employee
+                                                </th>
+                                                <th>
+                                                    Period Start
+                                                </th>
+                                                <th>
+                                                    Period End
+                                                </th>
+                                                <th t-if="o.template.print_timestamp == True">
+                                                    Printed At
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span t-esc="o.employee.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="o.period_start"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="o.period_end"/>
+                                                </td>
+                                                <td t-if="o.template.print_timestamp == True">
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row no-gutters"
+                                 style="padding-top: 16px;"
+                            >
+                                <div class="col-12">
+                                    <table class="table table-sm table-bordered"
+                                           style="font-size:6pt;"
+                                    >
+                                        <thead style="background-color:#F7F7F9;">
+                                            <tr>
+                                                <th name="line_name"
+                                                    class="text-center"
+                                                >
+                                                    Date
+                                                </th>
+                                                <th name="line_type"
+                                                    class="text-center"
+                                                >
+                                                    Type
+                                                </th>
+                                                <th name="line_attendance_start_hour"
+                                                    class="text-center"
+                                                >
+                                                    Check-In
+                                                </th>
+                                                <th name="line_attendance_end_hour"
+                                                    class="text-center"
+                                                >
+                                                    Check-Out
+                                                </th>
+                                                <th name="line_attendance_hour_regular"
+                                                    class="text-center"
+                                                >
+                                                    Regular Hour
+                                                </th>
+                                                <th name="line_attendance_hour_on_break"
+                                                    class="text-center"
+                                                >
+                                                    Break
+                                                </th>
+                                                <th name="line_attendance_hour_overtime"
+                                                    class="text-center"
+                                                >
+                                                    Overtime
+                                                </th>
+                                                <th name="line_leave_hour"
+                                                    class="text-center"
+                                                >
+                                                    Leave
+                                                </th>
+                                                <th name="line_sick_leave_hour"
+                                                    class="text-center"
+                                                >
+                                                    Sick Leave
+                                                </th>
+                                                <th name="line_signature"
+                                                    class="text-center"
+                                                >
+                                                    Signature
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="o.line"
+                                               t-as="line"
+                                            >
+                                                <tr t-att-class="'table-active' if line.type == 'rest' else ''">
+                                                    <td name="line_name">
+                                                        <span t-esc="line['name']"/>
+                                                    </td>
+                                                    <td name="line_type"
+                                                        class="text-center"
+                                                    >
+                                                        <t t-if="line.type_custom_name">
+                                                            <span t-esc="line.type_custom_name"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span t-esc="dict(line.fields_get(allfields=['type'])['type']['selection'])[line.type]"/>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_attendance_start_hour"
+                                                        class="text-center"
+                                                    >
+                                                        <t t-if="line['attendance_start_hour']">
+                                                            <span t-esc="line['attendance_start_hour']"
+                                                                  t-options='{"widget": "float_time"}'
+                                                            />
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_attendance_end_hour"
+                                                        class="text-center"
+                                                    >
+                                                        <t t-if="line['attendance_end_hour']">
+                                                            <span t-esc="line['attendance_end_hour']"
+                                                                  t-options='{"widget": "float_time"}'
+                                                            />
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_attendance_hour_regular"
+                                                        class="text-right"
+                                                    >
+                                                        <t t-if="line['attendance_hour_regular']">
+                                                            <span t-esc="line['attendance_hour_regular']"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_attendance_hour_on_break"
+                                                        class="text-right"
+                                                    >
+                                                        <t t-if="line['attendance_hour_on_break']">
+                                                            <span t-esc="line['attendance_hour_on_break']"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_attendance_hour_overtime"
+                                                        class="text-right"
+                                                    >
+                                                        <t t-if="line['attendance_hour_overtime']">
+                                                            <span t-esc="line['attendance_hour_overtime']"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_leave_hour"
+                                                        class="text-right"
+                                                    >
+                                                        <t t-if="line.is_sick_leave == False and line.leave_hour">
+                                                            <span t-esc="line.leave_hour"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_sick_leave_hour"
+                                                        class="text-right"
+                                                    >
+                                                        <t t-if="line.is_sick_leave == True and line.leave_hour">
+                                                            <span t-esc="line.leave_hour"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span>-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td name="line_signature"
+                                                        style="min-width:10%;width:20%;"
+                                                    >
+                                                        <span style="min-width:20%;width:20%;"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row"
+                                 style="padding-top: 16px;"
+                            >
+                                <div class="col-12">
+                                    <table class="table table-sm table-bordered"
+                                           style="font-size:8pt;"
+                                    >
+                                        <thead style="background-color:#F7F7F9;">
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="o.indicator"
+                                               t-as="report_indicator"
+                                            >
+                                                <tr>
+                                                    <td>
+                                                        <span t-esc="report_indicator.indicator.name"/>
+                                                    </td>
+                                                    <td style="text-align:right;">
+                                                        <span t-field="report_indicator.value_float"/>
+                                                    </td>
+                                                    <t t-if="report_indicator.indicator_value_type == 'monetary'">
+                                                        <td style="text-align:left;">
+                                                            <span t-if="report_indicator.value_currency"
+                                                                  t-field="report_indicator.value_currency.name"
+                                                            />
+                                                        </td>
+                                                    </t>
+                                                    <t t-if="report_indicator.indicator_value_type == 'quantity'">
+                                                        <td style="text-align:left;">
+                                                            <span t-if="report_indicator.value_uom"
+                                                                  t-field="report_indicator.value_uom.name"
+                                                            />
+                                                        </td>
+                                                    </t>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table class="table table-sm table-borderless"
+                                           style="font-size:8pt;page-break-inside: avoid;width:100%;"
+                                    >
+                                        <thead/>
+                                        <tbody>
+                                            <tr>
+                                                <td style="text-align:center;">
+                                                    <div>
+                                                        <br/>
+                                                        <br/>
+                                                        <br/>
+                                                        <div>..........................................</div>
+                                                        <div>Manager signature</div>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:center;">
+                                                    <div>
+                                                        <br/>
+                                                        <br/>
+                                                        <br/>
+                                                        <div>..........................................</div>
+                                                        <div>Employee signature</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

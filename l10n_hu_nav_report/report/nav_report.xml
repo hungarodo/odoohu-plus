@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Shortcut to create report -->
+        <report
+            id="period_report"
+            model="oregional.hr.period.report"
+            string="HR Period Report"
+            report_type="qweb-pdf"
+            name="oregional_hr_base.period_report_template"
+            file="oregional_hr_base.period_report_template"
+            print_report_name="('hr_period_report_'+str(object.id or '')+'_'+time.strftime('%Y_%m_%d_%H_%M_%S')+'.pdf')"
+        />
+    </data>
+</odoo>
