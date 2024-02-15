@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="tag_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Tags</field>
+        <field name="res_model">l10n.hu.tag</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="tag_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="tag_action"
+        />
+        <field name="sequence">10</field>
+        <field name="view_id"
+               ref="tag_view_list"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="tag_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="tag_action"
+        />
+        <field name="sequence">12</field>
+        <field name="view_id"
+               ref="tag_view_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Object company rule -->
+    <record id="object_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">Hungary Object Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_object"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- Tag company rule -->
+    <record id="tag_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">Hungary Tag Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_tag"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+</odoo>

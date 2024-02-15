@@ -1,0 +1,12 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+l10n_hu_document_type_portal_access,l10n_hu.document.type.portal.access,model_l10n_hu_document_type,base.group_portal,1,0,0,0
+l10n_hu_document_type_user_access,l10n_hu.document.type.user.access,model_l10n_hu_document_type,base.group_user,1,0,0,0
+l10n_hu_document_type_manager_access,l10n_hu.document.type.manager.access,model_l10n_hu_document_type,l10n_hu_base.l10n_hu_manager_group,1,1,1,1
+l10n_hu_object_portal_access,l10n_hu.object.portal.access,model_l10n_hu_object,base.group_portal,1,0,0,0
+l10n_hu_object_user_access,l10n_hu.object.user.access,model_l10n_hu_object,base.group_user,1,0,0,0
+l10n_hu_object_manager_access,l10n_hu.object.manager.access,model_l10n_hu_object,l10n_hu_base.l10n_hu_manager_group,1,1,1,1
+l10n_hu_tag_portal_access,l10n_hu.tag.portal.access,model_l10n_hu_tag,base.group_portal,1,0,0,0
+l10n_hu_tag_user_access,l10n_hu.tag.user.access,model_l10n_hu_tag,base.group_user,1,0,0,0
+l10n_hu_tag_manager_access,l10n_hu.tag.manager.access,model_l10n_hu_tag,l10n_hu_base.l10n_hu_manager_group,1,1,1,1
+l10n_hu_wizard_access,l10n_hu.wizard.access,model_l10n_hu_wizard,l10n_hu_base.l10n_hu_manager_group,1,1,1,1
+l10n_hu_wizard_line_access,l10n_hu.wizard.line.access,model_l10n_hu_wizard_line,l10n_hu_base.l10n_hu_manager_group,1,1,1,1

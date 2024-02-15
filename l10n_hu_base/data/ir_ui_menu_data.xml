@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- HU -->
+    <record id="hu_base_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">HU</field>
+        <field name="sequence">3636</field>
+        <field name="web_icon">l10n_hu_base,static/description/l10n_hu_menu_icon.png</field>
+    </record>
+    <!-- HU > Dashboard -->
+    <record id="hu_dashboard_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Dashboard</field>
+        <field name="action"
+               ref="object_dashboard_action"
+        />
+        <field name="parent_id"
+               ref="hu_base_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
+    <!-- HU > Reporting -->
+    <record id="hu_reporting_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Reporting</field>
+        <field name="parent_id"
+               ref="hu_base_menu"
+        />
+        <field name="sequence">96</field>
+    </record>
+    <!-- HU > Reporting > Objects -->
+    <record id="hu_reporting_object_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Objects</field>
+        <field name="action"
+               ref="object_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU > Configuration -->
+    <record id="hu_configuration_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Configuration</field>
+        <field name="parent_id"
+               ref="hu_base_menu"
+        />
+        <field name="sequence">128</field>
+    </record>
+    <!-- HU > Documentation -->
+    <record id="hu_configuration_documentation_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Documentation</field>
+        <field name="action"
+               ref="documentation_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
+    <!-- HU > Configuration > Document Types -->
+    <record id="hu_document_type_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Document Types</field>
+        <field name="action"
+               ref="document_type_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU > Configuration > Tags -->
+    <record id="hu_configuration_tag_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tags</field>
+        <field name="action"
+               ref="tag_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+</odoo>

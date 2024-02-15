@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="document_type_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Document Types</field>
+        <field name="res_model">l10n.hu.document.type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="document_type_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="document_type_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="document_type_view_list"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="document_type_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="document_type_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="document_type_view_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

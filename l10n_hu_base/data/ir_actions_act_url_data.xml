@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Documentation -->
+    <record id="documentation_action"
+            model="ir.actions.act_url"
+    >
+          <field name="name">Hungary Documentation</field>
+          <field name='url'>https://oregional.atlassian.net/wiki/spaces/OOA/pages/9809035302</field>
+      </record>
+</odoo>

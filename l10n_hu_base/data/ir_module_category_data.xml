@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="l10n_hu_module_category"
+            model="ir.module.category"
+    >
+        <field name="name">Hungary</field>
+        <field name="sequence">3636</field>
+    </record>
+</odoo>
