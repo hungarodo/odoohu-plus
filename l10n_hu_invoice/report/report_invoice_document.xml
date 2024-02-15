@@ -9,7 +9,7 @@
                t-value="o.with_context({'lang':o.partner_id.lang})"
             />
             <div name="invoice_page"
-                 class="page oregional-invoice"
+                 class="page l10n-hu-invoice"
             >
                 <div name="watermark"
                      style="position:absolute;opacity:0.32;width:100%;text-align:center;top:0px;z-index:1024;"

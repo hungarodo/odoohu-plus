@@ -268,7 +268,7 @@ class L10nHuNavReport(models.Model):
 
         # adozo_adoszam_xml
         adozo_adoszam_xml = lxml.etree.Element('adoszam')
-        adozo_adoszam_raw = str(self.company.partner_id.oregional_l10n_hu_vat)
+        adozo_adoszam_raw = str(self.company.partner_id.l10n_hu_vat)
         adozo_adoszam_xml.text = adozo_adoszam_raw.replace("-", "")
         adozo_xml.append(adozo_adoszam_xml)
 
@@ -307,9 +307,9 @@ class L10nHuNavReport(models.Model):
         # collect relevant_invoices
         relevant_invoices = self.env['account.move'].sudo().search([
             ('move_type', 'in', ['in_invoice', 'in_refund']),
-            ('oregional_invoice_delivery_date', '>=', self.period_start),
-            ('oregional_invoice_delivery_date', '<=', self.period_end),
-            ('partner_id.commercial_partner_id.oregional_l10n_hu_vat', '!=', False),
+            ('l10n_hu_invoice_delivery_date', '>=', self.period_start),
+            ('l10n_hu_invoice_delivery_date', '<=', self.period_end),
+            ('partner_id.commercial_partner_id.l10n_hu_vat', '!=', False),
         ])
 
         # collect relevant_partners
@@ -322,8 +322,8 @@ class L10nHuNavReport(models.Model):
         for relevant_partner in relevant_partners:
             partner_invoices = self.env['account.move'].sudo().search([
                 ('move_type', 'in', ['in_invoice', 'in_refund']),
-                ('oregional_invoice_delivery_date', '>=', self.period_start),
-                ('oregional_invoice_delivery_date', '<=', self.period_end),
+                ('l10n_hu_invoice_delivery_date', '>=', self.period_start),
+                ('l10n_hu_invoice_delivery_date', '<=', self.period_end),
                 ('partner_id', '=', relevant_partner.id),
             ])
 
@@ -355,7 +355,7 @@ class L10nHuNavReport(models.Model):
 
             # adozo_adoszam_xml
             adozo_adoszam_xml = lxml.etree.Element('adoszam')
-            adozo_adoszam_raw = str(self.company.partner_id.oregional_l10n_hu_vat)
+            adozo_adoszam_raw = str(self.company.partner_id.l10n_hu_vat)
             adozo_adoszam_xml.text = adozo_adoszam_raw.replace("-", "")
             adozo_xml.append(adozo_adoszam_xml)
 
@@ -372,7 +372,7 @@ class L10nHuNavReport(models.Model):
             
             # albizonylatazonositas_azonosito_xml
             albizonylatazonositas_azonosito_xml = lxml.etree.Element('azonosito')
-            albizonylatazonositas_azonosito_xml.text = str(relevant_partner.oregional_l10n_hu_vat[:8])
+            albizonylatazonositas_azonosito_xml.text = str(relevant_partner.l10n_hu_vat[:8])
             albizonylatazonositas_xml.append(albizonylatazonositas_azonosito_xml)
             
             nyomtatvanyinformacio_xml.append(albizonylatazonositas_xml)
@@ -473,7 +473,7 @@ class L10nHuNavReport(models.Model):
                 mezo_vat_total_xml = lxml.etree.Element('mezo')
                 mezo_vat_total_xml_eazon = '0B0001C000' + str(invoice_index) + 'DA'
                 mezo_vat_total_xml.attrib['eazon'] = mezo_vat_total_xml_eazon
-                if partner_invoice.oregional_nav_invoice:
+                if partner_invoice.l10n_hu_invoice:
                     vat_total_nav_value = partner_invoice.l10n_hu_invoice.invoice_vat_amount_huf / 1000
                 else:
                     vat_total_nav_value = abs(partner_invoice.amount_tax_signed / 1000)
@@ -504,7 +504,7 @@ class L10nHuNavReport(models.Model):
         attachment_datas = nyomtatvanyok_xml_base64
 
         attachment_name = "2365a_"
-        attachment_name += self.company.partner_id.oregional_l10n_hu_vat
+        attachment_name += self.company.partner_id.l10n_hu_vat
         attachment_name += "_"
         attachment_name += str(fields.Datetime.now()).replace(':', '_').replace(' ', '_')
         attachment_name += ".xml"

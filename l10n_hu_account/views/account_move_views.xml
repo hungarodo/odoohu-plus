@@ -22,45 +22,32 @@
                     <field name="l10n_hu_vat_date"
                            attrs="{
                                'invisible': [
-                                   '|',
-                                   ('oregional_is_invoice', '=', False),
-                                   ('oregional_journal_technical_type', '=', 'proforma'),
+                                   ('l10n_hu_journal_technical_type', '=', 'proforma'),
                                ],
                            }"
                            string="VAT Date"
                     />
-                    <label name="oregional_oss_label"
-                           attrs="{
-                               'invisible': [
-                                   ('oregional_is_invoice', '=', False),
-                               ],
-                           }"
-                           for="oregional_eu_oss_eligible"
+                    <label name="l10n_hu_oss_label"
+                           for="l10n_hu_eu_oss_eligible"
                            string="EU OSS"
                     />
-                    <div name="oregional_eu_oss_div"
-                         attrs="{
-                             'invisible': [
-                                 ('oregional_is_invoice', '=', False),
-                             ],
-                         }"
-                    >
-                        <div name="oregional_eu_oss_eligible">
-                            <field name="oregional_eu_oss_eligible"
+                    <div name="l10n_hu_eu_oss_div">
+                        <div name="l10n_hu_eu_oss_eligible">
+                            <field name="l10n_hu_eu_oss_eligible"
                                    class="mr-1"
                                    force_save="1"
                                    readonly="1"
                             />
                             <span>Eligible</span>
                         </div>
-                        <div name="oregional_eu_oss_enabled"
+                        <div name="l10n_hu_eu_oss_enabled"
                              attrs="{
                                  'invisible': [
-                                     ('oregional_eu_oss_eligible', '=', False),
+                                     ('l10n_hu_eu_oss_eligible', '=', False),
                                  ],
                              }"
                         >
-                            <field name="oregional_eu_oss_enabled"
+                            <field name="l10n_hu_eu_oss_enabled"
                                    class="mr-1"
                                    attrs="{
                                        'readonly': [
@@ -70,11 +57,10 @@
                             />
                             <span>Enabled</span>
                         </div>
-                        <button name="action_oregional_update_eu_oss"
+                        <button name="action_l10n_hu_update_eu_oss"
                                 attrs="{'invisible': [
-                                    '|', '|',
+                                    '|',
                                     ('id', '=', False),
-                                    ('oregional_is_invoice', '=', False),
                                     ('state', '!=', 'draft'),
                                 ]}"
                                 class="btn-link btn-block pull-start"
@@ -87,7 +73,7 @@
                            options="{'no_create': True,}"
                     />
                     <field name="l10n_hu_fiscal_representative_bank_account"
-                           domain="[('partner_id', '=', oregional_fiscal_representative)]"
+                           domain="[('partner_id', '=', l10n_hu_fiscal_representative)]"
                            options="{'no_create': True,}"
                     />
                     <!-- Technical -->

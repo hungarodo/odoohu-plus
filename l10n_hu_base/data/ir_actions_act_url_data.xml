@@ -5,6 +5,6 @@
             model="ir.actions.act_url"
     >
           <field name="name">Hungary Documentation</field>
-          <field name='url'>https://oregional.atlassian.net/wiki/spaces/OOA/pages/9809035302</field>
+          <field name='url'>https://hungarodo.atlassian.net/wiki/spaces/ODOOHU</field>
       </record>
 </odoo>

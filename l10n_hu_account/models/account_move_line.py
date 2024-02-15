@@ -39,11 +39,11 @@ class L10nHuAccountInvoiceAccountMoveLine(models.Model):
     )
     
     # Compute and search fields, in the same order of field declarations
-    def _compute_oregional_is_price_refund(self):
+    def _compute_l10n_hu_is_price_refund(self):
         for record in self:
             is_price_refund = False
             """ NOTE: rewrite to new analytic plan
-            refund_price_tag = record.move_id.journal_id.oregional_invoice_refund_price_tag
+            refund_price_tag = record.move_id.journal_id.l10n_hu_invoice_refund_price_tag
             if refund_price_tag and record.analytic_tag_ids:
                 for tag in record.analytic_tag_ids:
                     if tag == refund_price_tag:
@@ -52,7 +52,7 @@ class L10nHuAccountInvoiceAccountMoveLine(models.Model):
                     else:
                         pass
             """
-            record.oregional_is_price_refund = is_price_refund
+            record.l10n_hu_is_price_refund = is_price_refund
 
     # Constraints and onchanges
 

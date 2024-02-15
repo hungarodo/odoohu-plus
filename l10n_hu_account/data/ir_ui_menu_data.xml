@@ -42,7 +42,7 @@
     >
         <field name="name">Payment Methods</field>
         <field name="action"
-               ref="oregional_account_base.payment_method_action"
+               ref="l10n_hu_base.payment_method_action"
         />
         <field name="parent_id"
                ref="hu_configuration_accounting_menu"

@@ -166,7 +166,7 @@ class L10nHuNavReportTemplate(models.Model):
     # Compute and search fields, in the same order of field declarations
     def _compute_element_count(self):
         for record in self:
-            record.element_count = self.env['oregional.nav.report.element'].search_count([
+            record.element_count = self.env['l10n.hu.nav.report.element'].search_count([
                 ('template', '=', record.id),
             ])
 

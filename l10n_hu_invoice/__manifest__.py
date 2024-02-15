@@ -49,6 +49,6 @@
     'qweb': [],
     'summary': "Hungarian invoicing improvements",
     'test': [],
-    'version': "1.0.10",
-    'website': "https://www.oregional.hu/odoo",
+    'version': "1.0.11",
+    'website': "https://www.hungarodo.hu/odoohu",
 }

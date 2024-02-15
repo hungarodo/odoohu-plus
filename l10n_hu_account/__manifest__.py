@@ -34,6 +34,6 @@
     'qweb': [],
     'summary': "Hungarian accounting improvements",
     'test': [],
-    'version': "1.0.10",
+    'version': "1.0.13",
     'website': "https://wwww.hungarodo.hu/odoohu"
 }

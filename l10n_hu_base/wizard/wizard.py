@@ -203,23 +203,23 @@ class L10nHuBaseWizard(models.TransientModel):
             # # DELETE
             if self.action_type == 'partner' \
                     and self.action_partner == 'delete':
-                operation_result = partner.oregional_manage_partner({'operation': 'delete'})
+                operation_result = partner.l10n_hu_manage_partner({'operation': 'delete'})
             # # DOWNLOAD
             elif self.action_type == 'partner' \
                     and self.action_partner == 'download':
-                operation_result = partner.oregional_manage_partner({'operation': 'download'})
+                operation_result = partner.l10n_hu_manage_partner({'operation': 'download'})
             # # UPLOAD
             elif self.action_type == 'partner' \
                     and self.action_partner == 'upload':
-                operation_result = partner.oregional_manage_partner({'operation': 'upload'})
+                operation_result = partner.l10n_hu_manage_partner({'operation': 'upload'})
             # # PULL DATA
             elif self.action_type == 'partner' \
                     and self.action_partner == 'pull':
-                operation_result = partner.oregional_manage_partner({'operation': 'pull'})
+                operation_result = partner.l10n_hu_manage_partner({'operation': 'pull'})
             # # PUSH DATA
             elif self.action_type == 'partner' \
                     and self.action_partner == 'push':
-                operation_result = partner.oregional_manage_partner({'operation': 'push'})
+                operation_result = partner.l10n_hu_manage_partner({'operation': 'push'})
             else:
                 operation_result = {}
 

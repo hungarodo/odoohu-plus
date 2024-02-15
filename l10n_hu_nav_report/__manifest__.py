@@ -40,6 +40,6 @@
     'price': 0,
     'qweb': [],
     'summary': "Hungary NAV reporting",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'website': "https://hungarodo.hu/odoohu",
 }
