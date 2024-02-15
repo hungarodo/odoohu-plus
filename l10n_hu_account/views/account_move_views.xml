@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit - customer invoice -->
+    <record id="view_move_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.move.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_move_form"
+        />
+        <field name="model">account.move</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add more Oregional fields -->
+            <xpath expr="//group[@name='accounting_info_group']"
+                   position="after"
+            >
+                <group name="l10n_hu"
+                       string="HU"
+                >
+                    <field name="l10n_hu_vat_date"
+                           attrs="{
+                               'invisible': [
+                                   '|',
+                                   ('oregional_is_invoice', '=', False),
+                                   ('oregional_journal_technical_type', '=', 'proforma'),
+                               ],
+                           }"
+                           string="VAT Date"
+                    />
+                    <label name="oregional_oss_label"
+                           attrs="{
+                               'invisible': [
+                                   ('oregional_is_invoice', '=', False),
+                               ],
+                           }"
+                           for="oregional_eu_oss_eligible"
+                           string="EU OSS"
+                    />
+                    <div name="oregional_eu_oss_div"
+                         attrs="{
+                             'invisible': [
+                                 ('oregional_is_invoice', '=', False),
+                             ],
+                         }"
+                    >
+                        <div name="oregional_eu_oss_eligible">
+                            <field name="oregional_eu_oss_eligible"
+                                   class="mr-1"
+                                   force_save="1"
+                                   readonly="1"
+                            />
+                            <span>Eligible</span>
+                        </div>
+                        <div name="oregional_eu_oss_enabled"
+                             attrs="{
+                                 'invisible': [
+                                     ('oregional_eu_oss_eligible', '=', False),
+                                 ],
+                             }"
+                        >
+                            <field name="oregional_eu_oss_enabled"
+                                   class="mr-1"
+                                   attrs="{
+                                       'readonly': [
+                                           ('state', '!=', 'draft'),
+                                       ],
+                                   }"
+                            />
+                            <span>Enabled</span>
+                        </div>
+                        <button name="action_oregional_update_eu_oss"
+                                attrs="{'invisible': [
+                                    '|', '|',
+                                    ('id', '=', False),
+                                    ('oregional_is_invoice', '=', False),
+                                    ('state', '!=', 'draft'),
+                                ]}"
+                                class="btn-link btn-block pull-start"
+                                icon="fa-refresh"
+                                string="Refresh"
+                                type="object"
+                        />
+                    </div>
+                    <field name="l10n_hu_fiscal_representative"
+                           options="{'no_create': True,}"
+                    />
+                    <field name="l10n_hu_fiscal_representative_bank_account"
+                           domain="[('partner_id', '=', oregional_fiscal_representative)]"
+                           options="{'no_create': True,}"
+                    />
+                    <!-- Technical -->
+                    <field name="l10n_hu_journal_type"
+                           invisible="1"
+                           string="Journal Type"
+                    />
+                    <field name="l10n_hu_journal_technical_type"
+                           invisible="1"
+                           string="Journal Technical Type"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

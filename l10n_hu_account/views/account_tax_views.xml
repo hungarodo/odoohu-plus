@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_tax_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.tax.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_tax_form"
+        />
+        <field name="model">account.tax</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <xpath expr="//field[@name='country_id']"
+                   position="after"
+            >
+                <label name="l10n_hu_actions_label"
+                       class="o_form_label"
+                       for="action_l10n_hu_update_configuration"
+                       groups="account.group_account_manager"
+                       string="HU Actions"
+                />
+                <div name="l10n_hu_actions_div"
+                     groups="account.group_account_manager"
+                >
+                    <button name="action_l10n_hu_update_configuration"
+                            class="btn-link btn-sm"
+                            icon="fa-bolt"
+                            string="Update Configuration"
+                            type="object"
+                    />
+                </div>
+                <field name="l10n_hu_vat_type"/>
+                <field name="l10n_hu_vat_exemption_case"/>
+                <field name="l10n_hu_vat_out_of_scope_case"/>
+                <field name="l10n_hu_vat_reason"/>
+                <field name="l10n_hu_vat_amount_mismatch_case"/>
+                <field name="l10n_hu_technical_name"
+                       groups="account.group_account_manager"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

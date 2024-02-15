@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_account_position_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.account.position.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_account_position_form"
+        />
+        <field name="model">account.fiscal.position</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add fields -->
+            <xpath expr="//field[@name='auto_apply']"
+                   position="after"
+            >
+                <field name="l10n_hu_vat_status"/>
+                <field name="l10n_hu_incorporation"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

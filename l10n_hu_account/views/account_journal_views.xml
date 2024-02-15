@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_account_journal_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.account.journal.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_account_journal_form"
+        />
+        <field name="model">account.journal</field>
+        <field name="priority">24</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add l10n_hu page and fields -->
+            <xpath expr="//page[@name='advanced_settings']"
+                   position="after"
+            >
+                <page name="l10n_hu"
+                      string="Hungary"
+                >
+                    <group name="l10n_hu_1">
+                        <group name="l10n_hu_1_1">
+                            <field name="l10n_hu_document_type"
+                                   options="{'no_create': True, 'no_open': True,}"
+                                   string="Document Types"
+                                   widget="many2many_tags"
+                            />
+                        </group>
+                        <group name="l10n_hu_1_2">
+                            <field name="l10n_hu_currency_rate_inverse"
+                                   widget="boolean_toggle"
+                            />
+                        </group>
+                    </group>
+                    <group name="l10n_hu_2">
+                        <group name="l10n_hu_2_1">
+                            <field name="l10n_hu_eu_oss_enabled"
+                                   string="EU OSS Enabled"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_show_print_pdf"
+                                   groups="account.group_account_manager"
+                                   string="Show Print PDF"
+                                   widget="boolean_toggle"
+                            />
+                        </group>
+                        <group name="l10n_hu_2_2">
+                            <field name="l10n_hu_technical_type"
+                                   groups="account.group_account_manager"
+                                   string="Technical Type"
+                                   widget="selection"
+                            />
+                            <field name="l10n_hu_proforma_advance_journal"
+                                   domain="[
+                                       ('l10n_hu_technical_type', '=', 'invoice'),
+                                       ('type', '=', 'sale'),
+                                   ]"
+                                   groups="account.group_account_manager"
+                                   options="{'no_create': True}"
+                                   string="Proforma Advance Journal"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

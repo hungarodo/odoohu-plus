@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- HU > Configuration > Accounting -->
+    <record id="hu_configuration_accounting_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Accounting</field>
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_configuration_menu"
+        />
+        <field name="sequence">40</field>
+    </record>
+    <!-- HU > Configuration > Accounting > Account Journals -->
+    <record id="hu_configuration_accounting_account_journal_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Account Journals</field>
+        <field name="action"
+               ref="account_journal_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU > Configuration > Accounting > Fiscal Positions -->
+    <record id="hu_configuration_accounting_fiscal_position_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Fiscal Positions</field>
+        <field name="action"
+               ref="account.action_account_fiscal_position_form"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">24</field>
+    </record>
+    <!-- HU > Configuration > Accounting > Payment Methods -->
+    <record id="hu_configuration_accounting_payment_method_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Payment Methods</field>
+        <field name="action"
+               ref="oregional_account_base.payment_method_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU > Configuration > Accounting > Payment Terms -->
+    <record id="hu_configuration_accounting_payment_term_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Payment Terms</field>
+        <field name="action"
+               ref="account.action_payment_term_form"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">40</field>
+    </record>
+    <!-- HU > Configuration > Accounting > Taxes -->
+    <record id="hu_configuration_accounting_tax_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Taxes</field>
+        <field name="action"
+               ref="account.action_tax_form"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">48</field>
+    </record>
+</odoo>

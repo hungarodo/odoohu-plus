@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- List view -->
+    <record id="account_move_line_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.move.line.view.list</field>
+        <field name="model">account.move.line</field>
+        <field name="priority">32</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree string="Line">
+                <field name="move_id"/>
+                <field name="name"/>
+                <field name="account_id"
+                       groups="account.group_account_user"
+                />
+                <field name="quantity"/>
+                <field name="product_uom_id"
+                       groups="uom.group_uom"
+                />
+                <field name="price_unit"/>
+                <field name="discount"
+                       groups="base.group_no_one"
+                />
+                <field name="price_subtotal"
+                       groups="account.group_show_line_subtotals_tax_excluded"
+                />
+                <field name="price_total"
+                       groups="account.group_show_line_subtotals_tax_included"
+                />
+                <field name="currency_id"
+                       invisible="1"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view readonly -->
+    <record id="account_move_line_view_list_readonly"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.invoice.account.move.line.view.list.readonly</field>
+        <field name="model">account.move.line</field>
+        <field name="priority">40</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+                  string="Line"
+            >
+                <field name="move_id"/>
+                <field name="name"/>
+                <field name="account_id"
+                       groups="account.group_account_user"
+                />
+                <field name="quantity"/>
+                <field name="product_uom_id"
+                       groups="uom.group_uom"
+                />
+                <field name="price_unit"/>
+                <field name="discount"
+                       groups="base.group_no_one"
+                />
+                <field name="price_subtotal"
+                       groups="account.group_show_line_subtotals_tax_excluded"
+                />
+                <field name="price_total"
+                       groups="account.group_show_line_subtotals_tax_included"
+                />
+                <field name="currency_id"
+                       invisible="1"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>
