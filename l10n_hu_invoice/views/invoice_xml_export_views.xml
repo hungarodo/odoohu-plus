@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="invoice_xml_export_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.xml.export.view.form</field>
+        <field name="model">l10n.hu.invoice.xml.export</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  edit="0"
+            >
+                <header>
+                    <field name="status"
+                           widget="statusbar"
+                    />
+                </header>
+                <sheet>
+                    <div name="export_header_name">
+                        <h2>
+                            <field name="display_name"/>
+                        </h2>
+                    </div>
+                    <group name="export_header_data">
+                        <group>
+                            <field name="export_date"
+                                   readonly="1"
+                            />
+                            <field name="export_invoice_count"
+                                   readonly="1"
+                            />
+                        </group>
+                        <group>
+                            <div name="export_done_download"
+                                 attrs="{'invisible': [('status', '!=', 'export_done')]}"
+                                 class="card bg-success"
+                                 colspan="2"
+                            >
+                                <div class="card-header">
+                                    <i class="fa fa-download"/> Download
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                       <field name="xml_file_name"
+                                               invisible="1"
+                                        />
+                                        <field name="xml_data"
+                                               readonly="1"
+                                               filename="xml_file_name"
+                                        />
+                                    </p>
+                                </div>
+                            </div>
+                            <div name="export_empty_warning"
+                                 attrs="{'invisible': [('status', '!=', 'export_empty')]}"
+                                 class="card text-white bg-warning"
+                                 colspan="2"
+                            >
+                                <div class="card-header">
+                                    <i class="fa fa-exclamation-triangle"/> Warning
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                       XML file is not generated because no invoices found for search filter.
+                                    </p>
+                                </div>
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group name="details">
+                                <group>
+                                    <field name="filter_by"
+                                           readonly="1"
+                                    />
+                                    <field name="invoice_type"
+                                           readonly="1"
+                                    />
+                                    <field name="journal"
+                                           options="{'no_create_edit': True, 'no_quick_create': True}"
+                                           readonly="1"
+                                           widget="many2many_tags"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="date_start"
+                                           readonly="1"
+                                    />
+                                    <field name="date_end"
+                                           readonly="1"
+                                    />
+                                    <field name="invoice_number_start"
+                                           readonly="1"
+                                    />
+                                    <field name="invoice_number_end"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="audit">
+                                <group>
+                                    <field name="id"/>
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="invoice_xml_export_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.xml.export.view.list</field>
+        <field name="model">l10n.hu.invoice.xml.export</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="display_name"/>
+                <field name="status"/>
+                <field name="export_date"/>
+                <field name="export_invoice_count"/>
+                <field name="filter_by"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="invoice_number_start"/>
+                <field name="invoice_number_end"/>
+                <field name="create_uid"
+                       optional="hide"
+                />
+                <field name="create_date"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>

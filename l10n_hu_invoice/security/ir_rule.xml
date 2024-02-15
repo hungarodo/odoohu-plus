@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- HU invoice company rule -->
+    <record id="invoice_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- HU invoice line company rule -->
+    <record id="invoice_line_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice Line Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice_line"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- HU invoice link company rule -->
+    <record id="invoice_link_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice Link Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice_link"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- HU invoice log company rule -->
+    <record id="invoice_log_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice Log Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice_log"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- HU invoice product fee company rule -->
+    <record id="invoice_product_fee_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice Product Fee Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice_product_fee"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- HU invoice summary company rule -->
+    <record id="invoice_summary_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice Summary Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice_summary"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+    <!-- HU invoice xml export company rule -->
+    <record id="invoice_xml_export_company_rule"
+            model="ir.rule"
+    >
+        <field name="name">HU Invoice XML Export Company</field>
+        <field name="domain_force">['|', ('company', '=', False), ('company', 'in', company_ids)]</field>
+        <field name="model_id"
+               ref="model_l10n_hu_invoice_xml_export"
+        />
+        <field name="global"
+               eval="True"
+        />
+    </record>
+</odoo>

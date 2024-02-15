@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="invoice_link_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.link.view.form</field>
+        <field name="model">l10n.hu.invoice.link</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <button name="toggle_active"
+                                class="oe_stat_button"
+                                type="object"
+                        >
+                            <field name="active"
+                                   widget="boolean_toggle"
+                            />
+                            <span class="o_stat_text">Active</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                            bg_color="bg-danger"
+                            title="Archived"
+                    />
+                    <group name="base_info">
+                        <group>
+                            <field name="link_type"/>
+                        </group>
+                        <group>
+                            <field name="priority"/>
+                        </group>
+                    </group>
+                    <group name="task">
+                        <group>
+                            <field name="link_from_invoice"/>
+                            <field name="link_from_name"/>
+                        </group>
+                        <group>
+                            <field name="link_to_invoice"/>
+                            <field name="link_to_name"/>
+                        </group>
+                    </group>
+                    <notebook name="notebook">
+                        <page name="audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                              string="Audit"
+                        >
+                            <group name="audit">
+                                <group name="id_company">
+                                    <field name="id"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="create_write">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="invoice_link_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.link.view.list</field>
+        <field name="model">l10n.hu.invoice.link</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="1"
+                  edit="0"
+            >
+                <field name="priority"
+                       widget="handle"
+                />
+                <field name="link_type"
+                       invisible="1"
+                />
+                <field name="link_from_name"/>
+                <button name="action_view_link_from_invoice"
+                        class="fa fa-folder-open btn-secondary pull-right"
+                        string="View"
+                        type="object"
+                />
+                <field name="link_from_invoice"/>
+                <field name="link_to_name"/>
+                <button name="action_view_link_to_invoice"
+                        class="fa fa-folder-open btn-secondary pull-right"
+                        string="View"
+                        type="object"
+                />
+                <field name="link_to_invoice"/>
+            </tree>
+        </field>
+    </record>
+    <!-- List view incoming -->
+    <record id="invoice_link_view_list_incoming"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.link.view.list.incoming</field>
+        <field name="model">l10n.hu.invoice.link</field>
+        <field name="priority">32</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="priority"
+                       widget="handle"
+                />
+                <field name="link_type"
+                       invisible="1"
+                />
+                <field name="link_from_invoice"/>
+                <field name="link_from_name"/>
+                <field name="link_to_invoice"
+                       invisible="1"
+                />
+                <field name="link_to_name"
+                       invisible="1"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view outgoing -->
+    <record id="invoice_link_view_list_outgoing"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.link.view.list.outgoing</field>
+        <field name="model">l10n.hu.invoice.link</field>
+        <field name="priority">32</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="priority"
+                       widget="handle"
+                />
+                <field name="link_type"
+                       invisible="1"
+                />
+                <field name="link_from_invoice"
+                       invisible="1"
+                />
+                <field name="link_from_name"
+                       invisible="1"
+                />
+                <field name="link_to_invoice"/>
+                <field name="link_to_name"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="invoice_link_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.link.view.search</field>
+        <field name="model">l10n.hu.invoice.link</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="link_type"/>
+                <field name="link_from_invoice"/>
+                <field name="link_from_name"/>
+                <field name="link_to_invoice"/>
+                <field name="link_to_name"/>
+                <separator/>
+                <filter name="link_type_group_by"
+                        context="{'group_by': 'link_type'}"
+                        string="Link Type"
+                />
+                <filter name="link_from_invoice_group_by"
+                        context="{'group_by': 'link_from_invoice'}"
+                        string="Link From Invoice"
+                />
+                <filter name="link_to_invoice_group_by"
+                        context="{'group_by': 'link_to_invoice'}"
+                        string="Link To Invoice"
+                />
+            </search>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,1015 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="invoice_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.view.form</field>
+        <field name="model">l10n.hu.invoice</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <header>
+                    <button name="action_push_to_account_move"
+                            attrs="{'invisible': [
+                                ('id', '=', False),
+                            ]}"
+                            class="oe_read_only"
+                            groups="account.group_account_invoice"
+                            icon="fa-arrow-left"
+                            string="Push To Account Move"
+                            type="object"
+                    />
+                    <button name="action_pull_from_account_move"
+                            attrs="{'invisible': [
+                                ('id', '=', False),
+                            ]}"
+                            class="oe_read_only"
+                            groups="account.group_account_invoice"
+                            icon="fa-arrow-right"
+                            string="Pull From Account Move"
+                            type="object"
+                    />
+                </header>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <span class="float-start">
+                            <field name="invoice_status"
+                                   class="p-3 fw-bolder text-uppercase"
+                                   readonly="1"
+                            />
+                        </span>
+                        <button name="action_file_json"
+                                class="bg-primary oe_stat_button text-white"
+                                groups="account.group_account_invoice"
+                                icon="fa-file-code-o"
+                                invisible="1"
+                                string="JSON"
+                                type="object"
+                        />
+                        <button name="action_file_pdf"
+                                class="bg-primary oe_stat_button text-white"
+                                groups="account.group_account_invoice"
+                                icon="fa-file-pdf-o"
+                                string="PDF"
+                                type="object"
+                        />
+                        <button name="action_file_xml"
+                                class="bg-primary oe_stat_button text-white"
+                                groups="account.group_account_invoice"
+                                icon="fa-file-code-o"
+                                invisible="1"
+                                string="XML"
+                                type="object"
+                        />
+                        <button name="action_file_zip"
+                                class="bg-primary oe_stat_button text-white"
+                                groups="account.group_account_invoice"
+                                icon="fa-file-zip-o"
+                                invisible="1"
+                                string="ZIP"
+                                type="object"
+                        />
+                        <button name="action_list_invoice_logs"
+                                attrs="{'invisible': [
+                                    '|',
+                                    ('id', '=', False),
+                                    ('invoice_log_count', '=', 0),
+                                ]}"
+                                class="oe_stat_button"
+                                icon="fa-history"
+                                type="object"
+                        >
+                            <field name="invoice_log_count"
+                                   modifiers="{'readonly': true}"
+                                   string="Log"
+                                   widget="statinfo"
+                            />
+                        </button>
+                    </div>
+                    <group name="base_info">
+                        <group>
+                            <field name="invoice_number"/>
+                            <field name="document_type"/>
+                            <field name="supplier"/>
+                            <field name="customer"/>
+                        </group>
+                        <group>
+                            <field name="account_move"/>
+                            <field name="account_move_status"/>
+                            <field name="account_move_type"/>
+                            <field name="account_journal"/>
+                        </group>
+                    </group>
+                    <notebook name="base_notebook"
+                              readonly="1"
+                    >
+                        <page name="invoice_detail"
+                              string="Invoice Detail"
+                        >
+                            <group>
+                                <group>
+                                    <field name="invoice_issue_date"
+                                           string="Issue Date"
+                                    />
+                                    <field name="invoice_delivery_date"
+                                           string="Delivery Date"
+                                    />
+                                    <field name="periodical_delivery"/>
+                                    <field name="invoice_delivery_period_start"
+                                           attrs="{'invisible': [('periodical_delivery', '=', False)]}"
+                                           string="Delivery Period Start"
+                                    />
+                                    <field name="invoice_delivery_period_end"
+                                           attrs="{'invisible': [('periodical_delivery', '=', False)]}"
+                                           string="Delivery Period End"
+                                    />
+                                    <field name="invoice_accounting_delivery_date"
+                                           string="Accounting Delivery Date"
+                                    />
+                                    <field name="payment_date"/>
+                                    <field name="invoice_appearance"
+                                           string="Appearance"
+                                    />
+                                    <field name="invoice_direction"
+                                           string="Direction"
+                                    />
+                                    <field name="payment_method"/>
+                                    <field name="payment_term"/>
+                                    <field name="cash_accounting"
+                                           string="Cash Accounting"
+                                    />
+                                    <field name="self_billing"
+                                           string="Self Billing"
+                                    />
+                                    <field name="small_business"
+                                           string="Small Business"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="currency"/>
+                                    <field name="currency_code"/>
+                                    <field name="company_currency_name"
+                                           string="Company Currency"
+                                    />
+                                    <field name="currency_rate"
+                                           string="Currency Rate"
+                                    />
+                                    <field name="currency_rate_amount"
+                                           string="Rate Amount"
+                                    />
+                                    <field name="currency_rate_date"
+                                           string="Rate Date"
+                                    />
+                                    <field name="currency_rate_huf"
+                                           string="Rate HUF"
+                                    />
+                                    <field name="currency_rate_huf_amount"
+                                           string="Rate HUF Amount"
+                                    />
+                                    <field name="currency_rate_huf_date"
+                                           string="Rate HUF Date"
+                                    />
+                                    <field name="exchange_rate"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="invoice_category"
+                                           string="NAV Category"
+                                    />
+                                    <field name="invoice_operation"
+                                           string="NAV Operation"
+                                    />
+                                    <field name="invoice_type"
+                                           string="NAV Type"
+                                    />
+                                    <field name="eu_oss_eligible"
+                                           string="EU OSS Eligible"
+                                    />
+                                    <field name="eu_oss_enabled"
+                                           string="EU OSS Enabled"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="fiscal_position"/>
+                                    <field name="fiscal_position_name"/>
+                                    <field name="original_account_move"
+                                           attrs="{'invisible': [('invoice_operation', 'not in', ['modify', 'storno'])]}"
+                                    />
+                                    <field name="original_invoice"
+                                           attrs="{'invisible': [('invoice_operation', 'not in', ['modify', 'storno'])]}"
+                                           string="Original NAV Invoice"
+                                    />
+                                    <field name="original_invoice_number"
+                                           attrs="{'invisible': [('invoice_operation', 'not in', ['modify', 'storno'])]}"
+                                    />
+                                    <field name="modification_index"
+                                           attrs="{'invisible': [('invoice_operation', 'not in', ['modify', 'storno'])]}"
+                                    />
+                                    <field name="modify_without_master"
+                                           attrs="{'invisible': [('invoice_operation', '!=', 'modify')]}"
+                                    />
+                                    <field name="additional_invoice_data"
+                                           string="Additional Data"
+                                    />
+                                </group>
+                            </group>
+                            <group>
+                                <field name="comment"/>
+                            </group>
+                        </page>
+                        <page name="supplier"
+                              string="Supplier"
+                        >
+                            <group>
+                                <group>
+                                    <field name="supplier_name"
+                                           string="Name"
+                                    />
+                                    <field name="supplier_vat_status"
+                                           string="VAT Status"
+                                    />
+                                    <field name="supplier_incorporation"
+                                           string="NAV Incorporation"
+                                    />
+                                    <field name="supplier_tax_number"
+                                           string="Tax Number"
+                                    />
+                                    <field name="supplier_community_vat_number"
+                                           string="Community VAT Number"
+                                    />
+                                    <!--field name="supplier_vat_group"
+                                           string="VAT Group"
+                                    />
+                                    <field name="supplier_vat_group_number"
+                                           string="VAT Group Number"
+                                    />
+                                    <field name="supplier_vat_group_member_number"
+                                           string="VAT Group Member Number"
+                                    /-->
+                                    <field name="supplier_bank_account"
+                                           string="Bank Account"
+                                    />
+                                    <field name="supplier_bank_account_number"
+                                           string="Bank Account Number"
+                                    />
+                                    <field name="supplier_excise_license_number"
+                                           string="Excise License Number"
+                                    />
+                                    <field name="supplier_is_self_employed"
+                                           string="Self-Employed"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="supplier_self_employed_name"
+                                           string="Self-Employed Name"
+                                    />
+                                    <field name="supplier_self_employed_number"
+                                           string="Self-Employed Number"
+                                    />
+                                    <field name="supplier_is_individual_exemption"
+                                           string="Individual Exemption"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="supplier_is_vat_reverse_charge"
+                                           string="Reverse Charge"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="supplier_address_type"
+                                           string="Address Type"
+                                    />
+                                    <field name="supplier_address_country"
+                                           string="Country"
+                                    />
+                                    <field name="supplier_address_country_code"
+                                           string="Country Code"
+                                    />
+                                    <field name="supplier_address_country_name"
+                                           string="Country Name"
+                                    />
+                                    <field name="supplier_address_country_state_code"
+                                           string="State Code"
+                                    />
+                                    <field name="supplier_address_country_state_name"
+                                           string="State Name"
+                                    />
+                                    <field name="supplier_address_postal_code"
+                                           string="Postal Code"
+                                    />
+                                    <field name="supplier_address_settlement"
+                                           string="Settlement"
+                                    />
+                                    <field name="supplier_address_district"
+                                           string="District"
+                                    />
+                                    <field name="supplier_address_street"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'simple')]}"
+                                           string="Street"
+                                    />
+                                    <field name="supplier_address_street2"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'simple')]}"
+                                           string="Street2"
+                                    />
+                                    <field name="supplier_address_public_place_name"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Public Place Name"
+                                    />
+                                    <field name="supplier_address_public_place_type"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Public Place Type"
+                                    />
+                                    <field name="supplier_address_house_number"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="House Number"
+                                    />
+                                    <field name="supplier_address_building"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Building"
+                                    />
+                                    <field name="supplier_address_staircase"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Staircase"
+                                    />
+                                    <field name="supplier_address_floor"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Floor"
+                                    />
+                                    <field name="supplier_address_door"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Door"
+                                    />
+                                    <field name="supplier_address_lot_number"
+                                           attrs="{'invisible': [('supplier_address_type', '!=', 'detailed')]}"
+                                           string="Lot Number"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="customer"
+                              string="Customer"
+                        >
+                            <group>
+                                <group>
+                                    <field name="customer_name"
+                                           string="Name"
+                                    />
+                                    <field name="customer_vat_status"
+                                           string="NAV VAT Status"
+                                    />
+                                    <field name="customer_incorporation"
+                                           string="NAV Incorporation"
+                                    />
+                                    <field name="customer_tax_number"
+                                           string="Tax Number"
+                                    />
+                                    <!--field name="customer_vat_group"
+                                           string="VAT Group"
+                                    />
+                                    <field name="customer_vat_group_number"
+                                           string="VAT Group Number"
+                                    />
+                                    <field name="customer_vat_group_member_number"
+                                           string="VAT Group Member Number"
+                                    /-->
+                                    <field name="customer_community_vat_number"
+                                           string="Community VAT Number"
+                                    />
+                                    <field name="customer_third_state_tax_id"
+                                           string="Third State Tax ID"
+                                    />
+                                    <field name="customer_fiscal_position"
+                                           string="Fiscal Position"
+                                    />
+                                    <field name="customer_fiscal_position_name"
+                                           string="Fiscal Position Name"
+                                    />
+                                    <field name="customer_bank_account"
+                                           string="Bank Account"
+                                    />
+                                    <field name="customer_bank_account_number"
+                                           string="Bank Account Number"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="customer_address_type"
+                                           string="Address Type"
+                                    />
+                                    <field name="customer_address_country"
+                                           string="Country"
+                                    />
+                                    <field name="customer_address_country_code"
+                                           string="Country Code"
+                                    />
+                                    <field name="customer_address_country_name"
+                                           string="Country Name"
+                                    />
+                                    <field name="customer_address_country_state_code"
+                                           string="State Code"
+                                    />
+                                    <field name="customer_address_country_state_name"
+                                           string="State Name"
+                                    />
+                                    <field name="customer_address_postal_code"
+                                           string="Postal Code"
+                                    />
+                                    <field name="customer_address_settlement"
+                                           string="Settlement"
+                                    />
+                                    <field name="customer_address_district"
+                                           string="District"
+                                    />
+                                    <field name="customer_address_street"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'simple')]}"
+                                           string="Street"
+                                    />
+                                    <field name="customer_address_street2"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'simple')]}"
+                                           string="Street2"
+                                    />
+                                    <field name="customer_address_public_place_name"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Public Place Name"
+                                    />
+                                    <field name="customer_address_public_place_type"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Public Place Type"
+                                    />
+                                    <field name="customer_address_house_number"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="House Number"
+                                    />
+                                    <field name="customer_address_building"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Building"
+                                    />
+                                    <field name="customer_address_staircase"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Staircase"
+                                    />
+                                    <field name="customer_address_floor"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Floor"
+                                    />
+                                    <field name="customer_address_door"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Door"
+                                    />
+                                    <field name="customer_address_lot_number"
+                                           attrs="{'invisible': [('customer_address_type', '!=', 'detailed')]}"
+                                           string="Lot Number"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="fiscal_representative"
+                              string="Fiscal Representative"
+                        >
+                            <group>
+                                <group>
+                                    <field name="fiscal_representative"/>
+                                    <field name="fiscal_representative_name"
+                                           string="Name"
+                                    />
+                                    <field name="fiscal_representative_tax_number"
+                                           string="Tax Number"
+                                    />
+                                    <!--field name="fiscal_representative_vat_group"
+                                           string="VAT Group"
+                                    />
+                                    <field name="fiscal_representative_vat_group_number"
+                                           string="VAT Group Number"
+                                    /-->
+                                    <field name="fiscal_representative_bank_account"
+                                           string="Bank Account"
+                                    />
+                                    <field name="fiscal_representative_bank_account_number"
+                                           string="Bank Account Number"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="fiscal_representative_address_type"
+                                           string="Address Type"
+                                    />
+                                    <field name="fiscal_representative_address_country"
+                                           string="Country"
+                                    />
+                                    <field name="fiscal_representative_address_country_code"
+                                           string="Country Code"
+                                    />
+                                    <field name="fiscal_representative_address_country_name"
+                                           string="Country Name"
+                                    />
+                                    <field name="fiscal_representative_address_country_state_code"
+                                           string="State Code"
+                                    />
+                                    <field name="fiscal_representative_address_country_state_name"
+                                           string="State Name"
+                                    />
+                                    <field name="fiscal_representative_address_postal_code"
+                                           string="Postal Code"
+                                    />
+                                    <field name="fiscal_representative_address_settlement"
+                                           string="Settlement"
+                                    />
+                                    <field name="fiscal_representative_address_district"
+                                           string="District"
+                                    />
+                                    <field name="fiscal_representative_address_street"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'simple')]}"
+                                           string="Street"
+                                    />
+                                    <field name="fiscal_representative_address_street2"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'simple')]}"
+                                           string="Street2"
+                                    />
+                                    <field name="fiscal_representative_address_public_place_name"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Public Place Name"
+                                    />
+                                    <field name="fiscal_representative_address_public_place_type"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Public Place Type"
+                                    />
+                                    <field name="fiscal_representative_address_house_number"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="House Number"
+                                    />
+                                    <field name="fiscal_representative_address_building"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Building"
+                                    />
+                                    <field name="fiscal_representative_address_staircase"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Staircase"
+                                    />
+                                    <field name="fiscal_representative_address_floor"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Floor"
+                                    />
+                                    <field name="fiscal_representative_address_door"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Door"
+                                    />
+                                    <field name="fiscal_representative_address_lot_number"
+                                           attrs="{'invisible': [('fiscal_representative_address_type', '!=', 'detailed')]}"
+                                           string="Lot Number"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="lines"
+                              string="Lines"
+                        >
+                            <group>
+                                <group>
+                                    <field name="invoice_line_count"
+                                           string="Line Count"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="advance_status"
+                                           string="Advance"
+                                    />
+                                </group>
+                            </group>
+                            <group>
+                                <field name="invoice_line"
+                                       colspan="2"
+                                       context="{
+                                           'tree_view_ref': 'invoice.invoice_line_view_list_inline',
+                                       }"
+                                       nolabel="1"
+                                />
+                            </group>
+                        </page>
+                        <page name="product_fee"
+                              string="Product Fee"
+                        >
+                            <group>
+                                <group>
+                                    <field name="product_fee_operation"
+                                           string="Operation"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="product_charge_sum"
+                                           string="Product Charge Sum"
+                                    />
+                                </group>
+                            </group>
+                            <group>
+                                <field name="product_fee_summary"
+                                       colspan="2"
+                                       context="{
+                                           'default_scope': 'summary',
+                                           'tree_view_ref': 'invoice.invoice_product_fee_view_list_summary',
+                                       }"
+                                       nolabel="1"
+                                />
+                            </group>
+                        </page>
+                        <page name="summary"
+                              string="Summary"
+                        >
+                            <group>
+                                <group>
+                                    <field name="invoice_net_amount"
+                                           string="Net Amount"
+                                    />
+                                    <field name="invoice_vat_amount"
+                                           string="VAT Amount"
+                                    />
+                                    <field name="invoice_gross_amount"
+                                           string="Gross Amount"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="invoice_net_amount_huf"
+                                           string="Net Amount HUF"
+                                    />
+                                    <field name="invoice_vat_amount_huf"
+                                           string="VAT Amount HUF"
+                                    />
+                                    <field name="invoice_gross_amount_huf"
+                                           string="Gross Amount HUF"
+                                    />
+                                </group>
+                            </group>
+                            <group>
+                                <field name="invoice_summary"
+                                       colspan="2"
+                                       context="{
+                                           'tree_view_ref': 'invoice.invoice_summary_view_list_inline',
+                                       }"
+                                       nolabel="1"
+                                />
+                            </group>
+                            <group>
+                                <field name="invoice_net_amount_huf_text_hu"/>
+                                <field name="invoice_vat_amount_huf_text_hu"/>
+                                <field name="invoice_gross_amount_huf_text_hu"/>
+                            </group>
+                        </page>
+                        <page name="audit"
+                              string="Audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                        >
+                            <group>
+                                <group>
+                                    <field name="id"/>
+                                    <field name="is_locked"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="reference"/>
+                                    <field name="company"/>
+                                    <field name="company_currency"/>
+                                    <field name="currency_huf"/>
+                                    <field name="technical_source"
+                                           readonly="1"
+                                    />
+                                    <field name="technical_type"
+                                           readonly="1"
+                                    />
+                                    <field name="file_pdf"/>
+                                </group>
+                                <group>
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="maintenance_data"
+                                           readonly="1"
+                                           string="Maintenance Data"
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="maintenance_status"
+                                           readonly="1"
+                                           string="Maintenance Status"
+                                    />
+                                    <field name="maintenance_timestamp"
+                                           readonly="1"
+                                           string="Maintenance Timestamp"
+                                    />
+                                    <label for="action_run_invoice_maintenance"
+                                           string=""
+                                    />
+                                    <div>
+                                        <button name="action_run_invoice_maintenance"
+                                                attrs="{'invisible': [
+                                                    '|',
+                                                    ('id', '=', False),
+                                                    ('account_move', '=', False),
+                                                ]}"
+                                                class="btn-primary btn-block"
+                                                groups="account.group_account_invoice"
+                                                icon="fa-bolt"
+                                                string="Run Maintenance"
+                                                type="object"
+                                        />
+                                    </div>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="electronic_invoice_hash"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+     <!-- Form view compact -->
+    <record id="invoice_view_form_compact"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.view.form.compact</field>
+        <field name="model">l10n.hu.invoice</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <sheet>
+                    <group>
+                        <field name="reference"/>
+                        <field name="account_journal"/>
+                        <field name="account_move"/>
+                        <field name="supplier_name"/>
+                        <field name="customer_name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="invoice_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.view.list</field>
+        <field name="model">l10n.hu.invoice</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="invoice_number"/>
+                <field name="account_journal"/>
+                <field name="document_type"/>
+                <field name="account_move_type"
+                       optional="hide"
+                />
+                <field name="supplier_name"
+                       optional="show"
+                />
+                <field name="customer_name"
+                       optional="show"
+                />
+                <field name="invoice_issue_date"/>
+                <field name="invoice_delivery_date"/>
+                <field name="invoice_direction"
+                       optional="hide"
+                       string="Direction"
+                />
+                <field name="eu_oss_eligible"
+                       optional="hide"
+                />
+                <field name="eu_oss_enabled"
+                       optional="hide"
+                />
+                <field name="is_locked"
+                       optional="hide"
+                />
+                <field name="write_date"
+                       optional="show"
+                />
+                <field name="account_move_status"
+                       decoration-success="account_move_status == 'posted'"
+                       decoration-info="account_move_status == 'draft'"
+                       optional="show"
+                       string="Accounting"
+                       widget="badge"
+                />
+                <field name="technical_source"
+                       optional="hide"
+                />
+                <field name="technical_type"
+                       optional="hide"
+                />
+                <field name="maintenance_status"
+                       optional="hide"
+                />
+                <field name="maintenance_timestamp"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view compact -->
+    <record id="invoice_view_list_compact"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.view.list.compact</field>
+        <field name="model">l10n.hu.invoice</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="reference"/>
+                <field name="invoice_number"/>
+                <field name="supplier_name"/>
+                <field name="customer_name"/>
+                <field name="invoice_issue_date"
+                       string="Issue Date"
+                />
+                <field name="invoice_delivery_date"
+                       string="Delivery Date"
+                />
+                <field name="invoice_direction"
+                       optional="hide"
+                       string="Direction"
+                />
+                <field name="eu_oss_eligible"
+                       optional="hide"
+                       string="EU OSS Eligible"
+                />
+                <field name="eu_oss_enabled"
+                       optional="hide"
+                       string="EU OSS Enabled"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="invoice_view_search"
+            model="ir.ui.view">
+        <field name="name">l10n.hu.invoice.view.search</field>
+        <field name="model">l10n.hu.invoice</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="invoice_number"/>
+                <field name="account_journal"/>
+                <field name="account_move"/>
+                <field name="supplier_name"/>
+                <field name="customer_name"/>
+                <field name="maintenance_status"/>
+                <separator/>
+                <filter name="draft_invoice_status_filter"
+                        domain="[('invoice_status', 'in', ['draft'])]"
+                        string="Draft"
+                />
+                <filter name="regular_invoice_status_filter"
+                        domain="[('invoice_status', 'in', ['invoice'])]"
+                        string="Invoice"
+                />
+                <filter name="extra_invoice_status_filter"
+                        domain="[('invoice_status', 'not in', ['draft', 'invoice'])]"
+                        string="Modified/Cancelled"
+                />
+                <separator/>
+                <filter name="draft_account_move_status_filter"
+                        domain="[('account_move_status', 'in', ['draft'])]"
+                        string="Accounting Draft"
+                />
+                <filter name="posted_account_move_status_filter"
+                        domain="[('account_move_status', 'in', ['posted'])]"
+                        string="Accounting Posted"
+                />
+                <filter name="cancel_account_move_status_filter"
+                        domain="[('account_move_status', 'in', ['cancel'])]"
+                        string="Accounting Cancelled"
+                />
+                <separator/>
+                <filter name="locked_filter"
+                        domain="[('is_locked', '=', True)]"
+                        string="Locked"
+                />
+                <filter name="not_locked_filter"
+                        domain="[('is_locked', '=', False)]"
+                        string="Not Locked"
+                />
+                <separator/>
+                <filter name="eu_oss_eligible_filter"
+                        domain="[('eu_oss_eligible', '=', True)]"
+                        string="EU OSS Eligible"
+                />
+                <filter name="not_eu_oss_eligible_filter"
+                        domain="[('eu_oss_eligible', '=', False)]"
+                        string="Not EU OSS Eligible"
+                />
+                <filter name="eu_oss_enabled_filter"
+                        domain="[('eu_oss_enabled', '=', True)]"
+                        string="EU OSS Enabled"
+                />
+                <filter name="eu_oss_disabled_filter"
+                        domain="[('eu_oss_enabled', '=', False)]"
+                        string="EU OSS Disabled"
+                />
+                <separator/>
+                <group name="filter_group_by"
+                       expand="0"
+                       string="Group By"
+                >
+                    <filter name="account_journal_filter_group_by"
+                            context="{'group_by': 'account_journal'}"
+                            string="Journal"
+                    />
+                    <filter name="invoice_issue_date_filter_group_by"
+                            context="{'group_by': 'invoice_issue_date'}"
+                            string="Issue Date"
+                    />
+                    <filter name="invoice_delivery_date_filter_group_by"
+                            context="{'group_by': 'invoice_delivery_date'}"
+                            string="Delivery Date"
+                    />
+                    <filter name="invoice_direction_filter_group_by"
+                            context="{'group_by': 'invoice_direction'}"
+                            string="Direction"
+                    />
+                    <filter name="currency_filter_group_by"
+                            context="{'group_by': 'currency'}"
+                            string="Currency"
+                    />
+                    <filter name="document_type_filter_group_by"
+                            context="{'group_by': 'document_type'}"
+                            string="Document Type"
+                    />
+                    <filter name="customer_name_filter_group_by"
+                            context="{'group_by': 'customer_name'}"
+                            string="Customer Name"
+                    />
+                    <filter name="account_move_status_filter_group_by"
+                            context="{'group_by': 'account_move_status'}"
+                            string="Status"
+                    />
+                    <filter name="account_move_type_filter_group_by"
+                            context="{'group_by': 'account_move_type'}"
+                            string="Account Move Type"
+                    />
+                    <filter name="technical_source_filter_group_by"
+                            context="{'group_by': 'technical_source'}"
+                            string="Technical Source"
+                    />
+                    <filter name="technical_type_filter_group_by"
+                            context="{'group_by': 'technical_type'}"
+                            string="Technical Type"
+                    />
+                    <filter name="maintenance_status_filter_group_by"
+                            context="{'group_by': 'maintenance_status'}"
+                            string="Maintenance Status"
+                    />
+                    <filter name="maintenance_timestamp_filter_group_by"
+                            context="{'group_by': 'maintenance_timestamp'}"
+                            string="Maintenance Timestamp"
+                    />
+                    <filter name="eu_oss_eligible_filter_group_by"
+                            context="{'group_by': 'eu_oss_eligible'}"
+                            string="EU OSS Eligible"
+                    />
+                    <filter name="eu_oss_enabled_filter_group_by"
+                            context="{'group_by': 'eu_oss_enabled'}"
+                            string="EU OSS Enabled"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

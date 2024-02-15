@@ -1,0 +1,16 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+l10n_hu_invoice_user_access,l10n.hu.invoice.user.access,model_l10n_hu_invoice,account.group_account_invoice,1,1,1,0
+l10n_hu_invoice_manager_access,l10n.hu.invoice.manager.access,model_l10n_hu_invoice,account.group_account_manager,1,1,1,1
+l10n_hu_invoice_line_user_access,l10n.hu.invoice.line.user.access,model_l10n_hu_invoice_line,account.group_account_invoice,1,1,1,0
+l10n_hu_invoice_line_manager_access,l10n.hu.invoice.line.manager.access,model_l10n_hu_invoice_line,account.group_account_manager,1,1,1,1
+l10n_hu_invoice_link_user_access,l10n.hu.invoice.link.user.access,model_l10n_hu_invoice_link,account.group_account_invoice,1,1,1,1
+l10n_hu_invoice_link_manager_access,l10n.hu.invoice.link.manager.access,model_l10n_hu_invoice_link,account.group_account_manager,1,1,1,1
+l10n_hu_invoice_log_portal_access,l10n.hu.invoice.log.portal.access,model_l10n_hu_invoice_log,base.group_portal,1,0,0,0
+l10n_hu_invoice_log_user_access,l10n.hu.invoice.log.user.access,model_l10n_hu_invoice_log,account.group_account_invoice,1,1,1,0
+l10n_hu_invoice_log_manager_access,l10n.hu.invoice.log.manager.access,model_l10n_hu_invoice_log,account.group_account_manager,1,1,1,1
+l10n_hu_invoice_product_fee_user_access,l10n.hu.invoice.product.fee.user.access,model_l10n_hu_invoice_product_fee,account.group_account_invoice,1,1,1,0
+l10n_hu_invoice_product_fee_manager_access,l10n.hu.invoice.product.fee.manager.access,model_l10n_hu_invoice_product_fee,account.group_account_manager,1,1,1,1
+l10n_hu_invoice_summary_user_access,l10n.hu.invoice.summary.user.access,model_l10n_hu_invoice_summary,account.group_account_invoice,1,1,1,0
+l10n_hu_invoice_summary_manager_access,l10n.hu.invoice.summary.manager.access,model_l10n_hu_invoice_summary,account.group_account_manager,1,1,1,1
+l10n_hu_invoice_xml_export_user_access,l10n.hu.invoice.xml.export.user.access,model_l10n_hu_invoice_xml_export,account.group_account_invoice,1,1,1,0
+l10n_hu_invoice_xml_export_manager_access,l10n.hu.invoice.xml.export.manager.access,model_l10n_hu_invoice_xml_export,account.group_account_manager,1,1,1,1

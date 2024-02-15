@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_account_journal_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.view.account.journal.form.inherit</field>
+        <field name="inherit_id"
+               ref="l10n_hu_account.view_account_journal_form_inherit"
+        />
+        <field name="model">account.journal</field>
+        <field name="priority">24</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add l10n_hu page and fields -->
+            <xpath expr="//group[@name='l10n_hu_2']"
+                   position="after"
+            >
+                <group name="l10n_hu_invoice"
+                       string="Invoicing"
+                >
+                    <group name="l10n_hu_invoice_1">
+                        <field name="l10n_hu_invoice_delivery_date_default"
+                               groups="account.group_account_manager"
+                               string="Delivery Date Default"
+                        />
+                        <field name="l10n_hu_invoice_delivery_date_limit"
+                               class="oe_inline"
+                               groups="account.group_account_manager"
+                               string="Delivery Date Limit"
+                        />
+                        <field name="l10n_hu_invoice_document_template"
+                               groups="account.group_account_manager"
+                               options="{'no_create': True,}"
+                               string="Document Template"
+                               style="word-break: break-word;"
+                        />
+                        <field name="l10n_hu_invoice_document_line_label"
+                               groups="account.group_account_manager"
+                               string="Document Line Label"
+                               widget="selection"
+                        />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

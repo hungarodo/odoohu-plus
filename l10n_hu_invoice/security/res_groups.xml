@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Invoice user group -->
+    <record id="invoice_user_group"
+            model="res.groups"
+    >
+        <field name="name">User</field>
+        <field name="category_id"
+               ref="invoice_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('base.group_user'))]"
+        />
+    </record>
+    <!-- Invoice manager group -->
+    <record id="invoice_manager_group"
+            model="res.groups"
+    >
+        <field name="name">Manager</field>
+        <field name="category_id"
+               ref="invoice_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('invoice_user_group'))]"
+        />
+    </record>
+</odoo>

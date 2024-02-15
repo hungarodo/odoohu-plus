@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="invoice_summary_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.invoice.summary.view.form</field>
+        <field name="model">l10n.hu.invoice.summary</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                    </div>
+                    <h4>
+                       <field name="account_tax_name"/>
+                    </h4>
+                    <group>
+                        <group>
+                            <field name="account_tax"/>
+                            <field name="vat_rate_net_amount"
+                                   string="Net Amount"
+                            />
+                            <field name="vat_rate_vat_amount"
+                                   string="VAT Amount"
+                            />
+                            <field name="vat_rate_gross_amount"
+                                   string="Gross Amount"
+                            />
+                        </group>
+                        <group>
+                            <field name="invoice_category"
+                                   string="Invoice Category"
+                            />
+                            <field name="vat_rate_net_amount_huf"
+                                   string="Net Amount HUF"
+                            />
+                            <field name="vat_rate_vat_amount_huf"
+                                   string="VAT Amount HUF"
+                            />
+                            <field name="vat_rate_gross_amount_huf"
+                                   string="Gross Amount HUF"
+                            />
+                        </group>
+                    </group>
+                    <notebook readonly="1">
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group>
+                                <group>
+                                    <field name="account_tax_amount_type"
+                                           string="Amount Type"
+                                    />
+                                    <field name="account_tax_amount"
+                                           string="Amount"
+                                    />
+                                    <field name="account_tax_price_include"
+                                           string="Price Include"
+                                    />
+                                    <field name="account_tax_group"
+                                           string="Tax Group"
+                                    />
+                                    <field name="eu_oss_eligible"/>
+                                    <field name="eu_oss_enabled"/>
+                                </group>
+                                <group>
+                                    <field name="vat_type"
+                                           string="VAT Type"
+                                    />
+                                    <field name="vat_percentage"/>
+                                    <field name="vat_amount_mismatch_case"
+                                           attrs="{'invisible': [('vat_type', '!=', 'exemption')]}"
+                                           string="Amount Mismatch Case"
+                                    />
+                                    <field name="vat_exemption_case"
+                                           attrs="{'invisible': [('vat_type', '!=', 'exemption')]}"
+                                           string="Exemption Case"
+                                    />
+                                    <field name="vat_out_of_scope_case"
+                                           attrs="{'invisible': [('vat_type', '!=', 'out_of_scope')]}"
+                                           string="Out of Scope Case"
+                                    />
+                                    <field name="vat_reason"
+                                           attrs="{'invisible': [('vat_type', 'not in', ['exemption', 'out_of_scope'])]}"
+                                           string="Reason"
+                                    />
+                                    <field name="currency"/>
+                                    <field name="currency_huf"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="audit"
+                              string="Audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                        >
+                            <group>
+                                <group>
+                                    <field name="id"/>
+                                    <field name="company"/>
+                                    <field name="company_currency"/>
+                                    <field name="invoice"/>
+                                    <field name="account_move"/>
+                                    <field name="account_move_line"/>
+                                </group>
+                                <group>
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="invoice_summary_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.summary.view.list</field>
+        <field name="model">l10n.hu.invoice.summary</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="account_move"
+                       invisible="1"
+                />
+                <field name="currency"
+                       invisible="1"
+                />
+                <field name="currency_huf"
+                       invisible="1"
+                />
+                <field name="invoice"/>
+                <field name="account_tax"
+                       string="Tax"
+                />
+                <field name="account_tax_group"
+                       string="Tax Group"
+                />
+                <field name="vat_percentage"
+                       string="VAT Rate"
+                />
+                <field name="vat_rate_net_amount"
+                       string="Net Amount"
+                />
+                <field name="vat_rate_vat_amount"
+                       string="VAT Amount"
+                />
+                <field name="vat_rate_gross_amount"
+                       string="Gross Amount"
+                />
+                <field name="eu_oss_eligible"
+                       optional="hide"
+                />
+                <field name="eu_oss_enabled"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view inline -->
+    <record id="invoice_summary_view_list_inline"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.summary.view.list.inline</field>
+        <field name="model">l10n.hu.invoice.summary</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="account_move"
+                       invisible="1"
+                />
+                <field name="currency"
+                       invisible="1"
+                />
+                <field name="currency_huf"
+                       invisible="1"
+                />
+                <field name="account_tax_name"
+                       string="VAT Name"
+                />
+                <field name="vat_percentage"
+                       string="VAT Percentage"
+                />
+                <field name="vat_rate_net_amount"
+                       string="Net Amount"
+                       sum="1"
+                />
+                <field name="vat_rate_vat_amount"
+                       string="VAT Amount"
+                       sum="1"
+                />
+                <field name="vat_rate_gross_amount"
+                       string="Gross Amount"
+                       sum="1"
+                />
+                <field name="eu_oss_eligible"
+                       optional="hide"
+                />
+                <field name="eu_oss_enabled"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>

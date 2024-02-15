@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- HU > Invoicing -->
+    <record id="hu_invoicing_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoicing</field>
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_base_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+    <!-- HU > Invoicing > Invoices -->
+    <record id="hu_invoicing_invoice_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoices</field>
+        <field name="action"
+               ref="invoice_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_invoicing_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+     <!-- HU > Invoicing > Invoice XML Exports -->
+    <record id="nav_invoice_xml_export_list_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice XML Exports</field>
+        <field name="action"
+               ref="invoice_xml_export_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_invoicing_menu"
+        />
+        <field name="sequence">72</field>
+    </record>
+    <!-- HU > Invoicing > XML Export Wizard >
+    <record id="hu_invoicing_invoice_xml_export_wizard_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">XML Export Wizard</field>
+        <field name="action"
+               ref="invoice_xml_export_wizard_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_invoicing_menu"
+        />
+        <field name="sequence">80</field>
+    </record-->
+    <!-- HU > Reporting > Invoicing -->
+    <record id="hu_reporting_invoicing_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoicing</field>
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_reporting_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+    <!-- HU > Reporting > Invoicing > Invoice Lines -->
+    <record id="hu_reporting_invoicing_invoice_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice Lines</field>
+        <field name="action"
+               ref="invoice_line_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_invoicing_menu"
+        />
+        <field name="sequence">24</field>
+    </record>
+    <!-- HU > Reporting > Invoicing > Invoice Line Product Fees -->
+    <record id="hu_reporting_invoicing_invoice_line_product_fee_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice Line Product Fees</field>
+        <field name="action"
+               ref="invoice_line_product_fee_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_invoicing_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU > Reporting > Invoicing > Invoice Product Fee Summaries -->
+    <record id="hu_reporting_invoicing_invoice_product_fee_summary_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice Product Fee Summaries</field>
+        <field name="action"
+               ref="invoice_product_fee_summary_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_invoicing_menu"
+        />
+        <field name="sequence">40</field>
+    </record>
+    <!-- HU > Reporting > Invoicing > Invoice Summaries -->
+    <record id="hu_reporting_invoicing_invoice_summary_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice Summaries</field>
+        <field name="action"
+               ref="invoice_summary_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_invoicing_menu"
+        />
+        <field name="sequence">48</field>
+    </record>
+    <!-- HU > Reporting > Invoicing > Invoice Links -->
+    <record id="hu_reporting_invoicing_invoice_link_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice Links</field>
+        <field name="action"
+               ref="invoice_link_action"
+        />
+        <field name="groups_id"
+               eval="[(4, ref('account.group_account_invoice'))]"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_invoicing_menu"
+        />
+        <field name="sequence">56</field>
+    </record>
+    <!-- HU > Reporting > Invoicing > Invoice Logs -->
+    <record id="hu_reporting_invoicing_invoice_log_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Invoice Logs</field>
+        <field name="action"
+               ref="invoice_log_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_invoicing_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+</odoo>

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="invoice_product_fee_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.product.fee.view.form</field>
+        <field name="model">l10n.hu.invoice.product.fee</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                    </div>
+                    <h4>
+                       <field name="display_name"/>
+                    </h4>
+                    <group>
+                        <group>
+                            <field name="product_fee_quantity"/>
+                            <field name="product_fee_uom"/>
+                            <field name="product_fee_measuring_unit"/>
+                        </group>
+                        <group>
+                            <field name="product_fee_code"/>
+                            <field name="product_fee_rate"/>
+                            <field name="product_fee_amount"/>
+                        </group>
+                    </group>
+                    <group name="summary_details"
+                           attrs="{'invisible': [('scope', '!=', 'summary')]}"
+                    >
+                        <group>
+                            <field name="evidence_document_date"/>
+                            <field name="evidence_document_number"/>
+                        </group>
+                        <group>
+                            <field name="obligated_name"/>
+                            <field name="obligated_tax_number"/>
+                            <field name="obligated_address_type"
+                                   string="Address Type"
+                            />
+                            <field name="obligated_address_country"
+                                   string="Country"
+                            />
+                            <field name="obligated_address_country_code"
+                                   string="Country Code"
+                            />
+                            <field name="obligated_address_country_name"
+                                   string="Country Name"
+                            />
+                            <field name="obligated_address_country_state_code"
+                                   string="State Code"
+                            />
+                            <field name="obligated_address_country_state_name"
+                                   string="State Name"
+                            />
+                            <field name="obligated_address_postal_code"
+                                   string="Postal Code"
+                            />
+                            <field name="obligated_address_settlement"
+                                   string="Settlement"
+                            />
+                            <field name="obligated_address_district"
+                                   string="District"
+                            />
+                            <field name="obligated_address_street"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'simple')]}"
+                                   string="Street"
+                            />
+                            <field name="obligated_address_street2"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'simple')]}"
+                                   string="Street2"
+                            />
+                            <field name="obligated_address_public_place_name"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Public Place Name"
+                            />
+                            <field name="obligated_address_public_place_type"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Public Place Type"
+                            />
+                            <field name="obligated_address_house_number"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="House Number"
+                            />
+                            <field name="obligated_address_building"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Building"
+                            />
+                            <field name="obligated_address_staircase"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Staircase"
+                            />
+                            <field name="obligated_address_floor"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Floor"
+                            />
+                            <field name="obligated_address_door"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Door"
+                            />
+                            <field name="obligated_address_lot_number"
+                                   attrs="{'invisible': [('obligated_address_type', '!=', 'detailed')]}"
+                                   string="Lot Number"
+                            />
+                        </group>
+                    </group>
+                    <notebook readonly="1">
+                        <page name="audit"
+                              string="Audit"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                        >
+                            <group>
+                                <group>
+                                    <field name="id"/>
+                                    <field name="company"/>
+                                    <field name="company_currency"/>
+                                    <field name="currency"/>
+                                    <field name="currency_huf"/>
+                                    <field name="scope"/>
+                                    <field name="invoice"/>
+                                    <field name="invoice_line"/>
+                                    <field name="account_move"/>
+                                    <field name="account_move_line"/>
+                                </group>
+                                <group>
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view line -->
+    <record id="invoice_product_fee_view_list_line"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.product.fee.view.list.line</field>
+        <field name="model">l10n.hu.invoice.product.fee</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="invoice_line"
+                       optional="hide"
+                />
+                <field name="account_move_line"
+                       optional="hide"
+                />
+                <field name="scope"
+                       optional="hide"
+                />
+                <field name="product_fee_code"
+                       string="Code"
+                />
+                <field name="product_fee_quantity"
+                       string="Quantity"
+                />
+                <field name="product_fee_measuring_unit"
+                       string="Measuring Unit"
+                />
+                <field name="product_fee_rate"
+                       string="Rate"
+                />
+                <field name="product_fee_amount"
+                       string="Amount"
+                       sum="1"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- List view summary -->
+    <record id="invoice_product_fee_view_list_summary"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.invoice.product.fee.view.list.summary</field>
+        <field name="model">l10n.hu.invoice.product.fee</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="invoice"
+                       optional="hide"
+                />
+                <field name="account_move"
+                       optional="hide"
+                />
+                <field name="scope"
+                       optional="hide"
+                />
+                <field name="product_fee_code"
+                       string="Code"
+                />
+                <field name="product_fee_quantity"
+                       string="Quantity"
+                />
+                <field name="product_fee_measuring_unit"
+                       string="Measuring Unit"
+                />
+                <field name="product_fee_rate"
+                       string="Rate"
+                />
+                <field name="product_fee_amount"
+                       string="Amount"
+                       sum="1"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>
