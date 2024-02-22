@@ -20,9 +20,14 @@ class L10nHuNavReportInput(models.Model):
 
     # Field declarations
     account_move = fields.Many2one(
-        comodel_name='account.move',
-        readonly=True,
+        related='account_move_line.move_id',
+        store=True,
         string="Account Move",
+    )
+    account_move_line = fields.Many2one(
+        comodel_name='account.move.line',
+        readonly=True,
+        string="Account Move Line",
     )
     active = fields.Boolean(
         related='report.active',
@@ -81,14 +86,22 @@ class L10nHuNavReportInput(models.Model):
         store=True,
         string="Status",
     )
-    supplier = fields.Many2one(
+    partner = fields.Many2one(
         comodel_name='res.partner',
         readonly=True,
-        string="Supplier",
+        string="Partner",
     )
-    total_amount = fields.Monetary(
-        currency_field='company_currency',
-        string="Total Amount",
+    value_char = fields.Char(
+        string="Value Char",
+    )
+    value_date = fields.Date(
+        string="Value Date",
+    )
+    value_float = fields.Float(
+        string="Value Float",
+    )
+    value_integer = fields.Integer(
+        string="Value Integer",
     )
 
     # Compute and search fields, in the same order of field declarations

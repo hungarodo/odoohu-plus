@@ -17,7 +17,6 @@ class L10nHuAccountJournal(models.Model):
     # Default methods
 
     # Field declarations
-    # # ACCOUNT BASE
     l10n_hu_currency_rate_inverse = fields.Boolean(
         default=False,
         string="HU Currency Rate Inverse",

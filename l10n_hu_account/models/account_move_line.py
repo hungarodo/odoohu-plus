@@ -17,17 +17,6 @@ class L10nHuAccountInvoiceAccountMoveLine(models.Model):
     # Default methods
 
     # Field declarations
-    l10n_hu_is_price_refund = fields.Boolean(
-        compute='_compute_l10n_hu_is_price_refund',
-        string="Price Refund",
-    )
-    l10n_hu_vat_date = fields.Date(
-        string="VAT Date",
-    )
-    l10n_hu_vat_reason = fields.Char(
-        string="HU Tax Reason",
-        translate="True",
-    )
     l10n_hu_original_account_move = fields.Many2one(
         related='move_id.l10n_hu_original_account_move',
         string="Original Move",
@@ -37,22 +26,34 @@ class L10nHuAccountInvoiceAccountMoveLine(models.Model):
         index=True,
         string="Original Move Line",
     )
+    l10n_hu_price_refund = fields.Boolean(
+        default=False,
+        string="Price Refund",
+    )
+    l10n_hu_move_trade_position = fields.Selection(
+        related='move_id.l10n_hu_trade_position',
+        index=True,
+        store=True,
+        string="Trade Position Date",
+    )
+    l10n_hu_move_vat_date = fields.Date(
+        related='move_id.l10n_hu_vat_date',
+        index=True,
+        store=True,
+        string="VAT Date",
+    )
+    l10n_hu_move_vat_declaration = fields.Boolean(
+        related='move_id.l10n_hu_vat_declaration',
+        index=True,
+        store=True,
+        string="VAT Declaration",
+    )
+    l10n_hu_vat_reason = fields.Char(
+        string="VAT Reason",
+        translate="True",
+    )
     
     # Compute and search fields, in the same order of field declarations
-    def _compute_l10n_hu_is_price_refund(self):
-        for record in self:
-            is_price_refund = False
-            """ NOTE: rewrite to new analytic plan
-            refund_price_tag = record.move_id.journal_id.l10n_hu_invoice_refund_price_tag
-            if refund_price_tag and record.analytic_tag_ids:
-                for tag in record.analytic_tag_ids:
-                    if tag == refund_price_tag:
-                        is_price_refund = True
-                        break
-                    else:
-                        pass
-            """
-            record.l10n_hu_is_price_refund = is_price_refund
 
     # Constraints and onchanges
 

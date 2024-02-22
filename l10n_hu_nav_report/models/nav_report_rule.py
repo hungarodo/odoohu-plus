@@ -94,9 +94,17 @@ class L10nHuNavReportRule(models.Model):
     product_domain = fields.Text(
         string="Product Domain",
     )
+    report_template = fields.Many2many(
+        column1='rule',
+        column2='template',
+        comodel_name='l10n.hu.nav.report.template',
+        relation='l10n_hu_nav_report_rule_report_template',
+        string="NAV Report Template",
+    )
     rule_scope = fields.Selection(
         required=True,
         selection=[
+            ('input', "Input"),
             ('element', "Element"),
         ],
         string="Rule Scope",
@@ -104,6 +112,7 @@ class L10nHuNavReportRule(models.Model):
     rule_type = fields.Selection(
         required=True,
         selection=[
+            ('report', "Report"),
             ('value', "Value"),
         ],
         string="Rule Type",

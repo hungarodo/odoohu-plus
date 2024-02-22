@@ -19,6 +19,7 @@
             >
                 <field name="l10n_hu_vat_status"/>
                 <field name="l10n_hu_incorporation"/>
+                <field name="l10n_hu_trade_position"/>
             </xpath>
         </field>
     </record>

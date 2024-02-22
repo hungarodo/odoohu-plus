@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Form view inherit - customer invoice -->
+    <!-- Form view inherit -->
     <record id="view_move_form_inherit"
             model="ir.ui.view"
     >
@@ -12,80 +12,253 @@
         <field name="arch"
                type="xml"
         >
-            <!-- Add more Oregional fields -->
-            <xpath expr="//group[@name='accounting_info_group']"
+            <!-- HU fields -->
+            <xpath expr="//page[@name='aml_tab']"
                    position="after"
             >
-                <group name="l10n_hu"
-                       string="HU"
+                <page name="l10n_hu"
+                      string="HU"
                 >
-                    <field name="l10n_hu_vat_date"
-                           attrs="{
-                               'invisible': [
-                                   ('l10n_hu_journal_technical_type', '=', 'proforma'),
-                               ],
-                           }"
-                           string="VAT Date"
-                    />
-                    <label name="l10n_hu_oss_label"
-                           for="l10n_hu_eu_oss_eligible"
-                           string="EU OSS"
-                    />
-                    <div name="l10n_hu_eu_oss_div">
-                        <div name="l10n_hu_eu_oss_eligible">
-                            <field name="l10n_hu_eu_oss_eligible"
-                                   class="mr-1"
-                                   force_save="1"
-                                   readonly="1"
+                    <group name="l10n_hu">
+                        <group name="l10n_hu_1">
+                            <!-- Document -->
+                            <field name="l10n_hu_document_type"
+                                   options="{'no_create': True,}"
                             />
-                            <span>Eligible</span>
-                        </div>
-                        <div name="l10n_hu_eu_oss_enabled"
-                             attrs="{
-                                 'invisible': [
-                                     ('l10n_hu_eu_oss_eligible', '=', False),
-                                 ],
-                             }"
+                            <field name="l10n_hu_document_type_code"/>
+                            <!-- Payment -->
+                            <field name="l10n_hu_invoice_payment_method"
+                                   string="Payment Method"
+                            />
+                            <!-- Currency -->
+                            <field name="l10n_hu_currency_exchange"
+                                   string="Foreign Currency"
+                            />
+                            <field name="l10n_hu_currency_name"
+                                   string="Currency Code"
+                            />
+                            <field name="l10n_hu_currency_rate"
+                                   options="{'no_create': True,}"
+                                   string="Currency Rate"
+                            />
+                            <field name="l10n_hu_currency_rate_amount"
+                                   string="Exchange Rate"
+                            />
+                        </group>
+                        <group name="l10n_hu_2">
+                            <!-- VAT -->
+                            <field name="l10n_hu_vat_date"
+                                   string="VAT Date"
+                            />
+                            <field name="l10n_hu_vat_declaration"
+                                   string="VAT Declaration"
+                                   widget="boolean_toggle"
+                            />
+                            <!-- Original -->
+                            <field name="l10n_hu_original_account_move"
+                                   options="{'no_create': True,}"
+                                   string="Original Account Move"
+                            />
+                            <field name="l10n_hu_original_invoice_number"
+                                   string="Original Invoice Number"
+                            />
+                        </group>
+                        <group name="l10n_hu_3"
+                               string="Partner"
                         >
-                            <field name="l10n_hu_eu_oss_enabled"
-                                   class="mr-1"
-                                   attrs="{
-                                       'readonly': [
-                                           ('state', '!=', 'draft'),
-                                       ],
-                                   }"
+                            <!-- Partner -->
+                            <field name="l10n_hu_fiscal_representative"
+                                   options="{'no_create': True,}"
                             />
-                            <span>Enabled</span>
-                        </div>
-                        <button name="action_l10n_hu_update_eu_oss"
-                                attrs="{'invisible': [
-                                    '|',
-                                    ('id', '=', False),
-                                    ('state', '!=', 'draft'),
-                                ]}"
-                                class="btn-link btn-block pull-start"
-                                icon="fa-refresh"
-                                string="Refresh"
-                                type="object"
-                        />
-                    </div>
-                    <field name="l10n_hu_fiscal_representative"
-                           options="{'no_create': True,}"
-                    />
-                    <field name="l10n_hu_fiscal_representative_bank_account"
-                           domain="[('partner_id', '=', l10n_hu_fiscal_representative)]"
-                           options="{'no_create': True,}"
-                    />
-                    <!-- Technical -->
-                    <field name="l10n_hu_journal_type"
-                           invisible="1"
-                           string="Journal Type"
-                    />
-                    <field name="l10n_hu_journal_technical_type"
-                           invisible="1"
-                           string="Journal Technical Type"
-                    />
-                </group>
+                            <field name="l10n_hu_fiscal_representative_bank_account"
+                                   domain="[('partner_id', '=', l10n_hu_fiscal_representative)]"
+                                   options="{'no_create': True,}"
+                            />
+                            <field name="l10n_hu_company_partner"/>
+                            <field name="l10n_hu_partner_country"/>
+
+                        </group>
+                        <group name="l10n_hu_4"
+                               string="Period"
+                        >
+                            <!-- Period -->
+                            <field name="l10n_hu_invoice_delivery_period_start"
+                                   string="Period Start"
+                            />
+                            <field name="l10n_hu_invoice_delivery_period_end"
+                                   string="Period End"
+                            />
+                            <field name="l10n_hu_invoice_periodical_delivery"
+                                   string="Periodical Delivery"
+                            />
+                            <field name="l10n_hu_invoice_delivery_period_summary"
+                                   string="Period Summary"
+                            />
+                        </group>
+                        <group name="l10n_hu_5"
+                               string="OSS"
+                        >
+                            <!-- OSS -->
+                            <label name="l10n_hu_oss_label"
+                                   for="l10n_hu_eu_oss_eligible"
+                                   string="EU OSS"
+                            />
+                            <div name="l10n_hu_eu_oss_div">
+                                <div name="l10n_hu_eu_oss_eligible">
+                                    <field name="l10n_hu_eu_oss_eligible"
+                                           class="mr-1"
+                                           force_save="1"
+                                           readonly="1"
+                                    />
+                                    <span>Eligible</span>
+                                </div>
+                                <div name="l10n_hu_eu_oss_enabled"
+                                     attrs="{
+                                         'invisible': [
+                                             ('l10n_hu_eu_oss_eligible', '=', False),
+                                         ],
+                                     }"
+                                >
+                                    <field name="l10n_hu_eu_oss_enabled"
+                                           class="mr-1"
+                                           attrs="{
+                                               'readonly': [
+                                                   ('state', '!=', 'draft'),
+                                               ],
+                                           }"
+                                    />
+                                    <span>Enabled</span>
+                                </div>
+                                <button name="action_l10n_hu_update_eu_oss"
+                                        attrs="{'invisible': [
+                                            '|',
+                                            ('id', '=', False),
+                                            ('state', '!=', 'draft'),
+                                        ]}"
+                                        class="btn-link btn-block pull-start"
+                                        icon="fa-refresh"
+                                        string="Refresh"
+                                        type="object"
+                                />
+                            </div>
+                        </group>
+                        <group name="l10n_hu_6"
+                               string="Journal"
+                        >
+                            <!-- Journal -->
+                            <field name="l10n_hu_journal_show_print_pdf"/>
+                            <field name="l10n_hu_journal_technical_type"/>
+                            <field name="l10n_hu_journal_type"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- List view inherit  -->
+    <record id="view_invoice_tree_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.invoice.tree.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_invoice_tree"
+        />
+        <field name="model">account.move</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- HU fields -->
+            <xpath expr="//field[@name='date']"
+                   position="before"
+            >
+                <field name="l10n_hu_partner_country"
+                       optional="hide"
+                />
+                <field name="l10n_hu_trade_position"
+                       optional="hide"
+                       string="Trade Position"
+                />
+            </xpath>
+            <!-- HU fields -->
+            <xpath expr="//field[@name='date']"
+                   position="after"
+            >
+                <field name="l10n_hu_vat_date"
+                       optional="hide"
+                       string="HU VAT Date"
+                />
+                <field name="l10n_hu_vat_declaration"
+                       optional="hide"
+                       string="HU VAT Declaration"
+                />
+            </xpath>
+        </field>
+    </record>
+    <!-- Search view inherit  -->
+    <record id="view_account_invoice_filter_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.account.invoice.filter.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_account_invoice_filter"
+        />
+        <field name="model">account.move</field>
+        <field name="arch"
+               type="xml"
+        >
+           <!-- Filter -->
+            <xpath expr="//filter[@name='due_date']"
+                   position="after"
+            >
+                <separator/>
+                <filter name="l10n_hu_trade_position_domestic_filter"
+                        domain="[('l10n_hu_trade_position', '=', 'domestic')]"
+                        string="Domestic"
+                />
+                <filter name="l10n_hu_trade_position_eu_filter"
+                        domain="[('l10n_hu_trade_position', '=', 'eu')]"
+                        string="EU"
+                />
+                <filter name="l10n_hu_trade_position_other_filter"
+                        domain="[('l10n_hu_trade_position', '=', 'other')]"
+                        string="Other"
+                />
+                <filter name="l10n_hu_trade_position_none_filter"
+                        domain="[('l10n_hu_trade_position', '=', False)]"
+                        string="No Trade Position"
+                />
+                <separator/>
+                <filter name="l10n_hu_vat_date_filter"
+                        date="l10n_hu_vat_date"
+                        string="HU VAT Date"
+                />
+                <separator/>
+                <filter name="l10n_hu_vat_declaration_filter"
+                        domain="[('l10n_hu_vat_declaration', '=', True)]"
+                        string="HU VAT Declaration"
+                />
+            </xpath>
+            <!-- Filter group by -->
+            <xpath expr="//filter[@name='group_by_sequence_prefix']"
+                   position="after"
+            >
+                <separator/>
+                <filter name="l10n_hu_partner_country_filter_group_by"
+                        context="{'group_by': 'l10n_hu_partner_country'}"
+                        string="Partner Country"
+                />
+                <filter name="l10n_hu_trade_position_filter_group_by"
+                        context="{'group_by': 'l10n_hu_trade_position'}"
+                        string="Trade Position"
+                />
+                <filter name="l10n_hu_vat_date_filter_group_by"
+                        context="{'group_by': 'l10n_hu_vat_date'}"
+                        string="HU VAT Date"
+                />
+                <filter name="l10n_hu_vat_declaration_filter_group_by"
+                        context="{'group_by': 'l10n_hu_vat_declaration'}"
+                        string="HU VAT Declaration"
+                />
             </xpath>
         </field>
     </record>

@@ -13,33 +13,66 @@
         <field name="arch"
                type="xml"
         >
-            <xpath expr="//field[@name='country_id']"
+            <xpath expr="//page[@name='advanced_options']//group[1]"
                    position="after"
             >
-                <label name="l10n_hu_actions_label"
-                       class="o_form_label"
-                       for="action_l10n_hu_update_configuration"
-                       groups="account.group_account_manager"
-                       string="HU Actions"
-                />
-                <div name="l10n_hu_actions_div"
-                     groups="account.group_account_manager"
+                <group name="l10n_hu"
+                       string="HU"
                 >
-                    <button name="action_l10n_hu_update_configuration"
-                            class="btn-link btn-sm"
-                            icon="fa-bolt"
-                            string="Update Configuration"
-                            type="object"
-                    />
-                </div>
-                <field name="l10n_hu_vat_type"/>
-                <field name="l10n_hu_vat_exemption_case"/>
-                <field name="l10n_hu_vat_out_of_scope_case"/>
-                <field name="l10n_hu_vat_reason"/>
-                <field name="l10n_hu_vat_amount_mismatch_case"/>
-                <field name="l10n_hu_technical_name"
-                       groups="account.group_account_manager"
-                />
+                    <group name="l10n_hu_1">
+                        <field name="l10n_hu_tax_type"
+                               string="Tax Type"
+                        />
+                    </group>
+                    <group name="l10n_hu_2">
+                        <field name="l10n_hu_technical_name"
+                               string="Technical Name"
+                        />
+                        <label name="l10n_hu_actions_label"
+                               for="action_l10n_hu_update_configuration"
+                               string="Actions"
+                        />
+                        <div name="l10n_hu_actions_div">
+                            <button name="action_l10n_hu_update_configuration"
+                                    class="btn-link btn-sm"
+                                    icon="fa-bolt"
+                                    string="Update Configuration"
+                                    type="object"
+                            />
+                        </div>
+                    </group>
+                    <group name="l10n_hu_vat_1"
+                           attrs="{'invisible': [('l10n_hu_tax_type', '!=', 'vat')]}"
+                    >
+                        <field name="l10n_hu_vat_type"
+                               string="VAT Type"
+                        />
+                        <field name="l10n_hu_vat_exemption_case"
+                               attrs="{'invisible': [('l10n_hu_vat_type', '!=', 'exemption')]}"
+                               string="Exception Case"
+                        />
+                        <field name="l10n_hu_vat_out_of_scope_case"
+                               attrs="{'invisible': [('l10n_hu_vat_type', '!=', 'out_of_scope')]}"
+                               string="Out of Scope Case"
+                        />
+                        <field name="l10n_hu_vat_amount_mismatch_case"
+                               attrs="{'invisible': [('l10n_hu_vat_type', 'not in', ['margin_scheme_vat', 'margin_scheme_no_vat'])]}"
+                               string="Mismatch Case"
+                        />
+                    </group>
+                    <group name="l10n_hu_vat_2"
+                           attrs="{'invisible': [('l10n_hu_tax_type', '!=', 'vat')]}"
+                    >
+                        <field name="l10n_hu_vat_declaration"
+                               string="VAT Declaration"
+                               widget="boolean_toggle"
+                        />
+                        <field name="l10n_hu_vat_reason"
+                               attrs="{'invisible': [('l10n_hu_vat_type', 'not in', ['exemption', 'out_of_scope'])]}"
+                               string="Reason"
+                        />
+                    </group>
+                </group>
             </xpath>
         </field>
     </record>

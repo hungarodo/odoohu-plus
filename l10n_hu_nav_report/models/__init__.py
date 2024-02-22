@@ -7,4 +7,3 @@ from . import nav_report_input
 from . import nav_report_output
 from . import nav_report_rule
 from . import nav_report_template
-from . import product_template

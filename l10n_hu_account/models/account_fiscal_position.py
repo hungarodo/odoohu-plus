@@ -26,6 +26,15 @@ class L10nHuAccountFiscalPosition(models.Model):
         ],
         string="HU Taxpayer Type",
     )
+    l10n_hu_trade_position = fields.Selection(
+        selection=[
+            ('domestic', "Domestic"),
+            ('eu', "EU"),
+            ('other', "Other"),
+        ],
+        index=True,
+        string="HU Trade Position",
+    )
     l10n_hu_vat_status = fields.Selection(
         selection=[
             ('domestic', "Domestic"),

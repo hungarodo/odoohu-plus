@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="product_product_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Product</field>
+        <field name="domain">[]</field>
+        <field name="res_model">product.product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+    </record>
+    <!-- Window action kanban view -->
+    <record id="product_product_action_kanban"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="product_product_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="product.product_kanban_view"
+        />
+        <field name="view_mode">kanban</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="product_product_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="product_product_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="product.product_product_tree_view"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="product_product_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="product_product_action"
+        />
+        <field name="sequence">24</field>
+        <field name="view_id"
+               ref="product.product_normal_form_view"
+        />
+        <field name="view_mode">form</field>
+    </record>
+    <!-- Window action activity view -->
+    <record id="product_product_action_activity"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="product_product_action"
+        />
+        <field name="sequence">56</field>
+        <field name="view_id"
+               ref="product.product_product_view_activity"
+        />
+        <field name="view_mode">activity</field>
+    </record>
+</odoo>

@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- HU > Reporting > Accounting -->
+    <record id="hu_reporting_accounting_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Accounting</field>
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_reporting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU > Reporting > Accounting > Customer Invoices -->
+    <record id="hu_reporting_vat_account_move_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Customer Invoices</field>
+        <field name="action"
+               ref="account_move_customer_invoice_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_accounting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU > Reporting > Accounting > Vendor Bills -->
+    <record id="hu_reporting_accounting_vendor_bill_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Vendor Bills</field>
+        <field name="action"
+               ref="account_move_vendor_bill_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_accounting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU > Reporting > Accounting > VAT -->
+    <record id="hu_reporting_accounting_account_move_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">VAT Account Move Lines</field>
+        <field name="action"
+               ref="account_move_line_vat_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_accounting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
     <!-- HU > Configuration > Accounting -->
     <record id="hu_configuration_accounting_menu"
             model="ir.ui.menu"
@@ -62,17 +111,43 @@
         />
         <field name="sequence">40</field>
     </record>
+    <!-- HU > Configuration > Accounting > Tags -->
+    <record id="hu_configuration_accounting_tag_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tags</field>
+        <field name="action"
+               ref="account_tag_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">48</field>
+    </record>
     <!-- HU > Configuration > Accounting > Taxes -->
     <record id="hu_configuration_accounting_tax_menu"
             model="ir.ui.menu"
     >
         <field name="name">Taxes</field>
         <field name="action"
-               ref="account.action_tax_form"
+               ref="account_tax_action"
         />
         <field name="parent_id"
                ref="hu_configuration_accounting_menu"
         />
-        <field name="sequence">48</field>
+        <field name="sequence">56</field>
+    </record>
+    <!-- HU > Configuration > Accounting > Tax Groups -->
+    <record id="hu_configuration_accounting_tax_group_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tax Groups</field>
+        <field name="action"
+               ref="account_tax_group_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">64</field>
     </record>
 </odoo>

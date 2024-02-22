@@ -15,13 +15,18 @@
                   edit="1"
             >
                 <header>
-                    <button name="action_wizard_report"
-                            attrs="{'invisible': [
-                                ('id', '=', False),
-                            ]}"
-                            class="btn btn-primary"
-                            icon="fa-magic"
-                            string="Wizard"
+                    <button name="action_wizard_run_report"
+                            attrs="{'invisible': [('id', '=', False)]}"
+                            class="btn-link"
+                            icon="fa-bolt"
+                            string="Run Report"
+                            type="object"
+                    />
+                    <button name="action_wizard_print_report"
+                            attrs="{'invisible': [('id', '=', False)]}"
+                            class="btn-link"
+                            icon="fa-print"
+                            string="Print Report"
                             type="object"
                     />
                     <field name="status"
@@ -59,15 +64,6 @@
                                    widget="statinfo"
                             />
                         </button>
-                        <button name="toggle_active"
-                                class="oe_stat_button"
-                                type="object"
-                        >
-                            <field name="active"
-                                   widget="boolean_toggle"
-                            />
-                            <span class="o_stat_text">Active</span>
-                        </button>
                     </div>
                     <widget name="web_ribbon"
                             attrs="{'invisible': [('active', '=', True)]}"
@@ -81,9 +77,6 @@
                             />
                         </h2>
                     </div>
-                    <field name="description"
-                           placeholder="Description..."
-                    />
                     <group>
                         <group>
                             <field name="template"
@@ -97,19 +90,9 @@
                             />
                         </group>
                         <group>
-                            <div name="information"
-                                 class="card bg-info"
-                                 colspan="2"
-                            >
-                                <div class="card-header text-white">
-                                    <i class="fa fa-info-circle"/> Information
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text">
-                                        NAV report
-                                    </p>
-                                </div>
-                            </div>
+                            <field name="description"
+                                   placeholder="Description..."
+                            />
                         </group>
                     </group>
                     <notebook>
@@ -120,6 +103,9 @@
                             <group name="audit">
                                 <group name="id_company">
                                     <field name="id"
+                                           readonly="1"
+                                    />
+                                    <field name="active"
                                            readonly="1"
                                     />
                                     <field name="company"

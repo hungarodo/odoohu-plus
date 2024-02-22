@@ -5,6 +5,7 @@
             model="ir.actions.act_window"
     >
         <field name="name">HU Wizard</field>
+        <field name="context">{'default_action_type': 'nav_report', 'default_nav_report_action': 'create_report'}</field>
         <field name="res_model">l10n.hu.wizard</field>
         <field name="target">new</field>
         <field name="type">ir.actions.act_window</field>

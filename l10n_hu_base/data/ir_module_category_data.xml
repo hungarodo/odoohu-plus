@@ -6,4 +6,13 @@
         <field name="name">Hungary</field>
         <field name="sequence">3636</field>
     </record>
+    <record id="base_module_category"
+            model="ir.module.category"
+    >
+        <field name="name">Base</field>
+        <field name="parent_id"
+               ref="l10n_hu_module_category"
+        />
+        <field name="sequence">3640</field>
+    </record>
 </odoo>

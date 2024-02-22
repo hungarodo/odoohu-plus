@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="account_tag_view_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.tag.view.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.account_tag_view_form"
+        />
+        <field name="model">account.account.tag</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <xpath expr="//field[@name='country_id']"
+                   position="after"
+            >
+                <field name="l10n_hu_country_code"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

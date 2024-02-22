@@ -132,7 +132,7 @@ class L10nHuNavReport(models.Model):
         # Iterate through self
         for record in self:
             # Set name
-            name = "NAV-REP-" + str(record.id)
+            name = "[NAV-REP-" + str(record.id) + "]"
 
             if record.name:
                 name += " " + record.name
@@ -182,20 +182,51 @@ class L10nHuNavReport(models.Model):
         # Return result
         return result
 
-    def action_wizard_report(self):
-        """ Start report wizard """
+    def action_wizard_print_report(self):
+        """ Start wizard to print a report """
         # Ensure one record in self
         self.ensure_one()
 
         # Assemble context
         context = {
-            'default_action_nav_report': 'run_report',
-            'default_action_nav_report_editable': True,
-            'default_action_nav_report_required': True,
-            'default_action_nav_report_visible': True,
             'default_action_type': 'nav_report',
             'default_action_type_editable': False,
             'default_action_type_visible': False,
+            'default_nav_report_action': 'print_report',
+            'default_nav_report_action_editable': False,
+            'default_nav_report_action_required': True,
+            'default_nav_report_action_visible': True,
+            'default_nav_report_editable': False,
+            'default_nav_report_visible': True,
+        }
+
+        # Assemble result
+        result = {
+            'name': _("HU Wizard"),
+            'context': context,
+            'res_model': 'l10n.hu.wizard',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
+
+        # Return result
+        return result
+
+    def action_wizard_run_report(self):
+        """ Start wizard to run a report """
+        # Ensure one record in self
+        self.ensure_one()
+
+        # Assemble context
+        context = {
+            'default_action_type': 'nav_report',
+            'default_action_type_editable': False,
+            'default_action_type_visible': False,
+            'default_nav_report_action': 'run_report',
+            'default_nav_report_action_editable': False,
+            'default_nav_report_action_required': True,
+            'default_nav_report_action_visible': True,
             'default_nav_report_editable': False,
             'default_nav_report_visible': True,
         }
@@ -551,22 +582,79 @@ class L10nHuNavReport(models.Model):
     def run_report_2365a(self, values):
         """ Run report VAT 2365A """
         inputs = []
+        input_create_list = []
         outputs = []
         result = {}
         value_rules = []
 
-        # Prepare raw input-output values
-        for element in self.template.element:
-            if element.value_rule and element.value_rule not in value_rules:
-                # create raw_input
-                new_input_values = {
-                    'rule': element.value_rule.id,
-                    'name': element.value_rule.name,
-                    'report': self.id,
+        # Prepare raw input rules
+        rules = self.env['l10n.hu.nav.report.rule'].sudo().search([
+            ('report_template', '=', self.id)
+        ])
+        for rule in rules:
+            # create raw_input
+            input_values_common = {
+                'name': rule.technical_name,
+                'rule': rule.id,
+                'report': self.id,
+            }
+            if rule.technical_name == 'company_name':
+                input_values = {
+                    'partner': self.company.partner_id.id,
+                    'value_char': self.company.partner_id.name,
                 }
-                new_input = self.env['l10n.hu.nav.report.input'].create(new_input_values)
+                input_values.update(input_values_common)
+                input_create_list.append(input_values)
+            elif rule.technical_name == 'company_tax_number':
+                company_tax_number = self.company.partner_id.l10n_hu_vat.replace("-", "")
+                input_values = {
+                    'partner': self.company.partner_id.id,
+                    'value_char': company_tax_number,
+                }
+                input_values.update(input_values_common)
+                input_create_list.append(input_values)
+            elif rule.technical_name == 'account_move_line':
+                # Collect relevant
+                relevant_account_move_lines = self.env['account.move.line'].search([
+                    ('l10n_hu_move_vat_date', '>=', self.period_start),
+                    ('l10n_hu_move_vat_date', '<=', self.period_end),
+                    ('l10n_hu_move_vat_declaration', '=', True),
+                ])
+                for account_move_line in relevant_account_move_lines:
+                    input_values = {
+                        'account_move_line': account_move_line.id,
+                        'partner': account_move_line.move_id.partner_id.id,
+                    }
+                    if account_move_line.credit:
+                        input_values.update({
+                            'value_float': account_move_line.credit,
+                        })
+                    if account_move_line.debit:
+                        input_values.update({
+                            'value_float': account_move_line.debit,
+                        })
+                    input_values.update(input_values_common)
+                    input_create_list.append(input_values)
+            else:
+                pass
+
+        # Create
+        if len(input_create_list) > 0:
+            for input_create_value in input_create_list:
+                new_input = self.env['l10n.hu.nav.report.input'].create(input_create_value)
                 inputs.append(new_input)
-                value_rules.append(element.value_rule)
+
+        # Prepare raw input-output from elements
+        for element in self.template.element:
+
+            if element.value_rule and element.value_rule not in value_rules:
+                pass
+            else:
+                pass
+
+            new_input = self.env['l10n.hu.nav.report.input'].create(new_input_values)
+            inputs.append(new_input)
+            value_rules.append(element.value_rule)
 
             # output_code
             if element.code:

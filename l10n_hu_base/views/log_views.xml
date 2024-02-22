@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="log_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.log.view.form</field>
+        <field name="model">l10n.hu.log</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  edit="0"
+            >
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <field name="display_name"
+                               class="p-3 float-start text-start"
+                               readonly="1"
+                        />
+                        <button name="toggle_active"
+                                type="object"
+                                class="oe_stat_button"
+                        >
+                            <field name="active"
+                                   widget="boolean_toggle"
+                            />
+                            <span class="o_stat_text">Active</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                            bg_color="bg-danger"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h4>
+                            <field name="name"
+                                   readonly="1"
+                                   style="word-break: break-word;"
+                            />
+                        </h4>
+                    </div>
+                    <group>
+                        <field name="description"
+                               readonly="1"
+                               style="word-break: break-word;"
+                        />
+                    </group>
+                    <notebook>
+                        <page name="details"
+                              attrs="{'invisible': [('id', '=', False)]}"
+                              string="Details"
+                        >
+                            <group name="details">
+                                <group name="base">
+                                    <field name="level"
+                                           readonly="1"
+                                    />
+                                    <field name="model"
+                                           readonly="1"
+                                    />
+                                    <field name="app"
+                                           readonly="1"
+                                    />
+                                    <field name="id"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           groups="base.group_multi_company"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="audit">
+                                    <field name="user_id"
+                                           readonly="1"
+                                    />
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Tree view -->
+    <record id="log_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.log.view.list</field>
+        <field name="model">l10n.hu.log</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  edit="0"
+            >
+                <field name="display_name"
+                       optional="show"
+                />
+                <field name="id"
+                       optional="hide"
+                />
+                <field name="level"/>
+                <field name="app"/>
+                <field name="model"/>
+                <field name="name"/>
+                <field name="description"
+                       optional="show"
+                />
+                <field name="user_id"/>
+                <field name="create_date"/>
+                <field name="write_date"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="log_view_search"
+            model="ir.ui.view">
+        <field name="name">l10n.hu.log.view.search</field>
+        <field name="model">l10n.hu.log</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="app"/>
+                <field name="model"/>
+                <!-- filter -->
+                <filter name="level_info_filter"
+                        domain="[('level', '=', 'info')]"
+                        string="INFO"
+                />
+                <filter name="level_warning_filter"
+                        domain="[('level', '=', 'warning')]"
+                        string="WARNING"
+                />
+                <filter name="level_error_filter"
+                        domain="[('level', '=', 'error')]"
+                        string="ERROR"
+                />
+                <filter name="level_debug_filter"
+                        domain="[('level', '=', 'debug')]"
+                        string="DEBUG"
+                />
+                <separator/>
+                <!-- Meritum scheduled today -->
+                <filter name="created_today"
+                        domain="[
+                            ('create_date', '&gt;', (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('create_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ]"
+                        string="Today"
+                />
+                <!-- filter group by -->
+                <filter name="app_filter_group_by"
+                        context="{'group_by': 'app'}"
+                        string="App"
+                />
+                <filter name="model_filter_group_by"
+                        context="{'group_by': 'model'}"
+                        string="Model"
+                />
+                <filter name="level_filter_group_by"
+                        context="{'group_by': 'level'}"
+                        string="Level"
+                />
+                <filter name="user_id_filter_group_by"
+                        context="{'group_by': 'user_id'}"
+                        string="User ID"
+                />
+                <filter name="create_date_filter_group_by"
+                        context="{'group_by': 'create_date'}"
+                        string="Create Date"
+                />
+                <filter name="company_filter_group_by"
+                        context="{'group_by': 'company'}"
+                        groups="base.group_multi_company"
+                        string="Company"
+                />
+            </search>
+        </field>
+    </record>
+</odoo>

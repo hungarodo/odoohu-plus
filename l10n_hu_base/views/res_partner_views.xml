@@ -19,7 +19,7 @@
             >
                 <page name="l10n_hu"
                       attrs="{'invisible': [('l10n_hu_enabled', '=', False)]}"
-                      string="Hungary"
+                      string="HU"
                 >
                     <group name="l10n_hu">
                         <group name="l10n_hu_1"
@@ -201,12 +201,21 @@
         <field name="arch"
                type="xml"
         >
-            <!-- Add partner fields -->
+            <!-- Field -->
             <xpath expr="//field[@name='parent_id']"
                    position="after"
             >
                 <field name="l10n_hu_vat"/>
                 <field name="l10n_hu_vpid"/>
+            </xpath>
+            <!-- Filter group by -->
+            <xpath expr="//filter[@name='group_country']"
+                   position="after"
+            >
+                <filter name="l10n_hu_vat_status_filter_group_by"
+                        context="{'group_by': 'l10n_hu_vat_status'}"
+                        string="HU VAT Status"
+                />
             </xpath>
         </field>
     </record>

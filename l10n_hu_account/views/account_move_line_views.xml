@@ -16,6 +16,30 @@
                 <field name="account_id"
                        groups="account.group_account_user"
                 />
+                <field name="l10n_hu_original_account_move"
+                       optional="hide"
+                />
+                <field name="l10n_hu_original_account_move_line"
+                       optional="hide"
+                />
+                <field name="l10n_hu_price_refund"
+                       optional="hide"
+                />
+                <field name="l10n_hu_move_trade_position"
+                       optional="hide"
+                />
+                <field name="l10n_hu_move_vat_date"
+                       optional="hide"
+                />
+                <field name="l10n_hu_move_vat_declaration"
+                       optional="hide"
+                />
+                <field name="l10n_hu_vat_reason"
+                       optional="hide"
+                />
+                <field name="product_id"
+                       optional="show"
+                />
                 <field name="quantity"/>
                 <field name="product_uom_id"
                        groups="uom.group_uom"
@@ -40,7 +64,7 @@
     <record id="account_move_line_view_list_readonly"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.account.invoice.account.move.line.view.list.readonly</field>
+        <field name="name">l10n.hu.account.move.line.view.list.readonly</field>
         <field name="model">account.move.line</field>
         <field name="priority">40</field>
         <field name="arch"
@@ -55,6 +79,30 @@
                 <field name="name"/>
                 <field name="account_id"
                        groups="account.group_account_user"
+                />
+                 <field name="l10n_hu_original_account_move"
+                       optional="hide"
+                />
+                <field name="l10n_hu_original_account_move_line"
+                       optional="hide"
+                />
+                <field name="l10n_hu_price_refund"
+                       optional="hide"
+                />
+                <field name="l10n_hu_move_trade_position"
+                       optional="hide"
+                />
+                <field name="l10n_hu_move_vat_date"
+                       optional="hide"
+                />
+                <field name="l10n_hu_move_vat_declaration"
+                       optional="hide"
+                />
+                <field name="l10n_hu_vat_reason"
+                       optional="hide"
+                />
+                <field name="product_id"
+                       optional="show"
                 />
                 <field name="quantity"/>
                 <field name="product_uom_id"
@@ -74,6 +122,71 @@
                        invisible="1"
                 />
             </tree>
+        </field>
+    </record>
+    <!-- Search view inherit -->
+    <record id="view_account_move_line_filter_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.account.move.line.filter.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_account_move_line_filter"
+        />
+        <field name="model">account.move.line</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Filter -->
+            <xpath expr="//filter[@name='date']"
+                   position="after"
+            >
+                <separator/>
+                <filter name="l10n_hu_move_trade_position_domestic_filter"
+                        domain="[('l10n_hu_move_trade_position', '=', 'domestic')]"
+                        string="Domestic"
+                />
+                <filter name="l10n_hu_move_trade_position_eu_filter"
+                        domain="[('l10n_hu_move_trade_position', '=', 'eu')]"
+                        string="EU"
+                />
+                <filter name="l10n_hu_move_trade_position_other_filter"
+                        domain="[('l10n_hu_move_trade_position', '=', 'other')]"
+                        string="Other"
+                />
+                <filter name="l10n_hu_move_trade_position_none_filter"
+                        domain="[('l10n_hu_move_trade_position', '=', False)]"
+                        string="No Trade Position"
+                />
+                <separator/>
+                <filter name="l10n_hu_move_vat_declaration_filter"
+                        domain="[('l10n_hu_move_vat_declaration', '=', True)]"
+                        help="VAT declaration account moves"
+                        string="HU VAT Declaration Enabled"
+                />
+                <separator/>
+                <filter name="l10n_hu_move_vat_date_filter"
+                        date="l10n_hu_move_vat_date"
+                        help="Account move VAT date"
+                        string="HU VAT Date"
+                />
+            </xpath>
+            <!-- Filter group by -->
+            <xpath expr="//filter[@name='group_by_matching']"
+                   position="after"
+            >
+                <separator/>
+                <filter name="l10n_hu_move_trade_position_filter_group_by"
+                        domain="[]"
+                        context="{'group_by': 'l10n_hu_move_trade_position'}"
+                        string="HU Trade Position"
+                />
+                <filter name="l10n_hu_move_vat_date_filter_group_by"
+                        domain="[]"
+                        context="{'group_by': 'l10n_hu_move_vat_date'}"
+                        string="HU VAT Date"
+                />
+            </xpath>
         </field>
     </record>
 </odoo>

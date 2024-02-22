@@ -39,8 +39,15 @@
                         >
                             <group name="common">
                                 <group>
+                                    <field name="value_char"/>
+                                    <field name="value_date"/>
+                                    <field name="value_float"/>
+                                    <field name="value_integer"/>
                                 </group>
                                 <group>
+                                    <field name="account_move_line"/>
+                                    <field name="account_move"/>
+                                    <field name="partner"/>
                                 </group>
                             </group>
                         </page>
@@ -93,6 +100,12 @@
             <tree>
                 <field name="report"/>
                 <field name="name"/>
+                <field name="value_char"/>
+                <field name="value_date"/>
+                <field name="value_float"/>
+                <field name="account_move_line"/>
+                <field name="account_move"/>
+                <field name="partner"/>
             </tree>
         </field>
     </record>

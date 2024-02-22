@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Manager group -->
-    <record id="l10n_hu_manager_group"
+    <!-- User group -->
+    <record id="base_user_group"
             model="res.groups"
     >
-        <field name="name">Hungary Manager</field>
+        <field name="name">User</field>
         <field name="category_id"
-               ref="l10n_hu_module_category"
+               ref="base_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('base.group_user'))]"
+        />
+    </record>
+    <!-- Manager group -->
+    <record id="base_manager_group"
+            model="res.groups"
+    >
+        <field name="name">Manager</field>
+        <field name="category_id"
+               ref="base_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('base_user_group'))]"
         />
         <field name="users"
                eval="[(4, ref('base.user_admin'))]"

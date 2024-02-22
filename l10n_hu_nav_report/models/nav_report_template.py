@@ -200,3 +200,56 @@ class L10nHuNavReportTemplate(models.Model):
         return result
 
     # Business methods
+    @api.model
+    def create_nav_report_from_template(self, values):
+        """ Create report based on a template
+
+         :param values: dictionary
+
+         :return: dictionary
+         """
+        # raise exceptions.UserError("create_nav_report_from_template BEGIN" + str(values))
+
+        # Initialize variables
+        create_values = {}
+        debug_list = []
+        error_list = []
+        info_list = []
+        nav_report = False
+        result = {}
+        warning_list = []
+
+        # Set nav_report_template
+        if values.get('nav_report_template'):
+            nav_report_template = values['nav_report_template']
+            debug_list.append("nav_report_template set from values: " + str(nav_report_template.id))
+        elif len(self) == 1 and self.id:
+            nav_report_template = self
+            debug_list.append("nav_report_template set from self: " + str(nav_report_template.id))
+        else:
+            nav_report_template = False
+            error_list.append("nav_report_template not set")
+
+        if len(error_list) == 0:
+            create_values.update({
+                'company': nav_report_template.company.id,
+                'template': nav_report_template.id,
+            })
+
+        if len(error_list) == 0:
+            nav_report = self.env['l10n.hu.nav.report'].create(create_values)
+
+        # Update result
+        result.update({
+            'create_values': create_values,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'nav_report': nav_report,
+            'nav_report_template': nav_report_template,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("create_nav_report_from_template END" + str(result))
+        return result

@@ -18,7 +18,7 @@
                    position="after"
             >
                 <page name="l10n_hu"
-                      string="Hungary"
+                      string="HU"
                 >
                     <group name="l10n_hu_1">
                         <group name="l10n_hu_1_1">

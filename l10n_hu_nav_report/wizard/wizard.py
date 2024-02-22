@@ -36,26 +36,6 @@ class L10nHuNavReportWizard(models.TransientModel):
         ]
     )
     # # NAV REPORT
-    action_nav_report = fields.Selection(
-        default='run_report',
-        selection=[
-            ('run_report', "Run Report"),
-            ('print_report', "Print Report")
-        ],
-        string="NAV Report Action",
-    )
-    action_nav_report_editable = fields.Boolean(
-        default=True,
-        string="NAV Report Action Editable",
-    )
-    action_nav_report_required = fields.Boolean(
-        default=False,
-        string="NAV Report Action Required",
-    )
-    action_nav_report_visible = fields.Boolean(
-        default=False,
-        string="NAV Report Action Visible",
-    )
     nav_report = fields.Many2many(
         comodel_name='l10n.hu.nav.report',
         column1='wizard',
@@ -63,6 +43,28 @@ class L10nHuNavReportWizard(models.TransientModel):
         default=_get_default_nav_report,
         relation='l10n_hu_wizard_nav_report_rel',
         string="NAV Report",
+    )
+    nav_report_action = fields.Selection(
+        default='run_report',
+        selection=[
+            ('create_report', "Create Report"),
+            ('run_report', "Run Report"),
+            ('print_report', "Print Report"),
+            ('run_rule', "Run Rule")
+        ],
+        string="NAV Report Action",
+    )
+    nav_report_action_editable = fields.Boolean(
+        default=True,
+        string="NAV Report Action Editable",
+    )
+    nav_report_action_required = fields.Boolean(
+        default=False,
+        string="NAV Report Action Required",
+    )
+    nav_report_action_visible = fields.Boolean(
+        default=False,
+        string="NAV Report Action Visible",
     )
     nav_report_editable = fields.Boolean(
         default=False,
@@ -76,6 +78,14 @@ class L10nHuNavReportWizard(models.TransientModel):
         default=False,
         string="NAV Report Required",
     )
+    nav_report_rule = fields.Many2one(
+        comodel_name='l10n.hu.nav.report.rule',
+        string="NAV Report Rule",
+    )
+    nav_report_template = fields.Many2one(
+        comodel_name='l10n.hu.nav.report.template',
+        string="NAV Report Template",
+    )
     nav_report_visible = fields.Boolean(
         default=False,
         string="NAV Report Visible",
@@ -88,24 +98,35 @@ class L10nHuNavReportWizard(models.TransientModel):
     # CRUD methods (and name_get, name_search, ...) overrides
 
     # Action methods
+    # # SUPER
     def action_execute(self):
-        # Ensure one
-        self.ensure_one()
+        """ Super override of original method in l10n_hu_base app"""
+        result = super(L10nHuNavReportWizard, self).action_execute()
 
         # Process actions
         # # REPORT
         if self.action_type == 'nav_report':
-            # # # run_report
-            if self.action_nav_report == 'print_report':
+            # run_report
+            if self.nav_report_action == 'create_report':
                 # Check input
-                if not self.nav_report:
-                    raise exceptions.UserError(_("NAV Report is mandatory!"))
+                if not self.nav_report_template:
+                    raise exceptions.UserError(_("NAV Report template is mandatory!"))
 
                 # Manage result
                 manage_result = self.manage_nav_report()
 
                 # Wizard result
-                if manage_result.get('nav_report_ids'):
+                if len(manage_result.get('nav_report_ids', [])) == 1:
+                    result = {
+                        'name': _("NAV Report"),
+                        'res_id': manage_result['nav_report_ids'][0],
+                        'res_model': 'l10n.hu.nav.report',
+                        'target': 'current',
+                        'type': 'ir.actions.act_window',
+                        'view_mode': 'form,tree',
+                    }
+                    return result
+                elif len(manage_result.get('nav_report_ids', [])) > 1:
                     result = {
                         'name': _("NAV Report"),
                         'domain': [('id', 'in', manage_result['nav_report_ids'])],
@@ -114,10 +135,10 @@ class L10nHuNavReportWizard(models.TransientModel):
                         'type': 'ir.actions.act_window',
                         'view_mode': 'tree,form',
                     }
+                    return result
                 else:
                     raise exceptions.UserError("print_report error!")
-            # # # run_report
-            elif self.action_nav_report == 'run_report':
+            elif self.nav_report_action == 'print_report':
                 # Check input
                 if not self.nav_report:
                     raise exceptions.UserError(_("NAV Report is mandatory!"))
@@ -135,66 +156,49 @@ class L10nHuNavReportWizard(models.TransientModel):
                         'type': 'ir.actions.act_window',
                         'view_mode': 'tree,form',
                     }
+                    return result
+
+                else:
+                    raise exceptions.UserError("print_report error!")
+            # run_report
+            elif self.nav_report_action == 'run_report':
+                # Check input
+                if not self.nav_report:
+                    raise exceptions.UserError(_("NAV Report is mandatory!"))
+
+                # Manage result
+                manage_result = self.manage_nav_report()
+
+                # Wizard result
+                # Wizard result
+                if len(manage_result.get('nav_report_ids', [])) == 1:
+                    result = {
+                        'name': _("NAV Report"),
+                        'res_id': manage_result['nav_report_ids'][0],
+                        'res_model': 'l10n.hu.nav.report',
+                        'target': 'current',
+                        'type': 'ir.actions.act_window',
+                        'view_mode': 'form,tree',
+                    }
+                    return result
+                elif len(manage_result.get('nav_report_ids', [])) > 1:
+                    result = {
+                        'name': _("NAV Report"),
+                        'domain': [('id', 'in', manage_result['nav_report_ids'])],
+                        'res_model': 'l10n.hu.nav.report',
+                        'target': 'current',
+                        'type': 'ir.actions.act_window',
+                        'view_mode': 'tree,form',
+                    }
+                    return result
                 else:
                     raise exceptions.UserError("run_report error!")
             # # # else
             else:
                 raise exceptions.UserError("invalid nav_report action!")
-        # # PARTNER
-        elif self.action_type == 'partner':
-            # # # list
-            if self.action_partner == 'list':
-                # Check input
-                if not self.partner:
-                    raise exceptions.UserError(_("No partner selected!"))
-
-                # Manage result
-                manage_result = self.manage_partner()
-
-                # Wizard result
-                if manage_result.get('partner_ids'):
-                    result = {
-                        'name': _("Partner"),
-                        'domain': [('id', 'in', manage_result['partner_ids'])],
-                        'res_model': 'res.partner',
-                        'target': 'current',
-                        'type': 'ir.actions.act_window',
-                        'view_mode': 'tree,form',
-                    }
-                else:
-                    raise exceptions.UserError("partner_delete error!")
-            # # # else
-            else:
-                raise exceptions.UserError("invalid partner action!")
-        # # PRODUCT
-        elif self.action_type == 'product':
-            # # # list
-            if self.action_product == 'list':
-                # Check input
-                if not self.product:
-                    raise exceptions.UserError(_("No product selected!"))
-
-                # Manage result
-                manage_result = self.manage_product()
-
-                # Wizard result
-                if manage_result.get('product_ids'):
-                    result = {
-                        'name': _("Product"),
-                        'domain': [('id', 'in', manage_result['product_ids'])],
-                        'res_model': 'product.product',
-                        'target': 'current',
-                        'type': 'ir.actions.act_window',
-                        'view_mode': 'tree,form',
-                    }
-                else:
-                    raise exceptions.UserError("product_delete error!")
-            # # # else
-            else:
-                raise exceptions.UserError("invalid product action!")
         # # else
         else:
-            raise exceptions.UserError(_("Not yet implemented!"))
+            pass
 
         # Return result
         return result
@@ -207,32 +211,43 @@ class L10nHuNavReportWizard(models.TransientModel):
         :return: dictionary
         """
         # Initialize variables
+        error_list = []
         nav_reports = []
         nav_report_ids = []
         result = {}
 
         # Process scenarios
-        if self.action_type == 'nav_report' \
-                and self.action_nav_report == 'print_report':
-            for nav_report in self.nav_report:
-                nav_reports.append(nav_report)
-                nav_report_ids.append(nav_report.id)
-                result = nav_report.print_report({
-                    'print_locked': self.nav_report_print_locked
-                })
-            # raise exceptions.UserError(str(result))
-        elif self.action_type == 'nav_report' \
-                and self.action_nav_report == 'run_report':
-            for nav_report in self.nav_report:
-                nav_reports.append(nav_report)
-                nav_report_ids.append(nav_report.id)
-                result = nav_report.run_report({})
-            # raise exceptions.UserError(str(result))
+        if self.action_type == 'nav_report':
+            if self.nav_report_action == 'create_report' and self.nav_report_template:
+                create_values = {}
+                create_result = self.nav_report_template.create_nav_report_from_template(create_values)
+                if create_result.get('nav_report'):
+                    nav_reports.append(create_result['nav_report'])
+                    nav_report_ids.append(create_result['nav_report'].id)
+                error_list += create_result.get('error_list', [])
+                # raise exceptions.UserError(str(result))
+            elif self.nav_report_action == 'print_report':
+                for nav_report in self.nav_report:
+                    nav_reports.append(nav_report)
+                    nav_report_ids.append(nav_report.id)
+                    result = nav_report.print_report({
+                        'print_locked': self.nav_report_print_locked
+                    })
+                # raise exceptions.UserError(str(result))
+            elif self.nav_report_action == 'run_report':
+                for nav_report in self.nav_report:
+                    nav_reports.append(nav_report)
+                    nav_report_ids.append(nav_report.id)
+                    result = nav_report.run_report({})
+                # raise exceptions.UserError(str(result))
+            else:
+                pass
         else:
             pass
 
         # Update result
         result.update({
+            'error_list': error_list,
             'nav_reports': nav_reports,
             'nav_report_ids': nav_report_ids,
         })

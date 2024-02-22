@@ -18,11 +18,10 @@ class L10nHuAccountMove(models.Model):
     # Default methods
 
     # Field declarations
-    # # ACCOUNT BASE
-    l10n_hu_company_partner = fields.Many2one(
-        comodel_name='res.partner',
-        related='company_id.partner_id',
-        string="Company Partner",
+    # # CURRENCY
+    l10n_hu_currency_exchange = fields.Boolean(
+        compute='_compute_l10n_hu_currency_exchange',
+        string="Currency Exchange",
     )
     l10n_hu_currency_name = fields.Char(
         related='currency_id.name',
@@ -37,58 +36,17 @@ class L10nHuAccountMove(models.Model):
         compute='_compute_l10n_hu_currency_rate_amount',
         string="Currency Rate Amount",
     )
+    # # DOCUMENT TYPE
     l10n_hu_document_type = fields.Many2one(
         comodel_name='l10n.hu.document.type',
         index=True,
-        readonly=True,
         string="Document Type",
     )
     l10n_hu_document_type_code = fields.Char(
         related='l10n_hu_document_type.code',
         string="Document Type Code",
     )
-    l10n_hu_eu_oss_eligible = fields.Boolean(
-        copy=False,
-        default=False,
-        string="EU OSS Eligible",
-    )
-    l10n_hu_eu_oss_enabled = fields.Boolean(
-        copy=False,
-        default=False,
-        string="EU OSS Enabled",
-    )
-    l10n_hu_fiscal_representative = fields.Many2one(
-        comodel_name='res.partner',
-        index=True,
-        string="Fiscal Representative",
-    )
-    l10n_hu_fiscal_representative_bank_account = fields.Many2one(
-        comodel_name='res.partner.bank',
-        index=True,
-        string="Fiscal Representative Bank Account",
-    )
-    l10n_hu_invoice_delivery_period_end = fields.Date(
-        string="Invoice Delivery Period End",
-    )
-    l10n_hu_invoice_delivery_period_start = fields.Date(
-        string="Invoice Delivery Period Start",
-    )
-    l10n_hu_invoice_delivery_period_summary = fields.Text(
-        string="Invoice Delivery Period Summary",
-    )
-    l10n_hu_invoice_payment_method = fields.Many2one(
-        comodel_name='account.payment.method',
-        index=True,
-        string="Invoice Payment Method",
-    )
-    l10n_hu_invoice_periodical_delivery = fields.Boolean(
-        default=False,
-        string="Invoice Periodical Delivery",
-    )
-    l10n_hu_is_foreign_currency = fields.Boolean(
-        compute='_compute_l10n_hu_is_foreign_currency',
-        string="Is Foreign Currency",
-    )
+    # # JOURNAL
     l10n_hu_journal_show_print_pdf = fields.Boolean(
         related='journal_id.l10n_hu_show_print_pdf',
         string="Show Print PDF",
@@ -101,6 +59,7 @@ class L10nHuAccountMove(models.Model):
         related='journal_id.type',
         string="Journal Type",
     )
+    # # ORIGINAL
     l10n_hu_original_account_move = fields.Many2one(
         comodel_name='account.move',
         copy=False,
@@ -111,6 +70,32 @@ class L10nHuAccountMove(models.Model):
         copy=False,
         string="Original Invoice Number",
     )
+    # # OSS
+    l10n_hu_eu_oss_eligible = fields.Boolean(
+        copy=False,
+        default=False,
+        string="EU OSS Eligible",
+    )
+    l10n_hu_eu_oss_enabled = fields.Boolean(
+        copy=False,
+        default=False,
+        string="EU OSS Enabled",
+    )
+    # # PARTNER
+    l10n_hu_company_partner = fields.Many2one(
+        related='company_id.partner_id',
+        string="Company Partner",
+    )
+    l10n_hu_fiscal_representative = fields.Many2one(
+        comodel_name='res.partner',
+        index=True,
+        string="Fiscal Representative",
+    )
+    l10n_hu_fiscal_representative_bank_account = fields.Many2one(
+        comodel_name='res.partner.bank',
+        index=True,
+        string="Fiscal Representative Bank Account",
+    )
     l10n_hu_partner_country = fields.Many2one(
         comodel_name='res.country',
         related='partner_id.country_id',
@@ -118,18 +103,51 @@ class L10nHuAccountMove(models.Model):
         store=True,
         string="Partner Country",
     )
+    l10n_hu_trade_position = fields.Selection(
+        related='fiscal_position_id.l10n_hu_trade_position',
+        index=True,
+        store=True,
+        string="Trade Position",
+    )
+    # # PERIOD
+    l10n_hu_invoice_delivery_period_end = fields.Date(
+        string="Invoice Delivery Period End",
+    )
+    l10n_hu_invoice_delivery_period_start = fields.Date(
+        string="Invoice Delivery Period Start",
+    )
+    l10n_hu_invoice_delivery_period_summary = fields.Text(
+        string="Invoice Delivery Period Summary",
+    )
+    l10n_hu_invoice_periodical_delivery = fields.Boolean(
+        default=False,
+        string="Invoice Periodical Delivery",
+    )
+    # # PAYMENT
+    l10n_hu_invoice_payment_method = fields.Many2one(
+        comodel_name='account.payment.method',
+        index=True,
+        string="Invoice Payment Method",
+    )
+    # # VAT
     l10n_hu_vat_date = fields.Date(
         string="VAT Date",
+    )
+    l10n_hu_vat_declaration = fields.Boolean(
+        copy=False,
+        default=True,
+        string="VAT Declaration",
+        tracking=True,
     )
 
     # Compute and search fields, in the same order of field declarations
     @api.depends('currency_id')
-    def _compute_l10n_hu_is_foreign_currency(self):
+    def _compute_l10n_hu_currency_exchange(self):
         for record in self:
             if record.currency_id and record.currency_id != record.company_id.currency_id:
-                record.l10n_hu_is_foreign_currency = True
+                record.l10n_hu_currency_exchange = True
             else:
-                record.l10n_hu_is_foreign_currency = False
+                record.l10n_hu_currency_exchange = False
 
     @api.depends('l10n_hu_currency_rate')
     def _compute_l10n_hu_currency_rate_amount(self):
@@ -148,6 +166,23 @@ class L10nHuAccountMove(models.Model):
             else:
                 record.l10n_hu_currency_rate_amount = False
 
+    @api.depends('partner_id')
+    def _compute_l10n_hu_vat_position(self):
+        for record in self:
+            if record.state == 'draft' and record.partner_id:
+                vat_position_result = record.l10n_hu_get_vat_position({})
+                if vat_position_result.get('error_list', []) == 0:
+                    vat_position = vat_position_result.get('vat_position')
+                else:
+                    vat_position = False
+            elif record.state != 'draft' and record.partner_id:
+                vat_position = record.l10n_hu_vat_position
+            else:
+                vat_position = False
+
+            # Set value
+            record.l10n_hu_vat_position = vat_position
+
     # Constraints and onchanges
 
     # CRUD methods (and name_get, name_search, ...) overrides
@@ -161,7 +196,7 @@ class L10nHuAccountMove(models.Model):
                 error_text += " " + str(record.display_name)
                 raise exceptions.ValidationError(error_text)
 
-        # Do switch
+        # Set fields
         for record in self:
             oss_data = record.l10n_hu_get_eu_oss_data({})
             if oss_data.get('update_allowed') \

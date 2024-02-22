@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="account_tax_group_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Tax Groups</field>
+        <field name="domain">[('country_code', '=', 'HU')]</field>
+        <field name="res_model">account.tax.group</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="account_tax_group_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="account_tax_group_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="account.view_tax_group_tree"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="account_tax_group_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="account_tax_group_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="account.view_tax_group_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

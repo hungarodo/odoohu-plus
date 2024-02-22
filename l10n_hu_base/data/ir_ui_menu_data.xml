@@ -31,6 +31,32 @@
         />
         <field name="sequence">96</field>
     </record>
+    <!-- HU > Reporting > Partners -->
+    <record id="hu_reporting_partner_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Partners</field>
+        <field name="action"
+               ref="res_partner_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
+    <!-- HU > Reporting > Products -->
+    <record id="hu_reporting_product_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Products</field>
+        <field name="action"
+               ref="product_product_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
     <!-- HU > Reporting > Objects -->
     <record id="hu_reporting_object_menu"
             model="ir.ui.menu"
@@ -42,7 +68,20 @@
         <field name="parent_id"
                ref="hu_reporting_menu"
         />
-        <field name="sequence">32</field>
+        <field name="sequence">24</field>
+    </record>
+    <!-- HU > Reporting > Logs -->
+    <record id="hu_reporting_log_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Logs</field>
+        <field name="action"
+               ref="log_action"
+        />
+        <field name="parent_id"
+               ref="hu_reporting_menu"
+        />
+        <field name="sequence">28</field>
     </record>
     <!-- HU > Configuration -->
     <record id="hu_configuration_menu"

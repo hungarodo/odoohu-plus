@@ -62,6 +62,13 @@
                             />
                         </group>
                     </group>
+                    <group name="report_template"
+                           colspan="2"
+                    >
+                        <field name="report_template"
+                               widget="many2many_tags"
+                        />
+                    </group>
                     <notebook>
                         <page name="details"
                               string="Details"

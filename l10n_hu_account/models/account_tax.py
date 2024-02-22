@@ -18,6 +18,12 @@ class L10nHuAccountTax(models.Model):
     # Default methods
 
     # Field declarations
+    l10n_hu_tax_type = fields.Selection(
+        selection=[
+            ('vat', "VAT"),
+        ],
+        string="HU Tax Type",
+    )
     l10n_hu_technical_name = fields.Char(
         copy=False,
         string="HU Technical Name",
@@ -30,6 +36,11 @@ class L10nHuAccountTax(models.Model):
             ('unknown', "UNKNOWN - Pre-3.0 invoice"),
         ],
         string="HU VAT Mismatch Case",
+    )
+    l10n_hu_vat_declaration = fields.Boolean(
+        default=False,
+        help="Can be included in VAT declarations",
+        string="HU VAT Declaration",
     )
     l10n_hu_vat_exemption_case = fields.Selection(
         help="VAT exemption case according to NAV (Hungarian Tax Authority) regulations",

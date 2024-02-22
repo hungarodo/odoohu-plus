@@ -16,27 +16,41 @@
             <xpath expr="//field[@name='action_type']"
                    position="after"
             >
-                <field name="action_nav_report_editable"
+                <field name="nav_report_action_editable"
                        invisible="1"
                 />
-                <field name="action_nav_report_required"
+                <field name="nav_report_action_required"
                        invisible="1"
                 />
-                <field name="action_nav_report_visible"
+                <field name="nav_report_action_visible"
                        invisible="1"
                 />
-                <field name="action_nav_report"
+                <field name="nav_report_action"
                        attrs="{
-                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('action_nav_report_visible', '=', False)],
-                           'readonly': [('action_nav_report_editable', '=', False)],
-                           'required': ['|', ('action_type', '=', 'nav_report'), ('action_nav_report_required', '=', True)],
+                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('nav_report_action_visible', '=', False)],
+                           'readonly': [('nav_report_action_editable', '=', False)],
+                           'required': ['|', ('action_type', '=', 'nav_report'), ('nav_report_action_required', '=', True)],
                        }"
                        force_save="1"
                        string="Action"
                 />
+                <field name="nav_report_rule"
+                       attrs="{
+                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('nav_report_action', '!=', 'run_rule')],
+                       }"
+                       options="{'no_create': True,}"
+                       string="Rule"
+                />
+                <field name="nav_report_template"
+                       attrs="{
+                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('nav_report_action', '!=', 'create_report')],
+                       }"
+                       options="{'no_create': True,}"
+                       string="Template"
+                />
                 <field name="nav_report_print_locked"
                        attrs="{
-                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('action_nav_report', '!=', 'print_report')],
+                           'invisible': ['|', ('action_type', '!=', 'nav_report'), ('nav_report_action', '!=', 'print_report')],
                        }"
                        string="Print Locked"
                        widget="boolean_toggle"
@@ -47,9 +61,7 @@
                    position="inside"
             >
                 <div name="nav_report_info"
-                     attrs="{'invisible': [
-                         ('action_type', '!=', 'nav_report'),
-                     ]}"
+                     attrs="{'invisible': [('action_type', '!=', 'nav_report')]}"
                      class="card text-white bg-info"
                      colspan="2"
                 >
@@ -58,12 +70,23 @@
                         Information
                     </div>
                     <div class="card-body">
+                        <!-- Create report -->
                         <p class="card-text"
-                           attrs="{'invisible': [
-                               ('action_nav_report', '!=', 'run_report')
-                           ]}"
+                           attrs="{'invisible': [('nav_report_action', '!=', 'create_report')]}"
                         >
-                            Run NAV report
+                            Create new report
+                        </p>
+                        <!-- Run report -->
+                        <p class="card-text"
+                           attrs="{'invisible': [('nav_report_action', '!=', 'run_report')]}"
+                        >
+                            Run report
+                        </p>
+                        <!-- Run rule -->
+                        <p class="card-text"
+                           attrs="{'invisible': [('nav_report_action', '!=', 'run_rule')]}"
+                        >
+                            Run report rule
                         </p>
                     </div>
                 </div>
