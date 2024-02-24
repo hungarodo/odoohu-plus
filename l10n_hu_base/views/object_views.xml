@@ -79,11 +79,12 @@
                             <field name="key"
                                    readonly="1"
                             />
+                            <field name="description"/>
                         </group>
                     </group>
                     <notebook name="notebook">
-                        <page name="fields"
-                              string="Fields"
+                        <page name="details"
+                              string="Details"
                         >
                             <group>
                                 <group>
@@ -93,7 +94,9 @@
                                     />
                                 </group>
                                 <group>
-                                    <field name="description"/>
+                                    <field name="technical_name"/>
+                                    <field name="linked_model_name"/>
+                                    <field name="linked_record_id"/>
                                 </group>
                             </group>
                         </page>
@@ -102,19 +105,25 @@
                         >
                             <field name="html_content"/>
                         </page>
-                        <page name="technical"
-                              attrs="{'invisible': [('id', '=', False)]}"
-                              string="Technical"
+                        <page name="api"
+                              string="API"
                         >
-                            <group name="technical">
-                                <field name="technical_name"
-                                       readonly="1"
-                                />
-                                <field name="technical_data_type"
-                                       readonly="1"
-                                />
-                                <field name="technical_data"
-                                       readonly="1"
+                            <group name="api">
+                                <group>
+                                    <field name="api_enabled"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="api_timestamp"/>
+                                </group>
+                            </group>
+                            <group name="api_data"
+                                   colspan="2"
+                            >
+                                <field name="api_data"
+                                       attrs="{'readonly': [('api_enabled', '=', True)]}"
+                                       nolabel="1"
                                        style="word-break: break-word;"
                                 />
                             </group>
@@ -124,19 +133,22 @@
                               string="Audit"
                         >
                             <group name="audit">
-                                <group name="details">
+                                <group name="audit_1">
                                     <field name="id"
                                            readonly="1"
                                     />
                                     <field name="company"
                                            readonly="1"
                                     />
+                                    <field name="locked"
+                                           widget="boolean_toggle"
+                                    />
                                     <field name="category_technical_name"/>
                                     <field name="collection_technical_name"/>
                                     <field name="status_technical_name"/>
                                     <field name="type_technical_name"/>
                                 </group>
-                                <group name="create_write">
+                                <group name="audit_2">
                                     <field name="create_uid"
                                            readonly="1"
                                     />
@@ -148,6 +160,29 @@
                                     />
                                     <field name="write_date"
                                            readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   string="Technical"
+                            >
+                                <group>
+                                    <field name="technical_data_type"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="technical_data_type"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="technical_data"
+                                       colspan="2"
+                                >
+                                    <field name="technical_data"
+                                           nolabel="1"
+                                           readonly="1"
+                                           style="word-break: break-word;"
                                     />
                                 </group>
                             </group>

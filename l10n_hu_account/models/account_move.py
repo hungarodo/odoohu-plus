@@ -16,7 +16,7 @@ class L10nHuAccountMove(models.Model):
     _inherit = 'account.move'
 
     # Default methods
-
+    
     # Field declarations
     # # CURRENCY
     l10n_hu_currency_exchange = fields.Boolean(
@@ -132,12 +132,6 @@ class L10nHuAccountMove(models.Model):
     # # VAT
     l10n_hu_vat_date = fields.Date(
         string="VAT Date",
-    )
-    l10n_hu_vat_declaration = fields.Boolean(
-        copy=False,
-        default=True,
-        string="VAT Declaration",
-        tracking=True,
     )
 
     # Compute and search fields, in the same order of field declarations

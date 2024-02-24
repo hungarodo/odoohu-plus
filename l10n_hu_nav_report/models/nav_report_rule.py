@@ -20,27 +20,10 @@ class L10nHuNavReportRule(models.Model):
     # Default methods
 
     # Field declarations
-    account_move_domain = fields.Text(
-        string="Account Move Domain",
-    )
-    account_move_line_domain = fields.Text(
-        string="Account Move Line Domain",
-    )
+    # # COMMON
     active = fields.Boolean(
         default=True,
         string="Active",
-    )
-    code_method = fields.Char(
-        copy=False,
-        string="Code Method",
-    )
-    code_parameters = fields.Text(
-        copy=False,
-        string="Code Parameters",
-    )
-    code_result = fields.Text(
-        copy=False,
-        string="Code Result",
     )
     company = fields.Many2one(
         comodel_name='res.company',
@@ -48,39 +31,10 @@ class L10nHuNavReportRule(models.Model):
         index=True,
         string="Company",
     )
-    custom_domain = fields.Text(
-        string="Custom Domain",
-    )
     description = fields.Text(
         copy=False,
         string="Description",
         translate=True,
-    )
-    ir_model = fields.Many2one(
-        comodel_name='ir.model',
-        copy=True,
-        index=True,
-        ondelete='cascade',
-        string="Model",
-    )
-    ir_model_field = fields.Many2one(
-        comodel_name='ir.model.fields',
-        copy=True,
-        index=True,
-        ondelete='cascade',
-        string="Model Field",
-    )
-    ir_model_field_name = fields.Char(
-        index=True,
-        related='ir_model_field.name',
-        store=True,
-        string="Model Field Technical Name",
-    )
-    ir_model_name = fields.Char(
-        index=True,
-        related='ir_model.model',
-        store=True,
-        string="Model Technical Name",
     )
     name = fields.Char(
         copy=False,
@@ -88,42 +42,13 @@ class L10nHuNavReportRule(models.Model):
         string="Name",
         translate=True,
     )
-    partner_domain = fields.Text(
-        string="Partner Domain",
-    )
-    product_domain = fields.Text(
-        string="Product Domain",
-    )
-    report_template = fields.Many2many(
-        column1='rule',
-        column2='template',
-        comodel_name='l10n.hu.nav.report.template',
-        relation='l10n_hu_nav_report_rule_report_template',
-        string="NAV Report Template",
-    )
-    rule_scope = fields.Selection(
-        required=True,
-        selection=[
-            ('input', "Input"),
-            ('element', "Element"),
-        ],
-        string="Rule Scope",
-    )
     rule_type = fields.Selection(
         required=True,
         selection=[
-            ('report', "Report"),
-            ('value', "Value"),
+            ('report_input', "Report Input"),
+            ('report_output', "Report Output"),
         ],
         string="Rule Type",
-    )
-    search_limit = fields.Integer(
-        default=0,
-        string="Search Limit",
-    )
-    search_order = fields.Char(
-        copy=False,
-        string="Search Order",
     )
     sequence = fields.Integer(
         string="Sequence",
@@ -154,6 +79,98 @@ class L10nHuNavReportRule(models.Model):
         readonly=True,
         string="Technical Type",
     )
+    # # CODE
+    code_method = fields.Char(
+        copy=False,
+        string="Code Method",
+    )
+    code_parameters = fields.Text(
+        copy=False,
+        string="Code Parameters",
+    )
+    code_result = fields.Text(
+        copy=False,
+        string="Code Result",
+    )
+    # # DOMAIN & SEARCH
+    account_move_domain = fields.Text(
+        string="Account Move Domain",
+    )
+    account_move_line_domain = fields.Text(
+        string="Account Move Line Domain",
+    )
+    custom_domain = fields.Text(
+        string="Custom Domain",
+    )
+    partner_domain = fields.Text(
+        string="Partner Domain",
+    )
+    product_domain = fields.Text(
+        string="Product Domain",
+    )
+    search_limit = fields.Integer(
+        default=0,
+        string="Search Limit",
+    )
+    search_order = fields.Char(
+        copy=False,
+        string="Search Order",
+    )
+    # # MODEL & FIELD
+    ir_model = fields.Many2one(
+        comodel_name='ir.model',
+        copy=True,
+        index=True,
+        ondelete='cascade',
+        string="Model",
+    )
+    ir_model_field = fields.Many2one(
+        comodel_name='ir.model.fields',
+        copy=True,
+        index=True,
+        ondelete='cascade',
+        string="Model Field",
+    )
+    ir_model_field_name = fields.Char(
+        index=True,
+        related='ir_model_field.name',
+        store=True,
+        string="Model Field Technical Name",
+    )
+    ir_model_name = fields.Char(
+        index=True,
+        related='ir_model.model',
+        store=True,
+        string="Model Technical Name",
+    )
+    # # REPORT
+    report_template = fields.Many2many(
+        column1='rule',
+        column2='template',
+        comodel_name='l10n.hu.nav.report.template',
+        relation='l10n_hu_nav_report_rule_report_template',
+        string="NAV Report Template",
+    )
+    report_data_category = fields.Many2one(
+        comodel_name='l10n.hu.tag',
+        domain=[('tag_type', '=', 'nav_report_data_category')],
+        index=True,
+        string="Report Data Category",
+    )
+    report_data_category_technical_name = fields.Char(
+        related='report_data_category.technical_name',
+        string="Report Data Category Technical Name",
+    )
+    report_data_tag = fields.Many2many(
+        comodel_name='l10n.hu.tag',
+        column1='object',
+        column2='tag',
+        domain=[('tag_type', 'in', ['general', 'nav_report_data_tag'])],
+        index=True,
+        relation='l10n_hu_nav_report_rule_report_data_tag_rel',
+        string="Report Data Tag",
+    )
+    # # VALUE
     value_boolean = fields.Boolean(
         default=False,
         string="Boolean Value",
@@ -183,6 +200,7 @@ class L10nHuNavReportRule(models.Model):
         selection=[
             ('code', "Code"),
             ('field', "Field"),
+            ('filter', "Filter"),
             ('fixed', "Fixed"),
         ],
         string="Value Method",

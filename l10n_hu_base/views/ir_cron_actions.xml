@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="cron_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Scheduled Actions</field>
+        <field name="context">{'search_default_all': 1}</field>
+        <field name="domain">[('name', 'ilike', 'l10n_hu')]</field>
+        <field name="res_model">ir.cron</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form,calendar</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="cron_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="cron_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="base.ir_cron_view_tree"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="cron_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="cron_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="base.ir_cron_view_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+    <!-- Window action calendar view -->
+    <record id="cron_action_calendar"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="cron_action"
+        />
+        <field name="sequence">24</field>
+        <field name="view_id"
+               ref="base.ir_cron_view_calendar"
+        />
+        <field name="view_mode">calendar</field>
+    </record>
+</odoo>

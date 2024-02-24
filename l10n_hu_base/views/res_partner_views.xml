@@ -73,6 +73,9 @@
                                    }"
                                    placeholder="12345678-9-10"
                             />
+                            <field name="l10n_hu_tax_unit"/>
+                            <field name="l10n_hu_tax_unit_vat"/>
+                            <field name="l10n_hu_tax_unit_vat_hu"/>
                             <field name="l10n_hu_crn"/>
                             <field name="l10n_hu_vpid"
                                    string="VPID"

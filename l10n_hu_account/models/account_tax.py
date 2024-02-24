@@ -18,11 +18,11 @@ class L10nHuAccountTax(models.Model):
     # Default methods
 
     # Field declarations
-    l10n_hu_tax_type = fields.Selection(
+    l10n_hu_category = fields.Selection(
         selection=[
             ('vat', "VAT"),
         ],
-        string="HU Tax Type",
+        string="HU Category",
     )
     l10n_hu_technical_name = fields.Char(
         copy=False,

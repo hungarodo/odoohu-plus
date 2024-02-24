@@ -5,7 +5,7 @@
             model="ir.actions.act_window"
     >
         <field name="name">Account Move Lines</field>
-        <field name="context">{'journal_type':'general', 'search_default_posted':1, 'search_default_l10n_hu_move_vat_declaration_filter': 1, 'search_default_group_by_tax_tags': 1}</field>
+        <field name="context">{'journal_type':'general', 'search_default_posted':1, 'search_default_group_by_tax_tags': 1}</field>
         <field name="domain">[('display_type', 'not in', ('line_section', 'line_note')), ('parent_state', '!=', 'cancel')]</field>
         <field name="res_model">account.move.line</field>
         <field name="type">ir.actions.act_window</field>

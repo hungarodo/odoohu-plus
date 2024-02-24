@@ -31,9 +31,6 @@
                 <field name="l10n_hu_move_vat_date"
                        optional="hide"
                 />
-                <field name="l10n_hu_move_vat_declaration"
-                       optional="hide"
-                />
                 <field name="l10n_hu_vat_reason"
                        optional="hide"
                 />
@@ -95,9 +92,6 @@
                 <field name="l10n_hu_move_vat_date"
                        optional="hide"
                 />
-                <field name="l10n_hu_move_vat_declaration"
-                       optional="hide"
-                />
                 <field name="l10n_hu_vat_reason"
                        optional="hide"
                 />
@@ -142,6 +136,12 @@
                    position="after"
             >
                 <separator/>
+                <filter name="l10n_hu_move_vat_date_filter"
+                        date="l10n_hu_move_vat_date"
+                        help="Account move VAT date"
+                        string="HU VAT Date"
+                />
+                <separator/>
                 <filter name="l10n_hu_move_trade_position_domestic_filter"
                         domain="[('l10n_hu_move_trade_position', '=', 'domestic')]"
                         string="Domestic"
@@ -158,33 +158,21 @@
                         domain="[('l10n_hu_move_trade_position', '=', False)]"
                         string="No Trade Position"
                 />
-                <separator/>
-                <filter name="l10n_hu_move_vat_declaration_filter"
-                        domain="[('l10n_hu_move_vat_declaration', '=', True)]"
-                        help="VAT declaration account moves"
-                        string="HU VAT Declaration Enabled"
-                />
-                <separator/>
-                <filter name="l10n_hu_move_vat_date_filter"
-                        date="l10n_hu_move_vat_date"
-                        help="Account move VAT date"
-                        string="HU VAT Date"
-                />
             </xpath>
             <!-- Filter group by -->
             <xpath expr="//filter[@name='group_by_matching']"
                    position="after"
             >
                 <separator/>
-                <filter name="l10n_hu_move_trade_position_filter_group_by"
-                        domain="[]"
-                        context="{'group_by': 'l10n_hu_move_trade_position'}"
-                        string="HU Trade Position"
-                />
                 <filter name="l10n_hu_move_vat_date_filter_group_by"
                         domain="[]"
                         context="{'group_by': 'l10n_hu_move_vat_date'}"
                         string="HU VAT Date"
+                />
+                <filter name="l10n_hu_move_trade_position_filter_group_by"
+                        domain="[]"
+                        context="{'group_by': 'l10n_hu_move_trade_position'}"
+                        string="HU Trade Position"
                 />
             </xpath>
         </field>

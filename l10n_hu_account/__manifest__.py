@@ -16,6 +16,8 @@
         'views/account_move_line_actions.xml',
         'views/account_payment_method_views.xml',
         'views/account_payment_method_actions.xml',
+        'views/account_payment_term_views.xml',
+        'views/account_payment_term_actions.xml',
         'views/account_tag_views.xml',
         'views/account_tag_actions.xml',
         'views/account_tax_views.xml',
@@ -41,6 +43,6 @@
     'qweb': [],
     'summary': "Hungarian accounting improvements",
     'test': [],
-    'version': "1.0.16",
+    'version': "1.0.18",
     'website': "https://wwww.hungarodo.hu/odoohu"
 }

@@ -45,13 +45,13 @@ class L10nHuNavReportOutput(models.Model):
         ondelete='cascade',
         string="Element",
     )
-    is_locked = fields.Boolean(
-        default=False,
-        string="Locked",
-    )
     line_section_table_heading = fields.Boolean(
         default=True,
         string="Section Table Heading",
+    )
+    locked = fields.Boolean(
+        default=False,
+        string="Locked",
     )
     name = fields.Char(
         string="Name",

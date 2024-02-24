@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Object API cron -->
+    <record id="object_api_cron"
+            model="ir.cron"
+    >
+        <field name="name">HU Object API</field>
+        <field name="code">model.run_object_api_cron()</field>
+        <field name="doall"
+               eval="False"
+        />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="model_id"
+               ref="l10n_hu_base.model_l10n_hu_object"
+        />
+        <field name="numbercall">-1</field>
+        <field name="state">code</field>
+    </record>
+</odoo>

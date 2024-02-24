@@ -66,6 +66,20 @@ class L10nHuBaseResPartner(models.Model):
         help="Hungarian tax number",
         string="HU VAT",
     )
+    l10n_hu_tax_unit = fields.Many2one(
+        comodel_name='res.partner',
+        string="HU Tax Unit",
+    )
+    l10n_hu_tax_unit_vat = fields.Char(
+        related='l10n_hu_tax_unit.vat',
+        store=True,
+        string="HU Tax Unit VAT",
+    )
+    l10n_hu_tax_unit_vat_hu = fields.Char(
+        related='l10n_hu_tax_unit.l10n_hu_vat',
+        store=True,
+        string="HU Tax Unit VAT HU",
+    )
     l10n_hu_vat_reverse_charge = fields.Boolean(
         default=False,
         string="VAT Reverse Charge",

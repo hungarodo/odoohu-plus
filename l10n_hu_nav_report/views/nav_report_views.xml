@@ -82,6 +82,8 @@
                             <field name="template"
                                    options="{'no_create': True,}"
                             />
+                            <field name="template_code"/>
+                            <field name="template_version"/>
                             <field name="period_start"
                                    required="1"
                             />
@@ -90,6 +92,14 @@
                             />
                         </group>
                         <group>
+                            <field name="category"
+                                   options="{'color_field': 'color', 'no_create': True,}"
+                                   readonly="1"
+                            />
+                            <field name="tag"
+                                   options="{'color_field': 'color', 'no_create': True,}"
+                                   widget="many2many_tags"
+                            />
                             <field name="description"
                                    placeholder="Description..."
                             />
@@ -158,9 +168,16 @@
             <tree>
                 <field name="display_name"/>
                 <field name="template"/>
+                <field name="category"
+                       options="{'color_field': 'color'}"
+                />
+                <field name="status"/>
                 <field name="period_start"/>
                 <field name="period_end"/>
-                <field name="status"/>
+                <field name="tag"
+                       options="{'color_field': 'color'}"
+                       widget="many2many_tags"
+                />
                 <field name="write_date"
                        optional="hide"
                 />
@@ -184,11 +201,21 @@
                 <field name="template"/>
                 <field name="period_start"/>
                 <field name="period_end"/>
+                <field name="category"/>
+                <field name="tag"/>
                 <separator/>
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"
                 >
+                    <filter name="category_group_by"
+                            context="{'group_by': 'category'}"
+                            string="Category"
+                    />
+                    <filter name="tag_group_by"
+                            context="{'group_by': 'tag'}"
+                            string="Tag"
+                    />
                     <filter name="period_start_filter_group_by"
                             context="{'group_by': 'period_start'}"
                             string="Period Start"

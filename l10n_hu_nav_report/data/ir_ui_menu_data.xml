@@ -1,10 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- HU > NAV Report -->
+    <record id="hu_nav_report_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">NAV Report</field>
+        <field name="groups_id"
+               eval="[(4, ref('l10n_hu_nav_report.nav_report_user_group'))]"
+        />
+        <field name="parent_id"
+               ref="l10n_hu_base.hu_base_menu"
+        />
+        <field name="sequence">72</field>
+    </record>
+    <!-- HU > NAV Report > Reports -->
+    <record id="hu_nav_report_report_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Reports</field>
+        <field name="action"
+               ref="nav_report_action"
+        />
+        <field name="parent_id"
+               ref="hu_nav_report_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU > NAV > Report Wizard -->
+    <record id="hu_nav_report_wizard_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Report Wizard</field>
+        <field name="action"
+               ref="report_wizard_action"
+        />
+        <field name="parent_id"
+               ref="hu_nav_report_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
     <!-- HU > Reporting > NAV  -->
     <record id="hu_reporting_nav_menu"
             model="ir.ui.menu"
     >
-        <field name="name">NAV Reporting</field>
+        <field name="name">NAV</field>
         <field name="groups_id"
                eval="[(4, ref('l10n_hu_nav_report.nav_report_user_group'))]"
         />
@@ -13,19 +52,7 @@
         />
         <field name="sequence">48</field>
     </record>
-    <!-- HU > Reporting > NAV > Reports -->
-    <record id="hu_reporting_nav_report_menu"
-            model="ir.ui.menu"
-    >
-        <field name="name">Reports</field>
-        <field name="action"
-               ref="nav_report_action"
-        />
-        <field name="parent_id"
-               ref="hu_reporting_nav_menu"
-        />
-        <field name="sequence">16</field>
-    </record>
+
     <!-- HU > Reporting > NAV > Report Inputs -->
     <record id="hu_reporting_nav_report_input_menu"
             model="ir.ui.menu"
@@ -51,19 +78,6 @@
                ref="hu_reporting_nav_menu"
         />
         <field name="sequence">32</field>
-    </record>
-    <!-- HU > Reporting > NAV > Report Wizard -->
-    <record id="hu_reporting_nav_report_wizard_menu"
-            model="ir.ui.menu"
-    >
-        <field name="name">Report Wizard</field>
-        <field name="action"
-               ref="report_wizard_action"
-        />
-        <field name="parent_id"
-               ref="hu_reporting_nav_menu"
-        />
-        <field name="sequence">64</field>
     </record>
     <!-- HU > Configuration > NAV Reporting -->
     <record id="hu_configuration_nav_reporting_menu"

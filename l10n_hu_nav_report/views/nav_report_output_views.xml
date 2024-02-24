@@ -21,15 +21,6 @@
                                    readonly="1"
                             />
                         </span>
-                        <button name="toggle_active"
-                                class="oe_stat_button"
-                                type="object"
-                        >
-                            <field name="active"
-                                   widget="boolean_toggle"
-                            />
-                            <span class="o_stat_text">Active</span>
-                        </button>
                     </div>
                     <widget name="web_ribbon"
                             attrs="{'invisible': [('active', '=', True)]}"
@@ -48,7 +39,7 @@
                             <field name="output_type"
                                    required="1"
                             />
-                            <field name="is_locked"
+                            <field name="locked"
                                    widget="boolean_toggle"
                             />
                         </group>
@@ -138,6 +129,9 @@
                             <group name="audit">
                                 <group name="audit_base">
                                     <field name="id"/>
+                                    <field name="active"
+                                           readonly="1"
+                                    />
                                     <field name="company"
                                            readonly="1"
                                     />
@@ -183,7 +177,9 @@
         <field name="arch"
                type="xml"
         >
-            <tree create="0">
+            <tree create="0"
+                  multi_edit="1"
+            >
                 <field name="report"/>
                 <field name="sequence"/>
                 <field name="name"/>
@@ -197,7 +193,7 @@
                 <field name="value_display"
                        optional="show"
                 />
-                <field name="is_locked"
+                <field name="locked"
                        widget="boolean_toggle"
                 />
                 <field name="active"
@@ -233,6 +229,9 @@
                 <field name="sequence"
                        widget="handle"
                 />
+                <field name="locked"
+                       widget="boolean_toggle"
+                />
                 <field name="name"/>
                 <field name="code"/>
                 <field name="technical_name"
@@ -249,9 +248,6 @@
                 />
                 <field name="value_display"
                        optional="show"
-                />
-                <field name="is_locked"
-                       widget="boolean_toggle"
                 />
                 <field name="active"
                        widget="boolean_toggle"
@@ -290,11 +286,11 @@
                 />
                 <separator/>
                 <filter name="locked_filter"
-                        domain="[('is_locked','=', True)]"
+                        domain="[('locked','=', True)]"
                         string="Locked"
                 />
                 <filter name="not_locked_filter"
-                        domain="[('is_locked','=', False)]"
+                        domain="[('locked','=', False)]"
                         string="Not Locked"
                 />
                 <separator/>

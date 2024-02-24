@@ -20,8 +20,8 @@
                        string="HU"
                 >
                     <group name="l10n_hu_1">
-                        <field name="l10n_hu_tax_type"
-                               string="Tax Type"
+                        <field name="l10n_hu_category"
+                               string="Category"
                         />
                     </group>
                     <group name="l10n_hu_2">
@@ -42,7 +42,7 @@
                         </div>
                     </group>
                     <group name="l10n_hu_vat_1"
-                           attrs="{'invisible': [('l10n_hu_tax_type', '!=', 'vat')]}"
+                           attrs="{'invisible': [('l10n_hu_category', '!=', 'vat')]}"
                     >
                         <field name="l10n_hu_vat_type"
                                string="VAT Type"
@@ -61,7 +61,7 @@
                         />
                     </group>
                     <group name="l10n_hu_vat_2"
-                           attrs="{'invisible': [('l10n_hu_tax_type', '!=', 'vat')]}"
+                           attrs="{'invisible': [('l10n_hu_category', '!=', 'vat')]}"
                     >
                         <field name="l10n_hu_vat_declaration"
                                string="VAT Declaration"

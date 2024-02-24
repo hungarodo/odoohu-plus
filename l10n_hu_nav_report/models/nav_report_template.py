@@ -158,6 +158,10 @@ class L10nHuNavReportTemplate(models.Model):
         default=False,
         string="Title Use HTML",
     )
+    version = fields.Char(
+        copy=False,
+        string="Version",
+    )
     use_cover = fields.Boolean(
         default=False,
         string="Use Cover",

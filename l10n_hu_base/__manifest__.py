@@ -7,12 +7,15 @@
     'currency': "EUR",
     'data': [  # Files are processed in the order of listing
         'data/ir_actions_act_url_data.xml',
+        'data/ir_cron_data.xml',
         'data/ir_module_category_data.xml',
         'security/res_groups.xml',
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
         'views/document_type_views.xml',
         'views/document_type_actions.xml',
+        'views/ir_config_parameter_actions.xml',
+        'views/ir_cron_actions.xml',
         'views/log_views.xml',
         'views/log_actions.xml',
         'views/object_views.xml',
@@ -41,6 +44,6 @@
     'price': 0,
     'summary': "Hungarian localization",
     'test': [],
-    'version': "1.0.12",
+    'version': "1.0.13",
     'website': "https://wwww.hungarodo.hu/odoohu",
 }

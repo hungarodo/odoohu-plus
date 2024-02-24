@@ -50,10 +50,6 @@
                             <field name="l10n_hu_vat_date"
                                    string="VAT Date"
                             />
-                            <field name="l10n_hu_vat_declaration"
-                                   string="VAT Declaration"
-                                   widget="boolean_toggle"
-                            />
                             <!-- Original -->
                             <field name="l10n_hu_original_account_move"
                                    options="{'no_create': True,}"
@@ -187,10 +183,6 @@
                        optional="hide"
                        string="HU VAT Date"
                 />
-                <field name="l10n_hu_vat_declaration"
-                       optional="hide"
-                       string="HU VAT Declaration"
-                />
             </xpath>
         </field>
     </record>
@@ -211,6 +203,11 @@
                    position="after"
             >
                 <separator/>
+                <filter name="l10n_hu_vat_date_filter"
+                        date="l10n_hu_vat_date"
+                        string="HU VAT Date"
+                />
+                <separator/>
                 <filter name="l10n_hu_trade_position_domestic_filter"
                         domain="[('l10n_hu_trade_position', '=', 'domestic')]"
                         string="Domestic"
@@ -227,22 +224,16 @@
                         domain="[('l10n_hu_trade_position', '=', False)]"
                         string="No Trade Position"
                 />
-                <separator/>
-                <filter name="l10n_hu_vat_date_filter"
-                        date="l10n_hu_vat_date"
-                        string="HU VAT Date"
-                />
-                <separator/>
-                <filter name="l10n_hu_vat_declaration_filter"
-                        domain="[('l10n_hu_vat_declaration', '=', True)]"
-                        string="HU VAT Declaration"
-                />
             </xpath>
             <!-- Filter group by -->
             <xpath expr="//filter[@name='group_by_sequence_prefix']"
                    position="after"
             >
                 <separator/>
+                <filter name="l10n_hu_vat_date_filter_group_by"
+                        context="{'group_by': 'l10n_hu_vat_date'}"
+                        string="HU VAT Date"
+                />
                 <filter name="l10n_hu_partner_country_filter_group_by"
                         context="{'group_by': 'l10n_hu_partner_country'}"
                         string="Partner Country"
@@ -250,14 +241,6 @@
                 <filter name="l10n_hu_trade_position_filter_group_by"
                         context="{'group_by': 'l10n_hu_trade_position'}"
                         string="Trade Position"
-                />
-                <filter name="l10n_hu_vat_date_filter_group_by"
-                        context="{'group_by': 'l10n_hu_vat_date'}"
-                        string="HU VAT Date"
-                />
-                <filter name="l10n_hu_vat_declaration_filter_group_by"
-                        context="{'group_by': 'l10n_hu_vat_declaration'}"
-                        string="HU VAT Declaration"
                 />
             </xpath>
         </field>

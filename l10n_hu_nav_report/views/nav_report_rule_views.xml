@@ -49,7 +49,6 @@
                     </div>
                     <group name="base">
                         <group>
-                            <field name="rule_scope"/>
                             <field name="rule_type"/>
                             <field name="value_method"/>
                         </group>
@@ -62,17 +61,36 @@
                             />
                         </group>
                     </group>
-                    <group name="report_template"
-                           colspan="2"
-                    >
-                        <field name="report_template"
-                               widget="many2many_tags"
-                        />
-                    </group>
                     <notebook>
                         <page name="details"
                               string="Details"
                         >
+                            <group name="nav_report"
+                                   attrs="{'invisible': [('rule_type', '!=', 'report_input')]}"
+                                   string="Report"
+                            >
+                                <group>
+                                    <field name="report_data_category"
+                                           options="{'color_field': 'color', 'no_create': True,}"
+                                           string="Data Category"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="report_data_tag"
+                                           options="{'color_field': 'color', 'no_create': True,}"
+                                           string="Data Tag"
+                                           widget="many2many_tags"
+                                    />
+                                </group>
+                                <group name="report_template"
+                                       colspan="2"
+                                >
+                                    <field name="report_template"
+                                           string="Template"
+                                           widget="many2many_tags"
+                                    />
+                                </group>
+                            </group>
                             <group name="model"
                                    attrs="{
                                        'invisible': [('value_method', '=', 'fixed')],
@@ -150,10 +168,10 @@
                                     />
                                 </group>
                             </group>
-                            <group name="value_filter"
+                            <group name="filter"
                                    attrs="{
-                                       'invisible': [('value_method', '!=', 'field')],
-                                       'required': [('value_method', '=', 'field')],
+                                       'invisible': [('value_method', 'not in', ['field', 'filter'])],
+                                       'required': [('value_method', 'in', ['field', 'filter'])],
                                    }"
                                    string="Filter"
                             >
@@ -396,6 +414,13 @@
                 <field name="value_type"
                        optional="hide"
                 />
+                <field name="report_template"
+                       optional="hide"
+                       widget="many2many_tags"
+                />
+                <field name="technical_name"
+                       optional="hide"
+                />
                 <field name="technical_type"
                        optional="hide"
                 />
@@ -449,8 +474,8 @@
         >
             <search>
                 <field name="name"/>
-                <field name="technical_type"/>
-                <field name="code_method"/>
+                <field name="technical_name"/>
+                <field name="report_template"/>
                 <separator/>
                 <group name="filter_group_by"
                        expand="0"

@@ -42,12 +42,6 @@ class L10nHuAccountInvoiceAccountMoveLine(models.Model):
         store=True,
         string="VAT Date",
     )
-    l10n_hu_move_vat_declaration = fields.Boolean(
-        related='move_id.l10n_hu_vat_declaration',
-        index=True,
-        store=True,
-        string="VAT Declaration",
-    )
     l10n_hu_vat_reason = fields.Char(
         string="VAT Reason",
         translate="True",

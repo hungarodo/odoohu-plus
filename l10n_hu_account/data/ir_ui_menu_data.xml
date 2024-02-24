@@ -91,7 +91,7 @@
     >
         <field name="name">Payment Methods</field>
         <field name="action"
-               ref="l10n_hu_account.account_payment_method_action"
+               ref="account_payment_method_action"
         />
         <field name="parent_id"
                ref="hu_configuration_accounting_menu"
@@ -104,7 +104,7 @@
     >
         <field name="name">Payment Terms</field>
         <field name="action"
-               ref="account.action_payment_term_form"
+               ref="account_payment_term_action"
         />
         <field name="parent_id"
                ref="hu_configuration_accounting_menu"

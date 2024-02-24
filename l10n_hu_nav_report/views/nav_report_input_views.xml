@@ -11,43 +11,135 @@
                type="xml"
         >
             <form>
+                <header>
+                    <field name="status"
+                           clickable="0"
+                           widget="statusbar"
+                    />
+                </header>
                 <sheet>
                     <div name="button_box"
                          class="oe_button_box"
                     >
                         <span class="float-start">
                             <field name="display_name"
+                                   attrs="{'invisible': [('id', '=', False)]}"
                                    class="p-3 font-weight-bold"
                                    readonly="1"
                             />
                         </span>
                     </div>
-                    <h2>
-                        <field name="name"
-                               placeholder="Name..."
-                        />
-                    </h2>
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('locked', '=', False)]}"
+                            bg_color="bg-success"
+                            title="Locked"
+                    />
+                    <widget name="web_ribbon"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                            bg_color="bg-danger"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h4>
+                            <field name="name"
+                                   placeholder="Name..."
+                            />
+                        </h4>
+                    </div>
                     <group name="base">
                         <group>
+                            <field name="rule"
+                                   readonly="1"
+                            />
+                            <field name="category"
+                                   options="{'color_field': 'color', 'no_create': True,}"
+                                   readonly="1"
+                            />
+                            <field name="tag"
+                                   options="{'color_field': 'color', 'no_create': True,}"
+                                   widget="many2many_tags"
+                            />
                         </group>
                         <group>
+                            <field name="value_char"
+                                   string="String"
+                            />
+                            <field name="value_date"
+                                   string="Date"
+                            />
+                            <field name="value_float"
+                                   string="Decimal Number"
+                            />
+                            <field name="value_integer"
+                                   string="Whole Number"
+                            />
                         </group>
                     </group>
                     <notebook>
                         <page name="details"
                               string="Details"
                         >
-                            <group name="common">
-                                <group>
-                                    <field name="value_char"/>
-                                    <field name="value_date"/>
-                                    <field name="value_float"/>
-                                    <field name="value_integer"/>
+                            <group name="details">
+                                <group name="accounting_detail"
+                                       string="Accounting Detail"
+                                >
+                                    <field name="amount_credit"
+                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
+                                    />
+                                    <field name="amount_debit"
+                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
+                                    />
+                                    <field name="amount_balance"
+                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
+                                    />
+                                    <field name="amount_currency"
+                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
+                                    />
+                                    <field name="amount_net"
+                                           attrs="{'invisible': [('account_move_line', '!=', False)]}"
+                                    />
+                                    <field name="amount_tax"
+                                           attrs="{'invisible': [('account_move_line', '!=', False)]}"
+                                    />
+                                    <field name="amount_total"
+                                           attrs="{'invisible': [('account_move_line', '!=', False)]}"
+                                    />
+                                    <field name="currency"/>
+                                    <field name="currency_code"/>
+                                    <field name="currency_rate"/>
+                                    <field name="delivery_date"/>
+                                    <field name="payment_date"/>
+                                    <field name="payment_method"/>
                                 </group>
-                                <group>
-                                    <field name="account_move_line"/>
-                                    <field name="account_move"/>
+                                <group name="partner"
+                                       string="Partner"
+                                >
+                                    <field name="tax_number"/>
                                     <field name="partner"/>
+                                    <field name="partner_name"/>
+                                    <field name="partner_tax_number"/>
+                                    <field name="partner_tax_unit"/>
+                                    <field name="partner_country"/>
+                                    <field name="partner_country_code"/>
+                                    <field name="partner_fiscal_position"/>
+                                    <field name="partner_trade_position"/>
+                                </group>
+
+                                <group name="accounting_link"
+                                       string="Accounting Link"
+                                >
+                                    <field name="account_move"
+                                           attrs="{'invisible': [('account_move', '=', False)]}"
+                                    />
+                                    <field name="account_move_line"
+                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
+                                    />
+                                    <field name="account_payment_term"
+                                           attrs="{'invisible': [('account_payment_term', '=', False)]}"
+                                    />
+                                    <field name="account_tax"
+                                           attrs="{'invisible': [('account_tax', '=', False)]}"
+                                    />
                                 </group>
                             </group>
                         </page>
@@ -61,10 +153,15 @@
                                     <field name="company"
                                            readonly="1"
                                     />
+                                    <field name="active"/>
+                                    <field name="locked"
+                                           widget="boolean_toggle"
+                                    />
                                     <field name="report"
-                                           force_save="1"
                                            readonly="1"
                                     />
+                                    <field name="rule_technical_name"/>
+                                    <field name="rule_value_type"/>
                                 </group>
                                 <group name="audit_crud">
                                     <field name="create_uid"
@@ -97,15 +194,27 @@
         <field name="arch"
                type="xml"
         >
-            <tree>
-                <field name="report"/>
+            <tree multi_edit="1">
+                <field name="report"
+                       optional="hide"
+                />
                 <field name="name"/>
-                <field name="value_char"/>
-                <field name="value_date"/>
-                <field name="value_float"/>
+                <field name="category"
+                       options="{'color_field': 'color'}"
+                />
+                <field name="value_display"
+                       optional="show"
+                />
                 <field name="account_move_line"/>
                 <field name="account_move"/>
                 <field name="partner"/>
+                <field name="tag"
+                       options="{'color_field': 'color'}"
+                       widget="many2many_tags"
+                />
+                <field name="company"
+                       optional="hide"
+                />
             </tree>
         </field>
     </record>
@@ -141,11 +250,22 @@
         >
             <search>
                 <field name="name"/>
+                <field name="report"/>
+                <field name="category"/>
+                <field name="tag"/>
                 <separator/>
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"
                 >
+                    <filter name="category_group_by"
+                            context="{'group_by': 'category'}"
+                            string="Category"
+                    />
+                    <filter name="tag_group_by"
+                            context="{'group_by': 'tag'}"
+                            string="Tag"
+                    />
                     <filter name="report_group_by"
                             context="{'group_by': 'report'}"
                             string="Report"

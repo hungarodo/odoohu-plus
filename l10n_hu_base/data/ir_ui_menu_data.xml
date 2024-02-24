@@ -132,4 +132,43 @@
         />
         <field name="sequence">32</field>
     </record>
+    <!-- HU > Configuration > Technical -->
+    <record id="hu_configuration_technical_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Technical</field>
+        <field name="groups_id"
+               eval="[(4, ref('base.group_system'))]"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_menu"
+        />
+        <field name="sequence">128</field>
+    </record>
+    <!-- HU > Configuration > Technical > Scheduled Actions -->
+    <record id="hu_configuration_technical_cron_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Scheduled Actions</field>
+        <field name="action"
+               ref="cron_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_technical_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
+    <!-- HU > Configuration > Technical > System Parameters -->
+    <record id="hu_configuration_technical_parameter_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">System Parameters</field>
+        <field name="action"
+               ref="config_parameter_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_technical_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
 </odoo>

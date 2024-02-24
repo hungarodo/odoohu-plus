@@ -29,6 +29,16 @@ class L10nHuNavReport(models.Model):
         default=True,
         string="Active",
     )
+    category = fields.Many2one(
+        comodel_name='l10n.hu.tag',
+        domain=[('tag_type', '=', 'nav_report_category')],
+        index=True,
+        string="Category",
+    )
+    category_technical_name = fields.Char(
+        related='category.technical_name',
+        string="Category Technical Name",
+    )
     company = fields.Many2one(
         comodel_name='res.company',
         default=lambda self: self.env.company.id,
@@ -80,11 +90,28 @@ class L10nHuNavReport(models.Model):
         ],
         string="Status",
     )
+    tag = fields.Many2many(
+        comodel_name='l10n.hu.tag',
+        column1='object',
+        column2='tag',
+        domain=[('tag_type', 'in', ['general', 'nav_report_tag'])],
+        index=True,
+        relation='l10n_hu_nav_report_tag_rel',
+        string="Tag",
+    )
     template = fields.Many2one(
         comodel_name='l10n.hu.nav.report.template',
         index=True,
         required=True,
         string="Template",
+    )
+    template_code = fields.Char(
+        copy=False,
+        string="Template Code",
+    )
+    template_version = fields.Char(
+        copy=False,
+        string="Template Version",
     )
 
     # Compute and search fields, in the same order of field declarations
@@ -251,16 +278,26 @@ class L10nHuNavReport(models.Model):
         result = {}
 
         # Dispatch
-        if self.template and self.template.code == '2365A':
-            result = self.print_report_xml_2365a(values)
+        if self.template and self.template_code in ['2365', '2465']:
+            values.update({
+                'template_code': self.template_code,
+                'template_version': self.template_version,
+            })
+            result = self.print_report_xml_xx65(values)
 
         # Return
         return result
 
     @api.model
-    def print_report_xml_2365a(self, values):
-        """ Print 2365A report as xml """
+    def print_report_xml_xx65(self, values):
+        """ Print 65A 65M report as xml """
+        # raise exceptions.UserError("print_report_xml_xx65 BEGIN" + str(values))
+        # Initialize variables
         result = {}
+
+        # Inspect values
+        template_code = values.get('template_code', "")
+        template_version = values.get('template_version', "")
 
         if values.get('print_locked') is not None:
             print_locked = values['print_locked']
@@ -281,12 +318,12 @@ class L10nHuNavReport(models.Model):
 
         # nyomtatvanyazonosito_xml
         nyomtatvanyazonosito_xml = lxml.etree.Element('nyomtatvanyazonosito')
-        nyomtatvanyazonosito_xml.text = str("2365A")
+        nyomtatvanyazonosito_xml.text = str(template_code) + "A"
         nyomtatvanyinformacio_xml.append(nyomtatvanyazonosito_xml)
 
         # nyomtatvanyverzio_xml
         nyomtatvanyverzio_xml = lxml.etree.Element('nyomtatvanyverzio')
-        nyomtatvanyverzio_xml.text = str("1.0")
+        nyomtatvanyverzio_xml.text = str(template_version)
         nyomtatvanyinformacio_xml.append(nyomtatvanyverzio_xml)
 
         # adozo_xml
@@ -311,7 +348,7 @@ class L10nHuNavReport(models.Model):
 
         # process outputs
         for output in self.output:
-            if print_locked and output.is_locked:
+            if print_locked and output.locked:
                 processable = True
             elif not print_locked:
                 processable = True
@@ -338,8 +375,8 @@ class L10nHuNavReport(models.Model):
         # collect relevant_invoices
         relevant_invoices = self.env['account.move'].sudo().search([
             ('move_type', 'in', ['in_invoice', 'in_refund']),
-            ('l10n_hu_invoice_delivery_date', '>=', self.period_start),
-            ('l10n_hu_invoice_delivery_date', '<=', self.period_end),
+            ('l10n_hu_vat_date', '>=', self.period_start),
+            ('l10n_hu_vat_date', '<=', self.period_end),
             ('partner_id.commercial_partner_id.l10n_hu_vat', '!=', False),
         ])
 
@@ -353,8 +390,8 @@ class L10nHuNavReport(models.Model):
         for relevant_partner in relevant_partners:
             partner_invoices = self.env['account.move'].sudo().search([
                 ('move_type', 'in', ['in_invoice', 'in_refund']),
-                ('l10n_hu_invoice_delivery_date', '>=', self.period_start),
-                ('l10n_hu_invoice_delivery_date', '<=', self.period_end),
+                ('l10n_hu_vat_date', '>=', self.period_start),
+                ('l10n_hu_vat_date', '<=', self.period_end),
                 ('partner_id', '=', relevant_partner.id),
             ])
 
@@ -367,12 +404,12 @@ class L10nHuNavReport(models.Model):
 
             # nyomtatvanyazonosito_xml
             nyomtatvanyazonosito_xml = lxml.etree.Element('nyomtatvanyazonosito')
-            nyomtatvanyazonosito_xml.text = str("2365M")
+            nyomtatvanyazonosito_xml.text = str(template_code) + "M"
             nyomtatvanyinformacio_xml.append(nyomtatvanyazonosito_xml)
 
             # nyomtatvanyverzio_xml
             nyomtatvanyverzio_xml = lxml.etree.Element('nyomtatvanyverzio')
-            nyomtatvanyverzio_xml.text = str("1.0")
+            nyomtatvanyverzio_xml.text = str(template_version)
             nyomtatvanyinformacio_xml.append(nyomtatvanyverzio_xml)
 
             # BEGIN ADOZO
@@ -485,7 +522,7 @@ class L10nHuNavReport(models.Model):
                 mezo_delivery_date_xml = lxml.etree.Element('mezo')
                 mezo_delivery_date_xml_eazon = '0B0001C000' + str(invoice_index) + 'BA'
                 mezo_delivery_date_xml.attrib['eazon'] = mezo_delivery_date_xml_eazon
-                mezo_delivery_date_xml.text = str(partner_invoice.l10n_hu_invoice_delivery_date).replace("-", "")
+                mezo_delivery_date_xml.text = str(partner_invoice.date).replace("-", "")
                 mezok_xml.append(mezo_delivery_date_xml)
 
                 # mezo_net_total_xml 0B0001C0001CA
@@ -534,7 +571,7 @@ class L10nHuNavReport(models.Model):
         nyomtatvanyok_xml_base64 = base64.b64encode(nyomtatvanyok_xml_string)
         attachment_datas = nyomtatvanyok_xml_base64
 
-        attachment_name = "2365a_"
+        attachment_name = str(template_code)
         attachment_name += self.company.partner_id.l10n_hu_vat
         attachment_name += "_"
         attachment_name += str(fields.Datetime.now()).replace(':', '_').replace(' ', '_')
@@ -558,102 +595,320 @@ class L10nHuNavReport(models.Model):
     @api.model
     def run_report(self, values):
         """ Run report """
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        inputs = []
+        input_ids = []
+        outputs = []
+        output_ids = []
         result = {}
+        warning_list = []
 
         # Delete unlocked existing inputs
         self.env['l10n.hu.nav.report.input'].sudo().search([
+            ('locked', '=', False),
             ('report', '=', self.id),
-            ('is_locked', '=', False),
         ]).unlink()
 
         # Delete unlocked existing outputs
         self.env['l10n.hu.nav.report.output'].sudo().search([
+            ('locked', '=', False),
             ('report', '=', self.id),
-            ('is_locked', '=', False),
         ]).unlink()
 
-        if self.template and self.template.code == '2365A':
-            result = self.run_report_2365a(values)
+        if self.template:
+            # INPUTS
+            inputs_result = self.get_report_input_values({})
+            error_list += inputs_result.get('error_list', [])
+            if inputs_result.get('input_values_list'):
+                for input_values in inputs_result['input_values_list']:
+                    new_input = self.env['l10n.hu.nav.report.input'].create(input_values)
+                    inputs.append(new_input)
+                    input_ids.append(new_input.id)
+
+            # OUTPUTS
+            outputs_result = self.get_report_output_values({})
+            error_list += outputs_result.get('error_list', [])
+            if outputs_result.get('output_values_list'):
+                for output_values in outputs_result['output_values_list']:
+                    new_output = self.env['l10n.hu.nav.report.output'].create(output_values)
+                    outputs.append(new_output)
+                    output_ids.append(new_output.id)
+        else:
+            pass
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'inputs': inputs,
+            'input_ids': input_ids,
+            'outputs': outputs,
+            'output_ids': output_ids,
+            'warning_list': warning_list,
+        })
 
         # Return
         return result
 
+    # # HELPER
     @api.model
-    def run_report_2365a(self, values):
-        """ Run report VAT 2365A """
-        inputs = []
-        input_create_list = []
-        outputs = []
-        result = {}
-        value_rules = []
+    def get_nav_report_company_name(self):
+        """ Can be called from input to get company name
 
-        # Prepare raw input rules
+        :return: string
+        """
+        return self.company.name
+
+    @api.model
+    def get_nav_report_company_tax_number(self):
+        """ Can be called from input to get company name
+
+        :return: string
+        """
+        return self.company.partner_id.l10n_hu_vat.replace("-", "")
+
+    @api.model
+    def get_report_input_values(self, values):
+        """ Get input values for a report """
+        # raise exceptions.UserError("get_report_input_values BEGIN" + str(values))
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        input_values_list = []
+        result = {}
+        warning_list = []
+
+        # Get input rules
         rules = self.env['l10n.hu.nav.report.rule'].sudo().search([
-            ('report_template', '=', self.id)
+            ('company', '=', self.company.id),
+            ('report_template', '=', self.template.id),
+            ('rule_type', '=', 'report_input'),
         ])
+        # raise exceptions.UserError(str(len(rules)))
+
+        # Iterate rules
         for rule in rules:
-            # create raw_input
+            # Common values
             input_values_common = {
-                'name': rule.technical_name,
+                'name': rule.name,
                 'rule': rule.id,
                 'report': self.id,
             }
+            if rule.report_data_category:
+                input_values_common.update({
+                    'category': rule.report_data_category.id,
+                })
             if rule.technical_name == 'company_name':
+                company_name = self.get_nav_report_company_name()
                 input_values = {
                     'partner': self.company.partner_id.id,
-                    'value_char': self.company.partner_id.name,
+                    'value_char': company_name,
                 }
                 input_values.update(input_values_common)
-                input_create_list.append(input_values)
+                input_values_list.append(input_values)
             elif rule.technical_name == 'company_tax_number':
-                company_tax_number = self.company.partner_id.l10n_hu_vat.replace("-", "")
+                company_tax_number = self.get_nav_report_company_tax_number()
                 input_values = {
                     'partner': self.company.partner_id.id,
                     'value_char': company_tax_number,
                 }
                 input_values.update(input_values_common)
-                input_create_list.append(input_values)
+                input_values_list.append(input_values)
             elif rule.technical_name == 'account_move_line':
-                # Collect relevant
-                relevant_account_move_lines = self.env['account.move.line'].search([
+                # Base domain
+                aml_domain = [
                     ('l10n_hu_move_vat_date', '>=', self.period_start),
                     ('l10n_hu_move_vat_date', '<=', self.period_end),
-                    ('l10n_hu_move_vat_declaration', '=', True),
-                ])
+                    ('move_id.state', '=', 'posted'),
+                ]
+
+                # Custom domain
+                if rule.account_move_line_domain and len(rule.account_move_line_domain) > 0:
+                    try:
+                        aml_domain += safe_eval(rule.account_move_line_domain)
+                    except:
+                        pass
+
+                # DO search
+                relevant_account_move_lines = self.env['account.move.line'].search(aml_domain)
+
                 for account_move_line in relevant_account_move_lines:
+                    # Partner
+                    partner = account_move_line.move_id.partner_id.commercial_partner_id
+                    partner_name = partner.name
+
+                    # # Partner country
+                    if partner.country_id:
+                        partner_country_code = partner.country_id.code
+                        partner_country_id = partner.country_id.id
+                    else:
+                        partner_country_code = False
+                        partner_country_id = False
+
+                    # # Partner tax number
+                    if partner.l10n_hu_vat:
+                        partner_tax_number = partner.l10n_hu_vat
+                    elif partner.vat:
+                        partner_tax_number = partner.vat
+                    else:
+                        partner_tax_number = False
+
+                    # # Partner tax unit
+                    if partner.l10n_hu_tax_unit:
+                        partner_tax_unit = partner.l10n_hu_tax_unit
+                        partner_tax_unit_id = partner_tax_unit.id
+                    else:
+                        partner_tax_unit = False
+                        partner_tax_unit_id = False
+
+                    # # Tax number
+                    if partner_tax_unit and partner_tax_unit.l10n_hu_vat:
+                        tax_number = partner_tax_unit.l10n_hu_vat
+                    elif partner_tax_unit and partner_tax_unit.vat:
+                        tax_number = partner_tax_unit.vat
+                    elif partner_tax_number:
+                        tax_number = partner_tax_number
+                    else:
+                        tax_number = False
+
+                    # # Partner positions
+                    if partner.property_account_position_id:
+                        partner_fiscal_position_id = partner.property_account_position_id.id
+                        partner_trade_position = partner.property_account_position_id.l10n_hu_trade_position
+                    else:
+                        partner_fiscal_position_id = False
+                        partner_trade_position = False
+
                     input_values = {
+                        'account_move': account_move_line.move_id.id,
                         'account_move_line': account_move_line.id,
-                        'partner': account_move_line.move_id.partner_id.id,
+                        'account_tax': account_move_line.tax_line_id.id,
+                        'amount_balance': account_move_line.balance,
+                        'amount_currency': account_move_line.amount_currency,
+                        'amount_credit': account_move_line.credit,
+                        'amount_debit': account_move_line.debit,
+                        'currency': account_move_line.currency_id.id,
+                        'currency_code': account_move_line.currency_id.name,
+                        'currency_rate': account_move_line.currency_rate,
+                        'delivery_date': account_move_line.date,
+                        'payment_date': account_move_line.date_maturity,
+                        'partner': partner.id,
+                        'partner_country': partner_country_id,
+                        'partner_country_code': partner_country_code,
+                        'partner_name': partner_name,
+                        'partner_fiscal_position': partner_fiscal_position_id,
+                        'partner_tax_number': partner_tax_number,
+                        'partner_tax_unit': partner_tax_unit_id,
+                        'partner_trade_position': partner_trade_position,
+                        'tax_number': tax_number,
                     }
-                    if account_move_line.credit:
-                        input_values.update({
-                            'value_float': account_move_line.credit,
-                        })
-                    if account_move_line.debit:
-                        input_values.update({
-                            'value_float': account_move_line.debit,
-                        })
+
                     input_values.update(input_values_common)
-                    input_create_list.append(input_values)
+                    if account_move_line.tax_audit:
+                        input_values.update({
+                            'name': account_move_line.tax_audit
+                        })
+                    input_values_list.append(input_values)
+            elif rule.technical_name == 'customer_invoice':
+                # Base domain
+                cs_domain = [
+                    ('l10n_hu_vat_date', '>=', self.period_start),
+                    ('l10n_hu_vat_date', '<=', self.period_end),
+                    ('move_type', 'in', ['out_invoice', 'out_refund', 'out_receipt']),
+                    ('state', '=', 'posted'),
+                ]
+
+                # Custom domain
+                if rule.account_move_domain and len(rule.account_move_domain) > 0:
+                    try:
+                        cs_domain += safe_eval(rule.account_move_domain)
+                    except:
+                        pass
+
+                # DO search
+                customer_invoices = self.env['account.move'].search(cs_domain)
+
+                for customer_invoice in customer_invoices:
+                    input_values = {
+                        'account_move': customer_invoice.id,
+                        'amount_net': customer_invoice.amount_untaxed,
+                        'amount_tax': customer_invoice.amount_tax,
+                        'amount_total': customer_invoice.amount_total,
+                        'partner': customer_invoice.partner_id.id,
+                        'value_date': customer_invoice.date,
+                    }
+                    input_values.update(input_values_common)
+                    input_values_list.append(input_values)
+            elif rule.technical_name == 'vendor_bill':
+                # Base domain
+                vb_domain = [
+                    ('l10n_hu_vat_date', '>=', self.period_start),
+                    ('l10n_hu_vat_date', '<=', self.period_end),
+                    ('move_type', 'in', ['in_invoice', 'in_refund', 'in_receipt']),
+                    ('state', '=', 'posted'),
+                ]
+
+                # Custom domain
+                if rule.account_move_domain and len(rule.account_move_domain) > 0:
+                    try:
+                        vb_domain += safe_eval(rule.account_move_domain)
+                    except:
+                        pass
+
+                # DO search
+                vendor_bills = self.env['account.move'].search(vb_domain)
+
+                for vendor_bill in vendor_bills:
+                    input_values = {
+                        'account_move': vendor_bill.id,
+                        'amount_net': vendor_bill.amount_untaxed,
+                        'amount_tax': vendor_bill.amount_tax,
+                        'amount_total': vendor_bill.amount_total,
+                        'partner': vendor_bill.partner_id.id,
+                        'value_date': vendor_bill.date,
+                    }
+                    input_values.update(input_values_common)
+                    input_values_list.append(input_values)
             else:
                 pass
 
-        # Create
-        if len(input_create_list) > 0:
-            for input_create_value in input_create_list:
-                new_input = self.env['l10n.hu.nav.report.input'].create(input_create_value)
-                inputs.append(new_input)
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'input_values_list': input_values_list,
+            'warning_list': warning_list,
+        })
+
+        # Return
+        # raise exceptions.UserError("get_report_input_values END" + str(result))
+        return result
+
+    @api.model
+    def get_report_output_values(self, values):
+        """ Get output values for a report """
+        # raise exceptions.UserError("get_report_output_values BEGIN" + str(values))
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        output_values_list = []
+        result = {}
+        value_rules = []
+        warning_list = []
 
         # Prepare raw input-output from elements
         for element in self.template.element:
-
             if element.value_rule and element.value_rule not in value_rules:
                 pass
             else:
                 pass
-
-            new_input = self.env['l10n.hu.nav.report.input'].create(new_input_values)
-            inputs.append(new_input)
             value_rules.append(element.value_rule)
 
             # output_code
@@ -672,7 +927,7 @@ class L10nHuNavReport(models.Model):
             else:
                 output_technical_name = False
 
-            new_output_values = {
+            output_values = {
                 'code': output_code,
                 'element': element.id,
                 'name': element.name,
@@ -681,12 +936,17 @@ class L10nHuNavReport(models.Model):
                 'template': self.template.id,
                 'value_type': element.value_type,
             }
-            new_output = self.env['l10n.hu.nav.report.output'].create(new_output_values)
-            outputs.append(new_output)
+            output_values_list.append(output_values)
 
-        # Compute inputs
-
-        # Compute outputs
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'output_values_list': output_values_list,
+            'warning_list': warning_list,
+        })
 
         # Return
+        # raise exceptions.UserError("get_report_output_values END" + str(result))
         return result

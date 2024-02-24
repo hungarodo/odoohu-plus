@@ -76,6 +76,18 @@
                         >
                             Create new report
                         </p>
+                        <!-- Print report -->
+                        <p class="card-text"
+                           attrs="{'invisible': [('nav_report_action', '!=', 'print_report')]}"
+                        >
+                            Print report outputs into a file
+                        </p>
+                        <!-- Print report - locked -->
+                        <p class="card-text"
+                           attrs="{'invisible': ['|', ('nav_report_action', '!=', 'print_report'), ('nav_report_print_locked', '=', False)]}"
+                        >
+                            Print only locked outputs
+                        </p>
                         <!-- Run report -->
                         <p class="card-text"
                            attrs="{'invisible': [('nav_report_action', '!=', 'run_report')]}"

@@ -32,15 +32,6 @@
                                    readonly="1"
                             />
                         </span>
-                        <button name="toggle_active"
-                                class="oe_stat_button"
-                                type="object"
-                        >
-                            <field name="active"
-                                   widget="boolean_toggle"
-                            />
-                            <span class="o_stat_text">Active</span>
-                        </button>
                     </div>
                     <widget name="web_ribbon"
                             attrs="{'invisible': [('active', '=', True)]}"
@@ -257,6 +248,9 @@
                                     <field name="id"
                                            readonly="1"
                                     />
+                                    <field name="active"
+                                           readonly="1"
+                                    />
                                     <field name="company"
                                            readonly="1"
                                     />
@@ -316,7 +310,7 @@
         <field name="arch"
                type="xml"
         >
-            <tree>
+            <tree multi_edit="1">
                 <field name="sequence"
                        widget="handle"
                 />
@@ -419,11 +413,22 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="code"/>
                 <field name="nav_form"/>
                 <field name="nav_eazon"/>
+                <!-- Filter -->
+                <filter name="archived_filter"
+                        domain="[('active','=', False)]"
+                        string="Archived"
+                />
                 <separator/>
+                <filter name="no_template_filter"
+                        domain="[('template','=', False)]"
+                        string="No Template"
+                />
+                <!-- Filter group by -->
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"
