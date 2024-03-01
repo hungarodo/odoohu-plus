@@ -23,29 +23,19 @@
                         <field name="l10n_hu_category"
                                string="Category"
                         />
-                    </group>
-                    <group name="l10n_hu_2">
-                        <field name="l10n_hu_technical_name"
-                               string="Technical Name"
-                        />
-                        <label name="l10n_hu_actions_label"
-                               for="action_l10n_hu_update_configuration"
-                               string="Actions"
-                        />
-                        <div name="l10n_hu_actions_div">
-                            <button name="action_l10n_hu_update_configuration"
-                                    class="btn-link btn-sm"
-                                    icon="fa-bolt"
-                                    string="Update Configuration"
-                                    type="object"
-                            />
-                        </div>
-                    </group>
-                    <group name="l10n_hu_vat_1"
-                           attrs="{'invisible': [('l10n_hu_category', '!=', 'vat')]}"
-                    >
                         <field name="l10n_hu_vat_type"
+                               attrs="{'invisible': [('l10n_hu_category', '!=', 'vat')]}"
                                string="VAT Type"
+                        />
+                        <field name="l10n_hu_vat_declaration"
+                               attrs="{'invisible': [('l10n_hu_category', '!=', 'vat')]}"
+                               string="VAT Declaration"
+                               widget="boolean_toggle"
+                        />
+                        <field name="l10n_hu_vat_percentage"
+                               attrs="{'invisible': [('l10n_hu_vat_type', '!=', 'percentage')]}"
+                               class="oe_inline"
+                               string="VAT Percentage"
                         />
                         <field name="l10n_hu_vat_exemption_case"
                                attrs="{'invisible': [('l10n_hu_vat_type', '!=', 'exemption')]}"
@@ -59,18 +49,30 @@
                                attrs="{'invisible': [('l10n_hu_vat_type', 'not in', ['margin_scheme_vat', 'margin_scheme_no_vat'])]}"
                                string="Mismatch Case"
                         />
-                    </group>
-                    <group name="l10n_hu_vat_2"
-                           attrs="{'invisible': [('l10n_hu_category', '!=', 'vat')]}"
-                    >
-                        <field name="l10n_hu_vat_declaration"
-                               string="VAT Declaration"
-                               widget="boolean_toggle"
-                        />
                         <field name="l10n_hu_vat_reason"
-                               attrs="{'invisible': [('l10n_hu_vat_type', 'not in', ['exemption', 'out_of_scope'])]}"
+                               attrs="{'invisible': [('l10n_hu_vat_type', 'not in', ['exemption', 'out_of_scope', 'domestic_reverse_charge'])]}"
                                string="Reason"
                         />
+                    </group>
+                    <group name="l10n_hu_2">
+                        <field name="l10n_hu_api_enabled"
+                               widget="boolean_toggle"
+                        />
+                        <field name="l10n_hu_technical_name"
+                               attrs="{'readonly': [('l10n_hu_api_enabled', '=', True)]}"
+                        />
+                        <label name="l10n_hu_actions_label"
+                               for="action_l10n_hu_update_configuration"
+                               string="Actions"
+                        />
+                        <div name="l10n_hu_actions_div">
+                            <button name="action_l10n_hu_update_configuration"
+                                    class="btn-link btn-sm"
+                                    icon="fa-bolt"
+                                    string="Update Configuration"
+                                    type="object"
+                            />
+                        </div>
                     </group>
                 </group>
             </xpath>

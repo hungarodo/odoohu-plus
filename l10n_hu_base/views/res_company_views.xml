@@ -31,17 +31,22 @@
                    position="after"
             >
                 <page name="l10n_hu"
-                      string="Hungary"
+                      string="HU"
                 >
                     <group name="l10n_hu">
                         <group name="l10n_hu_1">
-                            <field name="l10n_hu_partner_vat_status_required"
-                                   string="Partner VAT Status Required"
+                            <field name="l10n_hu_api_enabled"
+                                   string="API Enabled"
                                    widget="boolean_toggle"
                             />
                         </group>
                         <group name="l10n_hu_2">
-
+                            <field name="l10n_hu_api_key"
+                                   string="API Key"
+                            />
+                            <field name="l10n_hu_api_url"
+                                   string="API URL"
+                            />
                         </group>
                     </group>
                 </page>

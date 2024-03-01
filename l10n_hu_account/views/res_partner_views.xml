@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_partner_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.partner.form.inherit</field>
+        <field name="inherit_id"
+               ref="l10n_hu_base.view_partner_form_inherit"
+        />
+        <field name="model">res.partner</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Fields -->
+            <xpath expr="//group[@name='l10n_hu_enabled_2']"
+                   position="inside"
+            >
+                <field name="l10n_hu_vat_status_required"
+                       invisible="1"
+                />
+                <field name="l10n_hu_vat_status"
+                       attrs="{'invisible': [('property_account_position_id', '=', False)]}"
+                       groups="account.group_account_invoice"
+                       string="VAT Status"
+                />
+                <field name="l10n_hu_incorporation"
+                       attrs="{'invisible': [('property_account_position_id', '=', False)]}"
+                       groups="account.group_account_invoice"
+                       string="Taxpayer Type"
+                />
+                <field name="l10n_hu_trade_position"
+                       attrs="{'invisible': [('property_account_position_id', '=', False)]}"
+                       groups="account.group_account_invoice"
+                       string="Trade Position"
+                />
+            </xpath>
+        </field>
+    </record>
+    <!-- List view inherit -->
+    <record id="view_partner_tree_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.partner.tree.inherit</field>
+        <field name="inherit_id"
+               ref="l10n_hu_base.view_partner_tree_inherit"
+        />
+        <field name="model">res.partner</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add partner fields -->
+            <xpath expr="//field[@name='l10n_hu_vat']"
+                   position="after"
+            >
+                <field name="l10n_hu_vat_status"
+                       optional="hide"
+                       string="VAT Status"
+                />
+                <field name="l10n_hu_incorporation"
+                       optional="hide"
+                       string="Taxpayer Type"
+                />
+                <field name="l10n_hu_trade_position"
+                       optional="hide"
+                       string="Trade Position"
+                />
+            </xpath>
+        </field>
+    </record>
+    <!-- Search view inherit -->
+    <record id="view_res_partner_filter_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.res.partner.filter.inherit</field>
+        <field name="inherit_id"
+               ref="base.view_res_partner_filter"
+        />
+        <field name="model">res.partner</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Filter group by -->
+            <xpath expr="//filter[@name='group_country']"
+                   position="after"
+            >
+                <filter name="l10n_hu_vat_status_filter_group_by"
+                        context="{'group_by': 'l10n_hu_vat_status'}"
+
+                        string="HU VAT Status"
+                />
+                <filter name="l10n_hu_incorporation_filter_group_by"
+                        context="{'group_by': 'l10n_hu_incorporation'}"
+                        string="HU Taxpayer Type"
+                />
+                <filter name="l10n_hu_trade_position_filter_group_by"
+                        context="{'group_by': 'l10n_hu_trade_position'}"
+                        string="HU Trade Position"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

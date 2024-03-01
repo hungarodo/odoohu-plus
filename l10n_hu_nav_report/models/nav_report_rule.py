@@ -15,6 +15,7 @@ class L10nHuNavReportRule(models.Model):
     # Private attributes
     _name = 'l10n.hu.nav.report.rule'
     _description = "HU NAV Report Rule"
+    _inherit = ['mail.activity.mixin', 'mail.thread']
     _order = 'id desc'
 
     # Default methods

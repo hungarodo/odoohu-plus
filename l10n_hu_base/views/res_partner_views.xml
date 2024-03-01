@@ -13,7 +13,7 @@
         <field name="arch"
                type="xml"
         >
-            <!-- Add more l10n_hu partner fields -->
+            <!-- Fields -->
             <xpath expr="//page[@name='sales_purchases']"
                    position="before"
             >
@@ -21,101 +21,65 @@
                       attrs="{'invisible': [('l10n_hu_enabled', '=', False)]}"
                       string="HU"
                 >
-                    <group name="l10n_hu">
-                        <group name="l10n_hu_1"
-                               attrs="{'invisible': [('parent_id', '!=', False)]}"
+                    <field name="l10n_hu_enabled"
+                           invisible="1"
+                    />
+                    <group name="l10n_hu_disabled"
+                           attrs="{'invisible': [('parent_id', '=', False)]}"
+                           colspan="2"
+                    >
+                        <div class="card bg-info mr-4"
+                             colspan="2"
                         >
-                            <field name="l10n_hu_enabled"
-                                   invisible="1"
-                            />
-                            <field name="l10n_hu_vat_status_required"
-                                   invisible="1"
-                            />
-                            <field name="l10n_hu_vat_status"
-                                   attrs="{
-                                       'readonly': [
-                                           ('is_company', '=', False),
-                                           ('parent_id', '!=', False),
-                                       ],
-                                       'required': [
-                                           ('l10n_hu_vat_status_required', '=', True),
-                                       ],
-                                   }"
-                            />
-                            <field name="l10n_hu_incorporation"
-                                   attrs="{
-                                       'invisible': [
-                                           ('l10n_hu_vat_status', '!=', 'domestic'),
-                                       ],
-                                       'readonly': [
-                                           ('is_company', '=', False),
-                                           ('parent_id', '!=', False),
-                                       ],
-                                       'required': [
-                                           ('parent_id', '=', False),
-                                           ('l10n_hu_vat_status', '=', 'domestic'),
-                                       ],
-                                   }"
-                            />
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-2"/>
+                                <span class="mr-2">Settings are managed on the parent partner</span>
+                                <button name="open_commercial_entity"
+                                        class="btn btn-sm btn-primary"
+                                        string="Open Parent"
+                                        type="object"
+                                />
+                            </div>
+                        </div>
+                    </group>
+                    <group name="l10n_hu_enabled"
+                           attrs="{'invisible': [('parent_id', '!=', False)]}"
+                    >
+                        <group name="l10n_hu_enabled_1"
+                               string="Identifiers"
+                        >
                             <field name="l10n_hu_vat"
-                                   attrs="{
-                                       'invisible': [
-                                           ('l10n_hu_vat_status', '!=', 'domestic'),
-                                       ],
-                                       'readonly': [
-                                           ('is_company', '=', False),
-                                           ('parent_id', '!=', False),
-                                       ],
-                                       'required': [
-                                           ('parent_id', '=', False),
-                                           ('l10n_hu_vat_status', '=', 'domestic'),
-                                       ],
-                                   }"
+                                   attrs="{'readonly': [
+                                       ('is_company', '=', False),
+                                       ('parent_id', '!=', False),
+                                   ]}"
                                    placeholder="12345678-9-10"
+                                   string="HU VAT"
                             />
-                            <field name="l10n_hu_tax_unit"/>
-                            <field name="l10n_hu_tax_unit_vat"/>
-                            <field name="l10n_hu_tax_unit_vat_hu"/>
                             <field name="l10n_hu_crn"/>
                             <field name="l10n_hu_vpid"
-                                   string="VPID"
-                            />
-                            <field name="l10n_hu_financial_representative"
-                                   options="{'no_quick_create': True,}"
+                                   string="HU VPID"
                             />
                             <field name="l10n_hu_self_employed_number"
-                                   attrs="{
-                                       'invisible': [
-                                           '|',
-                                           ('l10n_hu_vat_status', '!=', 'domestic'),
-                                           ('l10n_hu_incorporation', '!=', 'self_employed'),
-                                       ],
-                                       'readonly': [
-                                           ('is_company', '=', False),
-                                           ('parent_id', '!=', False),
-                                       ],
-                                   }"
+                                   attrs="{'readonly': [
+                                       ('is_company', '=', False),
+                                       ('parent_id', '!=', False),
+                                   ]}"
                                    help="Self-Employed Number"
                                    string="S.E. Number"
                             />
                             <field name="l10n_hu_self_employed_name"
-                                   attrs="{
-                                       'invisible': [
-                                           '|',
-                                           ('l10n_hu_vat_status', '!=', 'domestic'),
-                                           ('l10n_hu_incorporation', '!=', 'self_employed'),
-                                       ],
-                                       'readonly': [
-                                           ('is_company', '=', False),
-                                           ('parent_id', '!=', False),
-                                       ],
-                                   }"
+                                   attrs="{'readonly': [
+                                       ('is_company', '=', False),
+                                       ('parent_id', '!=', False),
+                                   ]}"
                                    help="Self-Employed Name"
                                    string="S.E. Name"
                             />
                         </group>
-                        <group name="l10n_hu_2"
+                        <group name="l10n_hu_enabled_2"
                                attrs="{'invisible': [('parent_id', '!=', False)]}"
+                               string="Taxation"
                         >
                             <field name="l10n_hu_cash_accounting"
                                    widget="boolean_toggle"
@@ -133,22 +97,17 @@
                                    widget="boolean_toggle"
                             />
                         </group>
-                        <group name="l10n_hu_disabled"
-                               attrs="{'invisible': [('parent_id', '!=', False)]}"
+                        <group name="l10n_hu_enabled_3"
+                               string="Relations"
                         >
-                            <div class="card bg-info mr-4"
-                                 colspan="2"
-                            >
-                                <div class="card-header">
-                                    <i class="fa fa-info-circle mr-2"/>
-                                    <span class="mr-2">Settings are managed on the parent partner</span>
-                                    <button name="open_commercial_entity"
-                                            class="btn btn-sm btn-primary"
-                                            string="Open Parent"
-                                            type="object"
-                                    />
-                                </div>
-                            </div>
+                            <field name="l10n_hu_financial_representative"
+                                   options="{'no_quick_create': True,}"
+                            />
+                            <field name="l10n_hu_tax_unit"
+                                   options="{'no_quick_create': True,}"
+                            />
+                            <field name="l10n_hu_tax_unit_vat"/>
+                            <field name="l10n_hu_tax_unit_vat_hu"/>
                         </group>
                     </group>
                 </page>
@@ -159,7 +118,7 @@
     <record id="view_partner_tree_inherit"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.account.base.view.partner.tree.inherit</field>
+        <field name="name">l10n.hu.base.view.partner.tree.inherit</field>
         <field name="inherit_id"
                ref="base.view_partner_tree"
         />
@@ -175,14 +134,7 @@
                 <field name="l10n_hu_vat"
                        optional="hide"
                        readonly="1"
-                />
-                <field name="l10n_hu_vat_status"
-                       optional="hide"
-                       readonly="1"
-                />
-                <field name="l10n_hu_incorporation"
-                       optional="hide"
-                       readonly="1"
+                       string="HU VAT"
                 />
                 <field name="l10n_hu_vpid"
                        optional="hide"
@@ -195,7 +147,7 @@
     <record id="view_res_partner_filter_inherit"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.account.base.view.res.partner.filter.inherit</field>
+        <field name="name">l10n.hu.base.view.res.partner.filter.inherit</field>
         <field name="inherit_id"
                ref="base.view_res_partner_filter"
         />
@@ -208,16 +160,11 @@
             <xpath expr="//field[@name='parent_id']"
                    position="after"
             >
-                <field name="l10n_hu_vat"/>
-                <field name="l10n_hu_vpid"/>
-            </xpath>
-            <!-- Filter group by -->
-            <xpath expr="//filter[@name='group_country']"
-                   position="after"
-            >
-                <filter name="l10n_hu_vat_status_filter_group_by"
-                        context="{'group_by': 'l10n_hu_vat_status'}"
-                        string="HU VAT Status"
+                <field name="l10n_hu_vat"
+                       string="HU VAT"
+                />
+                <field name="l10n_hu_vpid"
+                       string="HU VPID"
                 />
             </xpath>
         </field>

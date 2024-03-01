@@ -787,7 +787,8 @@ class L10nHuNavReport(models.Model):
                     input_values = {
                         'account_move': account_move_line.move_id.id,
                         'account_move_line': account_move_line.id,
-                        'account_tax': account_move_line.tax_line_id.id,
+                        'account_tax': [(4, x.id, 0) for x in account_move_line.tax_ids],
+                        'account_tax_line': account_move_line.tax_line_id.id,
                         'amount_balance': account_move_line.balance,
                         'amount_currency': account_move_line.amount_currency,
                         'amount_credit': account_move_line.credit,
@@ -900,16 +901,16 @@ class L10nHuNavReport(models.Model):
         info_list = []
         output_values_list = []
         result = {}
-        value_rules = []
+        output_rules = []
         warning_list = []
 
         # Prepare raw input-output from elements
         for element in self.template.element:
-            if element.value_rule and element.value_rule not in value_rules:
+            if element.output_rule and element.output_rule not in output_rules:
                 pass
             else:
                 pass
-            value_rules.append(element.value_rule)
+            output_rules.append(element.output_rule)
 
             # output_code
             if element.code:

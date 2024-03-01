@@ -16,6 +16,7 @@
         'views/document_type_actions.xml',
         'views/ir_config_parameter_actions.xml',
         'views/ir_cron_actions.xml',
+        'views/ir_module_module_actions.xml',
         'views/log_views.xml',
         'views/log_actions.xml',
         'views/object_views.xml',
@@ -44,6 +45,6 @@
     'price': 0,
     'summary': "Hungarian localization",
     'test': [],
-    'version': "1.0.13",
+    'version': "1.0.14",
     'website': "https://wwww.hungarodo.hu/odoohu",
 }

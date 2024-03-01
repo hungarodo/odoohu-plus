@@ -14,7 +14,7 @@ class L10nHuAccountBaseDocumentType(models.Model):
     # Private attributes
     _name = 'l10n.hu.document.type'
     _description = "Hungary Document Type"
-    _inherit = ['mail.thread']
+    _inherit = ['image.mixin', 'mail.activity.mixin', 'mail.thread']
 
     # Default methods
 

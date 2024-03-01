@@ -145,6 +145,19 @@
         />
         <field name="sequence">128</field>
     </record>
+    <!-- HU > Configuration > Technical > Apps -->
+    <record id="hu_configuration_technical_app_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Apps</field>
+        <field name="action"
+               ref="app_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_technical_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
     <!-- HU > Configuration > Technical > Scheduled Actions -->
     <record id="hu_configuration_technical_cron_menu"
             model="ir.ui.menu"
@@ -156,7 +169,7 @@
         <field name="parent_id"
                ref="hu_configuration_technical_menu"
         />
-        <field name="sequence">8</field>
+        <field name="sequence">16</field>
     </record>
     <!-- HU > Configuration > Technical > System Parameters -->
     <record id="hu_configuration_technical_parameter_menu"
@@ -169,6 +182,6 @@
         <field name="parent_id"
                ref="hu_configuration_technical_menu"
         />
-        <field name="sequence">16</field>
+        <field name="sequence">24</field>
     </record>
 </odoo>

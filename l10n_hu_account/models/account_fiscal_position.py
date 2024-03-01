@@ -17,6 +17,10 @@ class L10nHuAccountFiscalPosition(models.Model):
     # Default methods
 
     # Field declarations
+    l10n_hu_api_enabled = fields.Boolean(
+        default=False,
+        string="HU API Enabled",
+    )
     l10n_hu_incorporation = fields.Selection(
         index=True,
         selection=[
@@ -26,22 +30,26 @@ class L10nHuAccountFiscalPosition(models.Model):
         ],
         string="HU Taxpayer Type",
     )
+    l10n_hu_technical_name = fields.Char(
+        copy=False,
+        string="HU Technical Name",
+    )
     l10n_hu_trade_position = fields.Selection(
+        index=True,
         selection=[
             ('domestic', "Domestic"),
             ('eu', "EU"),
             ('other', "Other"),
         ],
-        index=True,
         string="HU Trade Position",
     )
     l10n_hu_vat_status = fields.Selection(
+        index=True,
         selection=[
             ('domestic', "Domestic"),
             ('private_person', "Private Person"),
             ('other', "Other"),
         ],
-        index=True,
         string="HU VAT Status",
     )
 

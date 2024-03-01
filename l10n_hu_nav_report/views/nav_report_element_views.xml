@@ -12,15 +12,7 @@
         >
             <form>
                 <header>
-                    <button name="action_report_wizard"
-                            attrs="{'invisible': [
-                                ('id', '=', False),
-                            ]}"
-                            class="btn btn-primary"
-                            icon="fa-magic"
-                            string="Wizard"
-                            type="object"
-                    />
+
                 </header>
                 <sheet>
                     <div name="button_box"
@@ -32,6 +24,16 @@
                                    readonly="1"
                             />
                         </span>
+                        <button name="action_list_report_outputs"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                type="object"
+                        >
+                            <field name="report_output_count"
+                                   string="Report Output"
+                                   widget="statinfo"
+                            />
+                        </button>
                     </div>
                     <widget name="web_ribbon"
                             attrs="{'invisible': [('active', '=', True)]}"
@@ -52,38 +54,64 @@
                             <field name="code"/>
                         </group>
                         <group>
-                            <field name="sequence"
-                                   class="oe_inline"
+                            <field name="description"
+                                   placeholder="Public description..."
+                                   style="word-break: break-word;"
                             />
-                            <field name="description"/>
                         </group>
                     </group>
                     <notebook>
                         <page name="details"
                               string="Details"
                         >
-                            <group name="details">
-                                <group name="value"
-                                       string="Value"
+                            <group name="details_1">
+                                <group name="details_1">
+                                    <field name="notes"
+                                           placeholder="Internal notes..."
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                                <group name="details_2">
+                                    <field name="sequence"
+                                           class="oe_inline"
+                                    />
+                                    <field name="api_enabled"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
+                            </group>
+                            <group name="details_2">
+                                <group name="input"
+                                       string="Input"
                                 >
-                                    <field name="value_method"
+                                    <field name="input_method"
                                            required="1"
                                            string="Method"
                                     />
-                                    <field name="value_rule"
-                                           attrs="{'invisible': [('value_method', '!=', 'rule')]}"
+                                    <field name="input_rule"
+                                           attrs="{'invisible': [('input_method', '!=', 'rule')]}"
+                                           domain="[('rule_type', '=', 'report_input')]"
                                            options="{'no_quick_create': True,}"
                                            string="Rule"
                                     />
+                                </group>
+                                <group name="output"
+                                       string="Output"
+                                >
                                     <field name="value_type"
-                                           attrs="{'invisible': [('value_method', '=', 'rule')]}"
-                                           string="Type"
+                                           string="Value Type"
+                                    />
+                                    <field name="output_rule"
+                                           attrs="{'invisible': [('input_method', '!=', 'rule')]}"
+                                           domain="[('rule_type', '=', 'report_output')]"
+                                           options="{'no_quick_create': True,}"
+                                           string="Rule"
                                     />
                                     <field name="value_boolean"
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'boolean'),
                                                ]
                                            }"
@@ -94,7 +122,7 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'char'),
                                                ]
                                            }"
@@ -105,7 +133,7 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'date'),
                                                ]
                                            }"
@@ -115,7 +143,7 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'datetime'),
                                                ]
                                            }"
@@ -125,7 +153,7 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'float'),
                                                ]
                                            }"
@@ -135,7 +163,7 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'html'),
                                                ]
                                            }"
@@ -145,7 +173,7 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'integer'),
                                                ]
                                            }"
@@ -155,16 +183,32 @@
                                            attrs="{
                                                'invisible': [
                                                    '|',
-                                                   ('value_method', '!=', 'fixed'),
+                                                   ('input_method', '!=', 'fixed'),
                                                    ('value_type', '!=', 'text'),
                                                ]
                                            }"
                                            placeholder="Enter value..."
                                            string="Value"
                                     />
-                                    <field name="notes"
-                                           placeholder="Internal notes..."
-                                           style="word-break: break-word;"
+                                </group>
+                                <group name="input_filter"
+                                       attrs="{'invisible': [('input_method', '!=', 'rule')]}"
+                                       string="Input Filter"
+                                >
+                                    <div colspan="2">
+                                        <field name="input_domain"
+                                               nolabel="1"
+                                               options="{'model': 'l10n.hu.nav.report.input'}"
+                                               string="Input Domain"
+                                               widget="domain"
+                                        />
+                                    </div>
+                                    <field name="input_limit"
+                                           class="oe_inline"
+                                           string="Input Limit"
+                                    />
+                                    <field name="input_order"
+                                           string="Input Order"
                                     />
                                 </group>
                                 <group name="nav"
@@ -280,9 +324,12 @@
                             >
                                 <group>
                                     <field name="technical_name"
+                                           attrs="{'readonly': [('api_enabled', '=', True)]}"
                                            style="word-break: break-word;"
                                     />
-                                    <field name="technical_type"/>
+                                    <field name="technical_type"
+                                           attrs="{'readonly': [('api_enabled', '=', True)]}"
+                                    />
                                 </group>
                                 <group>
                                     <field name="technical_status"/>
@@ -297,6 +344,17 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids"
+                           widget="mail_activity"
+                    />
+                    <field name="message_follower_ids"
+                           widget="mail_followers"
+                    />
+                    <field name="message_ids"
+                           widget="mail_thread"
+                    />
+                </div>
             </form>
         </field>
     </record>
@@ -321,9 +379,12 @@
                 />
                 <field name="code"/>
                 <field name="element_type"/>
+                <field name="input_method"/>
+                <field name="input_rule"
+                       optional="hide"
+                />
                 <field name="value_type"/>
-                <field name="value_method"/>
-                <field name="value_rule"
+                <field name="output_rule"
                        optional="hide"
                 />
                 <field name="section_object"
@@ -376,9 +437,12 @@
                 />
                 <field name="code"/>
                 <field name="element_type"/>
+                <field name="input_method"/>
+                <field name="input_rule"
+                       optional="hide"
+                />
                 <field name="value_type"/>
-                <field name="value_method"/>
-                <field name="value_rule"
+                <field name="output_rule"
                        optional="hide"
                 />
                 <field name="section_object"
@@ -418,6 +482,8 @@
                 <field name="code"/>
                 <field name="nav_form"/>
                 <field name="nav_eazon"/>
+                <field name="input_rule"/>
+                <field name="output_rule"/>
                 <!-- Filter -->
                 <filter name="archived_filter"
                         domain="[('active','=', False)]"
@@ -433,27 +499,31 @@
                        expand="0"
                        string="Group By"
                 >
-                    <filter name="element_type_group_by"
+                    <filter name="element_type_filter_group_by"
                             context="{'group_by': 'element_type'}"
                             string="Element Type"
                     />
-                    <filter name="value_method_group_by"
-                            context="{'group_by': 'value_method'}"
+                    <filter name="input_method_filter_group_by"
+                            context="{'group_by': 'input_method'}"
                             string="Value Method"
                     />
-                    <filter name="value_rule_group_by"
-                            context="{'group_by': 'value_rule'}"
-                            string="Value Rule"
+                    <filter name="input_rule_filter_group_by"
+                            context="{'group_by': 'input_rule'}"
+                            string="Input Rule"
                     />
-                    <filter name="value_type_group_by"
+                    <filter name="value_type_filter_group_by"
                             context="{'group_by': 'value_type'}"
                             string="Value Type"
                     />
-                    <filter name="nav_form_group_by"
+                    <filter name="output_rule_filter_group_by"
+                            context="{'group_by': 'output_rule'}"
+                            string="Output Rule"
+                    />
+                    <filter name="nav_form_filter_group_by"
                             context="{'group_by': 'nav_form'}"
                             string="NAV Form"
                     />
-                    <filter name="nav_page_group_by"
+                    <filter name="nav_page_filter_group_by"
                             context="{'group_by': 'nav_page'}"
                             string="NAV Page"
                     />

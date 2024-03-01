@@ -197,13 +197,15 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="template"/>
                 <field name="period_start"/>
                 <field name="period_end"/>
                 <field name="category"/>
                 <field name="tag"/>
-                <separator/>
+                <!-- Filter -->
+                <!-- Filter group by -->
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"

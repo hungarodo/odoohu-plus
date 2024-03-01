@@ -14,6 +14,7 @@ class L10nHuNavReportInput(models.Model):
     # Private attributes
     _name = 'l10n.hu.nav.report.input'
     _description = "HU NAV Report Input"
+    _inherit = ['mail.activity.mixin', 'mail.thread']
     _order = 'report desc, id desc'
 
     # Default methods
@@ -120,11 +121,20 @@ class L10nHuNavReportInput(models.Model):
         readonly=True,
         string="Account Payment Term",
     )
-    account_tax = fields.Many2one(
+    account_tax = fields.Many2many(
+        column1='input',
+        column2='tax',
         comodel_name='account.tax',
         copy=False,
         readonly=True,
-        string="Account Tax",
+        relation='l10n_hu_nav_report_input_account_tax_rel',
+        string="Taxes",
+    )
+    account_tax_line = fields.Many2one(
+        comodel_name='account.tax',
+        copy=False,
+        readonly=True,
+        string="Originator Tax",
     )
     amount_balance = fields.Float(
         copy=False,

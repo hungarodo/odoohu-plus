@@ -9,20 +9,7 @@
         <field name="domain">[]</field>
         <field name="res_model">res.partner</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">kanban,tree,form,activity</field>
-    </record>
-    <!-- Window action kanban view -->
-    <record id="res_partner_action_kanban"
-            model="ir.actions.act_window.view"
-    >
-        <field name="act_window_id"
-               ref="res_partner_action"
-        />
-        <field name="sequence">8</field>
-        <field name="view_id"
-               ref="base.res_partner_kanban_view"
-        />
-        <field name="view_mode">kanban</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
     </record>
     <!-- Window action list view -->
     <record id="res_partner_action_list"
@@ -31,11 +18,24 @@
         <field name="act_window_id"
                ref="res_partner_action"
         />
-        <field name="sequence">16</field>
+        <field name="sequence">8</field>
         <field name="view_id"
                ref="base.view_partner_tree"
         />
         <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action kanban view -->
+    <record id="res_partner_action_kanban"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="res_partner_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="base.res_partner_kanban_view"
+        />
+        <field name="view_mode">kanban</field>
     </record>
     <!-- Window action form view -->
     <record id="res_partner_action_form"

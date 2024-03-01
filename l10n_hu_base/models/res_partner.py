@@ -34,15 +34,6 @@ class L10nHuBaseResPartner(models.Model):
         comodel_name='res.partner',
         string="Financial Representative",
     )
-    l10n_hu_incorporation = fields.Selection(
-        index=True,
-        selection=[
-            ('organization', "Organization"),
-            ('self_employed', "Self Employed"),
-            ('taxable_person', "Taxable Person"),
-        ],
-        string="Taxpayer Type",
-    )
     l10n_hu_personal_tax_exempt = fields.Boolean(
         default=False,
         string="Personal Tax Exempt",
@@ -83,19 +74,6 @@ class L10nHuBaseResPartner(models.Model):
     l10n_hu_vat_reverse_charge = fields.Boolean(
         default=False,
         string="VAT Reverse Charge",
-    )
-    l10n_hu_vat_status = fields.Selection(
-        index=True,
-        selection=[
-            ('domestic', "Domestic"),
-            ('private_person', "Private Person"),
-            ('other', "Other"),
-        ],
-        string="VAT Status",
-    )
-    l10n_hu_vat_status_required = fields.Boolean(
-        compute='_compute_l10n_hu_vat_status_required',
-        string="VAT Status Required"
     )
     l10n_hu_vpid = fields.Char(
         string="VPID",
@@ -168,16 +146,14 @@ class L10nHuBaseResPartner(models.Model):
         result = super(L10nHuBaseResPartner, self)._commercial_fields()
 
         # Append fields
-        result.append('l10n_hu_incorporation')
         result.append('l10n_hu_self_employed_name')
         result.append('l10n_hu_self_employed_number')
         result.append('l10n_hu_vat')
-        result.append('l10n_hu_vat_status')
 
         # return
         return result
 
-    # # L10NHU SPECIFIC
+    # # HU
     @api.model
     def l10n_hu_get_is_l10n_hu_enabled(self):
         """ Determine if partner is L10NHU
@@ -195,33 +171,6 @@ class L10nHuBaseResPartner(models.Model):
             result = True
         else:
             pass
-
-        # Return result
-        return result
-
-    @api.model
-    def l10n_hu_get_is_vat_status_required(self):
-        """ Determine if HU VAT Status setting is required
-
-        May be overridden by super
-
-        :return: boolean
-        """
-        # Initialize variables
-        result = False
-
-        # Check active company
-        active_company_required = self.env.company.l10n_hu_partner_vat_status_required
-
-        # Check partner company setting
-        if self.company_id:
-            partner_company_required = self.company_id.l10n_hu_partner_vat_status_required
-        else:
-            partner_company_required = False
-
-        # NOTE: do not require if parent_id is set (which is the commercial partner probably)
-        if not self.parent_id and (active_company_required or partner_company_required):
-            result = True
 
         # Return result
         return result

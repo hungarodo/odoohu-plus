@@ -10,24 +10,16 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 
 # Class
-class L10nHuBaseResCompany(models.Model):
+class L10nHuAccountResCompany(models.Model):
     # Private attributes
     _inherit = 'res.company'
 
     # Default methods
 
     # Field declarations
-    l10n_hu_api_enabled = fields.Boolean(
+    l10n_hu_partner_vat_status_required = fields.Boolean(
         default=False,
-        string="HU API Enabled",
-    )
-    l10n_hu_api_key = fields.Char(
-        default=False,
-        string="HU API Key",
-    )
-    l10n_hu_api_url = fields.Char(
-        default=False,
-        string="HU API URL",
+        string="HU Partner VAT Status Required",
     )
 
     # Compute and search fields, in the same order of fields declaration

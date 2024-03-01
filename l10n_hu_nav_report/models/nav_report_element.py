@@ -15,6 +15,7 @@ class L10nHuNavReportElement(models.Model):
     # Private attributes
     _name = 'l10n.hu.nav.report.element'
     _description = "HU NAV Report Element"
+    _inherit = ['mail.activity.mixin', 'mail.thread']
     _order = 'id desc'
 
     # Default methods
@@ -23,6 +24,10 @@ class L10nHuNavReportElement(models.Model):
     active = fields.Boolean(
         default=True,
         string="Active",
+    )
+    api_enabled = fields.Boolean(
+        default=False,
+        string="API Enabled",
     )
     code = fields.Char(
         copy=False,
@@ -56,6 +61,93 @@ class L10nHuNavReportElement(models.Model):
         string="Name",
         translate=True,
     )
+    notes = fields.Text(
+        help="Internal notes",
+        string="Notes",
+    )
+    page_break = fields.Boolean(
+        default=False,
+        help="Make a page break after this element",
+        string="Page Break"
+    )
+    reference = fields.Char(
+        string="Reference",
+    )
+    report_output_count = fields.Integer(
+        compute='_compute_report_output_count',
+        string="Report Output Count",
+    )
+    section_object = fields.Many2one(
+        comodel_name='l10n.hu.object',
+        domain=[('object_type_technical_name', '=', 'nav_2365')],
+        index=True,
+        string="Section Object",
+    )
+    sequence = fields.Integer(
+        string="Sequence",
+    )
+    table_heading = fields.Boolean(
+        default=False,
+        string="Table Heading"
+    )
+    technical_data = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Technical Data",
+    )
+    technical_name = fields.Char(
+        copy=False,
+        index=True,
+        string="Technical Name",
+    )
+    technical_status = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Technical Status",
+    )
+    technical_timestamp = fields.Datetime(
+        copy=False,
+        readonly=True,
+        string="Technical Timestamp",
+    )
+    technical_type = fields.Char(
+        copy=False,
+        string="Technical Type",
+    )
+    template = fields.Many2one(
+        comodel_name='l10n.hu.nav.report.template',
+        index=True,
+        ondelete='cascade',
+        string="Template",
+    )
+    # # INPUT
+    input_domain = fields.Text(
+        string="Input Domain",
+    )
+    input_limit = fields.Integer(
+        string="Input Limit",
+    )
+    input_method = fields.Selection(
+        default='fixed',
+        required=True,
+        selection=[
+            ('rule', "Rule"),
+            ('manual', "Manual"),
+            ('fixed', "Fixed"),
+        ],
+        string="Input Method",
+    )
+    input_order = fields.Char(
+        default='id desc',
+        string="Input Order",
+    )
+    input_rule = fields.Many2one(
+        comodel_name='l10n.hu.nav.report.rule',
+        copy=True,
+        index=True,
+        string="Input Rule",
+    )
+    # # NAV
     nav_code = fields.Char(
         string="NAV Code",
     )
@@ -91,62 +183,12 @@ class L10nHuNavReportElement(models.Model):
     nav_row = fields.Integer(
         string="NAV Row",
     )
-    notes = fields.Text(
-        help="Internal notes",
-        string="Notes",
-    )
-    page_break = fields.Boolean(
-        default=False,
-        help="Make a page break after this element",
-        string="Page Break"
-    )
-    reference = fields.Char(
-        string="Reference",
-    )
-    section_object = fields.Many2one(
-        comodel_name='l10n.hu.object',
-        domain=[('object_type_technical_name', '=', 'nav_2365_a')],
+    # # OUTPUT
+    output_rule = fields.Many2one(
+        comodel_name='l10n.hu.nav.report.rule',
+        copy=True,
         index=True,
-        string="Section Object",
-    )
-    sequence = fields.Integer(
-        string="Sequence",
-    )
-    table_heading = fields.Boolean(
-        default=False,
-        string="Table Heading"
-    )
-    technical_data = fields.Text(
-        copy=False,
-        readonly=True,
-        string="Technical Data",
-    )
-    technical_name = fields.Char(
-        copy=False,
-        index=True,
-        readonly=True,
-        string="Technical Name",
-    )
-    technical_status = fields.Char(
-        copy=False,
-        readonly=True,
-        string="Technical Status",
-    )
-    technical_timestamp = fields.Datetime(
-        copy=False,
-        readonly=True,
-        string="Technical Timestamp",
-    )
-    technical_type = fields.Char(
-        copy=False,
-        readonly=True,
-        string="Technical Type",
-    )
-    template = fields.Many2one(
-        comodel_name='l10n.hu.nav.report.template',
-        index=True,
-        ondelete='cascade',
-        string="Template",
+        string="Input Rule",
     )
     value_boolean = fields.Boolean(
         default=False,
@@ -171,22 +213,6 @@ class L10nHuNavReportElement(models.Model):
     value_integer = fields.Integer(
         string="Whole Number Value",
     )
-    value_method = fields.Selection(
-        default='fixed',
-        required=True,
-        selection=[
-            ('rule', "Rule"),
-            ('manual', "Manual"),
-            ('fixed', "Fixed"),
-        ],
-        string="Value Method",
-    )
-    value_rule = fields.Many2one(
-        comodel_name='l10n.hu.nav.report.rule',
-        copy=True,
-        index=True,
-        string="Value Rule",
-    )
     value_text = fields.Text(
         string="Multi Line Text Value",
         translate=True,
@@ -208,6 +234,11 @@ class L10nHuNavReportElement(models.Model):
     )
 
     # Compute and search fields, in the same order of field declarations
+    def _compute_report_output_count(self):
+        for record in self:
+            record.report_output_count = self.env['l10n.hu.nav.report.output'].search_count([
+                ('element', '=', record.id),
+            ])
 
     # Constraints and onchanges
 
@@ -233,25 +264,18 @@ class L10nHuNavReportElement(models.Model):
         return result
 
     # Action methods
-    def action_report_wizard(self):
-        """ Start report wizard """
-        # Ensure one record in self
+    def action_list_report_outputs(self):
+        """ List related elements """
+        # Ensure one
         self.ensure_one()
-
-        # Assemble context
-        context = {
-            'default_action_type_editable': True,
-            'default_action_type_visible': True,
-        }
 
         # Assemble result
         result = {
-            'name': _("HU Wizard"),
-            'context': context,
-            'res_model': 'l10n.hu.wizard',
-            'target': 'new',
+            'name': _("NAV Report Outputs"),
+            'domain': [('element', '=', self.id)],
+            'res_model': 'l10n.hu.nav.report.output',
             'type': 'ir.actions.act_window',
-            'view_mode': 'form',
+            'view_mode': 'tree,form',
         }
 
         # Return result

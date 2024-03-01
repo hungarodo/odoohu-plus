@@ -15,6 +15,7 @@ class L10nHuNavReportOutput(models.Model):
     # Private attributes
     _name = 'l10n.hu.nav.report.output'
     _description = "HU NAV Report Output"
+    _inherit = ['mail.activity.mixin', 'mail.thread']
     _order = 'id desc'
 
     # Default methods

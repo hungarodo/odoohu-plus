@@ -18,6 +18,10 @@ class L10nHuAccountTax(models.Model):
     # Default methods
 
     # Field declarations
+    l10n_hu_api_enabled = fields.Boolean(
+        default=False,
+        string="HU API Enabled",
+    )
     l10n_hu_category = fields.Selection(
         selection=[
             ('vat', "VAT"),
@@ -66,6 +70,12 @@ class L10nHuAccountTax(models.Model):
             ('unknown', "UNKNOWN - Pre-3.0 invoice"),
         ],
         string="HU VAT Out of Scope Case",
+    )
+    l10n_hu_vat_percentage = fields.Float(
+        copy=False,
+        digits=(5, 4),
+        help="NAV (Hungarian Tax Authority) VAT rate",
+        string="HU VAT Percentage",
     )
     l10n_hu_vat_reason = fields.Char(
         copy=False,

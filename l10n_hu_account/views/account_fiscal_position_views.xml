@@ -14,12 +14,36 @@
                type="xml"
         >
             <!-- Add fields -->
-            <xpath expr="//field[@name='auto_apply']"
+            <xpath expr="//page[@name='account_mapping']"
                    position="after"
             >
-                <field name="l10n_hu_vat_status"/>
-                <field name="l10n_hu_incorporation"/>
-                <field name="l10n_hu_trade_position"/>
+                <page name="l10n_hu"
+                       string="HU"
+                >
+                    <group name="l10n_hu">
+                        <group name="l10n_hu_1">
+                            <field name="l10n_hu_vat_status"
+                                   string="VAT Status"
+                            />
+                            <field name="l10n_hu_incorporation"
+                                   string="Taxpayer Type"
+                            />
+                            <field name="l10n_hu_trade_position"
+                                   string="Trade Position"
+                            />
+                        </group>
+                        <group name="l10n_hu_2">
+                            <field name="l10n_hu_api_enabled"
+                                   string="API Enabled"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_technical_name"
+                                   attrs="{'readonly': [('l10n_hu_api_enabled', '=', True)]}"
+                                   string="Technical Name"
+                            />
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>

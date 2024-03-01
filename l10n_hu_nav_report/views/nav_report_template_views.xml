@@ -185,6 +185,7 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="code"/>
                 <field name="category"/>

@@ -23,6 +23,8 @@
         'views/account_tax_views.xml',
         'views/account_tax_actions.xml',
         'views/account_tax_group_actions.xml',
+        'views/res_company_views.xml',
+        'views/res_partner_views.xml',
         'data/ir_ui_menu_data.xml',
     ],
     'demo': [],
@@ -43,6 +45,6 @@
     'qweb': [],
     'summary': "Hungarian accounting improvements",
     'test': [],
-    'version': "1.0.18",
+    'version': "1.0.19",
     'website': "https://wwww.hungarodo.hu/odoohu"
 }
