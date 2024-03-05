@@ -55,89 +55,108 @@
                             />
                         </group>
                         <group>
-                            <field name="value_char"
-                                   string="String"
+                            <field name="locked"
+                                   widget="boolean_toggle"
                             />
-                            <field name="value_date"
-                                   string="Date"
-                            />
-                            <field name="value_float"
-                                   string="Decimal Number"
-                            />
-                            <field name="value_integer"
-                                   string="Whole Number"
-                            />
+                            <field name="description"/>
                         </group>
                     </group>
                     <notebook>
                         <page name="details"
                               string="Details"
                         >
-                            <group name="details">
-                                <group name="accounting_detail"
-                                       string="Accounting Details"
-                                >
-                                    <field name="amount_credit"
-                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
-                                    />
-                                    <field name="amount_debit"
-                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
-                                    />
-                                    <field name="amount_balance"
-                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
-                                    />
-                                    <field name="amount_currency"
-                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
-                                    />
-                                    <field name="amount_net"
-                                           attrs="{'invisible': [('account_move_line', '!=', False)]}"
-                                    />
-                                    <field name="amount_tax"
-                                           attrs="{'invisible': [('account_move_line', '!=', False)]}"
-                                    />
-                                    <field name="amount_total"
-                                           attrs="{'invisible': [('account_move_line', '!=', False)]}"
-                                    />
-                                    <field name="currency"/>
+                            <group name="input_value"
+                                   attrs="{'invisible': [('rule_value_type', '=', False)]}"
+                                   string="Input Value"
+                            >
+                                <field name="value_char"
+                                       attrs="{'invisible': [('rule_value_type', 'not in', ['char'])]}"
+                                       string="String"
+                                />
+                                <field name="value_date"
+                                       attrs="{'invisible': [('rule_value_type', '!=', 'date')]}"
+                                       string="Date"
+                                />
+                                <field name="value_float"
+                                       attrs="{'invisible': [('rule_value_type', '!=', 'float')]}"
+                                       string="Decimal Number"
+                                />
+                                <field name="value_integer"
+                                       attrs="{'invisible': [('rule_value_type', '!=', 'integer')]}"
+                                       string="Whole Number"
+                                />
+                            </group>
+                            <group name="accounting"
+                                   attrs="{'invisible': [('account_move_line', '=', False)]}"
+                                   string="Accounting"
+                            >
+                                <group name="accounting_1">
+                                    <field name="amount_credit"/>
+                                    <field name="amount_debit"/>
+                                    <field name="amount_balance"/>
+                                    <field name="amount_currency"/>
+                                    <field name="amount_net"/>
+                                    <field name="amount_tax"/>
+                                    <field name="amount_total"/>
                                     <field name="currency_code"/>
                                     <field name="currency_rate"/>
                                     <field name="delivery_date"/>
                                     <field name="payment_date"/>
                                     <field name="payment_method"/>
+                                    <field name="downpayment"/>
                                 </group>
-                                <group name="partner"
-                                       string="Partner"
-                                >
+                                <group name="accounting_2">
+                                    <field name="account_move"/>
+                                    <field name="account_move_line"/>
+                                    <field name="account_tag"
+                                           widget="many2many_tags"
+                                    />
+                                    <field name="account_tag_invert"/>
+                                    <field name="account_tax"
+                                           widget="many2many_tags"
+                                    />
+                                    <field name="account_tax_line"/>
+                                    <field name="account_tax_scope"/>
+                                    <field name="account_fiscal_position"/>
+                                    <field name="fiscal_position_match"/>
+                                    <field name="account_payment_term"/>
+                                    <field name="currency"/>
+                                </group>
+                            </group>
+                            <group name="partner"
+                                   string="Partner"
+                            >
+                                <group name="partner_1">
                                     <field name="tax_number"/>
-                                    <field name="partner"/>
                                     <field name="partner_name"/>
                                     <field name="partner_tax_number"/>
                                     <field name="partner_tax_unit"/>
-                                    <field name="partner_country"/>
                                     <field name="partner_country_code"/>
-                                    <field name="partner_fiscal_position"/>
                                     <field name="partner_trade_position"/>
                                 </group>
-
-                                <group name="accounting_link"
-                                       string="Accounting Links"
+                                <group name="partner_2">
+                                    <field name="partner"/>
+                                    <field name="partner_country"/>
+                                    <field name="partner_fiscal_position"/>
+                                </group>
+                            </group>
+                            <group name="product"
+                                   string="Product"
+                            >
+                                <group name="product_1">
+                                    <field name="product_name"/>
+                                    <field name="product_code"/>
+                                    <field name="product_scope"/>
+                                    <field name="product_type"/>
+                                    <field name="product_uom_name"/>
+                                    <field name="product_uom_category_name"/>
+                                </group>
+                                <group name="product_2"
                                 >
-                                    <field name="account_move"
-                                           attrs="{'invisible': [('account_move', '=', False)]}"
-                                    />
-                                    <field name="account_move_line"
-                                           attrs="{'invisible': [('account_move_line', '=', False)]}"
-                                    />
-                                    <field name="account_payment_term"
-                                           attrs="{'invisible': [('account_payment_term', '=', False)]}"
-                                    />
-                                    <field name="account_tax"
-                                           attrs="{'invisible': [('account_tax', '=', False)]}"
-                                           widget="many2many_tags"
-                                    />
-                                    <field name="account_tax_line"
-                                           attrs="{'invisible': [('account_tax_line', '=', False)]}"
-                                    />
+                                    <field name="product"/>
+                                    <field name="product_uom"/>
+                                    <field name="product_uom_category"/>
+                                    <field name="product_uom_type"/>
                                 </group>
                             </group>
                         </page>
@@ -152,9 +171,6 @@
                                            readonly="1"
                                     />
                                     <field name="active"/>
-                                    <field name="locked"
-                                           widget="boolean_toggle"
-                                    />
                                     <field name="report"
                                            readonly="1"
                                     />

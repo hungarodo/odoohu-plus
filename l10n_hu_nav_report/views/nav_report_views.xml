@@ -82,8 +82,6 @@
                             <field name="template"
                                    options="{'no_create': True,}"
                             />
-                            <field name="template_code"/>
-                            <field name="template_version"/>
                             <field name="period_start"
                                    required="1"
                             />
@@ -120,6 +118,12 @@
                                     />
                                     <field name="company"
                                            force_save="1"
+                                           readonly="1"
+                                    />
+                                    <field name="template_code"
+                                           readonly="1"
+                                    />
+                                    <field name="template_version"
                                            readonly="1"
                                     />
                                 </group>

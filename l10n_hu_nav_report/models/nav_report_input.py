@@ -19,8 +19,12 @@ class L10nHuNavReportInput(models.Model):
 
     # Default methods
     @api.model
-    def _get_payment_method_selection(self):
+    def _get_selection_payment_method(self):
         return self.env['account.payment.term'].l10n_hu_get_nav_method_selection()
+
+    @api.model
+    def _get_selection_product_uom_type(self):
+        return self.env['uom.uom'].l10n_hu_get_type_selection()
 
     # Field declarations
     # # COMMON
@@ -53,6 +57,7 @@ class L10nHuNavReportInput(models.Model):
         comodel_name='res.currency',
         related='company.currency_id',
         readonly=True,
+        string="Company Currency",
     )
     description = fields.Text(
         string="Description",
@@ -103,6 +108,12 @@ class L10nHuNavReportInput(models.Model):
         string="Tag",
     )
     # # ACCOUNT
+    account_fiscal_position = fields.Many2one(
+        comodel_name='account.fiscal.position',
+        copy=False,
+        readonly=True,
+        string="Account Fiscal Position",
+    )
     account_move = fields.Many2one(
         comodel_name='account.move',
         copy=False,
@@ -119,7 +130,22 @@ class L10nHuNavReportInput(models.Model):
         comodel_name='account.payment.term',
         copy=False,
         readonly=True,
-        string="Account Payment Term",
+        string="Payment Term",
+    )
+    account_tag = fields.Many2many(
+        column1='input',
+        column2='tag',
+        comodel_name='account.account.tag',
+        copy=False,
+        readonly=True,
+        relation='l10n_hu_nav_report_input_account_tag_rel',
+        string="Account Tags",
+    )
+    account_tag_invert = fields.Boolean(
+        copy=False,
+        default=False,
+        readonly=True,
+        string="Account Tag Invert",
     )
     account_tax = fields.Many2many(
         column1='input',
@@ -135,6 +161,15 @@ class L10nHuNavReportInput(models.Model):
         copy=False,
         readonly=True,
         string="Originator Tax",
+    )
+    account_tax_scope = fields.Selection(
+        copy=False,
+        readonly=True,
+        selection=[
+            ('product', "Product"),
+            ('service', "Service"),
+        ],
+        string="Tax Scope",
     )
     amount_balance = fields.Float(
         copy=False,
@@ -176,6 +211,18 @@ class L10nHuNavReportInput(models.Model):
         readonly=True,
         string="Delivery Date",
     )
+    downpayment = fields.Boolean(
+        copy=False,
+        default=False,
+        readonly=True,
+        string="Downpayment",
+    )
+    fiscal_position_match = fields.Boolean(
+        copy=False,
+        default=False,
+        readonly=True,
+        string="Fiscal Position Match",
+    )
     payment_date = fields.Date(
         copy=False,
         readonly=True,
@@ -184,7 +231,7 @@ class L10nHuNavReportInput(models.Model):
     payment_method = fields.Selection(
         copy=False,
         readonly=True,
-        selection=_get_payment_method_selection,
+        selection=_get_selection_payment_method,
         string="Payment Method",
     )
     # # CURRENCY
@@ -253,6 +300,61 @@ class L10nHuNavReportInput(models.Model):
         copy=False,
         readonly=True,
         string="Tax Number",
+    )
+    # # PRODUCT
+    product = fields.Many2one(
+        comodel_name='product.product',
+        copy=False,
+        readonly=True,
+        string="Product",
+    )
+    product_code = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Product Code",
+    )
+    product_name = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Product Name",
+    )
+    product_scope = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Product Scope",
+    )
+    product_type = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Product Type",
+    )
+    product_uom = fields.Many2one(
+        comodel_name='uom.uom',
+        copy=False,
+        readonly=True,
+        string="Product UoM",
+    )
+    product_uom_category = fields.Many2one(
+        comodel_name='uom.category',
+        copy=False,
+        readonly=True,
+        string="Product UoM Category",
+    )
+    product_uom_category_name = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Product UoM Name",
+    )
+    product_uom_name = fields.Char(
+        copy=False,
+        readonly=True,
+        string="Product UoM Name",
+    )
+    product_uom_type = fields.Selection(
+        copy=False,
+        readonly=True,
+        selection=_get_selection_product_uom_type,
+        string="Product Uom Type",
     )
     # # VALUE
     value_char = fields.Char(

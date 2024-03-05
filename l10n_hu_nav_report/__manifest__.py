@@ -36,10 +36,10 @@
     'images': [  # Odoo Marketplace banner
         'static/description/l10n_hu_nav_report_banner.png',
     ],
-    'license': "LGPL-3",
+    'license': "OPL-1",
     'price': 0,
     'qweb': [],
     'summary': "Hungary NAV reporting",
-    'version': "1.0.3",
+    'version': "1.0.4",
     'website': "https://hungarodo.hu/odoohu",
 }

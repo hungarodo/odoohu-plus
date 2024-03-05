@@ -36,19 +36,19 @@
                     </div>
                     <group name="base">
                         <group>
-                            <field name="output_type"
+                            <field name="value_type"
                                    required="1"
                             />
-                            <field name="locked"
-                                   widget="boolean_toggle"
-                            />
-                        </group>
-                        <group>
                             <field name="code"
                                    required="1"
                             />
-                            <field name="sequence"
-                                   class="oe_inline"
+                        </group>
+                        <group>
+                            <field name="locked"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="description"
+                                   placeholder="Public description..."
                             />
                         </group>
                     </group>
@@ -58,67 +58,77 @@
                         >
                             <group name="common">
                                 <group>
-                                    <field name="value_type"/>
-                                    <field name="page_break"
-                                           widget="boolean_toggle"
-                                    />
-                                </group>
-                                <group>
                                     <field name="notes"
                                            placeholder="Internal notes..."
                                     />
                                 </group>
+                                <group>
+                                    <field name="sequence"
+                                           class="oe_inline"
+                                    />
+                                    <field name="page_break"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
                             </group>
                             <group name="value_base"
-                                   attrs="{'invisible': [('output_type', 'not in', ['integer', 'float', 'date', 'datetime'])]}"
+                                   attrs="{'invisible': [('value_type', 'not in', ['integer', 'float', 'date', 'datetime'])]}"
                                    string="Value"
                             >
                                 <field name="value_char"
-                                       attrs="{'invisible': [('output_type', '!=', 'char')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'char')]}"
                                        placeholder="Enter text..."
                                        string="String"
                                 />
                                 <field name="value_date"
-                                       attrs="{'invisible': [('output_type', '!=', 'date')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'date')]}"
                                        string="Date"
                                 />
                                 <field name="value_datetime"
-                                       attrs="{'invisible': [('output_type', '!=', 'datetime')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'datetime')]}"
                                        string="Datetime"
                                 />
                                 <field name="value_integer"
-                                       attrs="{'invisible': [('output_type', '!=', 'integer')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'integer')]}"
                                        string="Integer"
                                 />
                                 <field name="value_float"
-                                       attrs="{'invisible': [('output_type', '!=', 'float')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'float')]}"
                                        string="Float"
                                 />
                             </group>
                             <group name="char_text"
-                                   attrs="{'invisible': [('output_type', 'not in', ['char', 'text'])]}"
+                                   attrs="{'invisible': [('value_type', 'not in', ['char', 'char_translatable', 'text', 'text_translatable'])]}"
                                    string="Text"
                             >
                                 <field name="value_char"
-                                       attrs="{'invisible': [('output_type', '!=', 'char')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'char')]}"
+                                       placeholder="Enter text..."
+                                />
+                                <field name="value_char_translatable"
+                                       attrs="{'invisible': [('value_type', '!=', 'char_translatable')]}"
                                        placeholder="Enter text..."
                                 />
                                 <field name="value_text"
-                                       attrs="{'invisible': [('output_type', '!=', 'text')]}"
+                                       attrs="{'invisible': [('value_type', '!=', 'text')]}"
+                                       placeholder="Enter text..."
+                                />
+                                <field name="value_text_translatable"
+                                       attrs="{'invisible': [('value_type', '!=', 'text_translatable')]}"
                                        placeholder="Enter text..."
                                 />
                             </group>
                             <group name="html"
-                                   attrs="{'invisible': [('output_type', '!=', 'html')]}"
+                                   attrs="{'invisible': [('value_type', 'not in', ['html', 'html_translatable'])]}"
                                    string="HTML"
                             >
                                 <field name="value_html"
+                                       attrs="{'invisible': [('value_type', '!=', 'html')]}"
                                        placeholder="Enter text..."
                                 />
-                            </group>
-                            <group name="description">
-                                <field name="description"
-                                       placeholder="Public description..."
+                                <field name="value_html_translatable"
+                                       attrs="{'invisible': [('value_type', '!=', 'html_translatable')]}"
+                                       placeholder="Enter text..."
                                 />
                             </group>
                         </page>
@@ -127,7 +137,7 @@
                               string="Audit"
                         >
                             <group name="audit">
-                                <group name="audit_base">
+                                <group name="audit_1">
                                     <field name="id"/>
                                     <field name="active"
                                            readonly="1"
@@ -146,7 +156,7 @@
                                     />
                                     <field name="technical_name"/>
                                 </group>
-                                <group name="audit_create_write">
+                                <group name="audit_2">
                                     <field name="create_uid"
                                            readonly="1"
                                     />
@@ -194,7 +204,7 @@
                 <field name="report"/>
                 <field name="sequence"/>
                 <field name="name"/>
-                <field name="output_type"/>
+                <field name="value_type"/>
                 <field name="code"
                        optional="show"
                 />
@@ -240,21 +250,18 @@
                 <field name="sequence"
                        widget="handle"
                 />
+                <field name="name"/>
                 <field name="locked"
                        widget="boolean_toggle"
                 />
-                <field name="name"/>
                 <field name="code"/>
-                <field name="technical_name"
-                       optional="show"
-                />
                 <field name="template"
                        optional="hide"
                 />
                 <field name="element"
                        optional="hide"
                 />
-                <field name="output_type"
+                <field name="value_type"
                        optional="hide"
                 />
                 <field name="value_display"
@@ -264,7 +271,13 @@
                        widget="boolean_toggle"
                 />
                 <field name="notes"/>
+                <field name="technical_name"
+                       optional="show"
+                />
                 <field name="report"
+                       optional="hide"
+                />
+                <field name="company"
                        optional="hide"
                 />
             </tree>
@@ -281,17 +294,14 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="technical_name"/>
                 <field name="code"/>
                 <field name="element"/>
                 <field name="template"/>
-                <separator/>
-                <filter name="active_filter"
-                        domain="[('active','=', True)]"
-                        string="Active"
-                />
-                <filter name="not_active_filter"
+                <!-- Filter -->
+                <filter name="archived_filter"
                         domain="[('active','=', False)]"
                         string="Archived"
                 />
@@ -304,13 +314,13 @@
                         domain="[('locked','=', False)]"
                         string="Not Locked"
                 />
-                <separator/>
+                <!-- Filter group by -->
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"
                 >
-                    <filter name="output_type_group_by"
-                            context="{'group_by': 'output_type'}"
+                    <filter name="value_type_group_by"
+                            context="{'group_by': 'value_type'}"
                             string="Output Type"
                     />
                     <filter name="report_group_by"

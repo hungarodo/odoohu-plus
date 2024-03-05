@@ -44,11 +44,11 @@
         'static/description/l10n_hu_invoice_banner.png',
     ],
     'installable': True,
-    'license': "LGPL-3",
+    'license': "OPL-1",
     'price': 0,
     'qweb': [],
     'summary': "Hungarian invoicing improvements",
     'test': [],
-    'version': "1.0.11",
+    'version': "1.0.12",
     'website': "https://www.hungarodo.hu/odoohu",
 }

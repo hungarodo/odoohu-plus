@@ -56,10 +56,12 @@
                     </group>
                     <group name="l10n_hu_2">
                         <field name="l10n_hu_api_enabled"
+                               string="API Enabled"
                                widget="boolean_toggle"
                         />
                         <field name="l10n_hu_technical_name"
                                attrs="{'readonly': [('l10n_hu_api_enabled', '=', True)]}"
+                               string="Technical_name"
                         />
                         <label name="l10n_hu_actions_label"
                                for="action_l10n_hu_update_configuration"

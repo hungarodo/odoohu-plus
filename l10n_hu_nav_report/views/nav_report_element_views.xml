@@ -94,15 +94,24 @@
                                            options="{'no_quick_create': True,}"
                                            string="Rule"
                                     />
+                                    <field name="input_locked"
+                                           attrs="{'invisible': [('input_method', '=', 'rule')]}"
+                                           string="Locked"
+                                           widget="boolean_toggle"
+                                    />
                                 </group>
                                 <group name="output"
                                        string="Output"
                                 >
+                                    <field name="output_method"
+                                           string="Method"
+                                    />
                                     <field name="value_type"
+                                           attrs="{'invisible': [('output_method', '!=', 'simple')]}"
                                            string="Value Type"
                                     />
                                     <field name="output_rule"
-                                           attrs="{'invisible': [('input_method', '!=', 'rule')]}"
+                                           attrs="{'invisible': [('output_method', '!=', 'rule')]}"
                                            domain="[('rule_type', '=', 'report_output')]"
                                            options="{'no_quick_create': True,}"
                                            string="Rule"
@@ -189,6 +198,10 @@
                                            }"
                                            placeholder="Enter value..."
                                            string="Value"
+                                    />
+                                    <field name="output_locked"
+                                           string="Locked"
+                                           widget="boolean_toggle"
                                     />
                                 </group>
                                 <group name="input_filter"

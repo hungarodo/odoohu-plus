@@ -25,6 +25,7 @@
         'views/account_tax_group_actions.xml',
         'views/res_company_views.xml',
         'views/res_partner_views.xml',
+        'views/uom_uom_views.xml',
         'data/ir_ui_menu_data.xml',
     ],
     'demo': [],
@@ -40,11 +41,11 @@
         'static/description/l10n_hu_account_invoice_banner.png',
     ],
     'installable': True,
-    'license': "LGPL-3",
+    'license': "OPL-1",
     'price': 0,
     'qweb': [],
     'summary': "Hungarian accounting improvements",
     'test': [],
-    'version': "1.0.19",
+    'version': "1.0.20",
     'website': "https://wwww.hungarodo.hu/odoohu"
 }

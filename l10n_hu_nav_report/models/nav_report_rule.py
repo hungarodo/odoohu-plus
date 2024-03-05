@@ -26,6 +26,10 @@ class L10nHuNavReportRule(models.Model):
         default=True,
         string="Active",
     )
+    api_enabled = fields.Boolean(
+        default=False,
+        string="API Enabled",
+    )
     company = fields.Many2one(
         comodel_name='res.company',
         default=lambda self: self.env.user.company_id.id,
@@ -36,6 +40,14 @@ class L10nHuNavReportRule(models.Model):
         copy=False,
         string="Description",
         translate=True,
+    )
+    element_input_count = fields.Integer(
+        compute='_compute_element_input_count',
+        string="Element Input Count",
+    )
+    element_output_count = fields.Integer(
+        compute='_compute_element_output_count',
+        string="Element Output Count",
     )
     name = fields.Char(
         copy=False,
@@ -62,7 +74,6 @@ class L10nHuNavReportRule(models.Model):
     technical_name = fields.Char(
         copy=False,
         index=True,
-        readonly=True,
         string="Technical Name",
     )
     technical_status = fields.Char(
@@ -77,7 +88,6 @@ class L10nHuNavReportRule(models.Model):
     )
     technical_type = fields.Char(
         copy=False,
-        readonly=True,
         string="Technical Type",
     )
     # # CODE
@@ -162,6 +172,10 @@ class L10nHuNavReportRule(models.Model):
         related='report_data_category.technical_name',
         string="Report Data Category Technical Name",
     )
+    report_data_locked = fields.Boolean(
+        default=False,
+        string="Report Data Locked",
+    )
     report_data_tag = fields.Many2many(
         comodel_name='l10n.hu.tag',
         column1='object',
@@ -171,29 +185,25 @@ class L10nHuNavReportRule(models.Model):
         relation='l10n_hu_nav_report_rule_report_data_tag_rel',
         string="Report Data Tag",
     )
-    # # VALUE
-    value_boolean = fields.Boolean(
-        default=False,
-        string="Boolean Value",
+    # # VALUE SETTING
+    numeric_decimal = fields.Integer(
+        string="Numeric Decimal",
     )
-    value_char = fields.Char(
-        string="Single Line Text Value",
+    numeric_processing = fields.Selection(
+        selection=[
+            ('total', "Total"),
+        ],
+        string="Numeric Processing",
     )
-    value_date = fields.Date(
-        string="Date Value",
+    numeric_rounding = fields.Float(
+        string="Numeric Rounding",
     )
-    value_datetime = fields.Datetime(
-        string="Datetime Value",
-    )
-    value_float = fields.Float(
-        string="Decimal Number Value",
-    )
-    value_html = fields.Html(
-        string="HTML",
-        translate=True,
-    )
-    value_integer = fields.Integer(
-        string="Whole Number Value",
+    numeric_signing = fields.Selection(
+        selection=[
+            ('final_abs', "Final Absolute"),
+            ('item_abs', "Item Absolute"),
+        ],
+        string="Numeric Signing",
     )
     value_method = fields.Selection(
         default='field',
@@ -206,15 +216,9 @@ class L10nHuNavReportRule(models.Model):
         ],
         string="Value Method",
     )
-    value_rule = fields.Many2one(
-        comodel_name='l10n.hu.nav.report.rule',
-        copy=True,
-        index=True,
-        string="Value Rule",
-    )
-    value_text = fields.Text(
-        string="Multi Line Text Value",
-        translate=True,
+    value_translatable = fields.Boolean(
+        default=False,
+        string="Translatable Value",
     )
     value_type = fields.Selection(
         selection=[
@@ -229,8 +233,56 @@ class L10nHuNavReportRule(models.Model):
         ],
         string="Value Type",
     )
+    # # VALUE STORAGE
+    value_boolean = fields.Boolean(
+        default=False,
+        string="Boolean Value",
+    )
+    value_char = fields.Char(
+        string="Single Line Text Value",
+    )
+    value_char_translatable = fields.Char(
+        string="Translatable Single Line Text",
+    )
+    value_date = fields.Date(
+        string="Date Value",
+    )
+    value_datetime = fields.Datetime(
+        string="Datetime Value",
+    )
+    value_float = fields.Float(
+        string="Decimal Number Value",
+    )
+    value_html = fields.Html(
+        string="HTML",
+    )
+    value_html_translatable = fields.Html(
+        string="Translatable HTML",
+        translate=True,
+    )
+    value_integer = fields.Integer(
+        string="Whole Number Value",
+    )
+    value_text = fields.Text(
+        string="Multi Line Text",
+    )
+    value_text_translatable = fields.Text(
+        string="Translatable Multi Line Text",
+        translate=True,
+    )
 
     # Compute and search fields, in the same order of field declarations
+    def _compute_element_input_count(self):
+        for record in self:
+            record.element_input_count = self.env['l10n.hu.nav.report.element'].search_count([
+                ('input_rule', '=', record.id),
+            ])
+
+    def _compute_element_output_count(self):
+        for record in self:
+            record.element_output_count = self.env['l10n.hu.nav.report.element'].search_count([
+                ('output_rule', '=', record.id),
+            ])
 
     # Constraints and onchanges
 
@@ -254,5 +306,38 @@ class L10nHuNavReportRule(models.Model):
         return result
 
     # Action methods
+    def action_list_input_rule_elements(self):
+        """ List related elements """
+        # Ensure one
+        self.ensure_one()
+
+        # Assemble result
+        result = {
+            'name': _("NAV Report Element"),
+            'domain': [('input_rule', '=', self.id)],
+            'res_model': 'l10n.hu.nav.report.element',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree,form',
+        }
+
+        # Return result
+        return result
+
+    def action_list_output_rule_elements(self):
+        """ List related elements """
+        # Ensure one
+        self.ensure_one()
+
+        # Assemble result
+        result = {
+            'name': _("NAV Report Element"),
+            'domain': [('output_rule', '=', self.id)],
+            'res_model': 'l10n.hu.nav.report.element',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree,form',
+        }
+
+        # Return result
+        return result
 
     # Business methods

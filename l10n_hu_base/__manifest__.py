@@ -41,10 +41,10 @@
         'static/description/l10n_hu_base_banner.png',
     ],
     'installable': True,
-    'license': "LGPL-3",
+    'license': "OPL-1",
     'price': 0,
     'summary': "Hungarian localization",
     'test': [],
-    'version': "1.0.14",
+    'version': "1.0.15",
     'website': "https://wwww.hungarodo.hu/odoohu",
 }

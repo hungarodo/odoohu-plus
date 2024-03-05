@@ -24,14 +24,27 @@
                                    readonly="1"
                             />
                         </span>
-                        <button name="toggle_active"
+                        <button name="action_list_input_rule_elements"
+                                attrs="{'invisible': [('rule_type', '!=', 'report_input')]}"
                                 class="oe_stat_button"
+                                icon="fa-list"
                                 type="object"
                         >
-                            <field name="active"
-                                   widget="boolean_toggle"
+                            <field name="element_input_count"
+                                   string="Element"
+                                   widget="statinfo"
                             />
-                            <span class="o_stat_text">Active</span>
+                        </button>
+                        <button name="action_list_output_rule_elements"
+                                attrs="{'invisible': [('rule_type', '!=', 'report_output')]}"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                type="object"
+                        >
+                            <field name="element_output_count"
+                                   string="Element"
+                                   widget="statinfo"
+                            />
                         </button>
                     </div>
                     <widget name="web_ribbon"
@@ -51,6 +64,7 @@
                         <group>
                             <field name="rule_type"/>
                             <field name="value_method"/>
+                            <field name="value_type"/>
                         </group>
                         <group>
                             <field name="sequence"
@@ -74,12 +88,16 @@
                                            options="{'color_field': 'color', 'no_create': True,}"
                                            string="Data Category"
                                     />
-                                </group>
-                                <group>
                                     <field name="report_data_tag"
                                            options="{'color_field': 'color', 'no_create': True,}"
                                            string="Data Tag"
                                            widget="many2many_tags"
+                                    />
+                                </group>
+                                <group>
+                                    <field name="report_data_locked"
+                                           string="Data Locked"
+                                           widget="boolean_toggle"
                                     />
                                 </group>
                                 <group name="report_template"
@@ -91,25 +109,38 @@
                                     />
                                 </group>
                             </group>
-                            <group name="model"
+                            <group name="model_field"
                                    attrs="{
                                        'invisible': [('value_method', '=', 'fixed')],
                                    }"
                                    string="Model"
                             >
-                                <group>
+                                <group name="model_field_1">
                                     <field name="ir_model"
                                            attrs="{
                                                'required': [('value_method', '!=', 'fixed')],
                                            }"
                                            options="{'no_create': True, 'no_open': True,}"
-                                           string="Name"
+                                           string="Model Name"
+                                    />
+                                    <field name="ir_model_field"
+                                            attrs="{
+                                                'invisible': [('ir_model', '=', False)],
+                                                'required': [('value_method', '=', 'field')],
+                                            }"
+                                            domain="[('model_id', '=', ir_model)]"
+                                            options="{'no_create': True, 'no_open': True,}"
+                                            string="Field Name"
                                     />
                                 </group>
-                                <group>
+                                <group name="model_field_2">
                                     <field name="ir_model_name"
                                            attrs="{'invisible': [('ir_model', '=', False)]}"
-                                           string="Technical Name"
+                                           string="Model Technical Name"
+                                    />
+                                    <field name="ir_model_field_name"
+                                           attrs="{'invisible': [('ir_model_field', '=', False)]}"
+                                           string="Field Technical Name"
                                     />
                                 </group>
                             </group>
@@ -144,34 +175,10 @@
                                     />
                                 </group>
                             </group>
-                            <group name="value_field"
-                                   attrs="{
-                                       'invisible': [('value_method', '!=', 'field')],
-                                   }"
-                                   string="Field"
-                            >
-                                <group>
-                                     <field name="ir_model_field"
-                                            attrs="{
-                                                'invisible': [('ir_model', '=', False)],
-                                                'required': [('value_method', '=', 'field')],
-                                            }"
-                                            domain="[('model_id', '=', ir_model)]"
-                                            options="{'no_create': True, 'no_open': True,}"
-                                            string=" Name"
-                                    />
-                                </group>
-                                <group>
-                                    <field name="ir_model_field_name"
-                                           attrs="{'invisible': [('ir_model_field', '=', False)]}"
-                                           string="Technical Name"
-                                    />
-                                </group>
-                            </group>
                             <group name="filter"
                                    attrs="{
-                                       'invisible': [('value_method', 'not in', ['field', 'filter'])],
-                                       'required': [('value_method', 'in', ['field', 'filter'])],
+                                       'invisible': [('value_method', 'not in', ['filter'])],
+                                       'required': [('value_method', 'in', ['filter'])],
                                    }"
                                    string="Filter"
                             >
@@ -239,102 +246,150 @@
                                    string="Value"
                             >
                                 <group>
-                                    <field name="value_type"
-                                           attrs="{
-                                               'required': [('value_method', '=', 'fixed')],
-                                           }"
-                                    />
-                                </group>
-                                <group>
                                     <field name="value_boolean"
-                                           attrs="{
-                                               'invisible': [
-                                                   ('value_type', '!=', 'boolean'),
-                                               ]
-                                           }"
+                                           attrs="{'invisible': [('value_type', '!=', 'boolean')]}"
                                            string="Value"
                                            widget="boolean_toggle"
                                     />
-                                    <field name="value_char"
-                                           attrs="{
-                                               'invisible': [
-                                                   ('value_type', '!=', 'char'),
-                                               ],
-                                               'required': [
-                                                   ('value_type', '=', 'char'),
-                                               ],
-                                           }"
-                                           placeholder="Enter value..."
-                                           string="Single Line Text"
-                                    />
                                     <field name="value_date"
                                            attrs="{
-                                               'invisible': [
-                                                   ('value_type', '!=', 'date'),
-                                               ],
-                                               'required': [
-                                                   ('value_type', '=', 'date'),
-                                               ],
+                                               'invisible': [('value_type', '!=', 'date')],
+                                               'required': [('value_type', '=', 'date')],
                                            }"
                                            string="Date"
                                     />
                                     <field name="value_datetime"
                                            attrs="{
-                                               'invisible': [
-                                                   ('value_type', '!=', 'datetime'),
-                                               ],
-                                               'required': [
-                                                   ('value_type', '=', 'datetime'),
-                                               ],
+                                               'invisible': [('value_type', '!=', 'datetime')],
+                                               'required': [('value_type', '=', 'datetime')],
                                            }"
                                            string="Date and Time"
                                     />
                                     <field name="value_float"
                                            attrs="{
-                                               'invisible': [
-                                                   ('value_type', '!=', 'float'),
-                                               ],
-                                               'required': [
-                                                   ('value_type', '=', 'float'),
-                                               ],
+                                               'invisible': [('value_type', '!=', 'float')],
+                                               'required': [('value_type', '=', 'float')],
                                            }"
                                            string="Decimal Number"
+                                    />
+                                    <field name="value_integer"
+                                           attrs="{
+                                               'invisible': [('value_type', '!=', 'integer')],
+                                               'required': [('value_type', '=', 'integer')],
+                                           }"
+                                           string="Whole Number"
+                                    />
+                                    <!-- TRANSLATABLE-->
+                                    <field name="value_translatable"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="value_char"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_translatable', '=', True),
+                                                   ('value_type', '!=', 'char'),
+                                               ],
+                                               'required': [('value_type', '=', 'char')],
+                                           }"
+                                           placeholder="Enter value..."
+                                           string="Single Line Text"
+                                    />
+                                    <field name="value_char_translatable"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_translatable', '=', False),
+                                                   ('value_type', '!=', 'char'),
+                                               ],
+                                               'required': [('value_type', '=', 'char')],
+                                           }"
+                                           placeholder="Enter value..."
+                                           string="Single Line Text"
                                     />
                                     <field name="value_html"
                                            attrs="{
                                                'invisible': [
+                                                   '|',
+                                                   ('value_translatable', '=', True),
                                                    ('value_type', '!=', 'html'),
                                                ],
-                                               'required': [
-                                                   ('value_type', '=', 'html'),
-                                               ],
+                                               'required': [('value_type', '=', 'html')],
                                            }"
                                            string="HTML"
                                            style="word-break: break-word;"
                                     />
-                                    <field name="value_integer"
+                                    <field name="value_html_translatable"
                                            attrs="{
                                                'invisible': [
-                                                   ('value_type', '!=', 'integer'),
+                                                   '|',
+                                                   ('value_translatable', '=', False),
+                                                   ('value_type', '!=', 'html'),
                                                ],
-                                               'required': [
-                                                   ('value_type', '=', 'integer'),
-                                               ],
+                                               'required': [('value_type', '=', 'html')],
                                            }"
-                                           string="Whole Number"
+                                           string="HTML"
+                                           style="word-break: break-word;"
                                     />
                                     <field name="value_text"
                                            attrs="{
                                                'invisible': [
+                                                   '|',
+                                                   ('value_translatable', '=', True),
                                                    ('value_type', '!=', 'text'),
                                                ],
-                                               'required': [
-                                                   ('value_type', '=', 'text'),
-                                               ],
+                                               'required': [('value_type', '=', 'text')],
                                            }"
                                            placeholder="Enter value..."
                                            string="Multiline Text"
                                            style="word-break: break-word;"
+                                    />
+                                    <field name="value_text_translatable"
+                                           attrs="{
+                                               'invisible': [
+                                                   '|',
+                                                   ('value_translatable', '=', False),
+                                                   ('value_type', '!=', 'text'),
+                                               ],
+                                               'required': [('value_type', '=', 'text')],
+                                           }"
+                                           placeholder="Enter value..."
+                                           string="Multiline Text"
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                            </group>
+                            <group name="numeric"
+                                   string="Numeric"
+                            >
+                                <group name="numeric_1">
+                                    <field name="numeric_decimal"
+                                           attrs="{
+                                               'invisible': [('value_type', 'not in', ['integer', 'float'])],
+                                           }"
+                                           class="oe_inline"
+                                           string="Decimal"
+                                    />
+                                    <field name="numeric_rounding"
+                                           attrs="{
+                                               'invisible': [('value_type', 'not in', ['integer', 'float'])],
+                                           }"
+                                           class="oe_inline"
+                                           string="Rounding"
+                                    />
+                                </group>
+                                <group name="numeric_2">
+                                    <field name="numeric_processing"
+                                           attrs="{
+                                               'invisible': [('value_type', 'not in', ['integer', 'float'])],
+                                           }"
+                                           string="Processing"
+                                    />
+                                    <field name="numeric_signing"
+                                           attrs="{
+                                               'invisible': [('value_type', 'not in', ['integer', 'float'])],
+                                           }"
+                                           string="Signing"
                                     />
                                 </group>
                             </group>
@@ -343,14 +398,20 @@
                               attrs="{'invisible': [('id', '=', False)]}"
                               string="Audit"
                         >
-                            <group>
-                                <group name="company">
+                            <group name="audit">
+                                <group name="audit_1">
                                     <field name="id"/>
+                                    <field name="active"
+                                           readonly="1"
+                                    />
                                     <field name="company"
                                            readonly="1"
                                     />
+                                    <field name="api_enabled"
+                                           widget="boolean_toggle"
+                                    />
                                 </group>
-                                <group name="audit">
+                                <group name="audit_2">
                                     <field name="create_uid"
                                            readonly="1"
                                     />
@@ -371,9 +432,12 @@
                             >
                                 <group>
                                     <field name="technical_name"
+                                           attrs="{'readonly': [('api_enabled', '=', True)]}"
                                            style="word-break: break-word;"
                                     />
-                                    <field name="technical_type"/>
+                                    <field name="technical_type"
+                                           attrs="{'readonly': [('api_enabled', '=', True)]}"
+                                    />
                                 </group>
                                 <group>
                                     <field name="technical_status"/>

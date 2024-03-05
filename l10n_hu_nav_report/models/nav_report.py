@@ -618,6 +618,7 @@ class L10nHuNavReport(models.Model):
             ('report', '=', self.id),
         ]).unlink()
 
+        # Prepare inputs and outputs
         if self.template:
             # INPUTS
             inputs_result = self.get_report_input_values({})
@@ -695,6 +696,7 @@ class L10nHuNavReport(models.Model):
         for rule in rules:
             # Common values
             input_values_common = {
+                'locked': rule.report_data_locked,
                 'name': rule.name,
                 'rule': rule.id,
                 'report': self.id,
@@ -738,7 +740,48 @@ class L10nHuNavReport(models.Model):
                 relevant_account_move_lines = self.env['account.move.line'].search(aml_domain)
 
                 for account_move_line in relevant_account_move_lines:
-                    # Partner
+                    # ACCOUNTING
+                    # # fiscal position
+                    if account_move_line.move_id.fiscal_position_id:
+                        account_fiscal_position_id = account_move_line.move_id.fiscal_position_id.id
+                    else:
+                        account_fiscal_position_id = False
+
+                    # # tax scope
+                    account_tax_scope = False
+                    if account_move_line.tax_line_id:
+                        if account_move_line.tax_line_id.tax_scope == 'consu':
+                            account_tax_scope = 'product'
+                        elif account_move_line.tax_line_id.tax_scope == 'service':
+                            account_tax_scope = 'service'
+                        else:
+                            pass
+                    elif account_move_line.tax_ids:
+                        # Initialize
+                        tax_scopes = []
+                        tax_scope_empty_count = 0
+
+                        # Inspect
+                        for tax_id in account_move_line.tax_ids:
+                            if tax_id.tax_scope and tax_id.tax_scope not in tax_scopes:
+                                tax_scopes.append(tax_id.tax_scope)
+                            else:
+                                tax_scope_empty_count += 1
+
+                        # Evaluate
+                        if len(tax_scopes) == 1 and tax_scope_empty_count == 0:
+                            if tax_scopes[0] == 'consu':
+                                account_tax_scope = 'product'
+                            elif tax_scopes[0] == 'service':
+                                account_tax_scope = 'service'
+                            else:
+                                pass
+                        else:
+                            pass
+                    else:
+                        pass
+
+                    # PARTNER
                     partner = account_move_line.move_id.partner_id.commercial_partner_id
                     partner_name = partner.name
 
@@ -784,11 +827,44 @@ class L10nHuNavReport(models.Model):
                         partner_fiscal_position_id = False
                         partner_trade_position = False
 
+                    # Fiscal position match
+                    if account_fiscal_position_id == partner_fiscal_position_id:
+                        fiscal_position_match = True
+                    else:
+                        fiscal_position_match = False
+
+                    # PRODUCT
+                    product_id = False
+                    product_code = False
+                    product_name = False
+                    product_scope = False
+                    product_type = False
+                    product_uom_id = False
+                    product_uom_name = False
+                    product_uom_category_id = False
+                    product_uom_category_name = False
+                    product_uom_type = False
+                    if account_move_line.product_id:
+                        product_id = account_move_line.product_id.id
+                        product_code = account_move_line.product_id.default_code
+                        product_name = account_move_line.product_id.name
+                        product_scope = account_move_line.product_id.l10n_hu_get_nav_report_product_scope()
+                        product_type = account_move_line.product_id.detailed_type
+                        product_uom_id = account_move_line.product_uom_id.id
+                        product_uom_category_id = account_move_line.product_uom_category_id.id
+                        product_uom_category_name = account_move_line.product_uom_category_id.name
+                        product_uom_name = account_move_line.product_uom_id.name
+                        product_uom_type = account_move_line.product_uom_id.l10n_hu_type
+
                     input_values = {
+                        'account_fiscal_position': account_fiscal_position_id,
                         'account_move': account_move_line.move_id.id,
                         'account_move_line': account_move_line.id,
+                        'account_tag': [(4, x.id, 0) for x in account_move_line.tax_tag_ids],
+                        'account_tag_invert': account_move_line.tax_tag_invert,
                         'account_tax': [(4, x.id, 0) for x in account_move_line.tax_ids],
                         'account_tax_line': account_move_line.tax_line_id.id,
+                        'account_tax_scope': account_tax_scope,
                         'amount_balance': account_move_line.balance,
                         'amount_currency': account_move_line.amount_currency,
                         'amount_credit': account_move_line.credit,
@@ -797,6 +873,8 @@ class L10nHuNavReport(models.Model):
                         'currency_code': account_move_line.currency_id.name,
                         'currency_rate': account_move_line.currency_rate,
                         'delivery_date': account_move_line.date,
+                        'downpayment': account_move_line.is_downpayment,
+                        'fiscal_position_match': fiscal_position_match,
                         'payment_date': account_move_line.date_maturity,
                         'partner': partner.id,
                         'partner_country': partner_country_id,
@@ -806,6 +884,16 @@ class L10nHuNavReport(models.Model):
                         'partner_tax_number': partner_tax_number,
                         'partner_tax_unit': partner_tax_unit_id,
                         'partner_trade_position': partner_trade_position,
+                        'product': product_id,
+                        'product_code': product_code,
+                        'product_name': product_name,
+                        'product_scope': product_scope,
+                        'product_type': product_type,
+                        'product_uom_category': product_uom_category_id,
+                        'product_uom_category_name': product_uom_category_name,
+                        'product_uom': product_uom_id,
+                        'product_uom_name': product_uom_name,
+                        'product_uom_type': product_uom_type,
                         'tax_number': tax_number,
                     }
 
@@ -893,7 +981,15 @@ class L10nHuNavReport(models.Model):
 
     @api.model
     def get_report_output_values(self, values):
-        """ Get output values for a report """
+        """ Get output values for a report
+
+        NOTE:
+        - Inputs are prepared at this point
+
+        @param values: dictionary
+
+        @return: dictionary
+        """
         # raise exceptions.UserError("get_report_output_values BEGIN" + str(values))
         # Initialize variables
         debug_list = []
@@ -901,18 +997,11 @@ class L10nHuNavReport(models.Model):
         info_list = []
         output_values_list = []
         result = {}
-        output_rules = []
         warning_list = []
 
-        # Prepare raw input-output from elements
+        # Prepare output from elements
         for element in self.template.element:
-            if element.output_rule and element.output_rule not in output_rules:
-                pass
-            else:
-                pass
-            output_rules.append(element.output_rule)
-
-            # output_code
+            # 1) prepare output_values
             if element.code:
                 output_code = element.code
             elif element.nav_code:
@@ -920,7 +1009,6 @@ class L10nHuNavReport(models.Model):
             else:
                 output_code = False
 
-            # output_technical_name
             if element.technical_name:
                 output_technical_name = element.technical_name
             elif element.nav_eazon:
@@ -928,15 +1016,70 @@ class L10nHuNavReport(models.Model):
             else:
                 output_technical_name = False
 
+            # value_type
+            if element.output_method == 'rule':
+                value_type = element.output_rule.value_type
+            else:
+                value_type = element.value_type
+
             output_values = {
                 'code': output_code,
                 'element': element.id,
+                'locked': element.output_locked,
                 'name': element.name,
                 'report': self.id,
                 'technical_name': output_technical_name,
                 'template': self.template.id,
-                'value_type': element.value_type,
+                'value_type': value_type,
             }
+
+            # 2) get output value
+            if element.input_method == 'rule':
+                # Initialize output_value
+                if value_type == 'float':
+                    output_value = 0.0
+                elif value_type == 'integer':
+                    output_value = 0
+                else:
+                    output_value = False
+
+                # Prepare domain
+                domain = [
+                    ('report', '=', self.id),
+                    ('rule', '=', element.input_rule.id),
+                ]
+                try:
+                    domain += safe_eval(element.input_domain)
+                except:
+                    pass
+
+                # Collect data
+                recordset = self.env['l10n.hu.nav.report.input'].search(domain)
+
+                for record in recordset:
+                    if value_type == 'float':
+                        output_value += record[element.output_rule.ir_model_field_name]
+                    elif value_type == 'integer':
+                        output_value += record[element.output_rule.ir_model_field_name]
+                    else:
+                        pass
+
+                # Update values
+                if value_type == 'float':
+                    output_values.update({
+                        'value_float': output_value,
+                    })
+                elif value_type == 'integer':
+                    output_values.update({
+                        'value_integer': output_value,
+                    })
+                else:
+                    pass
+                # raise exceptions.UserError("rule output_values" + str(output_values))
+            else:
+                pass
+
+            # Append to list
             output_values_list.append(output_values)
 
         # Update result

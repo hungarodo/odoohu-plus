@@ -127,6 +127,10 @@ class L10nHuNavReportElement(models.Model):
     input_limit = fields.Integer(
         string="Input Limit",
     )
+    input_locked = fields.Boolean(
+        default=False,
+        string="Input Locked",
+    )
     input_method = fields.Selection(
         default='fixed',
         required=True,
@@ -184,12 +188,26 @@ class L10nHuNavReportElement(models.Model):
         string="NAV Row",
     )
     # # OUTPUT
+    output_locked = fields.Boolean(
+        default=False,
+        string="Output Locked",
+    )
+    output_method = fields.Selection(
+        default='simple',
+        required=True,
+        selection=[
+            ('rule', "Rule"),
+            ('simple', "Simple"),
+        ],
+        string="Output Method",
+    )
     output_rule = fields.Many2one(
         comodel_name='l10n.hu.nav.report.rule',
         copy=True,
         index=True,
-        string="Input Rule",
+        string="Output Rule",
     )
+    # # VALUE
     value_boolean = fields.Boolean(
         default=False,
         string="Boolean Value",

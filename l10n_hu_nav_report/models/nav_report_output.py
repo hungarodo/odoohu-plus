@@ -46,10 +46,6 @@ class L10nHuNavReportOutput(models.Model):
         ondelete='cascade',
         string="Element",
     )
-    line_section_table_heading = fields.Boolean(
-        default=True,
-        string="Section Table Heading",
-    )
     locked = fields.Boolean(
         default=False,
         string="Locked",
@@ -60,24 +56,6 @@ class L10nHuNavReportOutput(models.Model):
     notes = fields.Text(
         help="Internal notes",
         string="Notes",
-    )
-    output_type = fields.Selection(
-        default='char',
-        required=True,
-        selection=[
-            ('html', "HTML"),
-            ('char', "Single Line Text"),
-            ('date', "Date"),
-            ('datetime', "Date and Time"),
-            ('float', "Decimal Number"),
-            ('integer', "Whole Number"),
-            ('text', "Multi Line Text"),
-        ],
-        string="Output Type",
-    )
-    page_break = fields.Boolean(
-        default=False,
-        string="Page Break"
     )
     reference = fields.Char(
         string="Reference",
@@ -100,43 +78,26 @@ class L10nHuNavReportOutput(models.Model):
     technical_name = fields.Char(
         string="Technical Name",
     )
-    value_boolean = fields.Boolean(
+    # # PRINT
+    line_section_table_heading = fields.Boolean(
+        default=True,
+        string="Section Table Heading",
+    )
+    page_break = fields.Boolean(
         default=False,
-        string="Boolean Value",
+        string="Page Break"
     )
-    value_char = fields.Char(
-        string="Single Line Text Value",
-    )
-    value_date = fields.Date(
-        string="Date Value",
-    )
-    value_datetime = fields.Datetime(
-        string="Datetime Value",
-    )
+    # # VALUE
     value_display = fields.Char(
         compute='_compute_value_display',
         store=True,
         string="Display Value",
-    )
-    value_float = fields.Float(
-        string="Decimal Number Value",
-    )
-    value_html = fields.Html(
-        string="HTML",
-        translate=True,
-    )
-    value_integer = fields.Integer(
-        string="Whole Number Value",
     )
     value_rule = fields.Many2one(
         comodel_name='l10n.hu.nav.report.rule',
         copy=True,
         index=True,
         string="Value Rule",
-    )
-    value_text = fields.Text(
-        string="Multi Line Text Value",
-        translate=True,
     )
     value_type = fields.Selection(
         default='char',
@@ -153,17 +114,58 @@ class L10nHuNavReportOutput(models.Model):
         ],
         string="Value Type",
     )
+    # # VALUE - STORAGE
+    value_boolean = fields.Boolean(
+        default=False,
+        string="Boolean Value",
+    )
+    value_char = fields.Char(
+        string="Single Line Text Value",
+    )
+    value_char_translatable = fields.Char(
+        string="Translatable Single Line Text Value",
+        translate=True,
+    )
+    value_date = fields.Date(
+        string="Date Value",
+    )
+    value_datetime = fields.Datetime(
+        string="Datetime Value",
+    )
+    value_float = fields.Float(
+        string="Decimal Number Value",
+    )
+    value_html = fields.Html(
+        string="HTML",
+    )
+    value_html_translatable = fields.Html(
+        string="Translatable HTML",
+        translate=True,
+    )
+    value_integer = fields.Integer(
+        string="Whole Number Value",
+    )
+    value_text = fields.Text(
+        string="Multi Line Text Value",
+    )
+    value_text_translatable = fields.Text(
+        string="Translatable Multi Line Text Value",
+        translate=True,
+    )
 
     # Compute and search fields, in the same order of field declarations
     @api.depends(
         'value_boolean',
         'value_char',
+        'value_char_translatable',
         'value_date',
         'value_datetime',
         'value_float',
         'value_html',
+        'value_html_translatable',
         'value_integer',
         'value_text',
+        'value_text_translatable',
         'value_type',
     )
     def _compute_value_display(self):
@@ -283,6 +285,8 @@ class L10nHuNavReportOutput(models.Model):
             result = str(self.value_boolean)
         elif self.value_type == 'char':
             result = self.value_char
+        elif self.value_type == 'char_translatable':
+            result = self.value_char_translatable
         elif self.value_type == 'date':
             result = str(self.value_date)
         elif self.value_type == 'datetime':
@@ -291,10 +295,12 @@ class L10nHuNavReportOutput(models.Model):
             result = str(self.value_float)
         elif self.value_type == 'html' and self.value_html:
             result = str(self.value_html[:64])
+        elif self.value_type == 'html_translatable' and self.value_html_translatable:
+            result = str(self.value_html_translatable[:64])
         elif self.value_type == 'integer':
             result = str(self.value_integer)
-        elif self.value_type == 'text' and self.value_text:
-            result = str(self.value_text[:64])
+        elif self.value_type == 'text_translatable' and self.value_text_translatable:
+            result = str(self.value_text_translatable[:64])
         else:
             result = _("Value display error!")
 
