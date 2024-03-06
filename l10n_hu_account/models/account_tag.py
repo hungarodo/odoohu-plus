@@ -18,11 +18,31 @@ class L10nHuAccountAccountTag(models.Model):
     # Default methods
 
     # Field declarations
+    l10n_hu_api_enabled = fields.Boolean(
+        default=False,
+        string="HU API Enabled",
+    )
     l10n_hu_country_code = fields.Char(
         related='country_id.code',
         index=True,
         store=True,
         string="Country Code",
+    )
+    l10n_hu_evat_description = fields.Text(
+        index=True,
+        string="HU eVAT Description",
+    )
+    l10n_hu_evat_readable_code = fields.Char(
+        index=True,
+        string="HU eVAT Readable Code",
+    )
+    l10n_hu_evat_standard_code = fields.Char(
+        index=True,
+        string="HU eVAT Standard Code",
+    )
+    l10n_hu_technical_name = fields.Char(
+        index=True,
+        string="HU Technical Name",
     )
 
     # Compute and search fields, in the same order of field declarations

@@ -150,4 +150,17 @@
         />
         <field name="sequence">64</field>
     </record>
+    <!-- HU > Configuration > Accounting > Tax Repartition Lines  -->
+    <record id="hu_configuration_accounting_tax_repartition_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tax Repartition Lines</field>
+        <field name="action"
+               ref="account_tax_repartition_line_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_accounting_menu"
+        />
+        <field name="sequence">72</field>
+    </record>
 </odoo>

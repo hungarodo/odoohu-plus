@@ -18,6 +18,72 @@
             >
                 <field name="l10n_hu_country_code"/>
             </xpath>
+            <xpath expr="//group[1]"
+                   position="after"
+            >
+                <group name="l10n_hu"
+                       attrs="{'invisible': [('l10n_hu_country_code', '!=', 'HU')]}"
+                       string="HU"
+                >
+                    <group name="l10n_hu_1">
+                        <field name="l10n_hu_evat_standard_code"
+                               string="eVAT Standard Code"
+                        />
+                        <field name="l10n_hu_evat_readable_code"
+                               string="eVAT Readable Code"
+                        />
+                        <field name="l10n_hu_evat_description"
+                               string="eVAT Description"
+                        />
+                    </group>
+                    <group name="l10n_hu_2">
+                        <field name="l10n_hu_api_enabled"
+                               string="API"
+                               widget="boolean_toggle"
+                        />
+                        <field name="l10n_hu_technical_name"
+                               string="Technical Name"
+                    />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <!-- List view inherit -->
+    <record id="account_tag_view_tree_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.tag.view.tree.inherit</field>
+        <field name="inherit_id"
+               ref="account.account_tag_view_tree"
+        />
+        <field name="model">account.account.tag</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <xpath expr="//field[@name='country_id']"
+                   position="after"
+            >
+                <field name="l10n_hu_country_code"
+                       optional="hide"
+                />
+                <field name="l10n_hu_evat_standard_code"
+                       optional="hide"
+                />
+                <field name="l10n_hu_evat_readable_code"
+                       optional="hide"
+                />
+                <field name="l10n_hu_evat_description"
+                       optional="hide"
+                />
+                <field name="l10n_hu_api_enabled"
+                       optional="hide"
+                />
+                <field name="l10n_hu_technical_name"
+                       optional="hide"
+                />
+            </xpath>
         </field>
     </record>
 </odoo>

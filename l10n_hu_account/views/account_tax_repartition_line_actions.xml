@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="account_tax_repartition_line_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Tax Repartition Lines</field>
+        <field name="res_model">account.tax.repartition.line</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="account_tax_repartition_line_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="account_tax_repartition_line_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="account_tax_repartition_line_view_list"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+</odoo>

@@ -23,6 +23,8 @@
         'views/account_tax_views.xml',
         'views/account_tax_actions.xml',
         'views/account_tax_group_actions.xml',
+        'views/account_tax_repartition_line_views.xml',
+        'views/account_tax_repartition_line_actions.xml',
         'views/res_company_views.xml',
         'views/res_partner_views.xml',
         'views/uom_uom_views.xml',
@@ -46,6 +48,6 @@
     'qweb': [],
     'summary': "Hungarian accounting improvements",
     'test': [],
-    'version': "1.0.20",
+    'version': "1.0.21",
     'website': "https://wwww.hungarodo.hu/odoohu"
 }

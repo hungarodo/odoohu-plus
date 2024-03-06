@@ -107,7 +107,7 @@
         <field name="sequence">8</field>
     </record>
     <!-- HU > Configuration > Document Types -->
-    <record id="hu_document_type_menu"
+    <record id="hu_configuration_document_type_menu"
             model="ir.ui.menu"
     >
         <field name="name">Document Types</field>

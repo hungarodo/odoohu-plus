@@ -242,6 +242,10 @@
                         context="{'group_by': 'l10n_hu_trade_position'}"
                         string="Trade Position"
                 />
+                <filter name="partner_id_filter_group_by"
+                        context="{'group_by': 'partner_id'}"
+                        string="Partner"
+                />
             </xpath>
         </field>
     </record>
