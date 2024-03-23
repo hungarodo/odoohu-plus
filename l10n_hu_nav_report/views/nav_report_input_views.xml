@@ -106,6 +106,7 @@
                                     <field name="downpayment"/>
                                 </group>
                                 <group name="accounting_2">
+                                    <field name="account_account"/>
                                     <field name="account_move"/>
                                     <field name="account_move_line"/>
                                     <field name="account_tag"
@@ -236,6 +237,9 @@
                        string="Value"
                 />
                 <field name="partner"/>
+                <field name="account_account"
+                       optional="hide"
+                />
                 <field name="account_move"
                        optional="hide"
                 />
@@ -312,6 +316,12 @@
                             context="{'group_by': 'tag'}"
                             string="Tag"
                     />
+                    <separator/>
+                    <filter name="account_account_group_by"
+                            context="{'group_by': 'account_account'}"
+                            string="Account"
+                    />
+
                     <filter name="account_tax_group_by"
                             context="{'group_by': 'account_tax'}"
                             string="Taxes"
@@ -320,6 +330,7 @@
                             context="{'group_by': 'account_tax_line'}"
                             string="Originator Tax"
                     />
+                    <separator/>
                     <filter name="report_group_by"
                             context="{'group_by': 'report'}"
                             string="Report"

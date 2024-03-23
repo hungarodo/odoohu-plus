@@ -108,6 +108,12 @@ class L10nHuNavReportInput(models.Model):
         string="Tag",
     )
     # # ACCOUNT
+    account_account = fields.Many2one(
+        comodel_name='account.account',
+        copy=False,
+        readonly=True,
+        string="Account",
+    )
     account_fiscal_position = fields.Many2one(
         comodel_name='account.fiscal.position',
         copy=False,

@@ -857,6 +857,7 @@ class L10nHuNavReport(models.Model):
                         product_uom_type = account_move_line.product_uom_id.l10n_hu_type
 
                     input_values = {
+                        'account_account': account_move_line.account_id.id,
                         'account_fiscal_position': account_fiscal_position_id,
                         'account_move': account_move_line.move_id.id,
                         'account_move_line': account_move_line.id,
