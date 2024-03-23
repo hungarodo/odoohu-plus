@@ -14,13 +14,31 @@
                   delete="0"
                   edit="0"
             >
+                <field name="id"
+                       optional="hide"
+                />
+                <field name="document_type"/>
                 <field name="sequence"
+                       optional="hide"
+                />
+                <field name="tax_id"
+                       optional="show"
+                />
+                <field name="invoice_tax_id"
+                       optional="hide"
+                />
+                <field name="refund_tax_id"
+                       optional="hide"
+                />
+                <field name="repartition_type"/>
+                <field name="factor"
+                       attrs="{'invisible': [('repartition_type', '=', 'base')]}"
                        optional="hide"
                 />
                 <field name="factor_percent"
                        attrs="{'invisible': [('repartition_type', '=', 'base')]}"
+                       optional="show"
                 />
-                <field name="repartition_type"/>
                 <field name="account_id"
                        attrs="{'invisible': [('repartition_type', '=', 'base')]}"
                        options="{'no_create': True}"

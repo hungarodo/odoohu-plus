@@ -19,22 +19,33 @@ class L10nHuAccountMove(models.Model):
     
     # Field declarations
     # # CURRENCY
-    l10n_hu_currency_exchange = fields.Boolean(
-        compute='_compute_l10n_hu_currency_exchange',
-        string="Currency Exchange",
+    l10n_hu_company_currency = fields.Many2one(
+        related='company_id.currency_id',
+        string="Company Currency",
+    )
+    l10n_hu_currency_date = fields.Date(
+        compute='_compute_l10n_hu_currency',
+        string="Currency Date",
     )
     l10n_hu_currency_name = fields.Char(
         related='currency_id.name',
         string="Currency Name",
     )
-    l10n_hu_currency_rate = fields.Many2one(
-        comodel_name='res.currency.rate',
-        index=True,
+    l10n_hu_currency_rate = fields.Float(
+        compute='_compute_l10n_hu_currency',
         string="Currency Rate",
     )
-    l10n_hu_currency_rate_amount = fields.Float(
-        compute='_compute_l10n_hu_currency_rate_amount',
-        string="Currency Rate Amount",
+    l10n_hu_document_rate = fields.Float(
+        copy=False,
+        string="Document Rate",
+    )
+    l10n_hu_foreign_currency = fields.Boolean(
+        compute='_compute_l10n_hu_foreign_currency',
+        string="Foreign Currency",
+    )
+    l10n_hu_rate_difference = fields.Float(
+        compute='_compute_l10n_hu_rate_difference',
+        string="Rate Difference",
     )
     # # DOCUMENT TYPE
     l10n_hu_document_type = fields.Many2one(
@@ -135,30 +146,31 @@ class L10nHuAccountMove(models.Model):
     )
 
     # Compute and search fields, in the same order of field declarations
-    @api.depends('currency_id')
-    def _compute_l10n_hu_currency_exchange(self):
+    def _compute_l10n_hu_foreign_currency(self):
         for record in self:
             if record.currency_id and record.currency_id != record.company_id.currency_id:
-                record.l10n_hu_currency_exchange = True
+                record.l10n_hu_foreign_currency = True
             else:
-                record.l10n_hu_currency_exchange = False
+                record.l10n_hu_foreign_currency = False
 
-    @api.depends('l10n_hu_currency_rate')
-    def _compute_l10n_hu_currency_rate_amount(self):
+    def _compute_l10n_hu_currency(self):
         for record in self:
-            if record.l10n_hu_currency_rate and record.l10n_hu_currency_rate.rate:
-                if record.currency_id == record.company_id.currency_id:
-                    record.l10n_hu_currency_rate_amount = 1
-                elif record.currency_id != record.company_id.currency_id \
-                        and record.journal_id.l10n_hu_currency_rate_inverse:
-                    record.l10n_hu_currency_rate_amount = 1 / record.l10n_hu_currency_rate.rate
-                elif record.currency_id != record.company_id.currency_id \
-                        and not record.journal_id.l10n_hu_currency_rate_inverse:
-                    record.l10n_hu_currency_rate_amount = record.l10n_hu_currency_rate.rate
-                else:
-                    record.l10n_hu_currency_rate_amount = False
+            last_rate = self.env['res.currency.rate'].search([
+                ('company_id', '=', record.company_id.id),
+                ('currency_id', '=', record.currency_id.id),
+                ('name', '<=', record.date)
+            ], limit=1)
+            if last_rate:
+                record.l10n_hu_currency_date = last_rate.name
+                record.l10n_hu_currency_rate = last_rate.inverse_company_rate
             else:
-                record.l10n_hu_currency_rate_amount = False
+                record.l10n_hu_currency_date = record.date
+                record.l10n_hu_currency_rate = 1.0
+
+    def _compute_l10n_hu_rate_difference(self):
+        for record in self:
+            difference = record.l10n_hu_currency_rate - record.l10n_hu_document_rate
+            record.l10n_hu_rate_difference = difference
 
     @api.depends('partner_id')
     def _compute_l10n_hu_vat_position(self):
@@ -200,6 +212,34 @@ class L10nHuAccountMove(models.Model):
 
         # Return
         return
+
+    def action_l10n_hu_wizard_currency_exchange(self):
+        """ Open the L10n HU wizard to calculate the document rate """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Assemble context
+        context = {
+            'default_action_type': 'currency_exchange',
+            'default_action_type_visible': False,
+            'default_account_move': [self.id],
+            'default_exchange_action': 'custom_currency',
+            'default_exchange_currency_from': self.company_id.currency_id.id,
+            'default_exchange_currency_to': self.currency_id.id,
+        }
+
+        # Assemble result
+        result = {
+            'name': _("HU Wizard"),
+            'context': context,
+            'res_model': 'l10n.hu.wizard',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
+
+        # Return result
+        return result
 
     # Business methods
     # # L10NHU METHODS

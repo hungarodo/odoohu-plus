@@ -4,7 +4,7 @@
     <record id="wizard_line_view_list"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.wizard.line.view.list</field>
+        <field name="name">l10n.hu.base.wizard.line.view.list</field>
         <field name="model">l10n.hu.wizard.line</field>
         <field name="priority">16</field>
         <field name="arch"

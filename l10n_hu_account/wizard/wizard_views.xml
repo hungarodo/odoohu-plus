@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="wizard_view_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.wizard.view.form.inherit</field>
+        <field name="inherit_id"
+               ref="l10n_hu_base.wizard_view_form"
+        />
+        <field name="model">l10n.hu.wizard</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <xpath expr="//field[@name='action_type']"
+                   position="after"
+            >
+                <field name="account_move_visible"
+                       invisible="1"
+                />
+                <field name="account_move_action"
+                       attrs="{'invisible': [('action_type', '!=', 'account_move')]}"
+                />
+                <field name="account_move"
+                       attrs="{'invisible': [('account_move_visible', '=', False)]}"
+                       options="{'no_create': True,}"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

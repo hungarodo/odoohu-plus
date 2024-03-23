@@ -9,6 +9,7 @@
                ref="account.view_move_form"
         />
         <field name="model">account.move</field>
+        <field name="priority">36</field>
         <field name="arch"
                type="xml"
         >
@@ -21,31 +22,51 @@
                 >
                     <group name="l10n_hu">
                         <group name="l10n_hu_1">
+                            <!-- Currency -->
+                            <field name="l10n_hu_foreign_currency"
+                                   string="Foreign Currency"
+                            />
+                            <field name="l10n_hu_company_currency"
+                                   invisible="1"
+                            />
+                            <field name="l10n_hu_currency_name"
+                                   string="Currency Code"
+                            />
+                            <field name="l10n_hu_currency_date"
+                                   string="Rate Date"
+                            />
+                            <field name="l10n_hu_currency_rate"
+                                   string="Accounting Rate"
+                            />
+                            <label name="l10n_hu_document_rate"
+                                   for="l10n_hu_document_rate"
+                                   string="Document Rate"
+                            />
+                            <div name="l10_hu_document_rate">
+                                <field name="l10n_hu_document_rate"
+                                       class="oe_inline"
+                                />
+                                <button name="action_l10n_hu_wizard_currency_exchange"
+                                        class="oe_inline btn-sm btn-link"
+                                        icon="fa-calculator"
+                                        string="Currency Exchange"
+                                        type="object"
+                                />
+                            </div>
+                            <field name="l10n_hu_rate_difference"
+                                   string="Rate Difference"
+                            />
+                            <!-- Payment -->
+                            <field name="l10n_hu_invoice_payment_method"
+                                   string="Payment Method"
+                            />
+                        </group>
+                        <group name="l10n_hu_2">
                             <!-- Document -->
                             <field name="l10n_hu_document_type"
                                    options="{'no_create': True,}"
                             />
                             <field name="l10n_hu_document_type_code"/>
-                            <!-- Payment -->
-                            <field name="l10n_hu_invoice_payment_method"
-                                   string="Payment Method"
-                            />
-                            <!-- Currency -->
-                            <field name="l10n_hu_currency_exchange"
-                                   string="Foreign Currency"
-                            />
-                            <field name="l10n_hu_currency_name"
-                                   string="Currency Code"
-                            />
-                            <field name="l10n_hu_currency_rate"
-                                   options="{'no_create': True,}"
-                                   string="Currency Rate"
-                            />
-                            <field name="l10n_hu_currency_rate_amount"
-                                   string="Exchange Rate"
-                            />
-                        </group>
-                        <group name="l10n_hu_2">
                             <!-- VAT -->
                             <field name="l10n_hu_vat_date"
                                    string="VAT Date"
@@ -160,6 +181,7 @@
                ref="account.view_invoice_tree"
         />
         <field name="model">account.move</field>
+        <field name="priority">36</field>
         <field name="arch"
                type="xml"
         >
@@ -195,6 +217,7 @@
                ref="account.view_account_invoice_filter"
         />
         <field name="model">account.move</field>
+        <field name="priority">36</field>
         <field name="arch"
                type="xml"
         >

@@ -25,6 +25,10 @@ class L10nHuAccountBaseDocumentType(models.Model):
         string="Active",
         tracking=2,
     )
+    api_enabled = fields.Boolean(
+        default=False,
+        string="API Enabled",
+    )
     code = fields.Char(
         copy=False,
         index=True,

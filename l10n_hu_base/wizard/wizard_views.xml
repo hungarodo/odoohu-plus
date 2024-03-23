@@ -4,8 +4,9 @@
     <record id="wizard_view_form"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.wizard.view.form</field>
+        <field name="name">l10n.hu.base.wizard.view.form</field>
         <field name="model">l10n.hu.wizard</field>
+        <field name="priority">16</field>
         <field name="arch"
                type="xml"
         >
@@ -40,14 +41,64 @@
                                }"
                                required="1"
                         />
-                        <!-- PARTNER -->
-                        <field name="action_partner_editable"
+                        <!-- CURRENCY EXCHANGE -->
+                        <field name="exchange_action_editable"
                                invisible="1"
                         />
-                        <field name="action_partner"
+                        <field name="exchange_visible"
+                               invisible="1"
+                        />
+                        <field name="exchange_action"
+                               attrs="{
+                                   'invisible': [('action_type', '!=', 'currency_exchange')],
+                                   'readonly': [('exchange_action_editable', '=', False)],
+                                   'required': [('action_type', '=', 'currency_exchange')],
+                               }"
+                               string="Action"
+                        />
+                        <div name="exchange_currency_from"
+                             attrs="{'invisible': [('action_type', '!=', 'currency_exchange')]}"
+                        >
+                            <field name="exchange_currency_from"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Currency From"
+                            />
+                        </div>
+                        <div name="exchange_amount_from"
+                             attrs="{'invisible': [('action_type', '!=', 'currency_exchange')]}"
+                        >
+                            <field name="exchange_amount_from"
+                                   placeholder="Amount From"
+                            />
+                        </div>
+                        <div name="exchange_currency_to"
+                             attrs="{'invisible': [('action_type', '!=', 'currency_exchange')]}"
+                        >
+                            <field name="exchange_currency_to"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Currency To"
+                            />
+                        </div>
+                        <div name="exchange_amount_to"
+                             attrs="{'invisible': [('action_type', '!=', 'currency_exchange')]}"
+                        >
+                            <field name="exchange_amount_to"
+                                   placeholder="Amount To"
+                            />
+                        </div>
+                        <field name="exchange_rate"
+                               attrs="{'invisible': [('action_type', '!=', 'currency_exchange')]}"
+                               class="oe_inline"
+                               string="Exchange Rate"
+                        />
+                        <!-- PARTNER -->
+                        <field name="partner_action_editable"
+                               invisible="1"
+                        />
+                        <field name="partner_action"
                                attrs="{
                                    'invisible': [('action_type', '!=', 'partner')],
-                                   'readonly': [('action_partner_editable', '=', False)],
+                                   'readonly': [('partner_action_editable', '=', False)],
                                    'required': [('action_type', '=', 'partner')],
                                }"
                                string="Action"
@@ -56,9 +107,7 @@
                     <group name="cards">
                         <!-- PARTNER -->
                         <div name="partner_info"
-                             attrs="{'invisible': [
-                                 ('action_type', '!=', 'partner'),
-                             ]}"
+                             attrs="{'invisible': [('action_type', '!=', 'partner')]}"
                              class="card text-white bg-info"
                              colspan="2"
                         >
@@ -71,7 +120,7 @@
                                    attrs="{'invisible': [
                                        '|',
                                        ('action_type', '!=', 'partner'),
-                                       ('action_partner', '!=', False)
+                                       ('partner_action', '!=', False)
                                    ]}"
                                 >
                                     Manage partners
@@ -80,7 +129,7 @@
                                    attrs="{'invisible': [
                                        '|',
                                        ('action_type', '!=', 'partner'),
-                                       ('action_partner', '!=', 'list')
+                                       ('partner_action', '!=', 'list')
                                    ]}"
                                 >
                                     List partners

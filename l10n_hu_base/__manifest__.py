@@ -45,6 +45,6 @@
     'price': 0,
     'summary': "Hungarian localization",
     'test': [],
-    'version': "1.0.16",
+    'version': "1.0.18",
     'website': "https://wwww.hungarodo.hu/odoohu",
 }

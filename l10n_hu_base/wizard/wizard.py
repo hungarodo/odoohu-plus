@@ -41,6 +41,7 @@ class L10nHuBaseWizard(models.TransientModel):
     action_type = fields.Selection(
         selection=[
             ('configuration', "Configuration"),
+            ('currency_exchange', "Currency Exchange"),
             ('product', "Product"),
         ],
         string="Action Type",
@@ -69,29 +70,95 @@ class L10nHuBaseWizard(models.TransientModel):
         readonly=True,
         string="Company",
     )
+    company_currency = fields.Many2one(
+        related='company.currency_id',
+        string="Company Currency",
+    )
+    company_currency_code = fields.Char(
+        related='company.currency_id.name',
+        string="Company Currency Code",
+    )
+    # # CURRENCY EXCHANGE
+    company_currency_rate = fields.Many2one(
+        comodel_name='res.currency.rate',
+        string="Company Currency Rate",
+    )
+    company_currency_rate_amount = fields.Float(
+        related='company_currency_rate.company_rate',
+        string="Company Currency Rate Amount",
+    )
+    company_currency_rate_date = fields.Date(
+        related='company_currency_rate.name',
+        string="Company Currency Rate Date",
+    )
+    company_currency_rate_inverse_amount = fields.Float(
+        related='company_currency_rate.inverse_company_rate',
+        string="Company Currency Rate Inverse Amount",
+    )
+    company_currency_rate_inverse_visible = fields.Boolean(
+        default=True,
+        string="Company Currency Rate Inverse Invisible",
+    )
+    exchange_action = fields.Selection(
+        selection=[
+            ('from_company_currency', "From company currency"),
+            ('to_company_currency', "To company currency"),
+            ('custom_currency', "Custom currency"),
+        ],
+        string="Exchange Method",
+    )
+    exchange_action_editable = fields.Boolean(
+        default=True,
+        string="Exchange Action Editable",
+    )
+    exchange_amount_from = fields.Float(
+        string="Exchange Amount From",
+    )
+    exchange_amount_to = fields.Float(
+        string="Exchange Amount To",
+    )
+    exchange_currency_from = fields.Many2one(
+        comodel_name='res.currency',
+        string="Exchange Currency From",
+    )
+    exchange_currency_to = fields.Many2one(
+        comodel_name='res.currency',
+        string="Exchange Currency To",
+    )
+    exchange_rate = fields.Float(
+        string="Exchange Rate",
+    )
+    exchange_visible = fields.Boolean(
+        default=True,
+        string="Exchange Invisible",
+    )
     # # PARTNER
     action_partner = fields.Selection(
-        default='list',
-        selection=[
-            ('list', "List partners"),
-        ],
-        string="Partner Action",
-    )
-    action_partner_editable = fields.Boolean(
-        default=True,
-        string="Partner Action Editable",
-    )
-    action_partner_summary = fields.Text(
-        readonly=True,
-        string="Partner Action Summary",
+        selection=[],
+        string="DEPRECATED"
     )
     partner = fields.Many2many(
         comodel_name='res.partner',
         column1='wizard',
         column2='partner',
         default=_get_default_partner,
-        relation='l10n_hu_nav_report_wizard_partner_rel',
+        relation='l10n_hu_wizard_partner_rel',
         string="Partner",
+    )
+    partner_action = fields.Selection(
+        default='list',
+        selection=[
+            ('list', "List partners"),
+        ],
+        string="Partner Action",
+    )
+    partner_action_editable = fields.Boolean(
+        default=True,
+        string="Partner Action Editable",
+    )
+    partner_action_summary = fields.Text(
+        readonly=True,
+        string="Partner Action Summary",
     )
     partner_visible = fields.Boolean(
         default=False,
@@ -103,7 +170,13 @@ class L10nHuBaseWizard(models.TransientModel):
     # Constraints and onchanges
     @api.onchange('partner')
     def onchange_partner(self):
-        self.action_partner_summary = self.get_partner_summary()
+        self.partner_action_summary = self.get_partner_summary()
+
+    @api.onchange('exchange_amount_from', 'exchange_amount_to')
+    def onchange_currency_exchange(self):
+        if self.exchange_action == 'custom_currency':
+            if self.exchange_amount_to != 0:
+                self.exchange_rate = self.exchange_amount_from / self.exchange_amount_to
 
     # CRUD methods (and name_get, name_search, ...) overrides
 
