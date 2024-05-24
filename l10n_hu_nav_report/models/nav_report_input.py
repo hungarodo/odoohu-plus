@@ -168,6 +168,12 @@ class L10nHuNavReportInput(models.Model):
         readonly=True,
         string="Originator Tax",
     )
+    account_tax_repartition_line = fields.Many2one(
+        comodel_name='account.tax.repartition.line',
+        copy=False,
+        readonly=True,
+        string="Tax Repartition Line",
+    )
     account_tax_scope = fields.Selection(
         copy=False,
         readonly=True,
@@ -239,6 +245,26 @@ class L10nHuNavReportInput(models.Model):
         readonly=True,
         selection=_get_selection_payment_method,
         string="Payment Method",
+    )
+    tax_base_distributed = fields.Float(
+        copy=False,
+        readonly=True,
+        string="Tax Base Distributed",
+    )
+    tax_base_factor = fields.Float(
+        copy=False,
+        readonly=True,
+        string="Tax Base Factor",
+    )
+    tax_base_original = fields.Float(
+        copy=False,
+        readonly=True,
+        string="Tax Base Original",
+    )
+    tax_base_percent = fields.Float(
+        copy=False,
+        readonly=True,
+        string="Tax Base Percent",
     )
     # # CURRENCY
     currency = fields.Many2one(

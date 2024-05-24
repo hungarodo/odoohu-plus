@@ -228,37 +228,37 @@ class L10nHuNavReportOutput(models.Model):
         # Common
         output_data = {
             'code': nav_report_output.code,
-            'output_type': nav_report_output.output_type,
             'sequence': nav_report_output.sequence,
             'technical_name': nav_report_output.technical_name,
+            'value_type': nav_report_output.value_type,
         }
 
         # Process value_type
         if len(error_list) == 0:
-            if self.value_type == 'char':
+            if nav_report_output.value_type == 'char':
                 output_data.update({
-                    'value':  self.value_char,
-                    'value_formatted':  self.value_char,
+                    'value':  nav_report_output.value_char,
+                    'value_formatted':  nav_report_output.value_char,
                 })
-            elif self.value_type == 'float':
+            elif nav_report_output.value_type == 'float':
                 output_data.update({
-                    'value':  self.value_float,
-                    'value_formatted':  self.value_float,
+                    'value':  nav_report_output.value_float,
+                    'value_formatted':  nav_report_output.value_float,
                 })
-            elif self.value_type == 'html':
+            elif nav_report_output.value_type == 'html':
                 output_data.update({
-                    'value': self.render_value_html(values),
-                    'value_formatted': self.value_html,
+                    'value': nav_report_output.render_value_html(values),
+                    'value_formatted': nav_report_output.value_html,
                 })
-            elif self.value_type == 'integer':
+            elif nav_report_output.value_type == 'integer':
                 output_data.update({
-                    'value': self.value_integer,
-                    'value_formatted': self.value_integer,
+                    'value': nav_report_output.value_integer,
+                    'value_formatted': nav_report_output.value_integer,
                 })
-            elif self.value_type == 'text':
+            elif nav_report_output.value_type == 'text':
                 output_data.update({
-                    'value': self.value_text,
-                    'value_formatted': self.value_text,
+                    'value': nav_report_output.value_text,
+                    'value_formatted': nav_report_output.value_text,
                 })
             else:
                 output_data.update({

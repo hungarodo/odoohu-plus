@@ -39,15 +39,89 @@
                                    string="API Enabled"
                                    widget="boolean_toggle"
                             />
+                            <field name="l10n_hu_api_registered"
+                                   invisible="1"
+                                   string="API Registered"
+                            />
+                            <field name="l10n_hu_api_timestamp"
+                                   string="API Timestamp"
+                            />
                         </group>
                         <group name="l10n_hu_2">
-                            <field name="l10n_hu_api_key"
-                                   string="API Key"
+                            <field name="l10n_hu_api_license_valid"
+                                   string="API License Valid"
                             />
-                            <field name="l10n_hu_api_url"
-                                   string="API URL"
+                            <label name="l10n_hu_actions"
+                                   for="action_l10n_hu_api_get_objects"
+                                   string="Actions"
                             />
+                            <div name="l10n_hu_actions">
+                                <div name="action_l10n_hu_api_create_registration"
+                                     attrs="{'invisible': [('l10n_hu_api_registered', '=', True)]}"
+                                >
+                                    <button name="action_l10n_hu_api_create_registration"
+                                            class="btn btn-link"
+                                            icon="fa-magic"
+                                            string="Create API registration"
+                                            type="object"
+                                    />
+                                </div>
+                                <div name="action_l10n_hu_api_get_objects"
+                                     attrs="{'invisible': [('l10n_hu_api_registered', '=', False)]}"
+                                >
+                                    <button name="action_l10n_hu_api_get_objects"
+                                            class="btn btn-link"
+                                            icon="fa-download"
+                                            string="Download API objects"
+                                            type="object"
+                                    />
+                                </div>
+                                <div name="l10n_hu_api_check_delete_registration"
+                                     attrs="{'invisible': [('l10n_hu_api_registered', '=', False)]}"
+                                >
+                                    <button name="action_l10n_hu_api_check_registration"
+                                            class="btn btn-link"
+                                            icon="fa-magic"
+                                            string="Check API registration"
+                                            type="object"
+                                    />
+                                    <br/>
+                                    <button name="action_l10n_hu_api_delete_registration"
+                                            class="btn btn-link"
+                                            icon="fa-trash"
+                                            string="Delete API registration"
+                                            type="object"
+                                    />
+                                </div>
+                                <div name="action_l10n_hu_api_list_logs">
+                                    <button name="action_l10n_hu_api_list_logs"
+                                            class="btn btn-link"
+                                            icon="fa-history"
+                                            string="View API logs"
+                                            type="object"
+                                    />
+                                </div>
+                            </div>
                         </group>
+                    </group>
+                    <group name="l10n_hu_api_data"
+                           groups="base.group_no_one"
+                           string="API Data"
+                    >
+                        <div colspan="2">
+                            <field name="l10n_hu_api_data"
+                                   string="API Data"
+                                   style="word-break: break-word;"
+                            />
+                        </div>
+                        <div colspan="2">
+                            <button name="action_l10n_hu_api_reset_registration"
+                                    class="btn btn-link text-danger"
+                                    icon="fa-eraser"
+                                    string="Reset API Registration"
+                                    type="object"
+                            />
+                        </div>
                     </group>
                 </page>
             </xpath>

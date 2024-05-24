@@ -4,7 +4,7 @@
     <record id="object_api_cron"
             model="ir.cron"
     >
-        <field name="name">HU Object API</field>
+        <field name="name">HU+ Object API</field>
         <field name="code">model.run_object_api_cron()</field>
         <field name="doall"
                eval="False"

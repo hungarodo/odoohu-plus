@@ -381,3 +381,243 @@ class L10nHuAccountMove(models.Model):
         # Return result
         # raise exceptions.UserError(str(result))
         return result
+
+    # # PERIOD
+    @api.model
+    def l10n_hu_get_invoice_delivery_date_info(self, values):
+        """ Get invoice delivery date
+
+        This method takes care of special hungarian rules
+
+        Specification: 2007. CXXVII. 58.§ (1)
+        NJT: https://njt.hu/jogszabaly/2007-127-00-00
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError(str(values))
+
+        # Initialize variables
+        debug_list = []
+        delivery_date = False
+        error_list = []
+        info_list = []
+        result = {}
+        scenario = "unknown"
+        warning_list = []
+
+        # Set journal
+        if values.get('journal_id'):
+            journal = self.env['account.journal'].sudo().browse(values['journal_id'])
+        elif values.get('journal'):
+            journal = values['journal']
+        elif self.journal_id:
+            journal = self.journal_id
+        else:
+            journal = False
+            error_list.append("could not set journal")
+
+        # Is hungarian company
+        if journal \
+                and journal.company_id.partner_id.country_id.code == 'HU':
+            is_hungarian_company = True
+        else:
+            is_hungarian_company = False
+
+        # Is invoice journal
+        if journal \
+                and journal.type in ['purchase', 'sale'] \
+                and journal.l10n_hu_nav_invoice_enabled \
+                and journal.l10n_hu_technical_type in ['invoice']:
+            is_invoice_journal = True
+        else:
+            is_invoice_journal = False
+
+        # Periodic settlement
+        if values.get('l10n_hu_invoice_periodical_delivery'):
+            is_periodic_delivery = True
+        elif self.l10n_hu_invoice_periodical_delivery:
+            is_periodic_delivery = True
+        else:
+            is_periodic_delivery = False
+
+        # Period start and end
+        if is_periodic_delivery:
+            if values.get('l10n_hu_invoice_delivery_period_start'):
+                invoice_delivery_period_start = values['l10n_hu_invoice_delivery_period_start']
+                if isinstance(invoice_delivery_period_start, datetime.date):
+                    pass
+                elif isinstance(invoice_delivery_period_start, str):
+                    try:
+                        date_string = invoice_delivery_period_start
+                        date_format = "%Y-%m-%d"
+                        invoice_delivery_period_start = datetime.datetime.strptime(date_string, date_format).date()
+                    except:
+                        invoice_delivery_period_start = False
+                else:
+                    invoice_delivery_period_start = False
+            elif self.l10n_hu_invoice_delivery_period_start:
+                invoice_delivery_period_start = self.l10n_hu_invoice_delivery_period_start
+            else:
+                invoice_delivery_period_start = False
+
+            if values.get('l10n_hu_invoice_delivery_period_end'):
+                invoice_delivery_period_end = values['l10n_hu_invoice_delivery_period_end']
+                if isinstance(invoice_delivery_period_end, datetime.date):
+                    pass
+                elif isinstance(invoice_delivery_period_end, str):
+                    try:
+                        date_string = invoice_delivery_period_end
+                        date_format = "%Y-%m-%d"
+                        invoice_delivery_period_end = datetime.datetime.strptime(date_string, date_format).date()
+                    except:
+                        invoice_delivery_period_end = False
+                else:
+                    invoice_delivery_period_end = False
+            elif self.l10n_hu_invoice_delivery_period_end:
+                invoice_delivery_period_end = self.l10n_hu_invoice_delivery_period_end
+            else:
+                invoice_delivery_period_end = False
+        else:
+            invoice_delivery_period_start = False
+            invoice_delivery_period_end = False
+
+        # Default delivery date
+        invoice_delivery_date_default = self.l10n_hu_get_invoice_delivery_date_default(journal=journal)
+
+        # Set today
+        date_today = fields.Date.today()
+
+        # Set invoice date
+        if values.get('invoice_date'):
+            invoice_date = values['invoice_date']
+            if isinstance(invoice_date, datetime.date):
+                pass
+            elif isinstance(invoice_date, str):
+                try:
+                    date_string = invoice_date
+                    date_format = "%Y-%m-%d"
+                    invoice_date = datetime.datetime.strptime(date_string, date_format).date()
+                except:
+                    invoice_date = False
+            else:
+                invoice_date = False
+        elif self.invoice_date:
+            invoice_date = self.invoice_date
+        elif self.state == 'draft':
+            invoice_date = date_today
+        else:
+            invoice_date = False
+
+        # Set invoice due date
+        # NOTE: using a payment term the due date is already recomputed and set, not need to manage payment term here
+        if values.get('invoice_date_due'):
+            invoice_date_due = values['invoice_date_due']
+            if isinstance(invoice_date_due, datetime.date):
+                pass
+            elif isinstance(invoice_date_due, str):
+                try:
+                    date_string = invoice_date_due
+                    date_format = "%Y-%m-%d"
+                    invoice_date_due = datetime.datetime.strptime(date_string, date_format).date()
+                except:
+                    invoice_date_due = False
+            else:
+                invoice_date_due = False
+        elif self.invoice_date_due:
+            invoice_date_due = self.invoice_date_due
+        else:
+            invoice_date_due = False
+
+        # Set last day of delivery period month
+        if invoice_delivery_period_end:
+            # Get close to the end of the month and add 4 days to 'roll it over'
+            period_next_month = invoice_delivery_period_end.replace(day=28) + datetime.timedelta(days=4)
+
+            # Set the day to 1 gives us the start of next month
+            period_first_day_of_next_month = period_next_month.replace(day=1)
+
+            # Remove one day to get last day of this month
+            invoice_delivery_period_month_last_day = period_first_day_of_next_month - datetime.timedelta(days=1)
+        else:
+            invoice_delivery_period_month_last_day = False
+
+        # Set 60 days from invoice_delivery_period_end
+        if invoice_delivery_period_end:
+            invoice_delivery_period_end_plus_60 = invoice_delivery_period_end + datetime.timedelta(days=60)
+        else:
+            invoice_delivery_period_end_plus_60 = False
+
+        # NAV SCENARIOS
+        # 0) DEFAULT
+        if invoice_delivery_date_default:
+            scenario = '0_default'
+            invoice_delivery_date = invoice_delivery_date_default
+        else:
+            scenario = '0_no_default'
+            invoice_delivery_date = False
+
+        # 1) PERIOD END
+        # Rule: invoice_delivery_period_end is set
+        # Value: invoice_delivery_period_end
+        if invoice_delivery_period_end:
+            scenario = '1_period_end'
+            invoice_delivery_date = invoice_delivery_period_end
+
+        # 2) INVOICE DATE
+        # Rule: BOTH invoice_date_due AND invoice_date are BEFORE invoice_delivery_period_end
+        # Value: invoice_date
+        if invoice_date and invoice_date_due and invoice_delivery_period_end  \
+                and invoice_date_due < invoice_delivery_period_end \
+                and invoice_date < invoice_delivery_period_end:
+            scenario = '1a_invoice_date'
+            invoice_delivery_date = invoice_date
+
+        # 3) INVOICE DATE DUE (MAX 60)
+        # Rule: invoice_date_due is AFTER invoice_delivery_period_end
+        # Value: invoice_date_due (BUT max 60 days from invoice_delivery_period_end)
+        if invoice_date_due and invoice_delivery_period_end \
+                and invoice_date_due > invoice_delivery_period_end:
+            if invoice_date_due <= invoice_delivery_period_end_plus_60:
+                scenario = '1b_invoice_date_due'
+                invoice_delivery_date = invoice_date_due
+            else:
+                scenario = '1b_invoice_date_due_max_60'
+                invoice_delivery_date = invoice_delivery_period_end_plus_60
+
+        # Period summary
+        period_summary = ""
+        if is_hungarian_company and is_periodic_settlement:
+            # period_summary += _("Period rule") + " "
+            period_summary += "2007. CXXVII. 58.§"
+
+            if scenario == '1a_invoice_date':
+                period_summary += " (1) a)"
+            elif scenario == '1b_invoice_date_due':
+                period_summary += " (1) b)"
+            elif scenario == '1b_invoice_date_due_max_60':
+                period_summary += " (1) b) 60+ " + _("day")
+            else:
+                pass
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'invoice_date': invoice_date,
+            'invoice_date_due': invoice_date_due,
+            'invoice_delivery_date': invoice_delivery_date,
+            'invoice_delivery_period_end': invoice_delivery_period_end,
+            'invoice_delivery_period_end_plus_60': invoice_delivery_period_end_plus_60,
+            'invoice_delivery_period_month_last_day': invoice_delivery_period_month_last_day,
+            'invoice_delivery_period_start': invoice_delivery_period_start,
+            'is_periodic_settlement': is_periodic_settlement,
+            'period_summary': period_summary,
+            'scenario': scenario,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        return result

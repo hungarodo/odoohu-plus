@@ -9,6 +9,7 @@
         'data/ir_actions_act_url_data.xml',
         'data/ir_cron_data.xml',
         'data/ir_module_category_data.xml',
+        'data/tag_data.xml',
         'security/res_groups.xml',
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
@@ -23,6 +24,7 @@
         'views/object_actions.xml',
         'views/product_product_actions.xml',
         'views/res_company_views.xml',
+        'views/res_company_actions.xml',
         'views/res_partner_views.xml',
         'views/res_partner_actions.xml',
         'views/tag_views.xml',
@@ -45,6 +47,6 @@
     'price': 0,
     'summary': "Hungarian localization",
     'test': [],
-    'version': "1.0.18",
+    'version': "1.1.5",
     'website': "https://wwww.hungarodo.hu/odoohu",
 }

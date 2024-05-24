@@ -14,8 +14,8 @@
                type="xml"
         >
             <!-- Fields -->
-            <xpath expr="//field[@name='l10n_hu_api_enabled']"
-                   position="after"
+            <xpath expr="//group[@name='l10n_hu_1']"
+                   position="inside"
             >
                 <field name="l10n_hu_partner_vat_status_required"
                        string="Partner VAT Status Required"

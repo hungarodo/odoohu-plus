@@ -95,6 +95,10 @@ class L10nHuBaseObject(models.Model):
         string="HTML Content",
         translate=html_translate,
     )
+    html_visible = fields.Boolean(
+        default=False,
+        string="HTML Visible",
+    )
     key = fields.Char(
         copy=False,
         index=True,
@@ -109,6 +113,10 @@ class L10nHuBaseObject(models.Model):
         copy=False,
         index=True,
         string="Linked Record ID",
+    )
+    linked_record_name = fields.Char(
+        compute='_compute_linked_record_name',
+        string="Linked Record Name",
     )
     locked = fields.Boolean(
         default=False,
@@ -144,7 +152,7 @@ class L10nHuBaseObject(models.Model):
         comodel_name='l10n.hu.tag',
         column1='object',
         column2='tag',
-        domain=[('tag_type', 'in', ['general', 'object'])],
+        domain=[('tag_type', 'in', ['general', 'object', 'technical'])],
         index=True,
         relation='l10n_hu_object_tag_rel',
         string="Tag",
@@ -182,6 +190,16 @@ class L10nHuBaseObject(models.Model):
     )
 
     # Compute and search fields, in the same order of field declarations
+    def _compute_linked_record_name(self):
+        for record in self:
+            if record.linked_model_name and record.linked_record_id:
+                linked_record = self.env[record.linked_model_name].browse(record.linked_record_id).exists()
+                if linked_record:
+                    record.linked_record_name = linked_record.display_name
+                else:
+                    record.linked_record_name = None
+            else:
+                record.linked_record_name = None
 
     # Constraints and onchanges
 
@@ -217,10 +235,35 @@ class L10nHuBaseObject(models.Model):
         else:
             return
 
+    def action_view_linked_record(self):
+        # Ensure one
+        self.ensure_one()
+
+        # Check
+        if not self.linked_model_name or not self.linked_record_id:
+            raise exceptions.UserError(_("Linked model name and record ID are both required!"))
+
+        model = self.env['ir.model'].search([
+            ('model', '=', self.linked_model_name)
+        ])
+
+        # Result
+        result = {
+            'name': model.display_name,
+            'res_id': self.linked_record_id,
+            'res_model': self.linked_model_name,
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form,tree',
+        }
+
+        # Return result
+        return result
+
     # Business methods
     # # API
     @api.model
-    def api_object_request_response(self, values):
+    def api_object_request(self, values):
         """ Make a request to API and process the response
 
         NOTE:
@@ -727,9 +770,36 @@ class L10nHuBaseObject(models.Model):
                 'response_text': False,
             })
 
-
         # Return result
         # raise exceptions.UserError(str(result))
+        return result
+
+    @api.model
+    def get_tags_by_technical_name(self):
+        """ Get tags by technical name
+
+        NOTE:
+        - helper method to get available tag ids and objects organized by technical name
+
+        :return dictionary
+        """
+        # raise exceptions.UserError("get_tags_by_technical_name BEGIN")
+
+        # Initialize variables
+        result = {}
+
+        # Collect tags and update result
+        tags = self.env['l10n.hu.tag'].sudo().search([
+            ('active', 'in', [True, False]),
+        ])
+        for tag in tags:
+            if tag.technical_name:
+                record_key = tag.technical_name + "_tag"
+                record_id_key = tag.technical_name + "_tag_id"
+                result[record_key] = tag
+                result[record_id_key] = tag.id
+
+        # Return result
         return result
 
     @api.model

@@ -146,9 +146,25 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="tag_type"/>
                 <field name="description"/>
+                <!-- Filter -->
+                <!-- Filter group by -->
+                <filter name="tag_type_filter_group_by"
+                        context="{'group_by': 'tag_type'}"
+                        string="Tag Type"
+                />
+                <separator/>
+                <filter name="write_date_filter_group_by"
+                        context="{'group_by': 'write_date'}"
+                        string="Write Date"
+                />
+                <filter name="company_filter_group_by"
+                        context="{'group_by': 'company'}"
+                        string="Company"
+                />
             </search>
         </field>
     </record>

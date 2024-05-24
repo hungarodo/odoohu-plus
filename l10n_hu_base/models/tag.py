@@ -72,6 +72,7 @@ class L10nHuBaseTag(models.Model):
             ('object_category', "Object Category"),
             ('object_collection', "Object Collection"),
             ('object_type', "Object Type"),
+            ('technical', "Technical"),
         ],
         string="Tag Type",
     )

@@ -252,6 +252,7 @@
                 />
                 <field name="name"/>
                 <field name="locked"
+                       optional="hide"
                        widget="boolean_toggle"
                 />
                 <field name="code"/>
@@ -267,12 +268,16 @@
                 <field name="value_display"
                        optional="show"
                 />
-                <field name="active"
-                       widget="boolean_toggle"
-                />
                 <field name="notes"/>
                 <field name="technical_name"
                        optional="show"
+                />
+                <field name="active"
+                       optional="hide"
+                       widget="boolean_toggle"
+                />
+                <field name="write_date"
+                       optional="hide"
                 />
                 <field name="report"
                        optional="hide"
@@ -312,30 +317,35 @@
                 />
                 <filter name="not_locked_filter"
                         domain="[('locked','=', False)]"
-                        string="Not Locked"
+                        string="Not locked"
                 />
                 <!-- Filter group by -->
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"
                 >
-                    <filter name="value_type_group_by"
+                    <filter name="value_type_filter_group_by"
                             context="{'group_by': 'value_type'}"
-                            string="Output Type"
+                            string="Value Type"
                     />
-                    <filter name="report_group_by"
-                            context="{'group_by': 'report'}"
-                            string="Report"
-                    />
-                    <filter name="element_group_by"
+                    <filter name="element_filter_group_by"
                             context="{'group_by': 'element'}"
                             string="Element"
                     />
-                    <filter name="template_group_by"
+                    <filter name="template_filter_group_by"
                             context="{'group_by': 'template'}"
                             string="Template"
                     />
-                    <filter name="company_group_by"
+                    <separator/>
+                    <filter name="locked_filter_group_by"
+                            context="{'group_by': 'locked'}"
+                            string="Locked"
+                    />
+                    <filter name="report_filter_group_by"
+                            context="{'group_by': 'report'}"
+                            string="Report"
+                    />
+                    <filter name="company_filter_group_by"
                             context="{'group_by': 'company'}"
                             string="Company"
                     />

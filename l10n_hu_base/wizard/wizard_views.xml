@@ -41,6 +41,43 @@
                                }"
                                required="1"
                         />
+                        <!-- API -->
+                        <field name="api_action_editable"
+                               invisible="1"
+                        />
+                        <field name="api_action"
+                               attrs="{
+                                   'invisible': [('action_type', '!=', 'api')],
+                                   'readonly': [('api_action_editable', '=', False)],
+                                   'required': [('action_type', '=', 'api')],
+                               }"
+                               force_save="1"
+                               string="Action"
+                        />
+                        <field name="api_license_code"
+                               attrs="{
+                                   'invisible': [('action_type', '!=', 'api')],
+                                   'readonly': [('api_action', 'in', ['check_registration', 'delete_registration', 'download_objects'])],
+                                   'required': [('action_type', '=', 'api')],
+                               }"
+                               string="License Code"
+                        />
+                        <field name="api_key"
+                               attrs="{
+                                   'invisible': [('action_type', '!=', 'api')],
+                                   'readonly': [('api_action', 'in', ['check_registration', 'delete_registration', 'download_objects'])],
+                                   'required': [('action_type', '=', 'api')],
+                               }"
+                               string="API Key"
+                        />
+                        <field name="api_url"
+                               attrs="{
+                                   'invisible': [('action_type', '!=', 'api')],
+                                   'readonly': [('api_action', 'in', ['download_objects'])],
+                                   'required': [('action_type', '=', 'api')],
+                               }"
+                               string="API URL"
+                        />
                         <!-- CURRENCY EXCHANGE -->
                         <field name="exchange_action_editable"
                                invisible="1"
@@ -54,6 +91,7 @@
                                    'readonly': [('exchange_action_editable', '=', False)],
                                    'required': [('action_type', '=', 'currency_exchange')],
                                }"
+                               force_save="1"
                                string="Action"
                         />
                         <div name="exchange_currency_from"
@@ -101,10 +139,49 @@
                                    'readonly': [('partner_action_editable', '=', False)],
                                    'required': [('action_type', '=', 'partner')],
                                }"
+                               force_save="1"
                                string="Action"
                         />
                     </group>
                     <group name="cards">
+                        <!-- API -->
+                        <div name="api_info"
+                             attrs="{'invisible': [('action_type', '!=', 'api')]}"
+                             class="card text-white bg-info"
+                             colspan="2"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-1"/>
+                                Information
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"
+                                   attrs="{'invisible': [('api_action', '!=', 'check_registration')]}"
+                                >
+                                    Check API registration
+                                </p>
+                                <p class="card-text"
+                                   attrs="{'invisible': [('api_action', '!=', 'create_registration')]}"
+                                >
+                                    Create API registration
+                                </p>
+                                <p class="card-text"
+                                   attrs="{'invisible': [('api_action', '!=', 'delete_registration')]}"
+                                >
+                                    Delete API registration
+                                </p>
+                                <p class="card-text"
+                                   attrs="{'invisible': ['|', ('api_action', '!=', 'download_objects'), ('api_details', 'in', [False, ''])]}"
+                                >
+                                    <field name="api_details"/>
+                                </p>
+                                <p class="card-text"
+                                   attrs="{'invisible': [('api_action', '!=', 'download_objects')]}"
+                                >
+                                    Download API objects
+                                </p>
+                            </div>
+                        </div>
                         <!-- PARTNER -->
                         <div name="partner_info"
                              attrs="{'invisible': [('action_type', '!=', 'partner')]}"

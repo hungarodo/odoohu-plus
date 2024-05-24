@@ -5,6 +5,7 @@
             model="ir.actions.act_window"
     >
         <field name="name">Tags</field>
+        <field name="context">{'search_default_tag_type_filter_group_by': 1}</field>
         <field name="res_model">l10n.hu.tag</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>

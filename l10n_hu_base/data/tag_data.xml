@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- accounting -->
+    <record id="accounting_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Accounting</field>
+        <field name="code">ACCOUNT</field>
+        <field name="color">0</field>
+        <field name="technical_name">accounting</field>
+        <field name="tag_type">object_category</field>
+    </record>
+    <!-- configuration -->
+    <record id="configuration_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Configuration</field>
+        <field name="code">CONFIG</field>
+        <field name="color">0</field>
+        <field name="technical_name">configuration</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- deleted -->
+    <record id="deleted_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Deleted</field>
+        <field name="code">DEL</field>
+        <field name="color">9</field>
+        <field name="technical_name">deleted</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- license_free -->
+    <record id="license_free_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Free</field>
+        <field name="code">FREE</field>
+        <field name="color">7</field>
+        <field name="technical_name">license_free</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- license_paid -->
+    <record id="license_paid_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Paid</field>
+        <field name="code">PAID</field>
+        <field name="color">5</field>
+        <field name="technical_name">license_paid</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- odoo_edition_enterprise -->
+    <record id="odoo_edition_enterprise_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Enterprise</field>
+        <field name="code">ODOO-ENTERPRISE</field>
+        <field name="color">5</field>
+        <field name="technical_name">odoo_edition_enterprise</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- odoo_edition_community -->
+    <record id="odoo_edition_community_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Community</field>
+        <field name="code">ODOO-COMMUNITY</field>
+        <field name="color">7</field>
+        <field name="technical_name">odoo_edition_community</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- odoo_version_14_0 -->
+    <record id="odoo_version_14_0_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Odoo 14.0</field>
+        <field name="code">ODOO-14</field>
+        <field name="color">11</field>
+        <field name="technical_name">odoo_version_14_0</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- odoo_version_15_0 -->
+    <record id="odoo_version_15_0_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Odoo 15.0</field>
+        <field name="code">ODOO-15</field>
+        <field name="color">11</field>
+        <field name="technical_name">odoo_version_15_0</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- odoo_version_16_0 -->
+    <record id="odoo_version_16_0_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Odoo 16.0</field>
+        <field name="code">ODOO-16</field>
+        <field name="color">11</field>
+        <field name="technical_name">odoo_version_16_0</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- odoo_version_17_0 -->
+    <record id="odoo_version_17_0_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Odoo 17.0</field>
+        <field name="code">ODOO-17</field>
+        <field name="color">11</field>
+        <field name="technical_name">odoo_version_17_0</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- production -->
+    <record id="production_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Production</field>
+        <field name="code">PROD</field>
+        <field name="color">10</field>
+        <field name="technical_name">production</field>
+        <field name="tag_type">technical</field>
+    </record>
+    <!-- test -->
+    <record id="test_tag"
+            model="l10n.hu.tag"
+            forcecreate="True"
+    >
+        <field name="name">Test</field>
+        <field name="code">TEST</field>
+        <field name="color">2</field>
+        <field name="technical_name">test</field>
+        <field name="tag_type">technical</field>
+    </record>
+</odoo>

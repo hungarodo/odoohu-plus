@@ -44,11 +44,22 @@
                             />
                         </h4>
                     </div>
-                    <group>
-                        <field name="description"
-                               readonly="1"
-                               style="word-break: break-word;"
-                        />
+                    <group name="base">
+                        <group name="base_1">
+                            <field name="log_type"
+                                   readonly="1"
+                                   string="Type"
+                            />
+                            <field name="direction"
+                                   readonly="1"
+                            />
+                        </group>
+                        <group name="base_2">
+                            <field name="description"
+                                   readonly="1"
+                                   style="word-break: break-word;"
+                            />
+                        </group>
                     </group>
                     <notebook>
                         <page name="details"
@@ -57,6 +68,11 @@
                         >
                             <group name="details">
                                 <group name="base">
+                                    <field name="id"/>
+                                    <field name="company"
+                                           groups="base.group_multi_company"
+                                           readonly="1"
+                                    />
                                     <field name="level"
                                            readonly="1"
                                     />
@@ -64,13 +80,6 @@
                                            readonly="1"
                                     />
                                     <field name="app"
-                                           readonly="1"
-                                    />
-                                    <field name="id"
-                                           readonly="1"
-                                    />
-                                    <field name="company"
-                                           groups="base.group_multi_company"
                                            readonly="1"
                                     />
                                 </group>
@@ -91,6 +100,21 @@
                                            readonly="1"
                                     />
                                 </group>
+                            </group>
+                            <group name="technical"
+                                   colspan="2"
+                                   string="Technical"
+                            >
+                                <field name="technical_name"
+                                       readonly="1"
+                                       string="Name"
+                                       style="word-break: break-word;"
+                                />
+                                <field name="technical_data"
+                                       readonly="1"
+                                       string="Data"
+                                       style="word-break: break-word;"
+                                />
                             </group>
                         </page>
                     </notebook>
@@ -117,12 +141,19 @@
                 <field name="id"
                        optional="hide"
                 />
-                <field name="level"/>
-                <field name="app"/>
-                <field name="model"/>
+                <field name="log_type"
+                       string="Type"
+                />
                 <field name="name"/>
                 <field name="description"
                        optional="show"
+                />
+                <field name="level"/>
+                <field name="app"
+                       optional="hide"
+                />
+                <field name="model"
+                       optional="hide"
                 />
                 <field name="user_id"/>
                 <field name="create_date"/>
@@ -145,11 +176,16 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="description"/>
+                <field name="log_type"/>
+                <field name="level"/>
+                <field name="technical_name"/>
+                <field name="status"/>
                 <field name="app"/>
                 <field name="model"/>
-                <!-- filter -->
+                <!-- Filter -->
                 <filter name="level_info_filter"
                         domain="[('level', '=', 'info')]"
                         string="INFO"
@@ -167,15 +203,27 @@
                         string="DEBUG"
                 />
                 <separator/>
-                <!-- Meritum scheduled today -->
-                <filter name="created_today"
+                <filter name="created_today_filter"
                         domain="[
                             ('create_date', '&gt;', (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
                             ('create_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
                         ]"
                         string="Today"
                 />
-                <!-- filter group by -->
+                <!-- Filter group by -->
+                <filter name="log_type_filter_group_by"
+                        context="{'group_by': 'log_type'}"
+                        string="Log Type"
+                />
+                <filter name="level_filter_group_by"
+                        context="{'group_by': 'level'}"
+                        string="Level"
+                />
+                <filter name="direction_filter_group_by"
+                        context="{'group_by': 'direction'}"
+                        string="Direction"
+                />
+                <separator/>
                 <filter name="app_filter_group_by"
                         context="{'group_by': 'app'}"
                         string="App"
@@ -184,10 +232,7 @@
                         context="{'group_by': 'model'}"
                         string="Model"
                 />
-                <filter name="level_filter_group_by"
-                        context="{'group_by': 'level'}"
-                        string="Level"
-                />
+                <separator/>
                 <filter name="user_id_filter_group_by"
                         context="{'group_by': 'user_id'}"
                         string="User ID"

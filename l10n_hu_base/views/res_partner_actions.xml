@@ -4,7 +4,7 @@
     <record id="res_partner_action"
             model="ir.actions.act_window"
     >
-        <field name="name">Partner</field>
+        <field name="name">Partners</field>
         <field name="context">{'search_default_l10n_hu_vat_status_filter_group_by': 1,}</field>
         <field name="domain">[]</field>
         <field name="res_model">res.partner</field>

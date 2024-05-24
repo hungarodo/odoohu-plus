@@ -243,3 +243,172 @@ class L10nHuBaseLog(models.Model):
             raise exceptions.UserError(_("Source record model name or source record id is empty!"))
 
     # Business methods
+    @api.model
+    def api_request_response(self, values):
+        """ Make a request to API and process the response
+
+        NOTE:
+        - simple python request implementation to manage API
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("api_request_response BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        processing_result = {}
+        response_json = {}
+        result = {}
+        warning_list = []
+
+        # api_key
+        if values.get('api_key'):
+            api_key = values['api_key']
+            debug_list.append("api_key found in values")
+        else:
+            api_key = None
+            error_list.append("api_key not found in values")
+        # raise exceptions.UserError("api_request_response api_key" + str(api_key))
+
+        # log
+        if values.get('log'):
+            log = values['log']
+            debug_list.append("log set from values")
+        elif len(self) == 1 and self.id:
+            log = self
+            debug_list.append("log set from self")
+        else:
+            log = None
+            error_list.append("log not set")
+
+        # request_data
+        if values.get('request_data'):
+            # request_data = {'params': values['request_data']}
+            request_data = json.dumps(values['request_data'], default=str)
+        else:
+            request_data = False
+            error_list.append("request_data not found in values")
+
+        # request_method
+        if values.get('request_method'):
+            request_method = values['request_method']
+            debug_list.append("request_method found in values: " + str(request_method))
+        else:
+            request_method = False
+            error_list.append("request_method not found in values")
+
+        # request_type
+        if values.get('request_type'):
+            request_type = values['request_type']
+        else:
+            request_type = False
+            error_list.append("request_type not found in values")
+
+        # request_url
+        if values.get('request_url'):
+            request_url = values['request_url']
+            debug_list.append("request_url found in values: " + str(request_url))
+        else:
+            request_url = False
+            error_list.append("request_url not found in values")
+
+        # Request-Response
+        # request_headers
+        request_headers = {
+                "accept": "application/json",
+                "Content-Type": "application/json",
+                "X-Api-Key": api_key,
+        }
+
+        # debug_exception
+        debug_exception = "\n" + str(request_url)
+        debug_exception += "\n" + str(request_headers)
+        debug_exception += "\n" + str(request_data)
+        debug_exception += "\n" + str(request_method)
+        debug_exception += "\n" + str(request_type)
+        # raise exceptions.UserError("api_request_response debug_exception" + debug_exception)
+
+        # Make request and process response
+        if len(error_list) == 0:
+            # Make request
+            if request_method == 'DELETE':
+                response = requests.delete(request_url, headers=request_headers, data=request_data)
+            elif request_method == 'GET':
+                response = requests.get(request_url, headers=request_headers, data=request_data)
+            elif request_method == 'POST':
+                response = requests.post(request_url, headers=request_headers, data=request_data)
+            else:
+                response = None
+            # raise exceptions.UserError(str(response.json()))
+            # raise exceptions.UserError(str(response.text))
+            try:
+                response_json = response.json()
+            except:
+                warning_list.append("response not json")
+
+            if response_json.get('result') and response_json['result'].get('payload'):
+                payload = response_json['result']['payload']
+            else:
+                payload = {}
+
+            # Process response
+            # response_status_code
+            if response and response.status_code in [200, 201, 204]:
+                response_status_code_type = 'success'
+                if request_type in ['delete_registration', 'get_registration', 'post_registration']:
+                    response_values = {
+                        'log': log,
+                        'payload': payload,
+                        'request_type': request_type,
+                    }
+                    processing_result = log.company.l10n_hu_api_registration_response(response_values)
+            elif response and response.status_code in [400, 401, 402, 403, 404, 422]:
+                response_status_code_type = 'error'
+            elif response and response.status_code in [500]:
+                response_status_code_type = 'server_error'
+            else:
+                response_status_code_type = 'unknown'
+        else:
+            # Processing result
+            processing_result = {
+                'response_success': False,
+                'response_type': 'error',
+                'status': 'error',
+            }
+            debug_list.append("request sending skipped due to previous errors")
+
+        # technical_data
+        technical_data = {
+            'processing_result': processing_result,
+            'request_info': {
+                'request_data': request_data,
+                'request_headers': request_headers,
+                'request_path': request_url,
+            },
+            'response_info': {
+                'response_json': response_json,
+                'response_success': processing_result.get('response_success', False),
+                'response_type': processing_result.get('response_type', False),
+            },
+        }
+        log.sudo().write({
+            'technical_data': json.dumps(technical_data, default=str),
+        })
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'log': log,
+            'processing_result': processing_result,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("api_request_response END" + str(result))
+        return result

@@ -104,6 +104,10 @@
                                     <field name="payment_date"/>
                                     <field name="payment_method"/>
                                     <field name="downpayment"/>
+                                    <field name="tax_base_original"/>
+                                    <field name="tax_base_factor"/>
+                                    <field name="tax_base_percent"/>
+                                    <field name="tax_base_distributed"/>
                                 </group>
                                 <group name="accounting_2">
                                     <field name="account_account"/>
@@ -117,6 +121,7 @@
                                            widget="many2many_tags"
                                     />
                                     <field name="account_tax_line"/>
+                                    <field name="account_tax_repartition_line"/>
                                     <field name="account_tax_scope"/>
                                     <field name="account_fiscal_position"/>
                                     <field name="fiscal_position_match"/>
@@ -224,6 +229,10 @@
                 <field name="report"
                        optional="hide"
                 />
+                <field name="locked"
+                       optional="hide"
+                       widget="boolean_toggle"
+                />
                 <field name="name"/>
                 <field name="category"
                        options="{'color_field': 'color'}"
@@ -251,6 +260,9 @@
                 <field name="account_tax_line"
                        optional="show"
                        widget="badge"
+                />
+                <field name="write_date"
+                       optional="hide"
                 />
                 <field name="company"
                        optional="hide"
@@ -289,6 +301,7 @@
                type="xml"
         >
             <search>
+                <!-- Field -->
                 <field name="name"/>
                 <field name="report"/>
                 <field name="category"/>
@@ -303,39 +316,51 @@
                         string="Tax Amount"
                 />
                 <separator/>
+                <filter name="locked_filter"
+                        domain="[('locked','=', True)]"
+                        string="Locked"
+                />
+                <filter name="not_locked_filter"
+                        domain="[('locked','=', False)]"
+                        string="Not locked"
+                />
                 <!-- Filter group by -->
                 <group name="filter_group_by"
                        expand="0"
                        string="Group By"
                 >
-                    <filter name="category_group_by"
+                    <filter name="category_filter_group_by"
                             context="{'group_by': 'category'}"
                             string="Category"
                     />
-                    <filter name="tag_group_by"
+                    <filter name="tag_filter_group_by"
                             context="{'group_by': 'tag'}"
                             string="Tag"
                     />
                     <separator/>
-                    <filter name="account_account_group_by"
+                    <filter name="account_account_filter_group_by"
                             context="{'group_by': 'account_account'}"
                             string="Account"
                     />
 
-                    <filter name="account_tax_group_by"
+                    <filter name="account_tax_filter_group_by"
                             context="{'group_by': 'account_tax'}"
                             string="Taxes"
                     />
-                    <filter name="account_tax_line_group_by"
+                    <filter name="account_tax_line_filter_group_by"
                             context="{'group_by': 'account_tax_line'}"
                             string="Originator Tax"
                     />
                     <separator/>
-                    <filter name="report_group_by"
+                    <filter name="locked_filter_group_by"
+                            context="{'group_by': 'locked'}"
+                            string="Locked"
+                    />
+                    <filter name="report_filter_group_by"
                             context="{'group_by': 'report'}"
                             string="Report"
                     />
-                    <filter name="company_group_by"
+                    <filter name="company_filter_group_by"
                             context="{'group_by': 'company'}"
                             string="Company"
                     />

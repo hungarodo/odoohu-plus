@@ -93,7 +93,7 @@
         />
         <field name="sequence">128</field>
     </record>
-    <!-- HU > Documentation -->
+    <!-- HU > Configuration > Documentation -->
     <record id="hu_configuration_documentation_menu"
             model="ir.ui.menu"
     >
@@ -106,8 +106,31 @@
         />
         <field name="sequence">8</field>
     </record>
-    <!-- HU > Configuration > Document Types -->
-    <record id="hu_configuration_document_type_menu"
+    <!-- HU > Configuration > Base -->
+    <record id="hu_configuration_base_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Base</field>
+        <field name="parent_id"
+               ref="hu_configuration_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
+    <!-- HU > Configuration > Base > Companies Types -->
+    <record id="hu_configuration_base_company_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Companies</field>
+        <field name="action"
+               ref="res_company_action"
+        />
+        <field name="parent_id"
+               ref="hu_configuration_base_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
+    <!-- HU > Configuration > Base > Document Types -->
+    <record id="hu_configuration_base_document_type_menu"
             model="ir.ui.menu"
     >
         <field name="name">Document Types</field>
@@ -115,11 +138,11 @@
                ref="document_type_action"
         />
         <field name="parent_id"
-               ref="hu_configuration_menu"
+               ref="hu_configuration_base_menu"
         />
         <field name="sequence">16</field>
     </record>
-    <!-- HU > Configuration > Tags -->
+    <!-- HU > Configuration > Base > Tags -->
     <record id="hu_configuration_tag_menu"
             model="ir.ui.menu"
     >
@@ -128,7 +151,7 @@
                ref="tag_action"
         />
         <field name="parent_id"
-               ref="hu_configuration_menu"
+               ref="hu_configuration_base_menu"
         />
         <field name="sequence">32</field>
     </record>

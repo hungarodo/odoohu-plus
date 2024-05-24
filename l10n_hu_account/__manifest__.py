@@ -41,7 +41,7 @@
         'python': [],
     },
     'images': [  # Odoo Marketplace banner
-        'static/description/l10n_hu_account_invoice_banner.png',
+        'static/description/l10n_hu_account_banner.png',
     ],
     'installable': True,
     'license': "OPL-1",
@@ -49,6 +49,6 @@
     'qweb': [],
     'summary': "Hungarian accounting improvements",
     'test': [],
-    'version': "1.0.22",
+    'version': "1.0.24",
     'website': "https://wwww.hungarodo.hu/odoohu"
 }

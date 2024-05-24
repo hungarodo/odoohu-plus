@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
+import json
 import re
 
 # 2 : imports of odoo
@@ -40,6 +41,7 @@ class L10nHuBaseWizard(models.TransientModel):
     # # COMMON
     action_type = fields.Selection(
         selection=[
+            ('api', "API"),
             ('configuration', "Configuration"),
             ('currency_exchange', "Currency Exchange"),
             ('product', "Product"),
@@ -77,6 +79,37 @@ class L10nHuBaseWizard(models.TransientModel):
     company_currency_code = fields.Char(
         related='company.currency_id.name',
         string="Company Currency Code",
+    )
+    # # API
+    api_action = fields.Selection(
+        selection=[
+            ('check_registration', "Check registration"),
+            ('create_registration', "Create registration"),
+            ('delete_registration', "Delete registration"),
+            ('download_objects', "Download objects"),
+        ],
+        string="API Action",
+    )
+    api_action_editable = fields.Boolean(
+        default=True,
+        string="API Action Editable",
+    )
+    api_data = fields.Text(
+        related='company.l10n_hu_api_data',
+        string="API Data",
+    )
+    api_details = fields.Text(
+        readonly=True,
+        string="API Details",
+    )
+    api_key = fields.Char(
+        string="API Key",
+    )
+    api_license_code = fields.Char(
+        string="API License Code",
+    )
+    api_url = fields.Char(
+        string="API URL",
     )
     # # CURRENCY EXCHANGE
     company_currency_rate = fields.Many2one(
@@ -133,10 +166,6 @@ class L10nHuBaseWizard(models.TransientModel):
         string="Exchange Invisible",
     )
     # # PARTNER
-    action_partner = fields.Selection(
-        selection=[],
-        string="DEPRECATED"
-    )
     partner = fields.Many2many(
         comodel_name='res.partner',
         column1='wizard',
@@ -168,6 +197,24 @@ class L10nHuBaseWizard(models.TransientModel):
     # Compute and search fields, in the same order of field declarations
 
     # Constraints and onchanges
+    @api.onchange('api_action')
+    def onchange_api_action(self):
+        if self.api_action is not None and self.company:
+            api_data = self.company.l10n_hu_get_api_data()
+            api_details = _("API Key") + ": " + str(api_data.get('api_key', None))
+            api_details += "\n" + _("License active") + ": " + str(api_data.get('license_active', None))
+            api_details += "\n" + _("License code") + ": " + str(api_data.get('license_code', None))
+            api_details += "\n" + _("License owner") + ": " + str(api_data.get('license_owner', None))
+            api_details += "\n" + _("License type") + ": " + str(api_data.get('license_type', None))
+            api_details += "\n" + _("License valid") + ": " + str(api_data.get('license_valid', None))
+            api_details += "\n" + _("License expiry") + ": " + str(api_data.get('license_valid_to', None))
+            self.api_details = api_details
+            self.api_key = api_data.get('api_key', "free")
+            self.api_license_code = api_data.get('license_code', "free")
+            self.api_url = api_data.get('api_url', "")
+        else:
+            pass
+
     @api.onchange('partner')
     def onchange_partner(self):
         self.partner_action_summary = self.get_partner_summary()
@@ -186,8 +233,84 @@ class L10nHuBaseWizard(models.TransientModel):
         self.ensure_one()
 
         # Process actions
+        # # API
+        if self.action_type == 'api':
+            # Update company API data
+            api_data = self.company.l10n_hu_get_api_data()
+            if self.api_key:
+                api_data.update({
+                    'api_key': self.api_key,
+                })
+            if self.api_url:
+                api_data.update({
+                    'api_url': self.api_url,
+                })
+            if self.api_license_code:
+                api_data.update({
+                    'license_code': self.api_license_code,
+                })
+            self.company.write({
+                'l10n_hu_api_data': json.dumps(api_data, default=str)
+            })
+
+            # Manage result
+            manage_result = self.manage_api()
+
+            # Wizard result
+            if self.api_action in ['check_registration', 'create_registration', 'delete_registration']:
+                result = {
+                    'name': _("Company"),
+                    'res_id': self.company.id,
+                    'res_model': 'res.company',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form,tree',
+                }
+                return result
+            elif manage_result.get('object_ids') and len(manage_result['object_ids']) == 1:
+                result = {
+                    'name': _("Object"),
+                    'res_id': manage_result['object_ids'][0],
+                    'res_model': 'l10n.hu.object',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form,tree',
+                }
+                return result
+            elif manage_result.get('object_ids'):
+                result = {
+                    'name': _("Objects"),
+                    'domain': [('id', 'in', manage_result['object_ids'])],
+                    'res_model': 'l10n.hu.object',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'tree,form',
+                }
+                return result
+            elif manage_result.get('log_ids') and len(manage_result['log_ids']) == 1:
+                result = {
+                    'name': _("Log"),
+                    'res_id': manage_result['log_ids'][0],
+                    'res_model': 'l10n.hu.log',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form,tree',
+                }
+                return result
+            elif manage_result.get('log_ids'):
+                result = {
+                    'name': _("Logs"),
+                    'domain': [('id', 'in', manage_result['log_ids'])],
+                    'res_model': 'l10n.hu.log',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'tree,form',
+                }
+                return result
+            else:
+                raise exceptions.UserError("api error!")
         # # PARTNER
-        if self.action_type == 'partner':
+        elif self.action_type == 'partner':
             # # # list
             if self.action_partner == 'list':
                 # Check input
@@ -250,6 +373,79 @@ class L10nHuBaseWizard(models.TransientModel):
             pass
 
         # Return result
+        return result
+
+    @api.model
+    def manage_api(self):
+        """ Manage API actions
+
+        :return: dictionary
+        """
+        # Initialize variables
+        api_result = {}
+        debug_list = []
+        error_list = []
+        info_list = []
+        log_ids = []
+        object_ids = []
+        result = {}
+        warning_list = []
+
+        # Process scenarios
+        if self.action_type == 'api':
+            debug_list.append("processing api action_type")
+            if self.api_action == 'check_registration':
+                debug_list.append("processing check_registration api_action")
+                api_values = {
+                    'request_type': 'get_registration',
+                }
+                api_result = self.company.l10n_hu_api_registration_request(api_values)
+            # # Create registration
+            elif self.api_action == 'create_registration':
+                debug_list.append("processing create_registration api_action")
+                api_values = {
+                    'request_type': 'post_registration',
+                }
+                api_result = self.company.l10n_hu_api_registration_request(api_values)
+            # # Delete registration
+            elif self.api_action == 'delete_registration':
+                debug_list.append("processing delete_registration api_action")
+                api_values = {
+                    'request_type': 'delete_registration',
+                }
+                api_result = self.company.l10n_hu_api_registration_request(api_values)
+            # # Get objects
+            elif self.api_action == 'download_objects':
+                debug_list.append("processing download_objects api_action")
+                api_values = {
+                    'request_type': 'get_object',
+                }
+                object_class = self.env['l10n.hu.object']
+                api_result = object_class.api_object_request(api_values)
+            else:
+                error_list.append("invalid api_action")
+        else:
+            error_list.append("invalid action_type")
+
+        # Append to lists
+        if api_result.get('l10n_hu_log'):
+            log_ids.append(api_result['l10n_hu_log'].id)
+        if api_result.get('l10n_hu_object'):
+            object_ids.append(api_result['l10n_hu_object'].id)
+
+        # Update result
+        result.update({
+            'api_result': api_result,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'log_ids': log_ids,
+            'object_ids': object_ids,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError(str(result))
         return result
 
     @api.model

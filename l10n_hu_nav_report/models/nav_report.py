@@ -128,6 +128,14 @@ class L10nHuNavReport(models.Model):
             ])
 
     # Constraints and onchanges
+    @api.onchange('template')
+    def onchange_template(self):
+        if self.template:
+            self.template_code = self.template.code
+            self.template_version = self.template.version
+        else:
+            self.template_code = None
+            self.template_version = None
 
     # CRUD methods (and name_get, name_search, ...) overrides
     def write(self, values):
@@ -747,6 +755,37 @@ class L10nHuNavReport(models.Model):
                     else:
                         account_fiscal_position_id = False
 
+                    # # tax_line
+                    if account_move_line.tax_line_id:
+                        tax_line = account_move_line.tax_line_id
+                        tax_line_id = tax_line.id
+                    else:
+                        tax_line = False
+                        tax_line_id = False
+
+                    # # tax repartition
+                    if account_move_line.tax_repartition_line_id:
+                        tax_repartition_line = account_move_line.tax_repartition_line_id
+                        tax_repartition_line_id = tax_repartition_line.id
+                    else:
+                        tax_repartition_line = False
+                        tax_repartition_line_id = False
+
+                    # tax base
+                    if tax_repartition_line and tax_line and tax_line.l10n_hu_vat_percentage != 0:
+                        tax_base_factor = tax_repartition_line.factor
+                        tax_base_percent = tax_repartition_line.factor_percent
+                        tax_base_distributed = account_move_line.balance / tax_line.l10n_hu_vat_percentage
+                        if tax_base_factor != 0:
+                            tax_base_original = tax_base_distributed / tax_base_factor
+                        else:
+                            tax_base_original = 0
+                    else:
+                        tax_base_distributed = None
+                        tax_base_factor = None
+                        tax_base_original = None
+                        tax_base_percent = None
+
                     # # tax scope
                     account_tax_scope = False
                     if account_move_line.tax_line_id:
@@ -856,6 +895,7 @@ class L10nHuNavReport(models.Model):
                         product_uom_name = account_move_line.product_uom_id.name
                         product_uom_type = account_move_line.product_uom_id.l10n_hu_type
 
+                    # Assemble input_values
                     input_values = {
                         'account_account': account_move_line.account_id.id,
                         'account_fiscal_position': account_fiscal_position_id,
@@ -864,7 +904,8 @@ class L10nHuNavReport(models.Model):
                         'account_tag': [(4, x.id, 0) for x in account_move_line.tax_tag_ids],
                         'account_tag_invert': account_move_line.tax_tag_invert,
                         'account_tax': [(4, x.id, 0) for x in account_move_line.tax_ids],
-                        'account_tax_line': account_move_line.tax_line_id.id,
+                        'account_tax_line': tax_line_id,
+                        'account_tax_repartition_line': tax_repartition_line_id,
                         'account_tax_scope': account_tax_scope,
                         'amount_balance': account_move_line.balance,
                         'amount_currency': account_move_line.amount_currency,
@@ -895,14 +936,27 @@ class L10nHuNavReport(models.Model):
                         'product_uom': product_uom_id,
                         'product_uom_name': product_uom_name,
                         'product_uom_type': product_uom_type,
+                        'tax_base_distributed': tax_base_distributed,
+                        'tax_base_factor': tax_base_factor,
+                        'tax_base_original': tax_base_original,
+                        'tax_base_percent': tax_base_percent,
                         'tax_number': tax_number,
                     }
-
+                    # Update with common
+                    # NOTE: must be after input_values is re-initialized for this iteration
                     input_values.update(input_values_common)
+
+                    # Update with special scenarios
                     if account_move_line.tax_audit:
                         input_values.update({
                             'name': account_move_line.tax_audit
                         })
+                    else:
+                        input_values.update({
+                            'name': account_move_line.display_name
+                        })
+
+                    # Append to list
                     input_values_list.append(input_values)
             elif rule.technical_name == 'customer_invoice':
                 # Base domain
@@ -1000,8 +1054,20 @@ class L10nHuNavReport(models.Model):
         result = {}
         warning_list = []
 
-        # Prepare output from elements
+        # Locked report elements
+        locked_report_elements = []
+        for output in self.output:
+            if output.locked:
+                locked_report_elements.append(output.element.id)
+
+        # Processable template elements
+        processable_template_elements = []
         for element in self.template.element:
+            if element not in locked_report_elements:
+                processable_template_elements.append(element)
+
+        # Prepare output from elements
+        for element in processable_template_elements:
             # 1) prepare output_values
             if element.code:
                 output_code = element.code
