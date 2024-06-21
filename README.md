@@ -1,2 +1,2 @@
 # odoohu
-Odoo HU 
+Odoo HU+ features
