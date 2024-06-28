@@ -39,6 +39,17 @@
                                invisible="not action_type_visible"
                                required="1"
                         />
+                        <!-- ACCOUNT MOVE -->
+                        <field name="account_move_visible"
+                               invisible="1"
+                        />
+                        <field name="account_move_action"
+                               invisible="action_type != 'account_move'"
+                        />
+                        <field name="account_move"
+                               invisible="not account_move_visible"
+                               options="{'no_create': True,}"
+                        />
                         <!-- API -->
                         <field name="api_action_editable"
                                invisible="1"

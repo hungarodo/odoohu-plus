@@ -20,8 +20,8 @@
                 <page name="l10n_hu_plus"
                       string="HU+"
                 >
-                    <group name="l10n_hu_plus">
-                        <group name="l10n_hu_plus_1">
+                    <group name="l10n_hu_plus_api">
+                        <group name="l10n_hu_plus_api_1">
                             <field name="l10n_hu_plus_api_enabled"
                                    string="API Enabled"
                                    widget="boolean_toggle"
@@ -34,7 +34,7 @@
                                    string="API Timestamp"
                             />
                         </group>
-                        <group name="l10n_hu_plus_2">
+                        <group name="l10n_hu_plus_api_2">
                             <field name="l10n_hu_plus_api_license_valid"
                                    string="API License Valid"
                             />

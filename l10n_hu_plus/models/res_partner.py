@@ -60,6 +60,25 @@ class L10nHuPlusResPartner(models.Model):
     l10n_hu_vpid = fields.Char(
         string="VPID",
     )
+    # # FISCAL POSITION
+    l10n_hu_incorporation = fields.Selection(
+        index=True,
+        related='property_account_position_id.l10n_hu_incorporation',
+        store=True,
+        string="HU Taxpayer Type",
+    )
+    l10n_hu_trade_position = fields.Selection(
+        index=True,
+        related='property_account_position_id.l10n_hu_trade_position',
+        store=True,
+        string="HU Trade Position",
+    )
+    l10n_hu_vat_status = fields.Selection(
+        index=True,
+        related='property_account_position_id.l10n_hu_vat_status',
+        store=True,
+        string="HU VAT Status",
+    )
 
     # Compute and search fields, in the same order of field declarations
     @api.depends('country_id', 'commercial_partner_id', 'parent_id')

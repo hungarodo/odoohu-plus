@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_account_position_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.account.view.account.position.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_account_position_form"
+        />
+        <field name="model">account.fiscal.position</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add fields -->
+            <xpath expr="//page[@name='account_mapping']"
+                   position="after"
+            >
+                <page name="l10n_hu_plus"
+                       string="HU+"
+                >
+                    <group name="l10n_hu_plus">
+                        <group name="l10n_hu_plus_1">
+                            <field name="l10n_hu_vat_status"
+                                   string="VAT Status"
+                            />
+                            <field name="l10n_hu_incorporation"
+                                   string="Taxpayer Type"
+                            />
+                            <field name="l10n_hu_trade_position"
+                                   string="Trade Position"
+                            />
+                        </group>
+                        <group name="l10n_hu_plus_2">
+                            <field name="l10n_hu_plus_api_enabled"
+                                   string="HU+ API"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_plus_technical_name"
+                                   invisible="not l10n_hu_plus_api_enabled"
+                                   string="Technical Name"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

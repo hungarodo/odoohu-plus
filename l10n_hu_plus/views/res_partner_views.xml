@@ -91,6 +91,23 @@
                                    options="{'no_quick_create': True,}"
                             />
                         </group>
+                        <group name="l10n_hu_plus_4">
+                            <field name="l10n_hu_vat_status"
+                                   groups="account.group_account_invoice"
+                                   invisible="not property_account_position_id"
+                                   string="VAT Status"
+                            />
+                            <field name="l10n_hu_incorporation"
+                                   groups="account.group_account_invoice"
+                                   invisible="not property_account_position_id"
+                                   string="Taxpayer Type"
+                            />
+                            <field name="l10n_hu_trade_position"
+                                   groups="account.group_account_invoice"
+                                   invisible="not property_account_position_id"
+                                   string="Trade Position"
+                            />
+                        </group>
                     </group>
                 </page>
             </xpath>

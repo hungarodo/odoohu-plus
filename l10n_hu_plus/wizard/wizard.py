@@ -19,6 +19,13 @@ class L10nHuPlusWizard(models.TransientModel):
 
     # Default methods
     @api.model
+    def _get_default_account_move(self):
+        account_move_ids = []
+        if self._context.get('active_model') and self._context['active_model'] == 'account.move':
+            account_move_ids = self._context.get('active_ids', [])
+        return [(4, x, 0) for x in account_move_ids]
+
+    @api.model
     def _get_default_active_model(self):
         model_id = False
         if self._context.get('active_model'):
@@ -79,6 +86,33 @@ class L10nHuPlusWizard(models.TransientModel):
     company_currency_code = fields.Char(
         related='company.currency_id.name',
         string="Company Currency Code",
+    )
+    # # ACCOUNT MOVE
+    account_move = fields.Many2many(
+        comodel_name='account.move',
+        column1='wizard',
+        column2='account_move',
+        default=_get_default_account_move,
+        relation='l10n_hu_plus_wizard_account_move_rel',
+        string="Account Move",
+    )
+    account_move_action = fields.Selection(
+        selection=[
+            ('list', "List"),
+        ],
+        string="Account Move Action",
+    )
+    account_move_action_editable = fields.Boolean(
+        default=True,
+        string="Account Move Action Editable",
+    )
+    account_move_count = fields.Integer(
+        compute='_compute_account_move_count',
+        string="Account Move Count",
+    )
+    account_move_visible = fields.Boolean(
+        default=False,
+        string="Account Move Visible",
     )
     # # API
     api_action = fields.Selection(
@@ -195,6 +229,9 @@ class L10nHuPlusWizard(models.TransientModel):
     )
 
     # Compute and search fields, in the same order of field declarations
+    def _compute_account_move_count(self):
+        for record in self:
+            record.account_move_count = len(record.account_move)
 
     # Constraints and onchanges
     @api.onchange('api_action')
@@ -233,8 +270,35 @@ class L10nHuPlusWizard(models.TransientModel):
         self.ensure_one()
 
         # Process actions
+        # # ACCOUNT MOVE
+        if self.action_type == 'account_move' and self.account_move:
+            # Manage result
+            manage_result = self.manage_account_move()
+
+            if manage_result.get('account_move_ids') and len(manage_result['account_move_ids']) == 1:
+                result = {
+                    'name': _("Account Move"),
+                    'res_id': manage_result['account_move_ids'][0],
+                    'res_model': 'account.move',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form,tree',
+                }
+                return result
+            elif manage_result.get('account_move_ids'):
+                result = {
+                    'name': _("Account Moves"),
+                    'domain': [('id', 'in', manage_result['account_move_ids'])],
+                    'res_model': 'account.move',
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'tree,form',
+                }
+                return result
+            else:
+                raise exceptions.UserError("account move action error!")
         # # API
-        if self.action_type == 'api':
+        elif self.action_type == 'api':
             # Update company API data
             api_data = self.company.l10n_hu_get_api_data()
             if self.api_key:
@@ -308,7 +372,7 @@ class L10nHuPlusWizard(models.TransientModel):
                 }
                 return result
             else:
-                raise exceptions.UserError("api error!")
+                raise exceptions.UserError("api action error!")
         # # PARTNER
         elif self.action_type == 'partner':
             # # # list
@@ -344,6 +408,7 @@ class L10nHuPlusWizard(models.TransientModel):
         return
 
     # Business methods
+    # # HELPER
     @api.model
     def get_partner_summary(self):
         """ Get summary for the selected partners
@@ -373,6 +438,44 @@ class L10nHuPlusWizard(models.TransientModel):
             pass
 
         # Return result
+        return result
+
+    # # MANAGE
+    @api.model
+    def manage_account_move(self):
+        """ Manage account move actions
+
+        NOTE:
+        - We may iterate because account move field is m2m to support mass management
+
+        :return: dictionary
+        """
+        # Initialize variables
+        account_moves = []
+        account_move_ids = []
+        account_move_ids_ignored = []
+        account_move_ids_managed = []
+        result = {}
+
+        # Process scenarios
+        if self.action_type == 'account_move':
+            if self.account_move_action == 'list':
+                operation_result = {}
+            else:
+                pass
+        else:
+            pass
+
+        # Update result
+        result.update({
+            'account_moves': account_moves,
+            'account_move_ids': account_move_ids,
+            'account_move_ids_ignored': account_move_ids_ignored,
+            'account_move_ids_managed': account_move_ids_managed,
+        })
+
+        # Return result
+        # raise exceptions.UserError(str(result))
         return result
 
     @api.model

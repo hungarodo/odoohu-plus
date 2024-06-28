@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_tax_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.view.tax.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_tax_form"
+        />
+        <field name="model">account.tax</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <xpath expr="//page[@name='advanced_options']//group[1]"
+                   position="after"
+            >
+                <group name="l10n_hu_plus"
+                       string="HU+"
+                >
+                    <group name="l10n_hu_plus_1">
+                        <field name="l10n_hu_category"
+                               string="Category"
+                        />
+                        <field name="l10n_hu_vat_declaration"
+                               invisible="l10n_hu_category != 'vat'"
+                               string="VAT Declaration"
+                               widget="boolean_toggle"
+                        />
+                        <field name="l10n_hu_vat_percentage"
+                               class="oe_inline"
+                               string="VAT Percentage"
+                        />
+                    </group>
+                    <group name="l10n_hu_plus_2">
+                        <field name="l10n_hu_plus_api_enabled"
+                               string="API Enabled"
+                               widget="boolean_toggle"
+                        />
+                        <field name="l10n_hu_plus_technical_name"
+                               invisible="not l10n_hu_plus_api_enabled"
+                               string="Technical_name"
+                        />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

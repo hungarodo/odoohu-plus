@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_account_journal_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.view.account.journal.form.inherit</field>
+        <field name="inherit_id"
+               ref="account.view_account_journal_form"
+        />
+        <field name="model">account.journal</field>
+        <field name="priority">24</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add l10n_hu page and fields -->
+            <xpath expr="//page[@name='advanced_settings']"
+                   position="after"
+            >
+                <page name="l10n_hu_plus"
+                      string="HU+"
+                >
+                    <group name="l10n_hu_plus_1">
+                        <group name="l10n_hu_plus_1_1">
+                            <field name="l10n_hu_plus_document_type"
+                                   options="{'no_create': True, 'no_open': True,}"
+                                   string="Document Types"
+                                   widget="many2many_tags"
+                            />
+                        </group>
+                        <group name="l10n_hu_plus_1_2">
+                            <field name="l10n_hu_amount_text_enabled"
+                                   widget="boolean_toggle"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

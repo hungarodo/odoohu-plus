@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="uom_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Unit of Measures</field>
+        <field name="res_model">uom.uom</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="uom_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="uom_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="uom.product_uom_tree_view"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="uom_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="uom_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="uom.product_uom_form_view"
+        />
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

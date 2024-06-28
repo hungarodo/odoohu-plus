@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- List view -->
+    <record id="account_tax_repartition_line_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tax.repartition.view.list</field>
+        <field name="model">account.tax.repartition.line</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  delete="0"
+                  edit="0"
+            >
+                <field name="id"
+                       optional="hide"
+                />
+                <field name="document_type"/>
+                <field name="sequence"
+                       optional="hide"
+                />
+                <field name="tax_id"
+                       optional="show"
+                />
+                <field name="repartition_type"/>
+                <field name="factor"
+                       invisible="repartition_type == 'base'"
+                       optional="hide"
+                />
+                <field name="factor_percent"
+                       invisible="repartition_type == 'base'"
+                       optional="show"
+                />
+                <field name="account_id"
+                       invisible="repartition_type == 'base'"
+                       options="{'no_create': True}"
+                />
+                <field name="tag_ids"
+                       domain="tag_ids_domain"
+                       options="{'no_create': True}"
+                       widget="many2many_tags"
+                />
+                <field name="use_in_tax_closing"
+                       invisible="repartition_type == 'base'"
+                       optional="hide"
+                />
+                <field name="company_id"
+                       optional="hide"
+                />
+                <field name="tag_ids_domain"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>

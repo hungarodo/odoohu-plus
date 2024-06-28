@@ -70,8 +70,57 @@
         />
         <field name="sequence">24</field>
     </record>
-    <!-- HU > Reporting > Logs -->
-    <record id="hu_reporting_log_menu"
+    <!-- HU+ > Reporting > Accounting -->
+    <record id="hu_plus_reporting_accounting_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Accounting</field>
+        <field name="parent_id"
+               ref="hu_plus_reporting_menu"
+        />
+        <field name="sequence">40</field>
+    </record>
+    <!-- HU+ > Reporting > Accounting > Customer Invoices -->
+    <record id="hu_plus_reporting_vat_account_move_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Customer Invoices</field>
+        <field name="action"
+               ref="account_move_customer_invoice_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_reporting_accounting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU+ > Reporting > Accounting > Vendor Bills -->
+    <record id="hu_plus_reporting_accounting_vendor_bill_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Vendor Bills</field>
+        <field name="action"
+               ref="account_move_vendor_bill_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_reporting_accounting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU+ > Reporting > Accounting > VAT -->
+    <record id="hu_plus_reporting_accounting_account_move_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">VAT Account Move Lines</field>
+        <field name="action"
+               ref="account_move_line_vat_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_reporting_accounting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU+ > Reporting > Logs -->
+    <record id="hu_plus_reporting_log_menu"
             model="ir.ui.menu"
     >
         <field name="name">Logs</field>
@@ -131,6 +180,133 @@
                ref="hu_plus_configuration_menu"
         />
         <field name="sequence">32</field>
+    </record>
+    <!-- HU+ > Configuration > Unit of measures -->
+    <record id="hu_plus_configuration_uom_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Unit of Measures</field>
+        <field name="action"
+               ref="uom_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_menu"
+        />
+        <field name="sequence">40</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting -->
+    <record id="hu_plus_configuration_accounting_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Accounting</field>
+        <field name="parent_id"
+               ref="hu_plus_configuration_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Account Journals -->
+    <record id="hu_plus_configuration_accounting_account_journal_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Account Journals</field>
+        <field name="action"
+               ref="account_journal_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Fiscal Positions -->
+    <record id="hu_plus_configuration_accounting_fiscal_position_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Fiscal Positions</field>
+        <field name="action"
+               ref="account.action_account_fiscal_position_form"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">24</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Payment Methods -->
+    <record id="hu_plus_configuration_accounting_payment_method_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Payment Methods</field>
+        <field name="action"
+               ref="account_payment_method_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">32</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Payment Terms -->
+    <record id="hu_plus_configuration_accounting_payment_term_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Payment Terms</field>
+        <field name="action"
+               ref="account_payment_term_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">40</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Tags -->
+    <record id="hu_plus_configuration_accounting_tag_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tags</field>
+        <field name="action"
+               ref="account_tag_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">48</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Taxes -->
+    <record id="hu_plus_configuration_accounting_tax_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Taxes</field>
+        <field name="action"
+               ref="account_tax_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">56</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Tax Groups -->
+    <record id="hu_plus_configuration_accounting_tax_group_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tax Groups</field>
+        <field name="action"
+               ref="account_tax_group_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">64</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Tax Repartition Lines  -->
+    <record id="hu_plus_configuration_accounting_tax_repartition_line_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tax Repartition Lines</field>
+        <field name="action"
+               ref="account_tax_repartition_line_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_configuration_accounting_menu"
+        />
+        <field name="sequence">72</field>
     </record>
     <!-- HU+ > Configuration > Technical -->
     <record id="hu_plus_configuration_technical_menu"
