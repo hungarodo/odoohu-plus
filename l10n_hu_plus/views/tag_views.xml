@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="tag_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tag.view.form</field>
+        <field name="model">l10n.hu.plus.tag</field>
+        <field name="priority">16</field>
+        <field name="type">form</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <button name="action_list_objects"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                type="object"
+                        >
+                            <field name="object_count"
+                                   string="Object"
+                                   widget="statinfo"
+                            />
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            bg_color="bg-danger"
+                            invisible="active"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h2>
+                            <field name="name"
+                                   placeholder="Name..."
+                                   required="1"
+                            />
+                        </h2>
+                    </div>
+                    <field name="description"
+                           placeholder="Description..."
+                    />
+                    <group>
+                        <group>
+                            <field name="tag_type"
+                                   required="1"
+                            />
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="priority"/>
+                            <field name="color"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="audit"
+                              invisible="not id"
+                              string="Audit"
+                        >
+                            <group name="audit">
+                                <group>
+                                    <field name="id"/>
+                                    <field name="active"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                    <field name="technical_name"/>
+                                </group>
+                                <group>
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids"
+                           widget="mail_activity"
+                    />
+                    <field name="message_follower_ids"
+                           widget="mail_followers"
+                    />
+                    <field name="message_ids"
+                           widget="mail_thread"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="tag_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tag.view.list</field>
+        <field name="model">l10n.hu.plus.tag</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree>
+                <field name="name"/>
+                <field name="tag_type"/>
+                <field name="code"/>
+                <field name="color"
+                       optional="hide"
+                />
+                <field name="priority"
+                       optional="hide"
+                />
+                <field name="technical_name"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="tag_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tag.view.search</field>
+        <field name="model">l10n.hu.plus.tag</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <!-- Field -->
+                <field name="name"/>
+                <field name="tag_type"/>
+                <field name="description"/>
+                <!-- Filter -->
+                <!-- Filter group by -->
+                <filter name="tag_type_filter_group_by"
+                        context="{'group_by': 'tag_type'}"
+                        string="Tag Type"
+                />
+                <separator/>
+                <filter name="write_date_filter_group_by"
+                        context="{'group_by': 'write_date'}"
+                        string="Write Date"
+                />
+                <filter name="company_filter_group_by"
+                        context="{'group_by': 'company'}"
+                        string="Company"
+                />
+            </search>
+        </field>
+    </record>
+</odoo>

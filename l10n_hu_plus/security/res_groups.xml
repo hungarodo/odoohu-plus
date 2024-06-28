@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- User group -->
+    <record id="user_group"
+            model="res.groups"
+    >
+        <field name="name">User</field>
+        <field name="category_id"
+               ref="l10n_hu_plus_module_category"
+        />
+    </record>
+    <!-- Manager group -->
+    <record id="manager_group"
+            model="res.groups"
+    >
+        <field name="name">Manager</field>
+        <field name="category_id"
+               ref="l10n_hu_plus_module_category"
+        />
+        <field name="implied_ids"
+               eval="[(4, ref('user_group'))]"
+        />
+        <field name="users"
+               eval="[(4, ref('base.user_admin'))]"
+        />
+    </record>
+</odoo>

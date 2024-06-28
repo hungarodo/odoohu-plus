@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view  -->
+    <record id="wizard_line_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.wizard.line.view.list</field>
+        <field name="model">l10n.hu.plus.wizard.line</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree>
+                <field name="wizard"
+                       optional="hide"
+                />
+                <field name="name"
+                       optional="show"
+                />
+            </tree>
+        </field>
+    </record>
+</odoo>

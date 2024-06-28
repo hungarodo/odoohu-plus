@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="object_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.object.view.form</field>
+        <field name="model">l10n.hu.plus.object</field>
+        <field name="priority">16</field>
+        <field name="type">form</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="1"
+                  delete="1"
+                  edit="1"
+            >
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                    </div>
+                    <widget name="web_ribbon"
+                            bg_color="bg-danger"
+                            invisible="active"
+                            title="Archived"
+                    />
+                    <field name="image_1920"
+                           class="oe_avatar"
+                           options="{&quot;preview_image&quot;: &quot;image_128&quot;}"
+                           widget="image"
+                    />
+                    <div class="oe_title">
+                        <h4 name="object_name">
+                            <field name="name"
+                                   placeholder="Name..."
+                            />
+                        </h4>
+                        <div>
+                            <field name="url"
+                                   placeholder="Url..."
+                                   widget="url"
+                            />
+                        </div>
+                        <div>
+                            <field name="tag"
+                                   context="{'default_type': 'object'}"
+                                   options="{'color_field': 'color'}"
+                                   placeholder="Tags..."
+                                   widget="many2many_tags"
+                            />
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="type_tag"
+                                   options="{'no_create': True,}"
+                            />
+                            <field name="category_tag"
+                                   options="{'no_create': True,}"
+                            />
+                            <field name="collection_tag"
+                                   options="{'no_create': True,}"
+                            />
+                        </group>
+                        <group>
+                            <field name="code"/>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                    <notebook name="notebook">
+                        <page name="html_content"
+                              invisible="not html_visible"
+                              string="HTML Content"
+                        >
+                            <field name="html_content"
+                                   readonly="locked"
+                            />
+                        </page>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="details">
+                                <group name="details_1">
+                                    <field name="key"
+                                           readonly="1"
+                                    />
+                                    <field name="external_id"/>
+                                    <field name="priority"
+                                           class="oe_inline"
+                                           groups="base.group_no_one"
+                                    />
+                                    <field name="color"
+                                           class="oe_inline"
+                                           groups="base.group_no_one"
+                                    />
+                                </group>
+                                <group name="details_2">
+                                    <field name="linked_model_name"/>
+                                    <field name="linked_record_id"/>
+                                    <field name="linked_record_name"/>
+                                    <label name="linked_record_actions"
+                                           for="action_view_linked_record"
+                                           string=""
+                                    />
+                                    <div name="linked_record_actions">
+                                        <button name="action_view_linked_record"
+                                                class="btn btn-link"
+                                                icon="fa-folder-open"
+                                                string="View record"
+                                                type="object"
+                                        />
+                                    </div>
+                                </group>
+                            </group>
+                            <group name="api"
+                                   string="API"
+                            >
+                                <group name="api_1">
+                                    <field name="api_enabled"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
+                                <group name="api_2">
+                                    <field name="api_timestamp"/>
+                                </group>
+                                <group name="api_data"
+                                       colspan="2"
+                                >
+                                    <field name="api_data"
+                                           readonly="api_enabled or locked"
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="audit"
+                              invisible="not id"
+                              string="Audit"
+                        >
+                            <group name="audit">
+                                <group name="audit_1">
+                                    <field name="id"/>
+                                    <field name="active"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                    <field name="locked"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="html_visible"
+                                           readonly="locked"
+                                    />
+                                </group>
+                                <group name="audit_2">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   string="Technical"
+                            >
+                                <group name="technical_1">
+                                    <field name="category_technical_name"
+                                           string="Category"
+                                    />
+                                    <field name="collection_technical_name"
+                                           string="Collection"
+                                    />
+                                </group>
+                                <group name="technical_2">
+                                    <field name="status_technical_name"
+                                           string="Status"
+                                    />
+                                    <field name="type_technical_name"
+                                           string="Object Type"
+                                    />
+                                </group>
+                                <group name="technical_3">
+                                    <field name="technical_name"/>
+                                </group>
+                                <group name="technical_4">
+                                    <field name="technical_data_type"
+                                           readonly="1"
+                                           string="Data Type"
+                                    />
+                                </group>
+                                <group name="technical_data"
+                                       colspan="2"
+                                >
+                                    <field name="technical_data"
+                                           readonly="1"
+                                           string="Data"
+                                           style="word-break: break-word;"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids"
+                           widget="mail_activity"
+                    />
+                    <field name="message_follower_ids"
+                           widget="mail_followers"
+                    />
+                    <field name="message_ids"
+                           widget="mail_thread"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+    <!-- Kanban view -->
+    <record id="object_view_kanban"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.object.view.kanban</field>
+        <field name="model">l10n.hu.plus.object</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <kanban class="oe_background_grey o_kanban_dashboard o_emphasize_colors"
+                    create="0"
+                    group_create="false"
+            >
+                <field name="color"/>
+                <field name="display_name"/>
+                <field name="id"/>
+                <field name="name"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div name="object_details"
+                             class="oe_kanban_global_click o_kanban_record_has_image_fill o_res_partner_kanban"
+                        >
+                            <div class="row">
+                                <strong class="o_kanban_record_title oe_partner_heading">
+                                    <field name="display_name"/>
+                                </strong>
+                            </div>
+                            <div class="row" style="display:none;">
+                                <div class="col-6">
+                                    <t t-if="record">
+                                        <t t-set="background_image"
+                                           t-value="kanban_image('l10n.hu.object', 'image_128', record.raw_value)"
+                                        />
+                                        <div class="d-none d-md-block"
+                                        >
+                                            <img class="o_kanban_image_inner_pic"
+                                                 t-if="record and record.raw_value"
+                                                 t-att-alt="record.value"
+                                                 t-att-src="kanban_image('l10n.hu.object', 'image_128', record.raw_value)"
+                                            />
+                                        </div>
+                                        <div class="o_kanban_image d-md-none"
+                                        >
+                                            <img class="o_kanban_image_inner_pic"
+                                                 t-if="record and record.raw_value"
+                                                 t-att-alt="record.value"
+                                                 t-att-src="kanban_image('res.partner', 'avatar_128', record.raw_value)"/>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="o_kanban_image_fill_left o_kanban_image_full"
+                                             t-attf-style="background-image: url(#{kanban_image('l10n.hu.object', 'image_128', record.raw_value)})"
+                                             role="img"
+                                        />
+                                    </t>
+                                </div>
+                                <div class="col-6">
+                                    <div class="col-12 p-0 m-0 d-grid gap-2">
+                                        <field name="code"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_details d-flex flex-column">
+                                <strong class="o_kanban_record_title oe_partner_heading">
+                                    <field name="description"/>
+                                </strong>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="object_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.object.view.list</field>
+        <field name="model">l10n.hu.plus.object</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="1"
+                  delete="1"
+                  edit="1"
+            >
+                <field name="id"
+                       optional="hide"
+                />
+                <field name="reference"
+                       optional="hide"
+                />
+                <field name="name"/>
+                <field name="type_tag"
+                       optional="show"
+                       string="Type"
+                />
+                <field name="code"
+                       optional="hide"
+                       string="Code"
+                />
+                <field name="category_tag"
+                       optional="show"
+                       string="Category"
+                />
+                <field name="tag"
+                       options="{'color_field': 'color'}"
+                       optional="show"
+                       string="Tags"
+                       widget="many2many_tags"
+                />
+                <field name="key"
+                       optional="hide"
+                />
+                <field name="status_tag"
+                       optional="hide"
+                />
+                <field name="linked_model_name"
+                       optional="hide"
+                />
+                <field name="linked_record_id"
+                       optional="hide"
+                />
+                <field name="linked_record_name"
+                       optional="hide"
+                />
+                <field name="technical_name"
+                       optional="hide"
+                />
+                <field name="write_date"
+                       optional="show"
+                />
+                <field name="write_uid"
+                       optional="hide"
+                />
+                <field name="create_date"
+                       optional="hide"
+                />
+                <field name="create_uid"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+                <field name="active"
+                       optional="hide"
+                       widget="boolean_toggle"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="object_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.object.view.search</field>
+        <field name="model">l10n.hu.plus.object</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <!-- Field -->
+                <field name="name"/>
+                <field name="code"/>
+                <field name="type_tag"/>
+                <field name="category_tag"/>
+                <field name="collection_tag"/>
+                <field name="status_tag"/>
+                <field name="tag"/>
+                <field name="key"/>
+                <field name="external_id"/>
+                <field name="description"/>
+                <field name="linked_model_name"/>
+                <field name="technical_name"/>
+                <!-- Filter -->
+                <filter name="object_active_filter"
+                        domain="[('active', '=', True)]"
+                        string="Active"
+                />
+                <filter name="object_inactive_filter"
+                        domain="[('active', '=', False)]"
+                        string="Inactive"
+                />
+                <separator/>
+                <filter name="object_locked_filter"
+                        domain="[('locked', '=', True)]"
+                        string="Locked"
+                />
+                <filter name="object_not_locked_filter"
+                        domain="[('locked', '=', False)]"
+                        string="Not Locked"
+                />
+                <!-- Filter group by -->
+                <filter name="type_tag_filter_group_by"
+                        context="{'group_by': 'type_tag'}"
+                        string="Type"
+                />
+                <separator/>
+                <filter name="category_tag_filter_group_by"
+                        context="{'group_by': 'category_tag'}"
+                        string="Category"
+                />
+                <filter name="collection_tag_filter_group_by"
+                        context="{'group_by': 'collection_tag'}"
+                        string="Collection"
+                />
+                <filter name="tag_filter_group_by"
+                        context="{'group_by': 'tag'}"
+                        string="Tags"
+                />
+                <separator/>
+                <filter name="linked_model_name_filter_group_by"
+                        context="{'group_by': 'linked_model_name'}"
+                        string="Linked Model Name"
+                />
+                <separator/>
+                <filter name="status_tag_filter_group_by"
+                        context="{'group_by': 'status_tag'}"
+                        string="Status"
+                />
+                <filter name="write_date_filter_group_by"
+                        context="{'group_by': 'write_date'}"
+                        string="Write Date"
+                />
+                <filter name="company_filter_group_by"
+                        context="{'group_by': 'company'}"
+                        string="Company"
+                />
+            </search>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="wizard_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.wizard.view.form</field>
+        <field name="model">l10n.hu.plus.wizard</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <group name="main">
+                    <group name="base">
+                        <!-- TECHNICAL -->
+                        <field name="active_model"
+                               force_save="1"
+                               invisible="1"
+                               options="{'no_open': True,}"
+                               readonly="1"
+                        />
+                        <field name="active_model_id"
+                               force_save="1"
+                               invisible="1"
+                        />
+                        <field name="active_model_name"
+                               invisible="1"
+                        />
+                        <field name="company"
+                               force_save="1"
+                               invisible="1"
+                        />
+                        <!-- ACTION TYPES -->
+                        <field name="action_type_visible"
+                               invisible="1"
+                        />
+                        <field name="action_type"
+                               invisible="not action_type_visible"
+                               required="1"
+                        />
+                        <!-- API -->
+                        <field name="api_action_editable"
+                               invisible="1"
+                        />
+                        <field name="api_action"
+                               force_save="1"
+                               invisible="action_type != 'api'"
+                               readonly="not api_action_editable"
+                               required="action_type == 'api'"
+                               string="Action"
+                        />
+                        <field name="api_license_code"
+                               invisible="action_type != 'api'"
+                               readonly="api_action in ['check_registration', 'delete_registration', 'download_objects']"
+                               required="action_type == 'api'"
+                               string="License Code"
+                        />
+                        <field name="api_key"
+                               invisible="action_type != 'api'"
+                               readonly="api_action in ['check_registration', 'delete_registration', 'download_objects']"
+                               required="action_type == 'api'"
+                               string="API Key"
+                        />
+                        <field name="api_url"
+                               invisible="action_type != 'api'"
+                               readonly="api_action in ['download_objects']"
+                               required="action_type == 'api'"
+                               string="API URL"
+                        />
+                        <!-- CURRENCY EXCHANGE -->
+                        <field name="exchange_action_editable"
+                               invisible="1"
+                        />
+                        <field name="exchange_visible"
+                               invisible="1"
+                        />
+                        <field name="exchange_action"
+                               force_save="1"
+                               invisible="action_type != 'currency_exchange'"
+                               readonly="not exchange_action_editable"
+                               required="action_type == 'currency_exchange'"
+                               string="Action"
+                        />
+                        <div name="exchange_currency_from"
+                             invisible="action_type != 'currency_exchange'"
+                        >
+                            <field name="exchange_currency_from"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Currency From"
+                            />
+                        </div>
+                        <div name="exchange_amount_from"
+                             invisible="action_type != 'currency_exchange'"
+                        >
+                            <field name="exchange_amount_from"
+                                   placeholder="Amount From"
+                            />
+                        </div>
+                        <div name="exchange_currency_to"
+                             invisible="action_type != 'currency_exchange'"
+                        >
+                            <field name="exchange_currency_to"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Currency To"
+                            />
+                        </div>
+                        <div name="exchange_amount_to"
+                             invisible="action_type != 'currency_exchange'"
+                        >
+                            <field name="exchange_amount_to"
+                                   placeholder="Amount To"
+                            />
+                        </div>
+                        <field name="exchange_rate"
+                               invisible="action_type != 'currency_exchange'"
+                               class="oe_inline"
+                               string="Exchange Rate"
+                        />
+                        <!-- PARTNER -->
+                        <field name="partner_action_editable"
+                               invisible="1"
+                        />
+                        <field name="partner_action"
+                               force_save="1"
+                               invisible="action_type != 'partner'"
+                               readonly="not partner_action_editable"
+                               required="action_type == 'partner'"
+                               string="Action"
+                        />
+                    </group>
+                    <group name="cards">
+                        <!-- API -->
+                        <div name="api_info"
+                             class="card text-white bg-info"
+                             colspan="2"
+                             invisible="action_type != 'api'"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-1"/>
+                                Information
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"
+                                   invisible="api_action != 'check_registration'"
+                                >
+                                    Check API registration
+                                </p>
+                                <p class="card-text"
+                                   invisible="api_action != 'create_registration'"
+                                >
+                                    Create API registration
+                                </p>
+                                <p class="card-text"
+                                   invisible="api_action != 'delete_registration'"
+                                >
+                                    Delete API registration
+                                </p>
+                                <p class="card-text"
+                                   invisible="api_action != 'download_objects' or api_details in [False, '']"
+                                >
+                                    <field name="api_details"/>
+                                </p>
+                                <p class="card-text"
+                                   invisible="api_action != 'download_objects'"
+                                >
+                                    Download API objects
+                                </p>
+                            </div>
+                        </div>
+                        <!-- PARTNER -->
+                        <div name="partner_info"
+                             class="card text-white bg-info"
+                             colspan="2"
+                             invisible="action_type != 'partner'"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-1"/>
+                                Information
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"
+                                   invisible="partner_action != False"
+                                >
+                                    Manage partners
+                                </p>
+                                <p class="card-text"
+                                   invisible="partner_action != 'list'"
+                                >
+                                    List partners
+                                </p>
+                            </div>
+                        </div>
+                    </group>
+                </group>
+                <notebook>
+                    <page name="partner"
+                          invisible="not partner_visible"
+                          string="Partner"
+                    >
+                        <group>
+                            <field name="partner_visible"
+                                   invisible="1"
+                            />
+                            <field name="partner"
+                                   colspan="2"
+                                   nolabel="1"
+                                   widget="many2many_tags"
+                            />
+                        </group>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_execute"
+                            class="btn-primary"
+                            default_focus="1"
+                            string="Execute"
+                            type="object"
+                    />
+                    <button special="cancel"
+                            class="btn-default"
+                            string="Cancel"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

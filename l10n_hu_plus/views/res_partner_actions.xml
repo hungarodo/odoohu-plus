@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="res_partner_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Partners</field>
+        <field name="context">{'search_default_l10n_hu_vat_status_filter_group_by': 1,}</field>
+        <field name="domain">[]</field>
+        <field name="res_model">res.partner</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="res_partner_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="res_partner_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="base.view_partner_tree"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action kanban view -->
+    <record id="res_partner_action_kanban"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="res_partner_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="base.res_partner_kanban_view"
+        />
+        <field name="view_mode">kanban</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="res_partner_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="res_partner_action"
+        />
+        <field name="sequence">24</field>
+        <field name="view_id"
+               ref="base.view_partner_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+    <!-- Window action activity view -->
+    <record id="res_partner_action_activity"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="res_partner_action"
+        />
+        <field name="sequence">56</field>
+        <field name="view_id"
+               ref="mail.res_partner_view_activity"
+        />
+        <field name="view_mode">activity</field>
+    </record>
+</odoo>

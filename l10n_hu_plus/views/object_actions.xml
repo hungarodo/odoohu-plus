@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Window action -->
+    <record id="object_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">HU+ Objects</field>
+        <field name="context">{'search_default_object_active_filter': 1,}</field>
+        <field name="domain">[('active', 'in', [True, False])]</field>
+        <field name="res_model">l10n.hu.plus.object</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Window action list view -->
+    <record id="object_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="object_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="object_view_list"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="object_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="object_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="object_view_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+    <!-- Dashboard window action -->
+    <record id="object_dashboard_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">Dashboard</field>
+        <field name="context">{'search_default_object_active_filter': 1,}</field>
+        <field name="domain">[('type_technical_name', 'in', ['dashboard', 'news'])]</field>
+        <field name="res_model">l10n.hu.plus.object</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+    <!-- Dashboard window action kanban view -->
+    <record id="object_dashboard_action_kanban"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="object_dashboard_action"
+        />
+        <field name="sequence">8</field>
+        <field name="view_id"
+               ref="object_view_kanban"
+        />
+        <field name="view_mode">kanban</field>
+    </record>
+    <!-- Dashboard window action list view -->
+    <record id="object_dashboard_action_list"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="object_dashboard_action"
+        />
+        <field name="sequence">16</field>
+        <field name="view_id"
+               ref="object_view_list"
+        />
+        <field name="view_mode">tree</field>
+    </record>
+    <!-- Dashboard window action form view -->
+    <record id="object_dashboard_action_form"
+            model="ir.actions.act_window.view"
+    >
+        <field name="act_window_id"
+               ref="object_dashboard_action"
+        />
+        <field name="sequence">24</field>
+        <field name="view_id"
+               ref="object_view_form"
+        />
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

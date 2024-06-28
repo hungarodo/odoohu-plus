@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="log_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.log.view.form</field>
+        <field name="model">l10n.hu.plus.log</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form create="0"
+                  edit="0"
+            >
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                    </div>
+                    <widget name="web_ribbon"
+                            bg_color="bg-danger"
+                            invisble="active"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h4>
+                            <field name="name"
+                                   readonly="1"
+                                   style="word-break: break-word;"
+                            />
+                        </h4>
+                    </div>
+                    <group name="base">
+                        <group name="base_1">
+                            <field name="log_type"
+                                   readonly="1"
+                                   string="Type"
+                            />
+                            <field name="direction"
+                                   readonly="1"
+                            />
+                        </group>
+                        <group name="base_2">
+                            <field name="description"
+                                   readonly="1"
+                                   style="word-break: break-word;"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="details">
+                                <group name="base">
+                                    <field name="id"/>
+                                    <field name="company"
+                                           groups="base.group_multi_company"
+                                           readonly="1"
+                                    />
+                                    <field name="level"
+                                           readonly="1"
+                                    />
+                                    <field name="model"
+                                           readonly="1"
+                                    />
+                                    <field name="app"
+                                           readonly="1"
+                                    />
+                                </group>
+                                <group name="audit">
+                                    <field name="user_id"
+                                           readonly="1"
+                                    />
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   colspan="2"
+                                   string="Technical"
+                            >
+                                <field name="technical_name"
+                                       readonly="1"
+                                       string="Name"
+                                       style="word-break: break-word;"
+                                />
+                                <field name="technical_data"
+                                       readonly="1"
+                                       string="Data"
+                                       style="word-break: break-word;"
+                                />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="log_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.log.view.list</field>
+        <field name="model">l10n.hu.plus.log</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <tree create="0"
+                  edit="0"
+            >
+                <field name="display_name"
+                       optional="show"
+                />
+                <field name="id"
+                       optional="hide"
+                />
+                <field name="log_type"
+                       string="Type"
+                />
+                <field name="name"/>
+                <field name="description"
+                       optional="show"
+                />
+                <field name="level"/>
+                <field name="app"
+                       optional="hide"
+                />
+                <field name="model"
+                       optional="hide"
+                />
+                <field name="user_id"/>
+                <field name="create_date"/>
+                <field name="write_date"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </tree>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="log_view_search"
+            model="ir.ui.view">
+        <field name="name">l10n.hu.plus.log.view.search</field>
+        <field name="model">l10n.hu.plus.log</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <!-- Field -->
+                <field name="name"/>
+                <field name="description"/>
+                <field name="log_type"/>
+                <field name="level"/>
+                <field name="technical_name"/>
+                <field name="status"/>
+                <field name="app"/>
+                <field name="model"/>
+                <!-- Filter -->
+                <filter name="level_info_filter"
+                        domain="[('level', '=', 'info')]"
+                        string="INFO"
+                />
+                <filter name="level_warning_filter"
+                        domain="[('level', '=', 'warning')]"
+                        string="WARNING"
+                />
+                <filter name="level_error_filter"
+                        domain="[('level', '=', 'error')]"
+                        string="ERROR"
+                />
+                <filter name="level_debug_filter"
+                        domain="[('level', '=', 'debug')]"
+                        string="DEBUG"
+                />
+                <separator/>
+                <filter name="created_today_filter"
+                        domain="[
+                            ('create_date', '&gt;', (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('create_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ]"
+                        string="Today"
+                />
+                <!-- Filter group by -->
+                <filter name="log_type_filter_group_by"
+                        context="{'group_by': 'log_type'}"
+                        string="Log Type"
+                />
+                <filter name="level_filter_group_by"
+                        context="{'group_by': 'level'}"
+                        string="Level"
+                />
+                <filter name="direction_filter_group_by"
+                        context="{'group_by': 'direction'}"
+                        string="Direction"
+                />
+                <separator/>
+                <filter name="app_filter_group_by"
+                        context="{'group_by': 'app'}"
+                        string="App"
+                />
+                <filter name="model_filter_group_by"
+                        context="{'group_by': 'model'}"
+                        string="Model"
+                />
+                <separator/>
+                <filter name="user_id_filter_group_by"
+                        context="{'group_by': 'user_id'}"
+                        string="User ID"
+                />
+                <filter name="create_date_filter_group_by"
+                        context="{'group_by': 'create_date'}"
+                        string="Create Date"
+                />
+                <filter name="company_filter_group_by"
+                        context="{'group_by': 'company'}"
+                        groups="base.group_multi_company"
+                        string="Company"
+                />
+            </search>
+        </field>
+    </record>
+</odoo>

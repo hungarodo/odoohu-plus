@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_partner_form_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.view.partner.form.inherit</field>
+        <field name="inherit_id"
+               ref="base.view_partner_form"
+        />
+        <field name="model">res.partner</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Fields -->
+            <xpath expr="//page[@name='internal_notes']"
+                   position="after"
+            >
+                <page name="l10n_hu_plus"
+                      invisible="not l10n_hu_plus_visible"
+                      string="HU+"
+                >
+                    <field name="l10n_hu_plus_visible"
+                           invisible="1"
+                    />
+                    <group name="l10n_hu_plus_hidden"
+                           colspan="2"
+                           invisible="not parent_id"
+                    >
+                        <div name="l10n_hu_plus_hidden"
+                             class="card bg-info mr-4"
+                             colspan="2"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-2"/>
+                                <span class="mr-2">Settings are managed on the parent partner</span>
+                                <button name="open_commercial_entity"
+                                        class="btn btn-sm btn-primary"
+                                        string="Open Parent"
+                                        type="object"
+                                />
+                            </div>
+                        </div>
+                    </group>
+                    <group name="l10n_hu_plus_displayed"
+                           invisible="parent_id"
+                    >
+                        <group name="l10n_hu_plus_1"
+                               string="Identifiers"
+                        >
+                            <field name="l10n_hu_crn"/>
+                            <field name="l10n_hu_vpid"
+                                   string="HU VPID"
+                            />
+                            <field name="l10n_hu_self_employed_number"
+                                   help="Self-Employed Number"
+                                   readonly="not is_company and parent_id"
+                                   string="S.E. Number"
+                            />
+                            <field name="l10n_hu_self_employed_name"
+                                   help="Self-Employed Name"
+                                   readonly="not is_company and parent_id"
+                                   string="S.E. Name"
+                            />
+                        </group>
+                        <group name="l10n_hu_plus_2"
+                               invisible="parent_id"
+                               string="Taxation"
+                        >
+                            <field name="l10n_hu_cash_accounting"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_personal_tax_exempt"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_self_billing"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_small_business"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_vat_reverse_charge"
+                                   widget="boolean_toggle"
+                            />
+                        </group>
+                        <group name="l10n_hu_plus_3"
+                               string="Relations"
+                        >
+                            <field name="l10n_hu_financial_representative"
+                                   options="{'no_quick_create': True,}"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- List view inherit -->
+    <record id="view_partner_tree_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.base.view.partner.tree.inherit</field>
+        <field name="inherit_id"
+               ref="base.view_partner_tree"
+        />
+        <field name="model">res.partner</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Add partner fields -->
+            <xpath expr="//field[@name='vat']"
+                   position="after"
+            >
+                <field name="l10n_hu_vpid"
+                       optional="hide"
+                       string="HU VPID"
+                />
+            </xpath>
+        </field>
+    </record>
+    <!-- Search view inherit -->
+    <record id="view_res_partner_filter_inherit"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.base.view.res.partner.filter.inherit</field>
+        <field name="inherit_id"
+               ref="base.view_res_partner_filter"
+        />
+        <field name="model">res.partner</field>
+        <field name="priority">36</field>
+        <field name="arch"
+               type="xml"
+        >
+            <!-- Field -->
+            <xpath expr="//field[@name='parent_id']"
+                   position="after"
+            >
+                <field name="l10n_hu_vpid"
+                       string="HU VPID"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

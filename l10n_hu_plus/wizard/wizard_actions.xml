@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard action -->
+    <record id="wizard_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">HU+ Wizard</field>
+        <field name="res_model">l10n.hu.plus.wizard</field>
+        <field name="target">new</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+    </record>
+    <!-- Configuration Wizard action -->
+    <record id="configuration_wizard_action"
+            model="ir.actions.act_window"
+    >
+        <field name="name">HU+ Configuration Wizard</field>
+        <field name="context">{
+            'default_action_type': 'configuration',
+            'default_configuration_action': 'onboarding',
+        }</field>
+        <field name="res_model">l10n.hu.plus.wizard</field>
+        <field name="target">new</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+    </record>
+</odoo>
