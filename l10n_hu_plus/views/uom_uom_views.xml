@@ -17,8 +17,14 @@
             <xpath expr="//field[@name='rounding']"
                    position="after"
             >
-                <field name="l10n_hu_type"/>
-            </xpath>
+                <field name="l10n_hu_plus_api_enabled"
+                       string="HU+ API"
+                       widget="boolean_toggle"
+                />
+                <field name="l10n_hu_plus_technical_name"
+                       string="HU+ Technical Name"
+                />
+    </xpath>
         </field>
     </record>
     <!-- List view inherit -->
@@ -38,7 +44,14 @@
             <xpath expr="//field[@name='uom_type']"
                    position="after"
             >
-                <field name="l10n_hu_type"/>
+                <field name="l10n_hu_plus_api_enabled"
+                       string="HU+ API"
+                       optional="hide"
+                />
+                <field name="l10n_hu_plus_technical_name"
+                       optional="hide"
+                       string="HU+ Technical Name"
+                />
             </xpath>
         </field>
     </record>
