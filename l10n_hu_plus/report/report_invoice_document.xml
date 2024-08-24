@@ -27,5 +27,16 @@
                 <span t-if="o.name != '/'" t-field="o.name">INV/2023/0001</span>
             </h2>
         </xpath>
+        <!-- Period summary -->
+        <xpath expr="//div[@name='comment']"
+               position="before"
+        >
+            <div name="l10n_hu_period_summary"
+                 class="text-muted mb-3"
+                 t-if="o.l10n_hu_invoice_delivery_period_start and o.l10n_hu_invoice_delivery_period_end and o.l10n_hu_invoice_delivery_period_summary"
+            >
+                <span t-field="o.l10n_hu_invoice_delivery_period_summary"/>
+            </div>
+        </xpath>
     </template>
 </odoo>

@@ -29,8 +29,8 @@
                             />
                         </group>
                         <group name="l10n_hu_plus_1_2">
-                            <field name="l10n_hu_amount_text_enabled"
-                                   widget="boolean_toggle"
+                            <field name="l10n_hu_delivery_date_default"
+                                   widget="Default Delivery Date"
                             />
                         </group>
                     </group>

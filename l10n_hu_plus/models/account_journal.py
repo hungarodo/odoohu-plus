@@ -17,10 +17,14 @@ class L10nHuPlusAccountJournal(models.Model):
     # Default methods
 
     # Field declarations
-    l10n_hu_amount_text_enabled = fields.Boolean(
+    l10n_hu_delivery_date_default = fields.Selection(
         copy=False,
-        default=False,
-        string="HU Amount Text",
+        default='none',
+        selection=[
+            ('none', "None"),
+            ('today', "Today"),
+        ],
+        string="Delivery Date Default",
     )
     l10n_hu_plus_document_type = fields.Many2many(
         column1='journal',

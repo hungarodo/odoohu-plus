@@ -21,7 +21,9 @@
                       string="HU+"
                 >
                     <group name="l10n_hu_plus">
-                        <group name="l10n_hu_plus_1">
+                        <group name="l10n_hu_plus_1"
+                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
+                        >
                             <!-- Currency -->
                             <field name="l10n_hu_currency_name"
                                    string="Currency Code"
@@ -55,7 +57,9 @@
                                    string="Payment Method"
                             />
                         </group>
-                        <group name="l10n_hu_plus_2">
+                        <group name="l10n_hu_plus_2"
+                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
+                        >
                             <!-- Document type -->
                             <field name="l10n_hu_plus_document_type"
                                    options="{'no_create': True,}"
@@ -75,6 +79,7 @@
                             />
                         </group>
                         <group name="l10n_hu_plus_3"
+                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                string="Partner"
                         >
                             <!-- Partner -->
@@ -90,6 +95,7 @@
 
                         </group>
                         <group name="l10n_hu_plus_4"
+                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                string="Period"
                         >
                             <!-- Period -->
@@ -99,6 +105,21 @@
                             <field name="l10n_hu_invoice_delivery_period_end"
                                    string="Period End"
                             />
+                            <div name="l10n_hu_invoice_delivery_period"
+                                 invisible="l10n_hu_journal_type != 'sale'"
+                                 colspan="2"
+                            >
+                                <field name="l10n_hu_invoice_delivery_period_summary"/>
+                                <br/>
+                                <field name="l10n_hu_invoice_delivery_period_legal"/>
+                                <br/>
+                                <button name="action_l10n_hu_refresh_invoice_delivery_period"
+                                        class="btn-sm btn-link"
+                                        icon="fa-refresh"
+                                        string="Refresh"
+                                        type="object"
+                                />
+                            </div>
                         </group>
                         <group name="l10n_hu_plus_5"
                                string="Journal"
