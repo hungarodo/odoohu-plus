@@ -96,13 +96,12 @@ class L10nHuPlusAccountMove(models.Model):
     )
     # # PERIOD
     l10n_hu_invoice_delivery_period_end = fields.Date(
+        copy=False,
         string="Invoice Delivery Period End",
     )
     l10n_hu_invoice_delivery_period_start = fields.Date(
+        copy=False,
         string="Invoice Delivery Period Start",
-    )
-    l10n_hu_invoice_delivery_period_summary = fields.Text(
-        string="Invoice Delivery Period Summary",
     )
     # # PAYMENT
     l10n_hu_invoice_payment_method = fields.Many2one(
@@ -116,6 +115,16 @@ class L10nHuPlusAccountMove(models.Model):
     )
 
     # Compute and search fields, in the same order of field declarations
+    # # SUPER
+    @api.depends('country_code', 'move_type')
+    def _compute_show_delivery_date(self):
+        # EXTENDS 'account'
+        super()._compute_show_delivery_date()
+        for move in self:
+            if move.country_code == 'HU':
+                move.show_delivery_date = True
+
+    # # HU+
     def _compute_l10n_hu_currency(self):
         for record in self:
             last_rate = self.env['res.currency.rate'].search([
