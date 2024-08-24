@@ -120,6 +120,8 @@ class L10nHuPlusAccountMove(models.Model):
     )
     # # VAT
     l10n_hu_vat_date = fields.Date(
+        copy=False,
+        index=True,
         string="VAT Date",
     )
 
