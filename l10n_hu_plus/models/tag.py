@@ -53,6 +53,7 @@ class L10nHuPlusTag(models.Model):
         index=True,
         required=True,
         string="Name",
+        translate=True,
     )
     object_count = fields.Integer(
         compute='_compute_object_count',

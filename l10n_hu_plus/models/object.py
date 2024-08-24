@@ -126,6 +126,7 @@ class L10nHuBaseObject(models.Model):
         copy=False,
         index=True,
         string="Name",
+        translate=True,
     )
     priority = fields.Integer(
         copy=False,

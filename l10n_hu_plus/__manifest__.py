@@ -13,6 +13,7 @@
         'security/res_groups.xml',
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
+        'report/report_invoice_document.xml',
         'views/account_fiscal_position_views.xml',
         'views/account_journal_views.xml',
         'views/account_journal_actions.xml',
@@ -65,6 +66,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.0.27",
+    'version': "1.0.29",
     'website': "https://hungarodo.hu/odoohu",
 }

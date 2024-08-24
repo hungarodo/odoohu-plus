@@ -4,7 +4,7 @@
     <record id="view_account_position_form_inherit"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.account.view.account.position.form.inherit</field>
+        <field name="name">l10n.hu.plus.view.account.position.form.inherit</field>
         <field name="inherit_id"
                ref="account.view_account_position_form"
         />

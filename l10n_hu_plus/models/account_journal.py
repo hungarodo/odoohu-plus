@@ -10,7 +10,7 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 
 # Class
-class L10nHuAccountJournal(models.Model):
+class L10nHuPlusAccountJournal(models.Model):
     # Private attributes
     _inherit = 'account.journal'
 

@@ -4,7 +4,7 @@
     <record id="view_move_form_inherit"
             model="ir.ui.view"
     >
-        <field name="name">l10n.hu.account.view.move.form.inherit</field>
+        <field name="name">l10n.hu.plus.view.move.form.inherit</field>
         <field name="inherit_id"
                ref="account.view_move_form"
         />
@@ -13,7 +13,7 @@
         <field name="arch"
                type="xml"
         >
-            <!-- HU fields -->
+            <!-- HU+ fields -->
             <xpath expr="//page[@name='aml_tab']"
                    position="after"
             >
@@ -100,7 +100,7 @@
                                    string="Period End"
                             />
                         </group>
-                        <group name="l10n_hu_plus_6"
+                        <group name="l10n_hu_plus_5"
                                string="Journal"
                         >
                             <field name="l10n_hu_journal_type"/>

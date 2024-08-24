@@ -21,6 +21,19 @@
         />
         <field name="sequence">8</field>
     </record>
+    <!-- HU > Objects -->
+    <record id="hu_object_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Objects</field>
+        <field name="action"
+               ref="object_action"
+        />
+        <field name="parent_id"
+               ref="hu_plus_menu"
+        />
+        <field name="sequence">88</field>
+    </record>
     <!-- HU+ > Reporting -->
     <record id="hu_plus_reporting_menu"
             model="ir.ui.menu"
@@ -56,19 +69,6 @@
                ref="hu_plus_reporting_menu"
         />
         <field name="sequence">16</field>
-    </record>
-    <!-- HU > Reporting > Objects -->
-    <record id="hu_reporting_object_menu"
-            model="ir.ui.menu"
-    >
-        <field name="name">Objects</field>
-        <field name="action"
-               ref="object_action"
-        />
-        <field name="parent_id"
-               ref="hu_plus_reporting_menu"
-        />
-        <field name="sequence">24</field>
     </record>
     <!-- HU+ > Reporting > Accounting -->
     <record id="hu_plus_reporting_accounting_menu"
