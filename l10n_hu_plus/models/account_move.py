@@ -5,7 +5,6 @@
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 # 3 : imports from odoo modules
-from odoo.tools.safe_eval import safe_eval
 
 # 4 : variable declarations
 

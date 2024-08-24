@@ -47,18 +47,11 @@
                            invisible="parent_id"
                     >
                         <group name="l10n_hu_plus_1">
-                            <label name="l10n_hu_plus_actions"
-                                   for="action_l10n_hu_plus_set_vat_status"
-                                   string="Actions"
+                            <field name="l10n_hu_trade_position"
+                                   groups="account.group_account_invoice"
+                                   invisible="not property_account_position_id"
+                                   string="Trade Position"
                             />
-                            <div name="l10n_hu_plus_actions">
-                                <button name="action_l10n_hu_plus_set_vat_status"
-                                        class="btn btn-link"
-                                        icon="fa-refresh"
-                                        string="Refresh VAT status"
-                                        type="object"
-                                />
-                            </div>
                             <field name="l10n_hu_vat_status"
                                    string="VAT Status"
                             />
@@ -91,11 +84,18 @@
                             />
                         </group>
                         <group name="l10n_hu_plus_2">
-                            <field name="l10n_hu_trade_position"
-                                   groups="account.group_account_invoice"
-                                   invisible="not property_account_position_id"
-                                   string="Trade Position"
+                            <label name="l10n_hu_plus_actions"
+                                   for="action_l10n_hu_plus_set_vat_status"
+                                   string="Actions"
                             />
+                            <div name="l10n_hu_plus_actions">
+                                <button name="action_l10n_hu_plus_set_vat_status"
+                                        class="btn btn-link"
+                                        icon="fa-refresh"
+                                        string="Refresh VAT status"
+                                        type="object"
+                                />
+                            </div>
                             <field name="l10n_hu_cash_accounting"
                                    invisible="l10n_hu_vat_status != 'domestic'"
                                    widget="boolean_toggle"
