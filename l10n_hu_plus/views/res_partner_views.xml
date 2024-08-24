@@ -46,66 +46,75 @@
                     <group name="l10n_hu_plus_displayed"
                            invisible="parent_id"
                     >
-                        <group name="l10n_hu_plus_1"
-                               string="Identifiers"
-                        >
-                            <field name="l10n_hu_crn"/>
+                        <group name="l10n_hu_plus_1">
+                            <label name="l10n_hu_plus_actions"
+                                   for="action_l10n_hu_plus_set_vat_status"
+                                   string="Actions"
+                            />
+                            <div name="l10n_hu_plus_actions">
+                                <button name="action_l10n_hu_plus_set_vat_status"
+                                        class="btn btn-link"
+                                        icon="fa-refresh"
+                                        string="Refresh VAT status"
+                                        type="object"
+                                />
+                            </div>
+                            <field name="l10n_hu_vat_status"
+                                   string="VAT Status"
+                            />
+                            <field name="l10n_hu_incorporation"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="Taxpayer Type"
+                            />
+                            <field name="l10n_hu_crn"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                            />
                             <field name="l10n_hu_vpid"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
                                    string="HU VPID"
+                            />
+                            <field name="l10n_hu_financial_representative"
+                                   invisible="l10n_hu_incorporation != 'self_employed'"
+                                   options="{'no_quick_create': True,}"
                             />
                             <field name="l10n_hu_self_employed_number"
                                    help="Self-Employed Number"
+                                   invisible="l10n_hu_incorporation != 'self_employed'"
                                    readonly="not is_company and parent_id"
                                    string="S.E. Number"
                             />
                             <field name="l10n_hu_self_employed_name"
                                    help="Self-Employed Name"
+                                   invisible="l10n_hu_incorporation != 'self_employed'"
                                    readonly="not is_company and parent_id"
                                    string="S.E. Name"
                             />
                         </group>
-                        <group name="l10n_hu_plus_2"
-                               invisible="parent_id"
-                               string="Taxation"
-                        >
-                            <field name="l10n_hu_cash_accounting"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_personal_tax_exempt"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_self_billing"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_small_business"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_vat_reverse_charge"
-                                   widget="boolean_toggle"
-                            />
-                        </group>
-                        <group name="l10n_hu_plus_3"
-                               string="Relations"
-                        >
-                            <field name="l10n_hu_financial_representative"
-                                   options="{'no_quick_create': True,}"
-                            />
-                        </group>
-                        <group name="l10n_hu_plus_4">
-                            <field name="l10n_hu_vat_status"
-                                   groups="account.group_account_invoice"
-                                   invisible="not property_account_position_id"
-                                   string="VAT Status"
-                            />
-                            <field name="l10n_hu_incorporation"
-                                   groups="account.group_account_invoice"
-                                   invisible="not property_account_position_id"
-                                   string="Taxpayer Type"
-                            />
+                        <group name="l10n_hu_plus_2">
                             <field name="l10n_hu_trade_position"
                                    groups="account.group_account_invoice"
                                    invisible="not property_account_position_id"
                                    string="Trade Position"
+                            />
+                            <field name="l10n_hu_cash_accounting"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_personal_tax_exempt"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_self_billing"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_small_business"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_vat_reverse_charge"
+                                   invisible="l10n_hu_vat_status != 'domestic'"
+                                   widget="boolean_toggle"
                             />
                         </group>
                     </group>

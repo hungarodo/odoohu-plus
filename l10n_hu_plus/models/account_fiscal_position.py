@@ -18,6 +18,7 @@ class L10nHuPlusFiscalPosition(models.Model):
 
     # Field declarations
     l10n_hu_incorporation = fields.Selection(
+        copy=False,
         index=True,
         selection=[
             ('organization', "Organization"),
@@ -35,6 +36,7 @@ class L10nHuPlusFiscalPosition(models.Model):
         string="HU+ Technical Name",
     )
     l10n_hu_trade_position = fields.Selection(
+        copy=False,
         index=True,
         selection=[
             ('domestic', "Domestic"),
@@ -44,6 +46,7 @@ class L10nHuPlusFiscalPosition(models.Model):
         string="HU Trade Position",
     )
     l10n_hu_vat_status = fields.Selection(
+        copy=False,
         index=True,
         selection=[
             ('domestic', "Domestic"),
