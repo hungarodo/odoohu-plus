@@ -291,7 +291,7 @@ class L10nHuBaseResCompany(models.Model):
             debug_list.append("request_method skipped due to previous errors")
 
         # name
-        name = "l10n_hu_api_registration" + " " + str(request_type)
+        name = "l10n_hu_plus_api_registration" + " " + str(request_type)
 
         # Create l10n_hu_log
         # # NOTE: we want to log everything, even failed attempts
@@ -302,7 +302,7 @@ class L10nHuBaseResCompany(models.Model):
             'log_type': request_type,
             'name': name,
             'technical_data': json.dumps({'request_data': request_data}, default=str),
-            'technical_name': 'l10n_hu_base.l10n_hu_api_registration',
+            'technical_name': 'l10n_hu_plus.l10n_hu_plus_api_registration',
         }
         l10n_hu_log = self.env['l10n.hu.log'].create(l10n_hu_log_values)
 
@@ -335,11 +335,11 @@ class L10nHuBaseResCompany(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_api_registration_request END" + str(result))
+        # raise exceptions.UserError("l10n_hu_plus_api_registration_request END" + str(result))
         return result
 
     @api.model
-    def l10n_hu_api_registration_response(self, values):
+    def l10n_hu_plus_api_registration_response(self, values):
         """ Process response for registration request
 
         NOTE:
@@ -347,7 +347,7 @@ class L10nHuBaseResCompany(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_api_registration_response BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_plus_api_registration_response BEGIN" + str(values))
 
         # Initialize variables
         company_values = {}
@@ -417,15 +417,15 @@ class L10nHuBaseResCompany(models.Model):
                 api_data = log.company.l10n_hu_get_api_data()
                 api_data.update(registration_data)
                 if registration_data.get('api_key'):
-                    l10n_hu_api_registered = True
+                    l10n_hu_plus_api_registered = True
                 else:
-                    l10n_hu_api_registered = False
+                    l10n_hu_plus_api_registered = False
                 company_values.update({
-                    'l10n_hu_api_data': json.dumps(api_data, default=str),
-                    'l10n_hu_api_license_valid': registration_data.get('license_valid', False),
-                    'l10n_hu_api_registered': l10n_hu_api_registered,
+                    'l10n_hu_plus_api_data': json.dumps(api_data, default=str),
+                    'l10n_hu_plus_api_license_valid': registration_data.get('license_valid', False),
+                    'l10n_hu_plus_api_registered': l10n_hu_plus_api_registered,
                 })
-                debug_list.append("l10n_hu_api_data set to registration_data")
+                debug_list.append("l10n_hu_plus_api_data set to registration_data")
             elif request_type == 'delete_registration':
                 current_api_data = log.company.l10n_hu_get_api_data()
                 api_data = {
@@ -434,11 +434,11 @@ class L10nHuBaseResCompany(models.Model):
                     'license_code': 'free',
                 }
                 company_values.update({
-                    'l10n_hu_api_data': json.dumps(api_data, default=str),
-                    'l10n_hu_api_license_valid': False,
-                    'l10n_hu_api_registered': False,
+                    'l10n_hu_plus_api_data': json.dumps(api_data, default=str),
+                    'l10n_hu_plus_api_license_valid': False,
+                    'l10n_hu_plus_api_registered': False,
                 })
-                debug_list.append("l10n_hu_api_data set to empty dict")
+                debug_list.append("l10n_hu_plus_api_data set to empty dict")
             else:
                 error_list.append("invalid request_type for company_values")
         else:
@@ -466,16 +466,16 @@ class L10nHuBaseResCompany(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_api_registration_response END" + str(result))
+        # raise exceptions.UserError("l10n_hu_plus_api_registration_response END" + str(result))
         return result
 
     @api.model
-    def l10n_hu_get_api_data(self):
+    def l10n_hu_plus_get_api_data(self):
         """ Get API data
         @:return: dictionary
         """
         try:
-            result = json.loads(self.l10n_hu_api_data)
+            result = json.loads(self.l10n_hu_plus_api_data)
         except:
             result = {}
 
@@ -483,11 +483,11 @@ class L10nHuBaseResCompany(models.Model):
         return result
 
     @api.model
-    def l10n_hu_get_api_environment(self):
+    def l10n_hu_plus_get_api_environment(self):
         """ Get API environment
         @:return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_api_environment BEGIN")
+        # raise exceptions.UserError("l10n_hu_plus_get_api_environment BEGIN")
 
         # Initialize variables
         api_environment = {}
@@ -517,8 +517,8 @@ class L10nHuBaseResCompany(models.Model):
             error_list.append('could not set company')
 
         # api_enabled
-        if company and company.l10n_hu_api_enabled is not None:
-            api_enabled = company.l10n_hu_api_enabled
+        if company and company.l10n_hu_plus_api_enabled is not None:
+            api_enabled = company.l10n_hu_plus_api_enabled
         else:
             api_enabled = False
             error_list.append("could not set api_enabled")
@@ -526,7 +526,7 @@ class L10nHuBaseResCompany(models.Model):
         # # app_version
         try:
             app_module = ir_module_module_class.search([
-                ('name', '=', 'l10n_hu_base'),
+                ('name', '=', 'l10n_hu_plus'),
                 ('state', '=', 'installed'),
             ])
             if app_module:
@@ -588,5 +588,5 @@ class L10nHuBaseResCompany(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_get_api_environment END")
+        # raise exceptions.UserError("l10n_hu_plus_get_api_environment END")
         return result

@@ -12,7 +12,7 @@
         >
             <form>
                 <group name="main">
-                    <group name="base">
+                    <group name="fields">
                         <!-- TECHNICAL -->
                         <field name="active_model"
                                force_save="1"
@@ -176,6 +176,22 @@
                                    invisible="api_action != 'download_objects'"
                                 >
                                     Download API objects
+                                </p>
+                            </div>
+                        </div>
+                        <!-- CURRENCY EXCHANGE -->
+                        <div name="currency_exchange_info"
+                             class="card text-white bg-info"
+                             colspan="2"
+                             invisible="action_type != 'currency_exchange'"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-1"/>
+                                Information
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    Currency exchange rate calculator
                                 </p>
                             </div>
                         </div>

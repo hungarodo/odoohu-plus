@@ -20,9 +20,12 @@ class L10nHuPlusWizard(models.TransientModel):
     # Default methods
     @api.model
     def _get_default_account_move(self):
-        account_move_ids = []
         if self._context.get('active_model') and self._context['active_model'] == 'account.move':
             account_move_ids = self._context.get('active_ids', [])
+        elif self._context.get('wizard_account_move_ids'):
+            account_move_ids = self._context.get('wizard_account_move_ids', [])
+        else:
+            account_move_ids = []
         return [(4, x, 0) for x in account_move_ids]
 
     @api.model
@@ -39,9 +42,12 @@ class L10nHuPlusWizard(models.TransientModel):
 
     @api.model
     def _get_default_partner(self):
-        partner_ids = []
         if self._context.get('active_model') and self._context['active_model'] == 'res.partner':
             partner_ids = self._context.get('active_ids', [])
+        elif self._context.get('wizard_account_move_ids'):
+            partner_ids = self._context.get('wizard_partner_ids', [])
+        else:
+            partner_ids = []
         return [(4, x, 0) for x in partner_ids]
 
     # Field declarations
@@ -259,8 +265,8 @@ class L10nHuPlusWizard(models.TransientModel):
     @api.onchange('exchange_amount_from', 'exchange_amount_to')
     def onchange_currency_exchange(self):
         if self.exchange_action == 'custom_currency':
-            if self.exchange_amount_to != 0:
-                self.exchange_rate = self.exchange_amount_from / self.exchange_amount_to
+            if self.exchange_amount_from != 0 and self.exchange_amount_to != 0:
+                self.exchange_rate = self.exchange_amount_to / self.exchange_amount_from
 
     # CRUD methods (and display_name, name_search, ...) overrides
 
@@ -373,6 +379,21 @@ class L10nHuPlusWizard(models.TransientModel):
                 return result
             else:
                 raise exceptions.UserError("api action error!")
+        # # CURRENCY EXCHANGE
+        elif self.action_type == 'currency_exchange' and self.account_move:
+            # Write
+            for account_move in self.account_move:
+                account_move.write({
+                    'l10n_hu_document_rate': self.exchange_rate
+                })
+
+            # Assemble result
+            result = {
+                'type': 'ir.actions.act_window_close'
+            }
+
+            # Return result
+            return result
         # # PARTNER
         elif self.action_type == 'partner':
             # # # list

@@ -170,14 +170,27 @@ class L10nHuPlusAccountMove(models.Model):
         # Make sure there is one record in self
         self.ensure_one()
 
+        # Prepare variables
+        exchange_amount_from = self.amount_total
+        if self.l10n_hu_document_rate != 0.0:
+            exchange_rate = self.l10n_hu_document_rate
+        else:
+            exchange_rate = self.l10n_hu_currency_rate
+        if exchange_rate != 0.0:
+            exchange_amount_to = exchange_amount_from * exchange_rate
+        else:
+            exchange_amount_to = 0.0
+
         # Assemble context
         context = {
             'default_action_type': 'currency_exchange',
             'default_action_type_visible': False,
-            'default_account_move': [self.id],
             'default_exchange_action': 'custom_currency',
-            'default_exchange_currency_from': self.company_id.currency_id.id,
-            'default_exchange_currency_to': self.currency_id.id,
+            'default_exchange_amount_from': exchange_amount_from,
+            'default_exchange_amount_to': exchange_amount_to,
+            'default_exchange_currency_from': self.currency_id.id,
+            'default_exchange_currency_to': self.company_id.currency_id.id,
+            'default_exchange_rate': exchange_rate,
         }
 
         # Assemble result
