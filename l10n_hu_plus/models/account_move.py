@@ -19,6 +19,17 @@ class L10nHuPlusAccountMove(models.Model):
     # Default methods
     
     # Field declarations
+    # # CASH ACCOUNTING
+    l10n_hu_cash_accounting = fields.Boolean(
+        compute='_compute_l10n_hu_cash_accounting',
+        copy=False,
+        default=False,
+        index=True,
+        readonly=False,
+        store=True,
+        string="Cash Accounting",
+        tracking=True,
+    )
     # # CURRENCY
     l10n_hu_currency_date = fields.Date(
         compute='_compute_l10n_hu_currency',
@@ -47,10 +58,6 @@ class L10nHuPlusAccountMove(models.Model):
         index=True,
         string="Document Type",
     )
-    l10n_hu_plus_document_type_code = fields.Char(
-        related='l10n_hu_plus_document_type.code',
-        string="Document Type Code",
-    )
     # # JOURNAL
     l10n_hu_journal_type = fields.Selection(
         related='journal_id.type',
@@ -59,9 +66,13 @@ class L10nHuPlusAccountMove(models.Model):
     # # ORIGINAL
     l10n_hu_original_account_move = fields.Many2one(
         comodel_name='account.move',
+        compute='_compute_l10n_hu_original_account_move',
         copy=False,
-        readonly=True,
+        index=True,
+        readonly=False,
+        store=True,
         string="Original Account Move",
+        tracking=True,
     )
     l10n_hu_original_invoice_number = fields.Char(
         copy=False,
@@ -136,6 +147,47 @@ class L10nHuPlusAccountMove(models.Model):
                 move.show_delivery_date = True
 
     # # HU+
+    @api.depends('partner_id')
+    def _compute_l10n_hu_cash_accounting(self):
+        for record in self:
+            if record.is_invoice(True) and record.state == 'draft':
+                if record.move_type in ['in_invoice', 'in_refund'] and record.partner_id:
+                    cash_accounting = record.partner_id.l10n_hu_cash_accounting
+                elif record.move_type in ['out_invoice', 'out_refund']:
+                    cash_accounting = record.company_id.partner_id.l10n_hu_cash_accounting
+                else:
+                    cash_accounting = False
+            else:
+                cash_accounting = record.l10n_hu_cash_accounting
+            record.l10n_hu_cash_accounting = cash_accounting
+
+    @api.depends('l10n_hu_original_invoice_number')
+    def _compute_l10n_hu_original_account_move(self):
+        for record in self:
+            original_invoice = None
+            if record.is_invoice(True) and record.l10n_hu_original_invoice_number:
+                if record.move_type in ['in_invoice', 'in_refund']:
+                    original_invoice = self.env['account_move'].search([
+                        ('company_id', '=', record.company_id.id),
+                        ('move_type', 'in', ['in_invoice', 'in_refund']),
+                        ('ref', 'ilike', record.l10n_hu_original_invoice_number)
+                    ], limit=1)
+                elif record.move_type in ['out_invoice', 'out_refund']:
+                    original_invoice = self.env['account_move'].search([
+                        ('company_id', '=', record.company_id.id),
+                        ('move_type', 'in', ['out_invoice', 'out_refund']),
+                        ('name', 'ilike', record.l10n_hu_original_invoice_number)
+                    ], limit=1)
+                else:
+                    pass
+            else:
+                pass
+            if original_invoice:
+                original_account_move_id = original_invoice.id
+            else:
+                original_account_move_id = None
+            record.l10n_hu_original_account_move = original_account_move_id
+
     def _compute_l10n_hu_currency(self):
         for record in self:
             last_rate = self.env['res.currency.rate'].search([
@@ -149,6 +201,7 @@ class L10nHuPlusAccountMove(models.Model):
             else:
                 record.l10n_hu_currency_date = record.date
                 record.l10n_hu_currency_rate = 1.0
+                record.l10n_hu_document_rate = 1.0
 
     def _compute_l10n_hu_invoice_delivery_period_text(self):
         for record in self:
@@ -170,23 +223,6 @@ class L10nHuPlusAccountMove(models.Model):
         for record in self:
             difference = record.l10n_hu_currency_rate - record.l10n_hu_document_rate
             record.l10n_hu_rate_difference = difference
-
-    @api.depends('partner_id')
-    def _compute_l10n_hu_vat_position(self):
-        for record in self:
-            if record.state == 'draft' and record.partner_id:
-                vat_position_result = record.l10n_hu_get_vat_position({})
-                if vat_position_result.get('error_list', []) == 0:
-                    vat_position = vat_position_result.get('vat_position')
-                else:
-                    vat_position = False
-            elif record.state != 'draft' and record.partner_id:
-                vat_position = record.l10n_hu_vat_position
-            else:
-                vat_position = False
-
-            # Set value
-            record.l10n_hu_vat_position = vat_position
 
     # Constraints and onchanges
     @api.onchange('l10n_hu_invoice_delivery_period_end', 'l10n_hu_invoice_delivery_period_start')
@@ -227,6 +263,47 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Return
         return
+
+    def action_l10n_hu_view_original_invoice(self):
+        """ View original invoice """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Initialize variables
+        original_invoice = None
+
+        # Search
+        if self.l10n_hu_original_account_move:
+            original_invoice = self.l10n_hu_original_account_move
+        elif self.l10n_hu_original_invoice_number and not self.l10n_hu_original_account_move:
+            if self.move_type in ['in_invoice', 'in_refund']:
+                original_invoice = self.env['account_move'].search([
+                    ('company_id', '=', self.company_id.id),
+                    ('move_type', 'in', ['in_invoice', 'in_refund']),
+                    ('ref', 'ilike', self.l10n_hu_original_invoice_number)
+                ], limit=1)
+            elif self.move_type in ['out_invoice', 'out_refund']:
+                original_invoice = self.env['account_move'].search([
+                    ('company_id', '=', self.company_id.id),
+                    ('move_type', 'in', ['out_invoice', 'out_refund']),
+                    ('name', 'ilike', self.l10n_hu_original_invoice_number)
+                ], limit=1)
+            else:
+                pass
+
+        # Return
+        if original_invoice:
+            result = {
+                'name': _("HU+ Wizard"),
+                'res_id': original_invoice.id,
+                'res_model': 'account.move',
+                'target': 'current',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form,tree',
+            }
+            return result
+        else:
+            return
 
     def action_l10n_hu_wizard_currency_exchange(self):
         """ Open the L10n HU wizard to calculate the document rate """

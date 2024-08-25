@@ -40,7 +40,7 @@
                         />
                         <field name="l10n_hu_plus_technical_name"
                                invisible="not l10n_hu_plus_api_enabled"
-                               string="Technical_name"
+                               string="Technical Name"
                         />
                     </group>
                 </group>

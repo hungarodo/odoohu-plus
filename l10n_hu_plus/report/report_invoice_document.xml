@@ -27,6 +27,17 @@
                 <span t-if="o.name != '/'" t-field="o.name">INV/2023/0001</span>
             </h2>
         </xpath>
+        <!-- Cash accounting -->
+        <xpath expr="//div[@name='comment']"
+               position="before"
+        >
+            <div name="l10n_hu_period_summary"
+                 class="text-muted mb-3"
+                 t-if="o.l10n_hu_cash_accounting"
+            >
+                The issuer of the invoice applies cash accounting.
+            </div>
+        </xpath>
         <!-- Period summary -->
         <xpath expr="//div[@name='comment']"
                position="before"

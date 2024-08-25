@@ -19,18 +19,23 @@ class L10nHuPlusResPartner(models.Model):
 
     # Field declarations
     l10n_hu_cash_accounting = fields.Boolean(
+        copy=False,
         default=False,
         string="Cash Accounting",
+        tracking=True,
     )
     l10n_hu_crn = fields.Char(
+        copy=False,
         help="Hungarian Company Registration Number",
         string="HU CRN",
     )
     l10n_hu_financial_representative = fields.Many2one(
         comodel_name='res.partner',
+        copy=False,
         string="Financial Representative",
     )
     l10n_hu_personal_tax_exempt = fields.Boolean(
+        copy=False,
         default=False,
         string="Personal Tax Exempt",
     )
@@ -39,25 +44,31 @@ class L10nHuPlusResPartner(models.Model):
         string="HU+ Visible",
     )
     l10n_hu_self_billing = fields.Boolean(
+        copy=False,
         default=False,
         string="Self Billing",
     )
     l10n_hu_self_employed_name = fields.Char(
+        copy=False,
         string="Self-Employed Name",
     )
     l10n_hu_self_employed_number = fields.Char(
+        copy=False,
         size=10,
         string="Self-Employed Number",
     )
     l10n_hu_small_business = fields.Boolean(
+        copy=False,
         default=False,
         string="Small Business",
     )
     l10n_hu_vat_reverse_charge = fields.Boolean(
+        copy=False,
         default=False,
         string="VAT Reverse Charge",
     )
     l10n_hu_vpid = fields.Char(
+        copy=False,
         string="VPID",
     )
     # # FISCAL POSITION
