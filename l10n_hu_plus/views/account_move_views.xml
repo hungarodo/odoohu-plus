@@ -24,15 +24,77 @@
                         <group name="l10n_hu_plus_1"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                         >
-                            <!-- Payment -->
-                            <field name="l10n_hu_invoice_payment_method"
-                                   readonly="state != 'draft'"
-                                   string="Payment Method"
-                            />
                             <!-- Document type -->
-                            <field name="l10n_hu_plus_document_type"
+                            <field name="l10n_hu_document_type"
                                    options="{'no_create': True,}"
-                                   readonly="state != 'draft'"
+                                   readonly="state != 'draft' and not to_check"
+                            />
+                            <!-- Original invoice -->
+                            <label name="l10n_hu_original_invoice"
+                                   for="l10n_hu_original_invoice_number"
+                                   string="Original Invoice Number"
+                            />
+                            <div name="l10n_hu_original_invoice">
+                                <field name="l10n_hu_original_invoice_number"
+                                       class="oe_inline"
+                                       readonly="state != 'draft' and not to_check"
+                                />
+                                <button name="action_l10n_hu_view_original_invoice"
+                                        class="oe_inline btn-sm btn-link"
+                                        icon="fa-folder-open"
+                                        invisible="not l10n_hu_original_invoice_number"
+                                        string="View"
+                                        type="object"
+                                />
+                            </div>
+                            <field name="l10n_hu_original_account_move"
+                                   invisible="1"
+                            />
+                            <!-- Delivery period -->
+                            <label name="l10n_hu_delivery_period"
+                                   for="l10n_hu_delivery_period_start"
+                                   string="Delivery Period"
+                            />
+                            <div name="l10n_hu_delivery_period">
+                                <field name="l10n_hu_delivery_period_start"
+                                       class="oe_inline o_input_10ch"
+                                       placeholder="Period Start"
+                                       readonly="state != 'draft' and not to_check"
+                                />
+                                <span class="ps-2 pe-2">-</span>
+                                <field name="l10n_hu_delivery_period_end"
+                                       class="oe_inline o_input_10ch"
+                                       placeholder="Period End"
+                                       readonly="state != 'draft' and not to_check"
+                                />
+                                <field name="l10n_hu_delivery_period_summary"
+                                       invisible="l10n_hu_journal_type != 'sale'"
+                                />
+                                <field name="l10n_hu_delivery_period_legal"
+                                       invisible="l10n_hu_journal_type != 'sale'"
+                                />
+                                <button name="action_l10n_hu_refresh_delivery_period"
+                                        class="oe_inline btn-sm btn-link"
+                                        icon="fa-refresh"
+                                        invisible="state != 'draft' or l10n_hu_journal_type != 'sale'"
+                                        string="Refresh"
+                                        type="object"
+                                />
+                            </div>
+                        </group>
+                        <group name="l10n_hu_plus_2"
+                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
+                        >
+                            <!-- VAT -->
+                            <field name="l10n_hu_vat_date"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="VAT Date"
+                            />
+                            <!-- Cash accounting -->
+                            <field name="l10n_hu_cash_accounting"
+                                   force_save="1"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Cash Accounting"
                             />
                             <!-- Currency -->
                             <label name="l10n_hu_document_rate"
@@ -45,6 +107,7 @@
                             >
                                 <field name="l10n_hu_document_rate"
                                        class="oe_inline"
+                                       readonly="state != 'draft' and not to_check"
                                 />
                                 <button name="action_l10n_hu_wizard_currency_exchange"
                                         class="oe_inline btn-sm btn-link"
@@ -76,86 +139,24 @@
                                    string="Rate Difference"
                             />
                         </group>
-                        <group name="l10n_hu_plus_2"
-                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
-                        >
-                            <!-- VAT -->
-                            <field name="l10n_hu_vat_date"
-                                   string="VAT Date"
-                            />
-                            <!-- Cash accounting -->
-                            <field name="l10n_hu_cash_accounting"
-                                   force_save="1"
-                                   readonly="move_type in ['out_invoice', 'out_refund']"
-                                   string="Cash Accounting"
-                            />
-                            <!-- Period -->
-                            <label name="l10n_hu_invoice_delivery_period"
-                                   for="l10n_hu_invoice_delivery_period_start"
-                                   string="Delivery Period"
-                            />
-                            <div name="l10n_hu_invoice_delivery_period">
-                                <field name="l10n_hu_invoice_delivery_period_start"
-                                       class="oe_inline"
-                                       placeholder="Period Start"
-                                       readonly="state != 'draft'"
-                                />
-                                <span class="ps-2 pe-2">-</span>
-                                <field name="l10n_hu_invoice_delivery_period_end"
-                                       class="oe_inline"
-                                       placeholder="Period End"
-                                       readonly="state != 'draft'"
-                                />
-                                <field name="l10n_hu_invoice_delivery_period_summary"
-                                       invisible="l10n_hu_journal_type != 'sale'"
-                                />
-                                <field name="l10n_hu_invoice_delivery_period_legal"
-                                       invisible="l10n_hu_journal_type != 'sale'"
-                                />
-                                <button name="action_l10n_hu_refresh_invoice_delivery_period"
-                                        class="oe_inline btn-sm btn-link"
-                                        icon="fa-refresh"
-                                        invisible="state != 'posted' or l10n_hu_journal_type != 'sale'"
-                                        string="Refresh"
-                                        type="object"
-                                />
-                            </div>
-                            <!-- Original -->
-                            <label name="l10n_hu_original_invoice"
-                                   for="l10n_hu_original_invoice_number"
-                                   string="Original Invoice Number"
-                            />
-                            <div name="l10n_hu_original_invoice">
-                                <field name="l10n_hu_original_invoice_number"
-                                       class="oe_inline"
-                                />
-                                <button name="action_l10n_hu_view_original_invoice"
-                                        class="oe_inline btn-sm btn-link"
-                                        icon="fa-folder-open"
-                                        invisible="not l10n_hu_original_invoice_number"
-                                        string="View"
-                                        type="object"
-                                />
-                            </div>
-                            <field name="l10n_hu_original_account_move"
-                                   invisible="1"
-                            />
-                        </group>
                         <group name="l10n_hu_plus_3"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                string="Partner"
                         >
                             <!-- Partner -->
                             <field name="l10n_hu_fiscal_representative"
+                                   invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                    options="{'no_create': True,}"
+                                   readonly="state != 'draft' and not to_check"
                             />
                             <field name="l10n_hu_fiscal_representative_bank_account"
                                    domain="[('partner_id', '=', l10n_hu_fiscal_representative)]"
+                                   invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                    options="{'no_create': True,}"
+                                   readonly="state != 'draft' and not to_check"
                             />
                             <field name="l10n_hu_company_partner"/>
                             <field name="l10n_hu_partner_country"/>
-
                         </group>
                         <group name="l10n_hu_plus_4"
                                string="Journal"

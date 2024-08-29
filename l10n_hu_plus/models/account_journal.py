@@ -26,13 +26,13 @@ class L10nHuPlusAccountJournal(models.Model):
         ],
         string="Delivery Date Default",
     )
-    l10n_hu_plus_document_type = fields.Many2many(
+    l10n_hu_document_type = fields.Many2many(
         column1='journal',
         column2='document_type',
         comodel_name='l10n.hu.plus.object',
         domain=[('type_technical_name', '=', 'document_type')],
         index=True,
-        relation='l10n_hu_plus_journal_document_type_rel',
+        relation='l10n_hu_journal_document_type_rel',
         string="HU+ Document Type",
     )
 

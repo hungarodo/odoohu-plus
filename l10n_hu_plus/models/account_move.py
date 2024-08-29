@@ -51,12 +51,32 @@ class L10nHuPlusAccountMove(models.Model):
         compute='_compute_l10n_hu_rate_difference',
         string="Rate Difference",
     )
+    # # DELIVERY PERIOD
+    l10n_hu_delivery_period_end = fields.Date(
+        copy=False,
+        string="Delivery Period End",
+        tracking=True,
+    )
+    l10n_hu_delivery_period_legal = fields.Text(
+        compute='_compute_l10n_hu_delivery_period_text',
+        string="Invoice Delivery Period Legal",
+    )
+    l10n_hu_delivery_period_start = fields.Date(
+        copy=False,
+        string="Delivery Period Start",
+        tracking=True,
+    )
+    l10n_hu_delivery_period_summary = fields.Text(
+        compute='_compute_l10n_hu_delivery_period_text',
+        string="Delivery Period Summary",
+    )
     # # DOCUMENT TYPE
-    l10n_hu_plus_document_type = fields.Many2one(
+    l10n_hu_document_type = fields.Many2one(
         comodel_name='l10n.hu.plus.object',
         domain=[('type_technical_name', '=', 'document_type')],
         index=True,
         string="Document Type",
+        tracking=True,
     )
     # # JOURNAL
     l10n_hu_journal_type = fields.Selection(
@@ -77,6 +97,7 @@ class L10nHuPlusAccountMove(models.Model):
     l10n_hu_original_invoice_number = fields.Char(
         copy=False,
         string="Original Invoice Number",
+        tracking=True,
     )
     # # PARTNER
     l10n_hu_company_partner = fields.Many2one(
@@ -106,34 +127,12 @@ class L10nHuPlusAccountMove(models.Model):
         store=True,
         string="Trade Position",
     )
-    # # PERIOD
-    l10n_hu_invoice_delivery_period_end = fields.Date(
-        copy=False,
-        string="Invoice Delivery Period End",
-    )
-    l10n_hu_invoice_delivery_period_legal = fields.Text(
-        compute='_compute_l10n_hu_invoice_delivery_period_text',
-        string="Invoice Delivery Period Legal",
-    )
-    l10n_hu_invoice_delivery_period_start = fields.Date(
-        copy=False,
-        string="Invoice Delivery Period Start",
-    )
-    l10n_hu_invoice_delivery_period_summary = fields.Text(
-        compute='_compute_l10n_hu_invoice_delivery_period_text',
-        string="Invoice Delivery Period Summary",
-    )
-    # # PAYMENT
-    l10n_hu_invoice_payment_method = fields.Many2one(
-        comodel_name='account.payment.method',
-        index=True,
-        string="Invoice Payment Method",
-    )
     # # VAT
     l10n_hu_vat_date = fields.Date(
         copy=False,
         index=True,
         string="VAT Date",
+        tracking=True,
     )
 
     # Compute and search fields, in the same order of field declarations
@@ -203,21 +202,21 @@ class L10nHuPlusAccountMove(models.Model):
                 record.l10n_hu_currency_rate = 1.0
                 record.l10n_hu_document_rate = 1.0
 
-    def _compute_l10n_hu_invoice_delivery_period_text(self):
+    def _compute_l10n_hu_delivery_period_text(self):
         for record in self:
             period_legal = ""
             period_summary = ""
             if record.move_type in ['out_invoice', 'out_refund'] \
-                    and record.l10n_hu_invoice_delivery_period_start \
-                    and record.l10n_hu_invoice_delivery_period_end:
+                    and record.l10n_hu_delivery_period_start \
+                    and record.l10n_hu_delivery_period_end:
                 # Get period info
-                delivery_period_result = record.l10n_hu_get_invoice_delivery_period({})
+                delivery_period_result = record.l10n_hu_get_delivery_period({})
                 if delivery_period_result.get('period_legal'):
                     period_legal = delivery_period_result['period_legal']
                 if delivery_period_result.get('period_summary'):
                     period_summary = delivery_period_result['period_summary']
-            record.l10n_hu_invoice_delivery_period_legal = period_legal
-            record.l10n_hu_invoice_delivery_period_summary = period_summary
+            record.l10n_hu_delivery_period_legal = period_legal
+            record.l10n_hu_delivery_period_summary = period_summary
 
     def _compute_l10n_hu_rate_difference(self):
         for record in self:
@@ -225,12 +224,12 @@ class L10nHuPlusAccountMove(models.Model):
             record.l10n_hu_rate_difference = difference
 
     # Constraints and onchanges
-    @api.onchange('l10n_hu_invoice_delivery_period_end', 'l10n_hu_invoice_delivery_period_start')
-    def onchange_l10n_hu_invoice_delivery_period(self):
-        if self.l10n_hu_invoice_delivery_period_end and self.l10n_hu_invoice_delivery_period_start:
-            if self.l10n_hu_invoice_delivery_period_end < self.l10n_hu_invoice_delivery_period_start:
+    @api.onchange('l10n_hu_delivery_period_end', 'l10n_hu_delivery_period_start')
+    def onchange_l10n_hu_delivery_period(self):
+        if self.l10n_hu_delivery_period_end and self.l10n_hu_delivery_period_start:
+            if self.l10n_hu_delivery_period_end < self.l10n_hu_delivery_period_start:
                 raise exceptions.UserError(_("Period end date must be after period start date!"))
-            elif self.l10n_hu_invoice_delivery_period_start > self.l10n_hu_invoice_delivery_period_end:
+            elif self.l10n_hu_delivery_period_start > self.l10n_hu_delivery_period_end:
                 raise exceptions.UserError(_("Period start date must be before period start date!"))
             else:
                 pass
@@ -240,7 +239,7 @@ class L10nHuPlusAccountMove(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_refresh_invoice_delivery_period(self):
+    def action_l10n_hu_refresh_delivery_period(self):
         """ Used by "Refresh" button in HU+ tab Period section """
         # Ensure one record in self
         self.ensure_one()
@@ -249,8 +248,8 @@ class L10nHuPlusAccountMove(models.Model):
         write_values = {}
 
         # Get summary
-        if self.l10n_hu_invoice_delivery_period_start and self.l10n_hu_invoice_delivery_period_end:
-            delivery_period_result = self.l10n_hu_get_invoice_delivery_period({})
+        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
+            delivery_period_result = self.l10n_hu_get_delivery_period({})
 
             if delivery_period_result.get('delivery_date'):
                 write_values.update({
@@ -348,8 +347,8 @@ class L10nHuPlusAccountMove(models.Model):
 
     # Business methods
     @api.model
-    def l10n_hu_get_invoice_delivery_date_default(self, values):
-        """ Get invoice delivery date default
+    def l10n_hu_get_delivery_date_default(self, values):
+        """ Get delivery date default
 
         :param values: dictionary
 
@@ -415,8 +414,8 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     @api.model
-    def l10n_hu_get_invoice_delivery_period(self, values):
-        """ Get invoice delivery period data
+    def l10n_hu_get_delivery_period(self, values):
+        """ Get delivery period data
 
         NOTE:
         - This method takes care of special hungarian rules
@@ -427,7 +426,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_invoice_delivery_period BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_get_delivery_period BEGIN" + str(values))
 
         # Initialize variables
         debug_list = []
@@ -475,8 +474,8 @@ class L10nHuPlusAccountMove(models.Model):
                     period_start = False
             else:
                 period_start = False
-        elif self.l10n_hu_invoice_delivery_period_start:
-            period_start = self.l10n_hu_invoice_delivery_period_start
+        elif self.l10n_hu_delivery_period_start:
+            period_start = self.l10n_hu_delivery_period_start
         else:
             period_start = None
 
@@ -493,8 +492,8 @@ class L10nHuPlusAccountMove(models.Model):
                     period_end = False
             else:
                 period_end = False
-        elif self.l10n_hu_invoice_delivery_period_end:
-            period_end = self.l10n_hu_invoice_delivery_period_end
+        elif self.l10n_hu_delivery_period_end:
+            period_end = self.l10n_hu_delivery_period_end
         else:
             period_end = False
 
@@ -505,7 +504,7 @@ class L10nHuPlusAccountMove(models.Model):
             is_periodic_settlement = False
 
         # Default delivery date
-        delivery_date_default = self.l10n_hu_get_invoice_delivery_date_default({})
+        delivery_date_default = self.l10n_hu_get_delivery_date_default({})
 
         # Set today
         date_today = fields.Date.today()

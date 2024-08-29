@@ -22,7 +22,7 @@
                 >
                     <group name="l10n_hu_plus_1">
                         <group name="l10n_hu_plus_1_1">
-                            <field name="l10n_hu_plus_document_type"
+                            <field name="l10n_hu_document_type"
                                    options="{'no_create': True, 'no_open': True,}"
                                    string="Document Types"
                                    widget="many2many_tags"

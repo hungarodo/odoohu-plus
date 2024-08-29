@@ -9,7 +9,7 @@
         <field name="web_icon">l10n_hu_plus,static/description/l10n_hu_plus_menu.png</field>
     </record>
     <!-- HU+ > Dashboard -->
-    <record id="hu_plus_dashboard_menu"
+    <record id="dashboard_menu"
             model="ir.ui.menu"
     >
         <field name="name">Dashboard</field>
@@ -21,8 +21,18 @@
         />
         <field name="sequence">8</field>
     </record>
-    <!-- HU > Objects -->
-    <record id="hu_object_menu"
+    <!-- HU+ > NAV -->
+    <record id="nav_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">NAV</field>
+        <field name="parent_id"
+               ref="hu_plus_menu"
+        />
+        <field name="sequence">36</field>
+    </record>
+    <!-- HU+ > Objects -->
+    <record id="object_menu"
             model="ir.ui.menu"
     >
         <field name="name">Objects</field>
@@ -35,7 +45,7 @@
         <field name="sequence">88</field>
     </record>
     <!-- HU+ > Reporting -->
-    <record id="hu_plus_reporting_menu"
+    <record id="reporting_menu"
             model="ir.ui.menu"
     >
         <field name="name">Reporting</field>
@@ -44,8 +54,8 @@
         />
         <field name="sequence">96</field>
     </record>
-    <!-- HU > Reporting > Partners -->
-    <record id="hu_reporting_partner_menu"
+    <!-- HU+ > Reporting > Partners -->
+    <record id="reporting_partner_menu"
             model="ir.ui.menu"
     >
         <field name="name">Partners</field>
@@ -53,12 +63,12 @@
                ref="res_partner_action"
         />
         <field name="parent_id"
-               ref="hu_plus_reporting_menu"
+               ref="reporting_menu"
         />
         <field name="sequence">8</field>
     </record>
-    <!-- HU > Reporting > Products -->
-    <record id="hu_reporting_product_menu"
+    <!-- HU+ > Reporting > Products -->
+    <record id="reporting_product_menu"
             model="ir.ui.menu"
     >
         <field name="name">Products</field>
@@ -66,22 +76,22 @@
                ref="product_product_action"
         />
         <field name="parent_id"
-               ref="hu_plus_reporting_menu"
+               ref="reporting_menu"
         />
         <field name="sequence">16</field>
     </record>
     <!-- HU+ > Reporting > Accounting -->
-    <record id="hu_plus_reporting_accounting_menu"
+    <record id="reporting_accounting_menu"
             model="ir.ui.menu"
     >
         <field name="name">Accounting</field>
         <field name="parent_id"
-               ref="hu_plus_reporting_menu"
+               ref="reporting_menu"
         />
         <field name="sequence">40</field>
     </record>
     <!-- HU+ > Reporting > Accounting > Customer Invoices -->
-    <record id="hu_plus_reporting_vat_account_move_line_menu"
+    <record id="reporting_vat_account_move_line_menu"
             model="ir.ui.menu"
     >
         <field name="name">Customer Invoices</field>
@@ -89,12 +99,12 @@
                ref="account_move_customer_invoice_action"
         />
         <field name="parent_id"
-               ref="hu_plus_reporting_accounting_menu"
+               ref="reporting_accounting_menu"
         />
         <field name="sequence">16</field>
     </record>
     <!-- HU+ > Reporting > Accounting > Vendor Bills -->
-    <record id="hu_plus_reporting_accounting_vendor_bill_menu"
+    <record id="reporting_accounting_vendor_bill_menu"
             model="ir.ui.menu"
     >
         <field name="name">Vendor Bills</field>
@@ -102,12 +112,12 @@
                ref="account_move_vendor_bill_action"
         />
         <field name="parent_id"
-               ref="hu_plus_reporting_accounting_menu"
+               ref="reporting_accounting_menu"
         />
         <field name="sequence">16</field>
     </record>
     <!-- HU+ > Reporting > Accounting > VAT -->
-    <record id="hu_plus_reporting_accounting_account_move_line_menu"
+    <record id="reporting_accounting_account_move_line_menu"
             model="ir.ui.menu"
     >
         <field name="name">VAT Account Move Lines</field>
@@ -115,12 +125,12 @@
                ref="account_move_line_vat_action"
         />
         <field name="parent_id"
-               ref="hu_plus_reporting_accounting_menu"
+               ref="reporting_accounting_menu"
         />
         <field name="sequence">32</field>
     </record>
     <!-- HU+ > Reporting > Logs -->
-    <record id="hu_plus_reporting_log_menu"
+    <record id="reporting_log_menu"
             model="ir.ui.menu"
     >
         <field name="name">Logs</field>
@@ -128,12 +138,12 @@
                ref="log_action"
         />
         <field name="parent_id"
-               ref="hu_plus_reporting_menu"
+               ref="reporting_menu"
         />
         <field name="sequence">32</field>
     </record>
     <!-- HU+ > Configuration -->
-    <record id="hu_plus_configuration_menu"
+    <record id="configuration_menu"
             model="ir.ui.menu"
     >
         <field name="name">Configuration</field>
@@ -143,7 +153,7 @@
         <field name="sequence">128</field>
     </record>
     <!-- HU+ > Configuration > Documentation -->
-    <record id="hu_plus_configuration_documentation_menu"
+    <record id="configuration_documentation_menu"
             model="ir.ui.menu"
     >
         <field name="name">Documentation</field>
@@ -151,12 +161,12 @@
                ref="documentation_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_menu"
+               ref="configuration_menu"
         />
         <field name="sequence">8</field>
     </record>
     <!-- HU+ > Configuration > Companies -->
-    <record id="hu_plus_configuration_company_menu"
+    <record id="configuration_company_menu"
             model="ir.ui.menu"
     >
         <field name="name">Companies</field>
@@ -164,12 +174,12 @@
                ref="res_company_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_menu"
+               ref="configuration_menu"
         />
         <field name="sequence">16</field>
     </record>
     <!-- HU+ > Configuration > Tags -->
-    <record id="hu_plus_configuration_tag_menu"
+    <record id="configuration_tag_menu"
             model="ir.ui.menu"
     >
         <field name="name">Tags</field>
@@ -177,12 +187,12 @@
                ref="tag_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_menu"
+               ref="configuration_menu"
         />
         <field name="sequence">32</field>
     </record>
     <!-- HU+ > Configuration > Unit of measures -->
-    <record id="hu_plus_configuration_uom_menu"
+    <record id="configuration_uom_menu"
             model="ir.ui.menu"
     >
         <field name="name">Unit of Measures</field>
@@ -190,22 +200,22 @@
                ref="uom_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_menu"
+               ref="configuration_menu"
         />
         <field name="sequence">40</field>
     </record>
     <!-- HU+ > Configuration > Accounting -->
-    <record id="hu_plus_configuration_accounting_menu"
+    <record id="configuration_accounting_menu"
             model="ir.ui.menu"
     >
         <field name="name">Accounting</field>
         <field name="parent_id"
-               ref="hu_plus_configuration_menu"
+               ref="configuration_menu"
         />
         <field name="sequence">64</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Account Journals -->
-    <record id="hu_plus_configuration_accounting_account_journal_menu"
+    <record id="configuration_accounting_account_journal_menu"
             model="ir.ui.menu"
     >
         <field name="name">Account Journals</field>
@@ -213,12 +223,12 @@
                ref="account_journal_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">16</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Fiscal Positions -->
-    <record id="hu_plus_configuration_accounting_fiscal_position_menu"
+    <record id="configuration_accounting_fiscal_position_menu"
             model="ir.ui.menu"
     >
         <field name="name">Fiscal Positions</field>
@@ -226,12 +236,12 @@
                ref="account.action_account_fiscal_position_form"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">24</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Payment Methods -->
-    <record id="hu_plus_configuration_accounting_payment_method_menu"
+    <record id="configuration_accounting_payment_method_menu"
             model="ir.ui.menu"
     >
         <field name="name">Payment Methods</field>
@@ -239,12 +249,12 @@
                ref="account_payment_method_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">32</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Payment Terms -->
-    <record id="hu_plus_configuration_accounting_payment_term_menu"
+    <record id="configuration_accounting_payment_term_menu"
             model="ir.ui.menu"
     >
         <field name="name">Payment Terms</field>
@@ -252,12 +262,12 @@
                ref="account_payment_term_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">40</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Tags -->
-    <record id="hu_plus_configuration_accounting_tag_menu"
+    <record id="configuration_accounting_tag_menu"
             model="ir.ui.menu"
     >
         <field name="name">Tags</field>
@@ -265,12 +275,12 @@
                ref="account_tag_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">48</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Taxes -->
-    <record id="hu_plus_configuration_accounting_tax_menu"
+    <record id="configuration_accounting_tax_menu"
             model="ir.ui.menu"
     >
         <field name="name">Taxes</field>
@@ -278,12 +288,12 @@
                ref="account_tax_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">56</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Tax Groups -->
-    <record id="hu_plus_configuration_accounting_tax_group_menu"
+    <record id="configuration_accounting_tax_group_menu"
             model="ir.ui.menu"
     >
         <field name="name">Tax Groups</field>
@@ -291,12 +301,12 @@
                ref="account_tax_group_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">64</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Tax Repartition Lines  -->
-    <record id="hu_plus_configuration_accounting_tax_repartition_line_menu"
+    <record id="configuration_accounting_tax_repartition_line_menu"
             model="ir.ui.menu"
     >
         <field name="name">Tax Repartition Lines</field>
@@ -304,12 +314,12 @@
                ref="account_tax_repartition_line_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_accounting_menu"
+               ref="configuration_accounting_menu"
         />
         <field name="sequence">72</field>
     </record>
     <!-- HU+ > Configuration > Technical -->
-    <record id="hu_plus_configuration_technical_menu"
+    <record id="configuration_technical_menu"
             model="ir.ui.menu"
     >
         <field name="name">Technical</field>
@@ -317,12 +327,12 @@
                eval="[(4, ref('l10n_hu_plus.manager_group'))]"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_menu"
+               ref="configuration_menu"
         />
         <field name="sequence">128</field>
     </record>
     <!-- HU+ > Configuration > Technical > Apps -->
-    <record id="hu_plus_configuration_technical_app_menu"
+    <record id="configuration_technical_app_menu"
             model="ir.ui.menu"
     >
         <field name="name">Apps</field>
@@ -330,12 +340,12 @@
                ref="app_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_technical_menu"
+               ref="configuration_technical_menu"
         />
         <field name="sequence">8</field>
     </record>
     <!-- HU+ > Configuration > Technical > Scheduled Actions -->
-    <record id="hu_plus_configuration_technical_cron_menu"
+    <record id="configuration_technical_cron_menu"
             model="ir.ui.menu"
     >
         <field name="name">Scheduled Actions</field>
@@ -343,12 +353,12 @@
                ref="cron_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_technical_menu"
+               ref="configuration_technical_menu"
         />
         <field name="sequence">16</field>
     </record>
     <!-- HU+ > Configuration > Technical > System Parameters -->
-    <record id="hu_plus_configuration_technical_parameter_menu"
+    <record id="configuration_technical_parameter_menu"
             model="ir.ui.menu"
     >
         <field name="name">System Parameters</field>
@@ -356,7 +366,7 @@
                ref="config_parameter_action"
         />
         <field name="parent_id"
-               ref="hu_plus_configuration_technical_menu"
+               ref="configuration_technical_menu"
         />
         <field name="sequence">24</field>
     </record>
