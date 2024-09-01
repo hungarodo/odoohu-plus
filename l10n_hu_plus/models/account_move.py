@@ -230,7 +230,7 @@ class L10nHuPlusAccountMove(models.Model):
             if self.l10n_hu_delivery_period_end < self.l10n_hu_delivery_period_start:
                 raise exceptions.UserError(_("Period end date must be after period start date!"))
             elif self.l10n_hu_delivery_period_start > self.l10n_hu_delivery_period_end:
-                raise exceptions.UserError(_("Period start date must be before period start date!"))
+                raise exceptions.UserError(_("Period start date must be before period end date!"))
             else:
                 pass
         else:
@@ -346,6 +346,47 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     # Business methods
+    # # SUPER
+    def _l10n_hu_edi_get_invoice_values(self):
+        """ Super for original method in l10n_hu_edi app
+
+        NOTE:
+        - super result is a dictionary containing invoice_values
+        - we update the dictionary with some values
+        - for xml rendering see file: data/template_invoice_xml.data
+
+        """
+        # Execute super
+        result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_invoice_values()
+
+        # accounting_delivery_date
+        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
+            accounting_delivery_date = self.l10n_hu_delivery_period_end
+        elif self.delivery_date:
+            accounting_delivery_date = self.delivery_date
+        elif self.date:
+            accounting_delivery_date = self.date
+        else:
+            accounting_delivery_date = None
+
+        # periodical_settlement
+        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
+            periodical_settlement = True
+        else:
+            periodical_settlement = False
+
+        # Update result
+        result.update({
+            'invoiceAccountingDeliveryDate': accounting_delivery_date,
+            'invoiceDeliveryPeriodEnd': self.l10n_hu_delivery_period_end,
+            'invoiceDeliveryPeriodStart': self.l10n_hu_delivery_period_start,
+            'periodicalSettlement': periodical_settlement
+        })
+
+        # Return result
+        return result
+
+    # # HU+
     @api.model
     def l10n_hu_get_delivery_date_default(self, values):
         """ Get delivery date default
@@ -432,7 +473,7 @@ class L10nHuPlusAccountMove(models.Model):
         debug_list = []
         error_list = []
         info_list = []
-        period_legal_note = ""
+        period_legal = ""
         period_summary = ""
         result = {}
         warning_list = []
@@ -498,7 +539,7 @@ class L10nHuPlusAccountMove(models.Model):
             period_end = False
 
         # is_periodic_settlement
-        if period_start and period_end:
+        if is_invoice_journal and period_start and period_end:
             is_periodic_settlement = True
         else:
             is_periodic_settlement = False

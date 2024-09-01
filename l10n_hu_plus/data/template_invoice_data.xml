@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- nav_online_invoice_xml_3_0 inherit -->
+        <template id="nav_online_invoice_xml_3_0_inherit"
+                  name="l10n.hu.plus.nav.online.invoice.xml.3.0.inherit"
+                  inherit_id="l10n_hu_edi.nav_online_invoice_xml_3_0"
+        >
+            <!-- invoiceDetail -->
+            <xpath expr="//*[local-name()='invoiceDeliveryDate']"
+                   position="after"
+            >
+                <invoiceDeliveryPeriodStart t-if="invoiceDeliveryPeriodStart"
+                                            t-out="invoiceDeliveryPeriodStart"
+                />
+                <invoiceDeliveryPeriodEnd t-if="invoiceDeliveryPeriodEnd"
+                                          t-out="invoiceDeliveryPeriodEnd"
+                />
+                <invoiceAccountingDeliveryDate t-if="invoiceAccountingDeliveryDate"
+                                               t-out="invoiceAccountingDeliveryDate"
+                />
+                <periodicalSettlement t-if="periodicalSettlement"
+                                      t-out="format_bool(periodicalSettlement)"
+                />
+            </xpath>
+        </template>
+    </data>
+</odoo>

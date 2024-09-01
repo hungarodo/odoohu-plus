@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': "HU+",  # Name first, others listed in alphabetical order
-    'author': "Online ERP Kft, Oregional Kft.",
+    'application': True,
+    'author': "E-Business Kft., Oregional Kft.",
     'auto_install': False,
     'category': "Localization",
     'currency': "EUR",
@@ -10,6 +11,7 @@
         'data/ir_config_parameter_data.xml',
         'data/ir_cron_data.xml',
         'data/ir_module_category_data.xml',
+        'data/template_invoice_data.xml',
         'security/res_groups.xml',
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
@@ -55,7 +57,7 @@
     ],
     'demo': [],
     'depends': [  # Include only direct dependencies
-        'l10n_hu',
+        'l10n_hu_edi',
     ],
     'description': "Hungarian localization improvements",
     'images': [  # Odoo Marketplace banner
@@ -66,6 +68,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.3.9",
+    'version': "1.4.10",
     'website': "https://hungarodo.hu/odoohu",
 }
