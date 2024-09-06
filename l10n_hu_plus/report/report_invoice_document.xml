@@ -8,24 +8,39 @@
         <xpath expr="//h2[1]"
                position="replace"
         >
-            <h2>
-                <span t-if="not proforma"/>
-                <span t-else="">PROFORMA</span>
-                <!-- document_type BEGIN -->
-                <span t-if="o.move_type in['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] and o.l10n_hu_document_type">
-                    <span t-field="o.l10n_hu_document_type"/>
-                </span>
-                <!-- document_type END -->
-                <span t-elif="o.move_type == 'out_invoice' and o.state == 'posted'">Invoice</span>
-                <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
-                <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
-                <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">Credit Note</span>
-                <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">Draft Credit Note</span>
-                <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">Cancelled Credit Note</span>
-                <span t-elif="o.move_type == 'in_refund'">Vendor Credit Note</span>
-                <span t-elif="o.move_type == 'in_invoice'">Vendor Bill</span>
-                <span t-if="o.name != '/'" t-field="o.name">INV/2023/0001</span>
-            </h2>
+            <div name="l10n_hu_invoice_document_type_and_number"
+                 class="row mt-1 mb-4 border-bottom"
+            >
+                <div name="l10n_hu_invoice_document_type"
+                     t-attf-class="#{'col-auto col-6 mw-100' if report_type != 'html' else 'col'}"
+                >
+                    <h2 class="text-start">
+                        <span t-if="not proforma"/>
+                        <span t-else="">PROFORMA</span>
+                        <!-- document_type BEGIN -->
+                        <span t-if="o.move_type in['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] and o.l10n_hu_document_type">
+                            <span t-field="o.l10n_hu_document_type"/>
+                        </span>
+                        <!-- document_type END -->
+                        <span t-elif="o.move_type == 'out_invoice' and o.state == 'posted'">Invoice</span>
+                        <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
+                        <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
+                        <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">Credit Note</span>
+                        <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">Draft Credit Note</span>
+                        <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">Cancelled Credit Note</span>
+                        <span t-elif="o.move_type == 'in_refund'">Vendor Credit Note</span>
+                        <span t-elif="o.move_type == 'in_invoice'">Vendor Bill</span>
+                        <span t-else=""/>
+                    </h2>
+                </div>
+                <div name="l10n_hu_invoice_number"
+                     t-attf-class="#{'col-auto col-6 mw-100' if report_type != 'html' else 'col'}"
+                >
+                    <h2 class="text-end">
+                       <span t-field="o.name"/>
+                    </h2>
+                </div>
+            </div>
         </xpath>
         <!-- Bordered table -->
         <xpath expr="//table[@name='invoice_line_table']"
