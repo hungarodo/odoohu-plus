@@ -30,20 +30,6 @@ class L10nHuBaseObject(models.Model):
         default=True,
         string="Active",
     )
-    api_enabled = fields.Boolean(
-        default=False,
-        string="API Enabled",
-    )
-    api_data = fields.Text(
-        copy=False,
-        readonly=True,
-        string="API Data",
-    )
-    api_timestamp = fields.Datetime(
-        copy=False,
-        readonly=True,
-        string="API Timestamp",
-    )
     category_tag = fields.Many2one(
         comodel_name='l10n.hu.plus.tag',
         domain=[('tag_type', '=', 'object_category')],
@@ -103,24 +89,12 @@ class L10nHuBaseObject(models.Model):
         copy=False,
         index=True,
         string="Key",
-    )
-    linked_model_name = fields.Char(
-        copy=False,
-        index=True,
-        string="Linked Model Name",
-    )
-    linked_record_id = fields.Integer(
-        copy=False,
-        index=True,
-        string="Linked Record ID",
-    )
-    linked_record_name = fields.Char(
-        compute='_compute_linked_record_name',
-        string="Linked Record Name",
+        tracking=True,
     )
     locked = fields.Boolean(
         default=False,
         string="Locked",
+        tracking=True,
     )
     name = fields.Char(
         copy=False,
@@ -158,24 +132,20 @@ class L10nHuBaseObject(models.Model):
         relation='l10n_hu_plus_object_tag_rel',
         string="Tag",
     )
-    technical_data = fields.Text(
-        copy=False,
-        string="Technical Data",
-    )
-    technical_data_type = fields.Char(
-        copy=False,
-        string="Technical Data Type",
-    )
-    technical_name = fields.Char(
-        copy=False,
-        index=True,
-        string="Technical Name",
-    )
     type_tag = fields.Many2one(
         comodel_name='l10n.hu.plus.tag',
         domain=[('tag_type', '=', 'object_type')],
         index=True,
         string="Object Type",
+        tracking=True,
+    )
+    type_key_enabled = fields.Boolean(
+        related='type_tag.key_enabled',
+        string="Type Key Enabled",
+    )
+    type_key_method = fields.Selection(
+        related='type_tag.key_method',
+        string="Type Key Method",
     )
     type_technical_name = fields.Char(
         related='type_tag.technical_name',
@@ -188,6 +158,53 @@ class L10nHuBaseObject(models.Model):
         index=True,
         size=1024,
         string="Url",
+    )
+    # # API
+    api_enabled = fields.Boolean(
+        default=False,
+        string="API Enabled",
+    )
+    api_data = fields.Json(
+        copy=False,
+        readonly=True,
+        string="API Data",
+    )
+    api_timestamp = fields.Datetime(
+        copy=False,
+        readonly=True,
+        string="API Timestamp",
+    )
+    # # LINKED
+    linked_model_name = fields.Char(
+        copy=False,
+        index=True,
+        string="Linked Model Name",
+    )
+    linked_record_id = fields.Integer(
+        copy=False,
+        index=True,
+        string="Linked Record ID",
+    )
+    linked_record_name = fields.Char(
+        compute='_compute_linked_record_name',
+        string="Linked Record Name",
+    )
+    # # TECHNICAL
+    technical_data = fields.Json(
+        copy=False,
+        string="Technical Data",
+    )
+    technical_name = fields.Char(
+        copy=False,
+        index=True,
+        string="Technical Name",
+        tracking=True,
+    )
+    technical_timestamp = fields.Datetime(
+        copy=False,
+        default=fields.Datetime.now(),
+        readonly=True,
+        string="Technical Timestamp",
     )
 
     # Compute and search fields, in the same order of field declarations
@@ -219,12 +236,37 @@ class L10nHuBaseObject(models.Model):
         self.ensure_one()
 
         # Get
-        if self.object_type \
-                and self.object_type.key_regeneration \
-                and self.object_type.key_automation == 'uuid4':
+        if self.type_tag \
+                and self.type_tag.key_enabled \
+                and self.type_tag.key_method == 'uuid4':
             self.key = self.get_uuid4()
         else:
             return
+
+    def action_view_api_data(self):
+        # Ensure one
+        self.ensure_one()
+
+        # api_data_display
+        if self.api_data:
+            api_data_display = json.dumps(self.api_data, default=str, indent=4)
+            context = {
+                'default_action_type': 'api',
+                'default_api_action': 'view_api_data',
+                'default_api_data_display': api_data_display,
+            }
+            result = {
+                'name': _("HU+ Wizard"),
+                'context': context,
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
+            return result
+        else:
+            raise exceptions.UserError(_("API data is empty!"))
+
 
     def action_view_linked_record(self):
         # Ensure one
@@ -587,8 +629,8 @@ class L10nHuBaseObject(models.Model):
 
     # # HELPER
     @api.model
-    def generate_random_string(self, values=None):
-        """ Generate a random string
+    def get_random_string(self, values=None):
+        """ Get a random string
 
         :param values: optional dictionary of parameters, including:
             - length: integer
@@ -685,87 +727,6 @@ class L10nHuBaseObject(models.Model):
             pass
 
         # Return
-        return result
-
-    @api.model
-    def get_request_response_details(self, response):
-        """ Get details of a http response
-
-        :param response: a response (python requests.Response object)
-
-        :return: dictionary
-        """
-        # raise exceptions.UserError(str(result))
-
-        # Initialize variables
-        result = {}
-
-        # Now try and set details
-        try:
-            result.update({
-                'response_content': response.content,
-            })
-        except:
-            result.update({
-                'response_content': False,
-            })
-
-        try:
-            result.update({
-                'response_headers': response.headers,
-            })
-        except:
-            result.update({
-                'response_headers': False,
-            })
-
-        try:
-            result.update({
-                'response_json': response.json(),
-            })
-        except:
-            result.update({
-                'response_json': False,
-            })
-
-        try:
-            result.update({
-                'response_ok': response.ok,
-            })
-        except:
-            result.update({
-                'response_ok': False,
-            })
-
-        try:
-            result.update({
-                'response_reason': response.reason,
-            })
-        except:
-            result.update({
-                'response_reason': False,
-            })
-
-        try:
-            result.update({
-                'response_status_code': response.status_code,
-            })
-        except:
-            result.update({
-                'response_status_code': False,
-            })
-
-        try:
-            result.update({
-                'response_text': response.text,
-            })
-        except:
-            result.update({
-                'response_text': False,
-            })
-
-        # Return result
-        # raise exceptions.UserError(str(result))
         return result
 
     @api.model

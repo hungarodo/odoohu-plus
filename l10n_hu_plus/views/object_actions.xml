@@ -6,7 +6,7 @@
     >
         <field name="name">HU+ Objects</field>
         <field name="context">{'search_default_object_active_filter': 1,}</field>
-        <field name="domain">[('active', 'in', [True, False])]</field>
+        <field name="domain">[]</field>
         <field name="res_model">l10n.hu.plus.object</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,form</field>

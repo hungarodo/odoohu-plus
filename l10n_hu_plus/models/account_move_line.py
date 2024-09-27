@@ -19,31 +19,31 @@ class L10nHuPlusAccountMoveLine(models.Model):
     # Field declarations
     l10n_hu_original_account_move = fields.Many2one(
         related='move_id.l10n_hu_original_account_move',
-        string="Original Move",
+        string="HU Original Move",
     )
     l10n_hu_original_account_move_line = fields.Many2one(
         comodel_name='account.move.line',
         index=True,
-        string="Original Move Line",
+        string="HU Original Move Line",
     )
     l10n_hu_price_refund = fields.Boolean(
         default=False,
-        string="Price Refund",
+        string="HU Price Refund",
     )
     l10n_hu_move_trade_position = fields.Selection(
         related='move_id.l10n_hu_trade_position',
         index=True,
         store=True,
-        string="Trade Position Date",
+        string="HU Trade Position Date",
     )
     l10n_hu_move_vat_date = fields.Date(
         related='move_id.l10n_hu_vat_date',
         index=True,
         store=True,
-        string="VAT Date",
+        string="HU VAT Date",
     )
     l10n_hu_vat_reason = fields.Char(
-        string="VAT Reason",
+        string="HU VAT Reason",
         translate="True",
     )
     

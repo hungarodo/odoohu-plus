@@ -127,16 +127,17 @@ class L10nHuPlusWizard(models.TransientModel):
             ('create_registration', "Create registration"),
             ('delete_registration', "Delete registration"),
             ('download_objects', "Download objects"),
+            ('view_api_data', "View API data"),
         ],
         string="API Action",
     )
     api_action_editable = fields.Boolean(
-        default=True,
+        default=False,
         string="API Action Editable",
     )
-    api_data = fields.Text(
-        related='company.l10n_hu_plus_api_data',
-        string="API Data",
+    api_data_display = fields.Text(
+        readonly=True,
+        string="API Data Display",
     )
     api_details = fields.Text(
         readonly=True,
@@ -239,25 +240,8 @@ class L10nHuPlusWizard(models.TransientModel):
         for record in self:
             record.account_move_count = len(record.account_move)
 
-    # Constraints and onchanges
-    @api.onchange('api_action')
-    def onchange_api_action(self):
-        if self.api_action is not None and self.company:
-            api_data = self.company.l10n_hu_plus_get_api_data()
-            api_details = _("API Key") + ": " + str(api_data.get('api_key', None))
-            api_details += "\n" + _("License active") + ": " + str(api_data.get('license_active', None))
-            api_details += "\n" + _("License code") + ": " + str(api_data.get('license_code', None))
-            api_details += "\n" + _("License owner") + ": " + str(api_data.get('license_owner', None))
-            api_details += "\n" + _("License type") + ": " + str(api_data.get('license_type', None))
-            api_details += "\n" + _("License valid") + ": " + str(api_data.get('license_valid', None))
-            api_details += "\n" + _("License expiry") + ": " + str(api_data.get('license_valid_to', None))
-            self.api_details = api_details
-            self.api_key = api_data.get('api_key', "free")
-            self.api_license_code = api_data.get('license_code', "free")
-            self.api_url = api_data.get('api_url', "")
-        else:
-            pass
 
+    # Constraints and onchanges
     @api.onchange('partner')
     def onchange_partner(self):
         self.partner_action_summary = self.get_partner_summary()
@@ -306,7 +290,7 @@ class L10nHuPlusWizard(models.TransientModel):
         # # API
         elif self.action_type == 'api':
             # Update company API data
-            api_data = self.company.l10n_hu_get_api_data()
+            api_data = self.company.l10n_hu_plus_api_data
             if self.api_key:
                 api_data.update({
                     'api_key': self.api_key,
@@ -320,7 +304,7 @@ class L10nHuPlusWizard(models.TransientModel):
                     'license_code': self.api_license_code,
                 })
             self.company.write({
-                'l10n_hu_api_data': json.dumps(api_data, default=str)
+                'l10n_hu_plus_api_data': api_data
             })
 
             # Manage result

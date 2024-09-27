@@ -62,21 +62,22 @@
                                string="Action"
                         />
                         <field name="api_license_code"
-                               invisible="action_type != 'api'"
-                               readonly="api_action in ['check_registration', 'delete_registration', 'download_objects']"
-                               required="action_type == 'api'"
+                               invisible="api_action not in ['check_registration', 'create_registration', 'delete_registration']"
+                               readonly="api_action in ['check_registration', 'delete_registration']"
+                               required="api_action in ['check_registration', 'create_registration', 'delete_registration']"
                                string="License Code"
                         />
                         <field name="api_key"
-                               invisible="action_type != 'api'"
-                               readonly="api_action in ['check_registration', 'delete_registration', 'download_objects']"
-                               required="action_type == 'api'"
+                               invisible="api_action not in ['check_registration', 'create_registration', 'delete_registration']"
+                               readonly="api_action in ['check_registration', 'delete_registration']"
+                               required="api_action in ['check_registration', 'create_registration', 'delete_registration']"
                                string="API Key"
                         />
                         <field name="api_url"
-                               invisible="action_type != 'api'"
-                               readonly="api_action in ['download_objects']"
-                               required="action_type == 'api'"
+                               groups="l10n_hu_plus.manager_group"
+                               invisible="api_action not in ['check_registration', 'create_registration', 'delete_registration']"
+                               readonly="api_action in ['check_registration', 'delete_registration']"
+                               required="api_action in ['check_registration', 'create_registration', 'delete_registration']"
                                string="API URL"
                         />
                         <!-- CURRENCY EXCHANGE -->
@@ -168,7 +169,7 @@
                                     Delete API registration
                                 </p>
                                 <p class="card-text"
-                                   invisible="api_action != 'download_objects' or api_details in [False, '']"
+                                   invisible="api_action == 'download_objects' or api_details in [False, '']"
                                 >
                                     <field name="api_details"/>
                                 </p>
@@ -176,6 +177,11 @@
                                    invisible="api_action != 'download_objects'"
                                 >
                                     Download API objects
+                                </p>
+                                <p class="card-text"
+                                   invisible="api_action != 'view_api_data'"
+                                >
+                                    View API data
                                 </p>
                             </div>
                         </div>
@@ -221,6 +227,19 @@
                     </group>
                 </group>
                 <notebook>
+                    <page name="api_data"
+                          invisible="action_type != 'api' or api_action != 'view_api_data'"
+                          string="API Data"
+                    >
+                        <div name="api_data_display"
+                             colspan="2"
+                        >
+                            <field name="api_data_display"
+                                   style="word-break: break-word;"
+                                   widget="code"
+                            />
+                        </div>
+                    </page>
                     <page name="partner"
                           invisible="not partner_visible"
                           string="Partner"
@@ -246,7 +265,7 @@
                     />
                     <button special="cancel"
                             class="btn-default"
-                            string="Cancel"
+                            string="Close"
                     />
                 </footer>
             </form>

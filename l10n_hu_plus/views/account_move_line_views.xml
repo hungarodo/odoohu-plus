@@ -18,21 +18,27 @@
                 />
                 <field name="l10n_hu_original_account_move"
                        optional="hide"
+                       string="Original Account Move"
                 />
                 <field name="l10n_hu_original_account_move_line"
                        optional="hide"
+                       string="Original Account Move Line"
                 />
                 <field name="l10n_hu_price_refund"
                        optional="hide"
+                       string="Price Refund"
                 />
                 <field name="l10n_hu_move_trade_position"
                        optional="hide"
+                       string="Trade Position"
                 />
                 <field name="l10n_hu_move_vat_date"
                        optional="hide"
+                       string="VAT Date"
                 />
                 <field name="l10n_hu_vat_reason"
                        optional="hide"
+                       string="VAT Reason"
                 />
                 <field name="product_id"
                        optional="show"
@@ -75,21 +81,27 @@
                 />
                  <field name="l10n_hu_original_account_move"
                        optional="hide"
+                        string="Original Account Move"
                 />
                 <field name="l10n_hu_original_account_move_line"
                        optional="hide"
+                       string="Original Account Move Line"
                 />
                 <field name="l10n_hu_price_refund"
                        optional="hide"
+                       string="Price Refund"
                 />
                 <field name="l10n_hu_move_trade_position"
                        optional="hide"
+                       string="Trade Position"
                 />
                 <field name="l10n_hu_move_vat_date"
                        optional="hide"
+                       string="VAT Date"
                 />
                 <field name="l10n_hu_vat_reason"
                        optional="hide"
+                       string="VAT Reason"
                 />
                 <field name="product_id"
                        optional="show"
@@ -131,7 +143,7 @@
                 <filter name="l10n_hu_move_vat_date_filter"
                         date="l10n_hu_move_vat_date"
                         help="Account move VAT date"
-                        string="HU VAT Date"
+                        string="VAT Date"
                 />
                 <separator/>
                 <filter name="l10n_hu_move_trade_position_domestic_filter"
@@ -159,12 +171,12 @@
                 <filter name="l10n_hu_move_vat_date_filter_group_by"
                         domain="[]"
                         context="{'group_by': 'l10n_hu_move_vat_date'}"
-                        string="HU VAT Date"
+                        string="VAT Date"
                 />
                 <filter name="l10n_hu_move_trade_position_filter_group_by"
                         domain="[]"
                         context="{'group_by': 'l10n_hu_move_trade_position'}"
-                        string="HU Trade Position"
+                        string="Trade Position"
                 />
             </xpath>
         </field>

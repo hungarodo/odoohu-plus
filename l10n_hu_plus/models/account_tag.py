@@ -22,7 +22,7 @@ class L10nHuPlusAccountTag(models.Model):
         related='country_id.code',
         index=True,
         store=True,
-        string="Country Code",
+        string="HU Country Code",
     )
     l10n_hu_evat_description = fields.Text(
         index=True,

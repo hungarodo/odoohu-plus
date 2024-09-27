@@ -12,6 +12,9 @@
                type="xml"
         >
             <form>
+                <header>
+
+                </header>
                 <sheet>
                     <div name="button_box"
                          class="oe_button_box"
@@ -36,32 +39,53 @@
                         <h2>
                             <field name="name"
                                    placeholder="Name..."
+                                   readonly="locked"
                                    required="1"
                             />
                         </h2>
                     </div>
-                    <field name="description"
-                           placeholder="Description..."
-                    />
                     <group>
                         <group>
                             <field name="tag_type"
+                                   readonly="locked"
                                    required="1"
                             />
-                            <field name="code"/>
+                            <field name="code"
+                                   readonly="locked"
+                            />
                         </group>
                         <group>
-                            <field name="priority"/>
-                            <field name="color"/>
+                            <field name="description"
+                                   placeholder="Description..."
+                            />
                         </group>
                     </group>
                     <notebook>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="details">
+                                <group name="details_1">
+                                    <field name="key_enabled"
+                                           readonly="locked"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="key_method"
+                                           readonly="locked"
+                                    />
+                                </group>
+                                <group name="details_2">
+                                    <field name="priority"/>
+                                    <field name="color"/>
+                                </group>
+                            </group>
+                        </page>
                         <page name="audit"
                               invisible="not id"
                               string="Audit"
                         >
                             <group name="audit">
-                                <group>
+                                <group name="audit_1">
                                     <field name="id"/>
                                     <field name="active"
                                            readonly="1"
@@ -69,9 +93,11 @@
                                     <field name="company"
                                            readonly="1"
                                     />
-                                    <field name="technical_name"/>
+                                    <field name="locked"
+                                           widget="boolean_toggle"
+                                    />
                                 </group>
-                                <group>
+                                <group name="audit_2">
                                     <field name="create_uid"
                                            readonly="1"
                                     />
@@ -83,6 +109,27 @@
                                     />
                                     <field name="write_date"
                                            readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   string="Technical"
+                            >
+                                <group name="technical_1">
+                                    <field name="technical_name"
+                                           readonly="locked"
+                                    />
+                                </group>
+                                <group name="technical_2">
+                                    <field name="technical_timestamp"/>
+                                </group>
+                                <group name="technical_data"
+                                       colspan="2"
+                                >
+                                    <field name="technical_data"
+                                           readonly="locked"
+                                           style="word-break: break-word;"
+                                           type="object"
                                     />
                                 </group>
                             </group>
@@ -123,7 +170,16 @@
                 <field name="priority"
                        optional="hide"
                 />
+                <field name="key_enabled"
+                       optional="hide"
+                />
+                <field name="key_method"
+                       optional="hide"
+                />
                 <field name="technical_name"
+                       optional="hide"
+                />
+                <field name="company"
                        optional="hide"
                 />
             </tree>
@@ -145,6 +201,14 @@
                 <field name="tag_type"/>
                 <field name="description"/>
                 <!-- Filter -->
+                <filter name="tag_archived_filter"
+                        domain="[('active', '=', False)]"
+                        string="Archived"
+                />
+                <filter name="tag_all_filter"
+                        domain="[('active', 'in', [True, False])]"
+                        string="All"
+                />
                 <!-- Filter group by -->
                 <filter name="tag_type_filter_group_by"
                         context="{'group_by': 'tag_type'}"

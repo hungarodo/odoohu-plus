@@ -16,7 +16,9 @@
             <xpath expr="//field[@name='country_id']"
                    position="after"
             >
-                <field name="l10n_hu_country_code"/>
+                <field name="l10n_hu_country_code"
+                       string="Country Code"
+                />
             </xpath>
             <xpath expr="//group[1]"
                    position="after"
@@ -38,7 +40,7 @@
                     </group>
                     <group name="l10n_hu_plus_2">
                         <field name="l10n_hu_plus_api_enabled"
-                               string="API"
+                               string="HU+ API"
                                widget="boolean_toggle"
                         />
                         <field name="l10n_hu_plus_technical_name"

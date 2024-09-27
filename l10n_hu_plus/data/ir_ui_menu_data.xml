@@ -129,19 +129,6 @@
         />
         <field name="sequence">32</field>
     </record>
-    <!-- HU+ > Reporting > Logs -->
-    <record id="reporting_log_menu"
-            model="ir.ui.menu"
-    >
-        <field name="name">Logs</field>
-        <field name="action"
-               ref="log_action"
-        />
-        <field name="parent_id"
-               ref="reporting_menu"
-        />
-        <field name="sequence">32</field>
-    </record>
     <!-- HU+ > Configuration -->
     <record id="configuration_menu"
             model="ir.ui.menu"
@@ -165,8 +152,18 @@
         />
         <field name="sequence">8</field>
     </record>
-    <!-- HU+ > Configuration > Companies -->
-    <record id="configuration_company_menu"
+    <!-- HU+ > Configuration > General -->
+    <record id="configuration_general_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">General</field>
+        <field name="parent_id"
+               ref="configuration_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
+    <!-- HU+ > Configuration > General > Companies -->
+    <record id="configuration_general_company_menu"
             model="ir.ui.menu"
     >
         <field name="name">Companies</field>
@@ -174,12 +171,12 @@
                ref="res_company_action"
         />
         <field name="parent_id"
-               ref="configuration_menu"
+               ref="configuration_general_menu"
         />
-        <field name="sequence">16</field>
+        <field name="sequence">8</field>
     </record>
-    <!-- HU+ > Configuration > Tags -->
-    <record id="configuration_tag_menu"
+    <!-- HU+ > Configuration > General > Tags -->
+    <record id="configuration_general_tag_menu"
             model="ir.ui.menu"
     >
         <field name="name">Tags</field>
@@ -187,12 +184,12 @@
                ref="tag_action"
         />
         <field name="parent_id"
-               ref="configuration_menu"
+               ref="configuration_general_menu"
         />
-        <field name="sequence">32</field>
+        <field name="sequence">16</field>
     </record>
-    <!-- HU+ > Configuration > Unit of measures -->
-    <record id="configuration_uom_menu"
+    <!-- HU+ > Configuration > General > Unit of measures -->
+    <record id="configuration_general_uom_menu"
             model="ir.ui.menu"
     >
         <field name="name">Unit of Measures</field>
@@ -200,9 +197,9 @@
                ref="uom_action"
         />
         <field name="parent_id"
-               ref="configuration_menu"
+               ref="configuration_general_menu"
         />
-        <field name="sequence">40</field>
+        <field name="sequence">24</field>
     </record>
     <!-- HU+ > Configuration > Accounting -->
     <record id="configuration_accounting_menu"
@@ -344,6 +341,19 @@
         />
         <field name="sequence">8</field>
     </record>
+    <!-- HU+ > Configuration > Technical > Logs -->
+    <record id="configuration_technical_log_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Logs</field>
+        <field name="action"
+               ref="log_action"
+        />
+        <field name="parent_id"
+               ref="configuration_technical_menu"
+        />
+        <field name="sequence">16</field>
+    </record>
     <!-- HU+ > Configuration > Technical > Scheduled Actions -->
     <record id="configuration_technical_cron_menu"
             model="ir.ui.menu"
@@ -355,7 +365,7 @@
         <field name="parent_id"
                ref="configuration_technical_menu"
         />
-        <field name="sequence">16</field>
+        <field name="sequence">24</field>
     </record>
     <!-- HU+ > Configuration > Technical > System Parameters -->
     <record id="configuration_technical_parameter_menu"
@@ -368,6 +378,6 @@
         <field name="parent_id"
                ref="configuration_technical_menu"
         />
-        <field name="sequence">24</field>
+        <field name="sequence">32</field>
     </record>
 </odoo>

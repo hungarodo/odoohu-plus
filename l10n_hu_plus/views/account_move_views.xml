@@ -28,6 +28,7 @@
                             <field name="l10n_hu_document_type"
                                    options="{'no_create': True,}"
                                    readonly="state != 'draft' and not to_check"
+                                   string="Document Type"
                             />
                             <!-- Original invoice -->
                             <label name="l10n_hu_original_invoice"
@@ -148,20 +149,28 @@
                                    invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                    options="{'no_create': True,}"
                                    readonly="state != 'draft' and not to_check"
+                                   string="Fiscal Representative"
                             />
                             <field name="l10n_hu_fiscal_representative_bank_account"
                                    domain="[('partner_id', '=', l10n_hu_fiscal_representative)]"
                                    invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                    options="{'no_create': True,}"
                                    readonly="state != 'draft' and not to_check"
+                                   string="Fiscal Representative Bank Account"
                             />
-                            <field name="l10n_hu_company_partner"/>
-                            <field name="l10n_hu_partner_country"/>
+                            <field name="l10n_hu_company_partner"
+                                   string="Company Partner"
+                            />
+                            <field name="l10n_hu_partner_country"
+                                   string="Partner Country"
+                            />
                         </group>
                         <group name="l10n_hu_plus_4"
                                string="Journal"
                         >
-                            <field name="l10n_hu_journal_type"/>
+                            <field name="l10n_hu_journal_type"
+                                   string="Journal Type"
+                            />
                         </group>
                     </group>
                 </page>
@@ -181,6 +190,16 @@
         <field name="arch"
                type="xml"
         >
+            <!-- Add delivery date -->
+            <field name="date"
+                   position="after"
+            >
+                <field name="delivery_date"
+                       optional="hide"
+                       readonly="state in ['cancel', 'posted']"
+                       string="Delivery Date"
+                />
+            </field>
             <!-- HU fields -->
             <xpath expr="//field[@name='date']"
                    position="before"
@@ -199,7 +218,7 @@
             >
                 <field name="l10n_hu_vat_date"
                        optional="hide"
-                       string="HU VAT Date"
+                       string="VAT Date"
                 />
             </xpath>
         </field>
@@ -217,14 +236,22 @@
         <field name="arch"
                type="xml"
         >
-           <!-- Filter -->
+            <!-- Filter -->
+            <xpath expr="//filter[@name='invoice_date']"
+                   position="after"
+            >
+                <filter name="delivery_date_filter"
+                        date="delivery_date"
+                        string="Delivery Date"
+                />
+            </xpath>
             <xpath expr="//filter[@name='due_date']"
                    position="after"
             >
                 <separator/>
                 <filter name="l10n_hu_vat_date_filter"
                         date="l10n_hu_vat_date"
-                        string="HU VAT Date"
+                        string="VAT Date"
                 />
                 <separator/>
                 <filter name="l10n_hu_trade_position_domestic_filter"
@@ -245,13 +272,21 @@
                 />
             </xpath>
             <!-- Filter group by -->
+            <xpath expr="//filter[@name='invoicedate']"
+                   position="after"
+            >
+                <filter name="delivery_date_filter_group_by"
+                        context="{'group_by': 'delivery_date'}"
+                        string="Delivery Date"
+                />
+            </xpath>
             <xpath expr="//filter[@name='group_by_sequence_prefix']"
                    position="after"
             >
                 <separator/>
                 <filter name="l10n_hu_vat_date_filter_group_by"
                         context="{'group_by': 'l10n_hu_vat_date'}"
-                        string="HU VAT Date"
+                        string="VAT Date"
                 />
                 <filter name="l10n_hu_partner_country_filter_group_by"
                         context="{'group_by': 'l10n_hu_partner_country'}"

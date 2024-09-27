@@ -17,7 +17,7 @@
                    position="after"
             >
                 <field name="l10n_hu_nav_method"
-                       string="HU NAV Method"
+                       string="NAV Method"
                 />
             </xpath>
         </field>
@@ -39,7 +39,7 @@
                    position="after"
             >
                 <field name="l10n_hu_nav_method"
-                       string="HU NAV Method"
+                       string="NAV Method"
                 />
             </xpath>
         </field>

@@ -64,7 +64,7 @@
                             />
                             <field name="l10n_hu_vpid"
                                    invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="HU VPID"
+                                   string="VPID"
                             />
                             <field name="l10n_hu_financial_representative"
                                    invisible="l10n_hu_incorporation != 'self_employed'"
@@ -98,22 +98,27 @@
                             </div>
                             <field name="l10n_hu_cash_accounting"
                                    invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="Cash Accounting"
                                    widget="boolean_toggle"
                             />
                             <field name="l10n_hu_personal_tax_exempt"
                                    invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="Personal Tax Exempt"
                                    widget="boolean_toggle"
                             />
                             <field name="l10n_hu_self_billing"
                                    invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="Self Billing"
                                    widget="boolean_toggle"
                             />
                             <field name="l10n_hu_small_business"
                                    invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="Small Business"
                                    widget="boolean_toggle"
                             />
                             <field name="l10n_hu_vat_reverse_charge"
                                    invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="VAT Reverse Charge"
                                    widget="boolean_toggle"
                             />
                         </group>
@@ -141,7 +146,7 @@
             >
                 <field name="l10n_hu_vpid"
                        optional="hide"
-                       string="HU VPID"
+                       string="VPID"
                 />
             </xpath>
         </field>
@@ -164,7 +169,7 @@
                    position="after"
             >
                 <field name="l10n_hu_vpid"
-                       string="HU VPID"
+                       string="VPID"
                 />
             </xpath>
         </field>

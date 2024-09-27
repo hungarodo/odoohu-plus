@@ -22,20 +22,22 @@ class L10nHuPlusLog(models.Model):
     # Private attributes
     _name = 'l10n.hu.plus.log'
     _description = "HU+ Log"
-    _order = 'timestamp desc, id desc'
+    _order = 'id desc'
 
     # Default methods
 
     # Field declarations
     active = fields.Boolean(
+        copy=False,
         default=True,
+        readonly=True,
         string="Active",
     )
-    app = fields.Many2one(
-        comodel_name='ir.module.module',
+    app_name = fields.Char(
+        copy=False,
         index=True,
         readonly=True,
-        string="App",
+        string="App Name",
     )
     company = fields.Many2one(
         comodel_name='res.company',
@@ -45,12 +47,13 @@ class L10nHuPlusLog(models.Model):
         string="Company",
     )
     description = fields.Text(
-        help="Additional information",
+        copy=False,
         readonly=True,
         string="Description",
     )
     direction = fields.Selection(
         copy=False,
+        readonly=True,
         selection=[
             ('incoming', "Incoming"),
             ('internal', "Internal"),
@@ -59,6 +62,8 @@ class L10nHuPlusLog(models.Model):
         string="Direction",
     )
     level = fields.Selection(
+        copy=False,
+        readonly=True,
         selection=[
             ('info', "INFO"),
             ('warning', "WARNING"),
@@ -81,27 +86,31 @@ class L10nHuPlusLog(models.Model):
         string="Object Count",
     )
     log_type = fields.Char(
+        copy=False,
         readonly=True,
         string="Log Type",
     )
-    model = fields.Many2one(
-        comodel_name='ir.model',
+    model_name = fields.Char(
+        copy=False,
         index=True,
         readonly=True,
-        string="Model",
+        string="Model Name",
     )
     name = fields.Char(
+        copy=False,
         readonly=True,
         string="Name",
     )
     source_model_name = fields.Char(
         copy=False,
         index=True,
+        readonly=True,
         string="Source Model Name",
     )
     source_record_id = fields.Integer(
         copy=False,
         index=True,
+        readonly=True,
         string="Source Record ID",
     )
     source_record_display_name = fields.Char(
@@ -120,22 +129,32 @@ class L10nHuPlusLog(models.Model):
         ],
         string="Status",
     )
-    technical_data = fields.Text(
+    timestamp = fields.Datetime(
         copy=False,
+        default=fields.Datetime.now(),
+        readonly=True,
+        string="Timestamp",
+    )
+    user_id = fields.Integer(
+        copy=False,
+        readonly=True,
+        string="User ID",
+    )
+    # TECHNICAL
+    technical_data = fields.Json(
+        copy=False,
+        readonly=True,
         string="Technical Data",
+    )
+    technical_data_display = fields.Text(
+        compute='_compute_technical_data_display',
+        string="Technical Data Display",
     )
     technical_name = fields.Char(
         copy=False,
         index=True,
-        string="Technical Name",
-    )
-    timestamp = fields.Datetime(
-        copy=False,
-        string="Processing Timestamp",
-    )
-    user_id = fields.Integer(
         readonly=True,
-        string="User ID",
+        string="Technical Name",
     )
 
     # Compute and search fields, in the same order of field declarations
@@ -162,6 +181,13 @@ class L10nHuPlusLog(models.Model):
 
             # Set field
             record.source_record_display_name = display_name
+
+    def _compute_technical_data_display(self):
+        for record in self:
+            if record.technical_data and len(record.technical_data) > 0:
+                record.technical_data_display = json.dumps(record.technical_data, default=str, indent=4)
+            else:
+                record.technical_data_display = None
 
     # Constraints and onchanges
 
@@ -230,6 +256,11 @@ class L10nHuPlusLog(models.Model):
             return result
         else:
             raise exceptions.UserError(_("Source record model name or source record id is empty!"))
+
+    def action_view_technical_data(self):
+        # Ensure one
+        self.ensure_one()
+        raise exceptions.UserError(str(self.technical_data))
 
     # Business methods
     @api.model
@@ -354,7 +385,7 @@ class L10nHuPlusLog(models.Model):
                         'payload': payload,
                         'request_type': request_type,
                     }
-                    processing_result = log.company.l10n_hu_api_registration_response(response_values)
+                    processing_result = log.company.l10n_hu_plus_api_registration_response(response_values)
             elif response and response.status_code in [400, 401, 402, 403, 404, 422]:
                 response_status_code_type = 'error'
             elif response and response.status_code in [500]:
@@ -385,7 +416,7 @@ class L10nHuPlusLog(models.Model):
             },
         }
         log.sudo().write({
-            'technical_data': json.dumps(technical_data, default=str),
+            'technical_data': technical_data,
         })
 
         # Update result

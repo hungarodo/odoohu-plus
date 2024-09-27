@@ -15,6 +15,22 @@
                   delete="1"
                   edit="1"
             >
+                <header>
+                    <button name="action_generate_key"
+                            class="btn btn-link"
+                            icon="fa-bolt"
+                            invisible="not type_key_enabled or not type_key_method or key"
+                            string="Generate key"
+                            type="object"
+                    />
+                    <button name="action_view_linked_record"
+                            class="btn btn-link"
+                            icon="fa-folder-open"
+                            invisible="not linked_model_name or not linked_record_id"
+                            string="View linked record"
+                            type="object"
+                    />
+                </header>
                 <sheet>
                     <div name="button_box"
                          class="oe_button_box"
@@ -34,37 +50,38 @@
                         <h4 name="object_name">
                             <field name="name"
                                    placeholder="Name..."
+                                   readonly="locked"
                             />
                         </h4>
-                        <div>
-                            <field name="url"
-                                   placeholder="Url..."
-                                   widget="url"
-                            />
-                        </div>
                         <div>
                             <field name="tag"
                                    context="{'default_type': 'object'}"
                                    options="{'color_field': 'color'}"
                                    placeholder="Tags..."
+                                   readonly="locked"
                                    widget="many2many_tags"
                             />
                         </div>
                     </div>
-                    <group>
-                        <group>
+                    <group name="base">
+                        <group name="base_1">
                             <field name="type_tag"
                                    options="{'no_create': True,}"
+                                   readonly="locked"
                             />
                             <field name="category_tag"
                                    options="{'no_create': True,}"
+                                   readonly="locked"
                             />
                             <field name="collection_tag"
                                    options="{'no_create': True,}"
+                                   readonly="locked"
                             />
                         </group>
-                        <group>
-                            <field name="code"/>
+                        <group name="base_2">
+                            <field name="code"
+                                   readonly="locked"
+                            />
                             <field name="description"/>
                         </group>
                     </group>
@@ -85,7 +102,16 @@
                                     <field name="key"
                                            readonly="1"
                                     />
-                                    <field name="external_id"/>
+                                    <field name="external_id"
+                                           readonly="locked"
+                                    />
+                                    <field name="url"
+                                           placeholder="Url..."
+                                           readonly="locked"
+                                           widget="url"
+                                    />
+                                </group>
+                                <group name="details_2">
                                     <field name="priority"
                                            class="oe_inline"
                                            groups="base.group_no_one"
@@ -95,42 +121,37 @@
                                            groups="base.group_no_one"
                                     />
                                 </group>
-                                <group name="details_2">
-                                    <field name="linked_model_name"/>
-                                    <field name="linked_record_id"/>
-                                    <field name="linked_record_name"/>
-                                    <label name="linked_record_actions"
-                                           for="action_view_linked_record"
-                                           string=""
-                                    />
-                                    <div name="linked_record_actions">
-                                        <button name="action_view_linked_record"
-                                                class="btn btn-link"
-                                                icon="fa-folder-open"
-                                                string="View record"
-                                                type="object"
-                                        />
-                                    </div>
-                                </group>
                             </group>
                             <group name="api"
                                    string="API"
                             >
                                 <group name="api_1">
                                     <field name="api_enabled"
+                                           readonly="locked"
                                            widget="boolean_toggle"
                                     />
+                                    <field name="api_timestamp"/>
+                                    <label name="view_api_data"
+                                           for="action_view_api_data"
+                                           string="API Data"
+                                    />
+                                    <div name="view_api_data">
+                                        <button name="action_view_api_data"
+                                                class="btn-link btn-sm"
+                                                icon="fa-code"
+                                                string="View"
+                                                type="object"
+                                        />
+                                    </div>
                                 </group>
                                 <group name="api_2">
-                                    <field name="api_timestamp"/>
-                                </group>
-                                <group name="api_data"
-                                       colspan="2"
-                                >
-                                    <field name="api_data"
-                                           readonly="api_enabled or locked"
-                                           style="word-break: break-word;"
+                                    <field name="linked_model_name"
+                                           readonly="locked"
                                     />
+                                    <field name="linked_record_id"
+                                           readonly="locked"
+                                    />
+                                    <field name="linked_record_name"/>
                                 </group>
                             </group>
                         </page>
@@ -169,41 +190,50 @@
                                     />
                                 </group>
                             </group>
-                            <group name="technical"
-                                   string="Technical"
+                            <group name="related"
+                                   string="Related"
                             >
-                                <group name="technical_1">
+                                <group name="related_1">
                                     <field name="category_technical_name"
                                            string="Category"
                                     />
                                     <field name="collection_technical_name"
                                            string="Collection"
                                     />
-                                </group>
-                                <group name="technical_2">
                                     <field name="status_technical_name"
                                            string="Status"
                                     />
+                                </group>
+                                <group name="related_2">
                                     <field name="type_technical_name"
                                            string="Object Type"
                                     />
-                                </group>
-                                <group name="technical_3">
-                                    <field name="technical_name"/>
-                                </group>
-                                <group name="technical_4">
-                                    <field name="technical_data_type"
-                                           readonly="1"
-                                           string="Data Type"
+                                    <field name="type_key_enabled"
+                                           string="Key Enabled"
                                     />
+                                    <field name="type_key_method"
+                                           string="Key Method"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   string="Technical"
+                            >
+                                <group name="technical_1">
+                                    <field name="technical_name"
+                                           readonly="locked"
+                                    />
+                                </group>
+                                <group name="technical_2">
+                                    <field name="technical_timestamp"/>
                                 </group>
                                 <group name="technical_data"
                                        colspan="2"
                                 >
                                     <field name="technical_data"
-                                           readonly="1"
-                                           string="Data"
+                                           readonly="locked"
                                            style="word-break: break-word;"
+                                           type="object"
                                     />
                                 </group>
                             </group>
@@ -309,6 +339,7 @@
                type="xml"
         >
             <tree create="1"
+                  decoration-muted="not active"
                   delete="1"
                   edit="1"
             >
@@ -402,13 +433,13 @@
                 <field name="linked_model_name"/>
                 <field name="technical_name"/>
                 <!-- Filter -->
-                <filter name="object_active_filter"
-                        domain="[('active', '=', True)]"
-                        string="Active"
-                />
-                <filter name="object_inactive_filter"
+                <filter name="object_archived_filter"
                         domain="[('active', '=', False)]"
-                        string="Inactive"
+                        string="Archived"
+                />
+                <filter name="object_all_filter"
+                        domain="[('active', 'in', [True, False])]"
+                        string="All"
                 />
                 <separator/>
                 <filter name="object_locked_filter"

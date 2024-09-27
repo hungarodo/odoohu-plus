@@ -13,6 +13,9 @@
             <form create="0"
                   edit="0"
             >
+                <header>
+
+                </header>
                 <sheet>
                     <div name="button_box"
                          class="oe_button_box"
@@ -20,30 +23,23 @@
                     </div>
                     <widget name="web_ribbon"
                             bg_color="bg-danger"
-                            invisble="active"
+                            invisible="active"
                             title="Archived"
                     />
                     <div class="oe_title">
                         <h4>
                             <field name="name"
-                                   readonly="1"
                                    style="word-break: break-word;"
                             />
                         </h4>
                     </div>
                     <group name="base">
                         <group name="base_1">
-                            <field name="log_type"
-                                   readonly="1"
-                                   string="Type"
-                            />
-                            <field name="direction"
-                                   readonly="1"
-                            />
+                            <field name="log_type"/>
+                            <field name="direction"/>
                         </group>
                         <group name="base_2">
                             <field name="description"
-                                   readonly="1"
                                    style="word-break: break-word;"
                             />
                         </group>
@@ -55,24 +51,15 @@
                             <group name="details">
                                 <group name="base">
                                     <field name="id"/>
-                                    <field name="company"
-                                           groups="base.group_multi_company"
-                                           readonly="1"
-                                    />
-                                    <field name="level"
-                                           readonly="1"
-                                    />
-                                    <field name="model"
-                                           readonly="1"
-                                    />
-                                    <field name="app"
-                                           readonly="1"
-                                    />
+                                    <field name="active"/>
+                                    <field name="company"/>
+                                    <field name="level"/>
+                                    <field name="model_name"/>
+                                    <field name="app_name"/>
                                 </group>
                                 <group name="audit">
-                                    <field name="user_id"
-                                           readonly="1"
-                                    />
+                                    <field name="user_id"/>
+                                    <field name="timestamp"/>
                                     <field name="create_uid"
                                            readonly="1"
                                     />
@@ -92,15 +79,24 @@
                                    string="Technical"
                             >
                                 <field name="technical_name"
-                                       readonly="1"
-                                       string="Name"
                                        style="word-break: break-word;"
                                 />
-                                <field name="technical_data"
-                                       readonly="1"
-                                       string="Data"
-                                       style="word-break: break-word;"
+                                <label name="view_technical_data"
+                                       for="action_view_technical_data"
+                                       string="Technical Data"
                                 />
+                                <div name="view_technical_data">
+                                    <button name="action_view_technical_data"
+                                            class="btn-link btn-sm"
+                                            icon="fa-code"
+                                            string="View"
+                                            type="object"
+                                    />
+                                    <field name="technical_data_display"
+                                           invisible="1"
+                                           style="word-break: break-word;"
+                                    />
+                                </div>
                             </group>
                         </page>
                     </notebook>
@@ -135,10 +131,10 @@
                        optional="show"
                 />
                 <field name="level"/>
-                <field name="app"
+                <field name="app_name"
                        optional="hide"
                 />
-                <field name="model"
+                <field name="model_name"
                        optional="hide"
                 />
                 <field name="user_id"/>
@@ -169,8 +165,8 @@
                 <field name="level"/>
                 <field name="technical_name"/>
                 <field name="status"/>
-                <field name="app"/>
-                <field name="model"/>
+                <field name="app_name"/>
+                <field name="model_name"/>
                 <!-- Filter -->
                 <filter name="level_info_filter"
                         domain="[('level', '=', 'info')]"
@@ -210,13 +206,13 @@
                         string="Direction"
                 />
                 <separator/>
-                <filter name="app_filter_group_by"
-                        context="{'group_by': 'app'}"
-                        string="App"
+                <filter name="app_name_filter_group_by"
+                        context="{'group_by': 'app_name'}"
+                        string="App Name"
                 />
-                <filter name="model_filter_group_by"
-                        context="{'group_by': 'model'}"
-                        string="Model"
+                <filter name="model_name_filter_group_by"
+                        context="{'group_by': 'model_name'}"
+                        string="Model Name"
                 />
                 <separator/>
                 <filter name="user_id_filter_group_by"

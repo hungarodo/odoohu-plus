@@ -29,10 +29,12 @@ class L10nHuPlusTag(models.Model):
     active = fields.Boolean(
         default=True,
         string="Active",
+        tracking=True,
     )
     code = fields.Char(
         index=True,
         string="Code",
+        tracking=True,
     )
     color = fields.Integer(
         default=_get_default_color,
@@ -48,6 +50,12 @@ class L10nHuPlusTag(models.Model):
     )
     description = fields.Text(
         string="Description",
+    )
+    locked = fields.Boolean(
+        copy=False,
+        default=False,
+        string="Locked",
+        tracking=True,
     )
     name = fields.Char(
         index=True,
@@ -76,10 +84,39 @@ class L10nHuPlusTag(models.Model):
             ('technical', "Technical"),
         ],
         string="Tag Type",
+        tracking=True,
+    )
+    # # KEY
+    key_enabled = fields.Boolean(
+        copy=False,
+        default=False,
+        string="Key Enabled",
+    )
+    key_method = fields.Selection(
+        copy=False,
+        selection=[
+            ('uuid4', "UUID4"),
+        ],
+        string="Key Method",
+    )
+    # # TECHNICAL
+    technical_data = fields.Json(
+        copy=False,
+        readonly=True,
+        string="Technical Data",
     )
     technical_name = fields.Char(
+        copy=False,
         index=True,
         string="Technical Name",
+        tracking=True,
+    )
+    technical_timestamp = fields.Datetime(
+        copy=False,
+        default=fields.Datetime.now(),
+        index=True,
+        readonly=True,
+        string="Technical Timestamp",
     )
     
     # Compute and search fields, in the same order of field declarations

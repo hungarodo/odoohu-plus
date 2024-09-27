@@ -2,7 +2,7 @@
 {
     'name': "HU+",  # Name first, others listed in alphabetical order
     'application': True,
-    'author': "E-Business Kft., Oregional Kft.",
+    'author': "Online ERP, Oregional",
     'auto_install': False,
     'category': "Localization",
     'currency': "EUR",
@@ -68,6 +68,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.4.13",
+    'version': "1.5.11",
     'website': "https://hungarodo.hu/odoohu",
 }

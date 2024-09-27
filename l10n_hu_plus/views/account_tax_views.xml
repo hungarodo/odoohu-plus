@@ -20,26 +20,22 @@
                        string="HU+"
                 >
                     <group name="l10n_hu_plus_1">
-                        <field name="l10n_hu_category"
+                        <field name="l10n_hu_plus_category"
+                               options="{'no_create': True,}"
                                string="Category"
                         />
                         <field name="l10n_hu_vat_declaration"
-                               invisible="l10n_hu_category != 'vat'"
                                string="VAT Declaration"
                                widget="boolean_toggle"
-                        />
-                        <field name="l10n_hu_vat_percentage"
-                               class="oe_inline"
-                               string="VAT Percentage"
                         />
                     </group>
                     <group name="l10n_hu_plus_2">
                         <field name="l10n_hu_plus_api_enabled"
-                               string="API Enabled"
+                               string="API"
                                widget="boolean_toggle"
                         />
                         <field name="l10n_hu_plus_technical_name"
-                               invisible="not l10n_hu_plus_api_enabled"
+                               readonly="l10n_hu_plus_api_enabled"
                                string="Technical Name"
                         />
                     </group>

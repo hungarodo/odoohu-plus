@@ -27,61 +27,61 @@ class L10nHuPlusAccountMove(models.Model):
         index=True,
         readonly=False,
         store=True,
-        string="Cash Accounting",
+        string="HU Cash Accounting",
         tracking=True,
     )
     # # CURRENCY
     l10n_hu_currency_date = fields.Date(
         compute='_compute_l10n_hu_currency',
-        string="Currency Date",
+        string="HU Currency Date",
     )
     l10n_hu_currency_name = fields.Char(
         related='currency_id.name',
-        string="Currency Name",
+        string="HU Currency Name",
     )
     l10n_hu_currency_rate = fields.Float(
         compute='_compute_l10n_hu_currency',
-        string="Currency Rate",
+        string="HU Currency Rate",
     )
     l10n_hu_document_rate = fields.Float(
         copy=False,
-        string="Document Rate",
+        string="HU Document Rate",
     )
     l10n_hu_rate_difference = fields.Float(
         compute='_compute_l10n_hu_rate_difference',
-        string="Rate Difference",
+        string="HU Rate Difference",
     )
     # # DELIVERY PERIOD
     l10n_hu_delivery_period_end = fields.Date(
         copy=False,
-        string="Delivery Period End",
+        string="HU Delivery Period End",
         tracking=True,
     )
     l10n_hu_delivery_period_legal = fields.Text(
         compute='_compute_l10n_hu_delivery_period_text',
-        string="Invoice Delivery Period Legal",
+        string="HU Invoice Delivery Period Legal",
     )
     l10n_hu_delivery_period_start = fields.Date(
         copy=False,
-        string="Delivery Period Start",
+        string="HU Delivery Period Start",
         tracking=True,
     )
     l10n_hu_delivery_period_summary = fields.Text(
         compute='_compute_l10n_hu_delivery_period_text',
-        string="Delivery Period Summary",
+        string="HU Delivery Period Summary",
     )
     # # DOCUMENT TYPE
     l10n_hu_document_type = fields.Many2one(
         comodel_name='l10n.hu.plus.object',
         domain=[('type_technical_name', '=', 'document_type')],
         index=True,
-        string="Document Type",
+        string="HU Document Type",
         tracking=True,
     )
     # # JOURNAL
     l10n_hu_journal_type = fields.Selection(
         related='journal_id.type',
-        string="Journal Type",
+        string="HU Journal Type",
     )
     # # ORIGINAL
     l10n_hu_original_account_move = fields.Many2one(
@@ -91,47 +91,47 @@ class L10nHuPlusAccountMove(models.Model):
         index=True,
         readonly=False,
         store=True,
-        string="Original Account Move",
+        string="HU Original Account Move",
         tracking=True,
     )
     l10n_hu_original_invoice_number = fields.Char(
         copy=False,
-        string="Original Invoice Number",
+        string="HU Original Invoice Number",
         tracking=True,
     )
     # # PARTNER
     l10n_hu_company_partner = fields.Many2one(
         related='company_id.partner_id',
-        string="Company Partner",
+        string="HU Company Partner",
     )
     l10n_hu_fiscal_representative = fields.Many2one(
         comodel_name='res.partner',
         index=True,
-        string="Fiscal Representative",
+        string="HU Fiscal Representative",
     )
     l10n_hu_fiscal_representative_bank_account = fields.Many2one(
         comodel_name='res.partner.bank',
         index=True,
-        string="Fiscal Representative Bank Account",
+        string="HU Fiscal Representative Bank Account",
     )
     l10n_hu_partner_country = fields.Many2one(
         comodel_name='res.country',
         related='partner_id.country_id',
         index=True,
         store=True,
-        string="Partner Country",
+        string="HU Partner Country",
     )
     l10n_hu_trade_position = fields.Selection(
         related='fiscal_position_id.l10n_hu_trade_position',
         index=True,
         store=True,
-        string="Trade Position",
+        string="HU Trade Position",
     )
     # # VAT
     l10n_hu_vat_date = fields.Date(
         copy=False,
         index=True,
-        string="VAT Date",
+        string="HU VAT Date",
         tracking=True,
     )
 

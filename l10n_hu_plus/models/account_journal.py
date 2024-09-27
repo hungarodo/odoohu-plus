@@ -24,7 +24,7 @@ class L10nHuPlusAccountJournal(models.Model):
             ('none', "None"),
             ('today', "Today"),
         ],
-        string="Delivery Date Default",
+        string="HU Delivery Date Default",
     )
     l10n_hu_document_type = fields.Many2many(
         column1='journal',
@@ -33,7 +33,7 @@ class L10nHuPlusAccountJournal(models.Model):
         domain=[('type_technical_name', '=', 'document_type')],
         index=True,
         relation='l10n_hu_journal_document_type_rel',
-        string="HU+ Document Type",
+        string="HU Document Type",
     )
 
     # Compute and search fields, in the same order of field declarations
