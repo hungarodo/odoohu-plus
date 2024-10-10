@@ -140,6 +140,17 @@
                                required="action_type == 'partner'"
                                string="Action"
                         />
+                        <!-- TECHNICAL -->
+                        <field name="technical_action_editable"
+                               invisible="1"
+                        />
+                        <field name="technical_action"
+                               force_save="1"
+                               invisible="action_type != 'technical'"
+                               readonly="not technical_action_editable"
+                               required="action_type == 'technical'"
+                               string="Action"
+                        />
                     </group>
                     <group name="cards">
                         <!-- API -->
@@ -224,6 +235,29 @@
                                 </p>
                             </div>
                         </div>
+                        <!-- TECHNICAL -->
+                        <div name="technical_info"
+                             class="card text-white bg-info"
+                             colspan="2"
+                             invisible="action_type != 'technical'"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-1"/>
+                                Information
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"
+                                   invisible="technical_action != False"
+                                >
+                                    Manage technical actions
+                                </p>
+                                <p class="card-text"
+                                   invisible="technical_action != 'view_data'"
+                                >
+                                    View technical data in JSON format
+                                </p>
+                            </div>
+                        </div>
                     </group>
                 </group>
                 <notebook>
@@ -255,11 +289,28 @@
                             />
                         </group>
                     </page>
+                    <page name="technical_data"
+                          invisible="action_type != 'technical' or technical_action != 'view_data'"
+                          string="Technical Data"
+                    >
+                        <div name="technical_data_display"
+                             colspan="2"
+                        >
+                            <field name="technical_data_display"
+                                   style="word-break: break-word;"
+                                   widget="code"
+                            />
+                        </div>
+                    </page>
                 </notebook>
                 <footer>
+                    <field name="action_execute_visible"
+                           invisible="1"
+                    />
                     <button name="action_execute"
                             class="btn-primary"
                             default_focus="1"
+                            invisible="not action_execute_visible"
                             string="Execute"
                             type="object"
                     />

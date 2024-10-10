@@ -13,6 +13,60 @@
         <field name="arch"
                type="xml"
         >
+            <!-- HU+ banner -->
+            <xpath expr="//div[1]"
+                   position="before"
+            >
+                <div name="l10n_hu_plus_div"
+                     class="border font-weight-bold mb-2 p-1 text-uppercase"
+                     invisible="not id or not l10n_hu_banner_enabled"
+                >
+                    <div name="l10n_hu_info"
+                         class="d-inline ms-2"
+                    >
+                        <span name="hu_flag">
+                            <img src="/l10n_hu_plus/static/description/hu_flag.png"
+                                 alt="HU Flag"
+                                 class="p-0"
+                                 width="36px"
+                            />
+                        </span>
+                        <span name="action_l10n_hu_plus_documentation">
+                            <button name="action_l10n_hu_plus_documentation"
+                                    class="btn-link"
+                                    groups="l10n_hu_plus.user_group"
+                                    string="HU+"
+                                    type="object"
+                            />
+                        </span>
+                    </div>
+                    <div name="l10n_hu_details"
+                         class="d-inline"
+                    >
+                        <span name="l10n_hu_proforma_name"
+                              class="ms-2 me-2"
+                              invisible="not l10n_hu_proforma_date or not l10n_hu_proforma_name"
+                        >
+                            <field name="l10n_hu_proforma_name"
+                                   readonly="1"
+                                   string="Proforma"
+                            />
+                        </span>
+                        <span name="action_l10n_hu_send_proforma"
+                              class="ms-2"
+                              invisible="state != 'draft' or not l10n_hu_proforma_sequence"
+                        >
+                            <button name="action_l10n_hu_send_proforma"
+                                    class="btn-secondary btn-sm"
+                                    groups="l10n_hu_plus.user_group"
+                                    icon="fa-send"
+                                    string="Proforma Send"
+                                    type="object"
+                            />
+                        </span>
+                    </div>
+                </div>
+            </xpath>
             <!-- HU+ fields -->
             <xpath expr="//page[@name='aml_tab']"
                    position="after"
@@ -77,11 +131,22 @@
                                 <button name="action_l10n_hu_refresh_delivery_period"
                                         class="oe_inline btn-sm btn-link"
                                         icon="fa-refresh"
-                                        invisible="state != 'draft' or l10n_hu_journal_type != 'sale'"
+                                        invisible="state != 'draft' or l10n_hu_journal_type != 'sale' or not l10n_hu_delivery_period_start or not l10n_hu_delivery_period_end"
                                         string="Refresh"
                                         type="object"
                                 />
                             </div>
+                            <!-- Proforma -->
+                            <field name="l10n_hu_proforma_name"
+                                   invisible="not l10n_hu_proforma_sequence"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Proforma Name"
+                            />
+                            <field name="l10n_hu_proforma_date"
+                                   invisible="not l10n_hu_proforma_sequence"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Proforma Date"
+                            />
                         </group>
                         <group name="l10n_hu_plus_2"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
@@ -168,6 +233,13 @@
                         <group name="l10n_hu_plus_4"
                                string="Journal"
                         >
+                            <field name="l10n_hu_banner_enabled"
+                                   string="Banner"
+                            />
+                            <field name="l10n_hu_proforma_sequence"
+                                   invisible="not l10n_hu_proforma_sequence"
+                                   string="Proforma Sequence"
+                            />
                             <field name="l10n_hu_journal_type"
                                    string="Journal Type"
                             />
@@ -253,6 +325,15 @@
                         date="l10n_hu_vat_date"
                         string="VAT Date"
                 />
+                <filter name="l10n_hu_proforma_date_filter"
+                        date="l10n_hu_proforma_date"
+                        string="Proforma Date"
+                />
+                <separator/>
+                <filter name="l10n_hu_proforma_sent_filter"
+                        domain="[('l10n_hu_proforma_date', '!=', False), ('l10n_hu_proforma_name', '!=', False)]"
+                        string="Proforma Sent"
+                />
                 <separator/>
                 <filter name="l10n_hu_trade_position_domestic_filter"
                         domain="[('l10n_hu_trade_position', '=', 'domestic')]"
@@ -288,6 +369,11 @@
                         context="{'group_by': 'l10n_hu_vat_date'}"
                         string="VAT Date"
                 />
+                <filter name="l10n_hu_proforma_date_filter_group_by"
+                        context="{'group_by': 'l10n_hu_proforma_date'}"
+                        string="Proforma Date"
+                />
+                <separator/>
                 <filter name="l10n_hu_partner_country_filter_group_by"
                         context="{'group_by': 'l10n_hu_partner_country'}"
                         string="Partner Country"

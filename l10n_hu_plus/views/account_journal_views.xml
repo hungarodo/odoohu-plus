@@ -27,10 +27,23 @@
                                    string="Document Types"
                                    widget="many2many_tags"
                             />
-                        </group>
-                        <group name="l10n_hu_plus_1_2">
                             <field name="l10n_hu_delivery_date_default"
                                    string="Default Delivery Date"
+                            />
+                            <field name="l10n_hu_proforma_sequence"
+                                   invisible="type != 'sale'"
+                                   options="{'no_create': True}"
+                                   string="Proforma Sequence"
+                            />
+                        </group>
+                        <group name="l10n_hu_plus_1_2">
+                            <field name="l10n_hu_banner_enabled"
+                                   string="Banner"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="l10n_hu_priority"
+                                   class="oe_inline"
+                                   string="Priority"
                             />
                         </group>
                     </group>

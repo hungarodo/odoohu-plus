@@ -90,12 +90,6 @@ class L10nHuPlusLog(models.Model):
         readonly=True,
         string="Log Type",
     )
-    model_name = fields.Char(
-        copy=False,
-        index=True,
-        readonly=True,
-        string="Model Name",
-    )
     name = fields.Char(
         copy=False,
         readonly=True,
@@ -113,9 +107,9 @@ class L10nHuPlusLog(models.Model):
         readonly=True,
         string="Source Record ID",
     )
-    source_record_display_name = fields.Char(
-        compute='_compute_source_record_info',
-        string="Source Record Display Name",
+    source_display_name = fields.Char(
+        compute='_compute_source_display_name',
+        string="Source Display Name",
     )
     status = fields.Selection(
         copy=False,
@@ -163,7 +157,7 @@ class L10nHuPlusLog(models.Model):
             record.l10n_hu_object_count = len(record.l10n_hu_object)
 
     @api.depends('source_model_name', 'source_record_id')
-    def _compute_source_record_info(self):
+    def _compute_source_display_name(self):
         for record in self:
             # Initialize variables
             display_name = False
@@ -180,7 +174,7 @@ class L10nHuPlusLog(models.Model):
                     pass
 
             # Set field
-            record.source_record_display_name = display_name
+            record.source_display_name = display_name
 
     def _compute_technical_data_display(self):
         for record in self:
@@ -260,7 +254,27 @@ class L10nHuPlusLog(models.Model):
     def action_view_technical_data(self):
         # Ensure one
         self.ensure_one()
-        raise exceptions.UserError(str(self.technical_data))
+
+        # data_display
+        if self.technical_data:
+            data_display = json.dumps(self.technical_data, default=str, indent=4)
+            context = {
+                'default_action_type': 'technical',
+                'default_action_execute_visible': False,
+                'default_technical_action': 'view_data',
+                'default_technical_data_display': data_display,
+            }
+            result = {
+                'name': _("HU+ Wizard"),
+                'context': context,
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
+            return result
+        else:
+            raise exceptions.UserError(_("Technical data is empty!"))
 
     # Business methods
     @api.model

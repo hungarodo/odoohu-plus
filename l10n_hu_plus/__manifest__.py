@@ -11,6 +11,9 @@
         'data/ir_config_parameter_data.xml',
         'data/ir_cron_data.xml',
         'data/ir_module_category_data.xml',
+        'data/ir_sequence_data.xml',
+        'data/mail_message_subtype_data.xml',
+        'data/mail_template_data.xml',
         'data/template_invoice_data.xml',
         'security/res_groups.xml',
         'security/ir_rule.xml',
@@ -68,6 +71,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.5.11",
+    'version': "1.8.1",
     'website': "https://hungarodo.hu/odoohu",
 }

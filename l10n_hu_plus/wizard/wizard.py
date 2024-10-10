@@ -51,13 +51,18 @@ class L10nHuPlusWizard(models.TransientModel):
         return [(4, x, 0) for x in partner_ids]
 
     # Field declarations
-    # # COMMON
+    ## COMMON
+    action_execute_visible = fields.Boolean(
+        default=True,
+        string="Action Execute Visible",
+    )
     action_type = fields.Selection(
         selection=[
             ('api', "API"),
             ('configuration', "Configuration"),
             ('currency_exchange', "Currency Exchange"),
             ('product', "Product"),
+            ('technical', "Technical"),
         ],
         string="Action Type",
     )
@@ -93,7 +98,7 @@ class L10nHuPlusWizard(models.TransientModel):
         related='company.currency_id.name',
         string="Company Currency Code",
     )
-    # # ACCOUNT MOVE
+    ## ACCOUNT MOVE
     account_move = fields.Many2many(
         comodel_name='account.move',
         column1='wizard',
@@ -120,7 +125,7 @@ class L10nHuPlusWizard(models.TransientModel):
         default=False,
         string="Account Move Visible",
     )
-    # # API
+    ## API
     api_action = fields.Selection(
         selection=[
             ('check_registration', "Check registration"),
@@ -152,7 +157,7 @@ class L10nHuPlusWizard(models.TransientModel):
     api_url = fields.Char(
         string="API URL",
     )
-    # # CURRENCY EXCHANGE
+    ## CURRENCY EXCHANGE
     company_currency_rate = fields.Many2one(
         comodel_name='res.currency.rate',
         string="Company Currency Rate",
@@ -206,7 +211,7 @@ class L10nHuPlusWizard(models.TransientModel):
         default=True,
         string="Exchange Invisible",
     )
-    # # PARTNER
+    ## PARTNER
     partner = fields.Many2many(
         comodel_name='res.partner',
         column1='wizard',
@@ -234,6 +239,21 @@ class L10nHuPlusWizard(models.TransientModel):
         default=False,
         string="Partner Visible",
     )
+    ## TECHNICAL
+    technical_action = fields.Selection(
+        selection=[
+            ('view_data', "View data"),
+        ],
+        string="Technical Action",
+    )
+    technical_action_editable = fields.Boolean(
+        default=False,
+        string="Technical Action Editable",
+    )
+    technical_data_display = fields.Text(
+        readonly=True,
+        string="Technical Data Display",
+    )
 
     # Compute and search fields, in the same order of field declarations
     def _compute_account_move_count(self):
@@ -260,7 +280,7 @@ class L10nHuPlusWizard(models.TransientModel):
         self.ensure_one()
 
         # Process actions
-        # # ACCOUNT MOVE
+        ## ACCOUNT MOVE
         if self.action_type == 'account_move' and self.account_move:
             # Manage result
             manage_result = self.manage_account_move()
@@ -287,7 +307,7 @@ class L10nHuPlusWizard(models.TransientModel):
                 return result
             else:
                 raise exceptions.UserError("account move action error!")
-        # # API
+        ## API
         elif self.action_type == 'api':
             # Update company API data
             api_data = self.company.l10n_hu_plus_api_data
@@ -363,7 +383,7 @@ class L10nHuPlusWizard(models.TransientModel):
                 return result
             else:
                 raise exceptions.UserError("api action error!")
-        # # CURRENCY EXCHANGE
+        ## CURRENCY EXCHANGE
         elif self.action_type == 'currency_exchange' and self.account_move:
             # Write
             for account_move in self.account_move:
@@ -378,9 +398,9 @@ class L10nHuPlusWizard(models.TransientModel):
 
             # Return result
             return result
-        # # PARTNER
+        ## PARTNER
         elif self.action_type == 'partner':
-            # # # list
+            ## # list
             if self.action_partner == 'list':
                 # Check input
                 if not self.partner:
@@ -402,10 +422,39 @@ class L10nHuPlusWizard(models.TransientModel):
                     return result
                 else:
                     raise exceptions.UserError("partner_delete error!")
-            # # # else
+            ## # else
             else:
                 raise exceptions.UserError("invalid partner action!")
-        # # else
+        ## TECHNICAL
+        elif self.action_type == 'technical':
+            # Manage result
+            manage_result = self.manage_technical()
+
+            # Wizard result
+            if manage_result.get('record_ids') and len(manage_result['record_ids']) == 1 and manage_result.get('model_name'):
+                result = {
+                    'name': _("HU+ Technical"),
+                    'res_id': manage_result['record_ids'][0],
+                    'res_model': manage_result['model_name'],
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form,tree',
+                }
+                return result
+            elif manage_result.get('record_ids'):
+                result = {
+                    'name': _("HU+ Technical"),
+                    'domain': [('id', 'in', manage_result['record_ids'])],
+                    'res_model': manage_result['model_name'],
+                    'target': 'current',
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'tree,form',
+                }
+                return result
+            else:
+                result = {'type': 'ir.actions.act_window_close'}
+                return result
+        ## else
         else:
             pass
 
@@ -413,7 +462,7 @@ class L10nHuPlusWizard(models.TransientModel):
         return
 
     # Business methods
-    # # HELPER
+    ## HELPER
     @api.model
     def get_partner_summary(self):
         """ Get summary for the selected partners
@@ -445,7 +494,7 @@ class L10nHuPlusWizard(models.TransientModel):
         # Return result
         return result
 
-    # # MANAGE
+    ## MANAGE
     @api.model
     def manage_account_move(self):
         """ Manage account move actions
@@ -508,21 +557,21 @@ class L10nHuPlusWizard(models.TransientModel):
                     'request_type': 'get_registration',
                 }
                 api_result = self.company.l10n_hu_plus_api_registration_request(api_values)
-            # # Create registration
+            ## Create registration
             elif self.api_action == 'create_registration':
                 debug_list.append("processing create_registration api_action")
                 api_values = {
                     'request_type': 'post_registration',
                 }
                 api_result = self.company.l10n_hu_plus_api_registration_request(api_values)
-            # # Delete registration
+            ## Delete registration
             elif self.api_action == 'delete_registration':
                 debug_list.append("processing delete_registration api_action")
                 api_values = {
                     'request_type': 'delete_registration',
                 }
                 api_result = self.company.l10n_hu_plus_api_registration_request(api_values)
-            # # Get objects
+            ## Get objects
             elif self.api_action == 'download_objects':
                 debug_list.append("processing download_objects api_action")
                 api_values = {
@@ -577,23 +626,23 @@ class L10nHuPlusWizard(models.TransientModel):
         # Iterate partners
         for partner in self.partner:
             # Process scenarios
-            # # DELETE
+            ## DELETE
             if self.action_type == 'partner' \
                     and self.action_partner == 'delete':
                 operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'delete'})
-            # # DOWNLOAD
+            ## DOWNLOAD
             elif self.action_type == 'partner' \
                     and self.action_partner == 'download':
                 operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'download'})
-            # # UPLOAD
+            ## UPLOAD
             elif self.action_type == 'partner' \
                     and self.action_partner == 'upload':
                 operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'upload'})
-            # # PULL DATA
+            ## PULL DATA
             elif self.action_type == 'partner' \
                     and self.action_partner == 'pull':
                 operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'pull'})
-            # # PUSH DATA
+            ## PUSH DATA
             elif self.action_type == 'partner' \
                     and self.action_partner == 'push':
                 operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'push'})
@@ -619,6 +668,43 @@ class L10nHuPlusWizard(models.TransientModel):
             'partner_ids': partner_ids,
             'partner_ids_ignored': partner_ids_ignored,
             'partner_ids_managed': partner_ids_managed,
+        })
+
+        # Return result
+        # raise exceptions.UserError(str(result))
+        return result
+
+    @api.model
+    def manage_technical(self):
+        """ Manage technical actions
+
+        :return: dictionary
+        """
+        # Initialize variables
+        api_result = {}
+        debug_list = []
+        error_list = []
+        info_list = []
+        model_name = None
+        record_ids = []
+        result = {}
+        warning_list = []
+
+        # Process scenarios
+        if self.action_type == 'technical':
+            debug_list.append("processing technical action_type")
+        else:
+            error_list.append("invalid action_type")
+
+        # Update result
+        result.update({
+            'api_result': api_result,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'model_name': model_name,
+            'record_ids': record_ids,
+            'warning_list': warning_list,
         })
 
         # Return result

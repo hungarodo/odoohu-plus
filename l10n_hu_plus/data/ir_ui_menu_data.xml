@@ -224,6 +224,19 @@
         />
         <field name="sequence">16</field>
     </record>
+    <!-- HU+ > Configuration > Accounting > Currencies Journals -->
+    <record id="configuration_accounting_currency_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Currencies</field>
+        <field name="action"
+               ref="base.action_currency_form"
+        />
+        <field name="parent_id"
+               ref="configuration_accounting_menu"
+        />
+        <field name="sequence">20</field>
+    </record>
     <!-- HU+ > Configuration > Accounting > Fiscal Positions -->
     <record id="configuration_accounting_fiscal_position_menu"
             model="ir.ui.menu"

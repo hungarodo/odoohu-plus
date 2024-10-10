@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="proforma_send_mail_message_subtype"
+                model="mail.message.subtype"
+        >
+            <field name="name">HU+ Proforma Send</field>
+            <field name="hidden">1</field>
+            <field name="internal">1</field>
+            <field name="res_model">account.move</field>
+            <field name="sequence">36</field>
+        </record>
+    </data>
+</odoo>

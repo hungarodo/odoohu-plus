@@ -17,6 +17,12 @@ class L10nHuPlusAccountJournal(models.Model):
     # Default methods
 
     # Field declarations
+    l10n_hu_banner_enabled = fields.Boolean(
+        copy=False,
+        default=False,
+        index=True,
+        string="HU Banner",
+    )
     l10n_hu_delivery_date_default = fields.Selection(
         copy=False,
         default='none',
@@ -34,6 +40,19 @@ class L10nHuPlusAccountJournal(models.Model):
         index=True,
         relation='l10n_hu_journal_document_type_rel',
         string="HU Document Type",
+    )
+    l10n_hu_priority = fields.Integer(
+        copy=False,
+        default=10,
+        index=True,
+        string="HU Priority",
+    )
+    l10n_hu_proforma_sequence = fields.Many2one(
+        comodel_name='ir.sequence',
+        copy=False,
+        domain=[('code', 'like', 'proforma')],
+        index=True,
+        string="HU Proforma Sequence",
     )
 
     # Compute and search fields, in the same order of field declarations

@@ -54,8 +54,18 @@
                                     <field name="active"/>
                                     <field name="company"/>
                                     <field name="level"/>
-                                    <field name="model_name"/>
-                                    <field name="app_name"/>
+                                    <field name="app_name"
+                                           string="App"
+                                    />
+                                    <field name="source_model_name"
+                                           string="Model"
+                                    />
+                                    <field name="source_record_id"
+                                           string="Record ID"
+                                    />
+                                    <field name="source_display_name"
+                                           string="Display Name"
+                                    />
                                 </group>
                                 <group name="audit">
                                     <field name="user_id"/>
@@ -133,9 +143,11 @@
                 <field name="level"/>
                 <field name="app_name"
                        optional="hide"
+                       string="App"
                 />
-                <field name="model_name"
+                <field name="source_model_name"
                        optional="hide"
+                       string="Model"
                 />
                 <field name="user_id"/>
                 <field name="create_date"/>
@@ -165,8 +177,12 @@
                 <field name="level"/>
                 <field name="technical_name"/>
                 <field name="status"/>
-                <field name="app_name"/>
-                <field name="model_name"/>
+                <field name="app_name"
+                       string="App"
+                />
+                <field name="source_model_name"
+                       string="Model"
+                />
                 <!-- Filter -->
                 <filter name="level_info_filter"
                         domain="[('level', '=', 'info')]"
@@ -208,11 +224,11 @@
                 <separator/>
                 <filter name="app_name_filter_group_by"
                         context="{'group_by': 'app_name'}"
-                        string="App Name"
+                        string="App"
                 />
-                <filter name="model_name_filter_group_by"
-                        context="{'group_by': 'model_name'}"
-                        string="Model Name"
+                <filter name="source_model_name_filter_group_by"
+                        context="{'group_by': 'source_model_name'}"
+                        string="Model"
                 />
                 <separator/>
                 <filter name="user_id_filter_group_by"

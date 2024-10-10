@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="account_move_proforma_mail_template"
+                model="mail.template"
+        >
+            <field name="name">HU+ Proforma Send</field>
+            <field name="auto_delete"
+                   eval="False"
+            />
+            <field name="email_from">{{object.user_id.email_formatted}}</field>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="model_id"
+                   ref="account.model_account_move"
+            />
+            <field name="partner_to">{{object.partner_id.id}}</field>
+            <field name="report_template_ids"
+                   eval="[(4, ref('account.account_invoices'))]"
+            />
+            <field name="subject">{{object.company_id.name}} Proforma {{object.l10n_hu_proforma_name or ''}}</field>
+            <field name="body_html"
+                   type="html"
+            >
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <p style="font-weight:bold;">
+                            Dear <t t-out="object.partner_id.name"/>!
+                        </p>
+                        <p>
+                            Please find attached our proforma document.
+                        </p>
+                        <t t-if="object.l10n_hu_proforma_name">
+                            <p>
+                                <strong>Reference: <t t-out="object.l10n_hu_proforma_name"/></strong>
+                            </p>
+                        </t>
+                        <t t-else="">
+                            <strong>Reference: Proforma</strong>
+                        </t>
+                        <p>
+                            <strong>Amount: <t t-out="format_amount(object.amount_total,object.currency_id)"/></strong>
+                        </p>
+                        <t t-if="object.invoice_origin">
+                            <p>
+                                <strong>Origin:</strong><t t-out="object.invoice_origin"/>
+                            </p>
+                        </t>
+                        <t t-if="object.ref">
+                            <p>
+                                <strong>Client Reference:</strong><t t-out="object.ref"/>
+                            </p>
+                        </t>
+                        <p>
+                            Please do not hesitate to contact us if you have any questions.
+                        </p>
+                        <p>
+                            Best Regards,
+                        </p>
+                        <p>
+                            <t t-out="user.signature or ''"/>
+                        </p>
+                        <br/>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

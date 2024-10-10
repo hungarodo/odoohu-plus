@@ -19,7 +19,7 @@ class L10nHuPlusAccountMove(models.Model):
     # Default methods
     
     # Field declarations
-    # # CASH ACCOUNTING
+    ## CASH ACCOUNTING
     l10n_hu_cash_accounting = fields.Boolean(
         compute='_compute_l10n_hu_cash_accounting',
         copy=False,
@@ -30,7 +30,7 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Cash Accounting",
         tracking=True,
     )
-    # # CURRENCY
+    ## CURRENCY
     l10n_hu_currency_date = fields.Date(
         compute='_compute_l10n_hu_currency',
         string="HU Currency Date",
@@ -51,7 +51,7 @@ class L10nHuPlusAccountMove(models.Model):
         compute='_compute_l10n_hu_rate_difference',
         string="HU Rate Difference",
     )
-    # # DELIVERY PERIOD
+    ## DELIVERY PERIOD
     l10n_hu_delivery_period_end = fields.Date(
         copy=False,
         string="HU Delivery Period End",
@@ -70,7 +70,7 @@ class L10nHuPlusAccountMove(models.Model):
         compute='_compute_l10n_hu_delivery_period_text',
         string="HU Delivery Period Summary",
     )
-    # # DOCUMENT TYPE
+    ## DOCUMENT TYPE
     l10n_hu_document_type = fields.Many2one(
         comodel_name='l10n.hu.plus.object',
         domain=[('type_technical_name', '=', 'document_type')],
@@ -78,12 +78,16 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Document Type",
         tracking=True,
     )
-    # # JOURNAL
+    ## JOURNAL
+    l10n_hu_banner_enabled = fields.Boolean(
+        related='journal_id.l10n_hu_banner_enabled',
+        string="HU Banner",
+    )
     l10n_hu_journal_type = fields.Selection(
         related='journal_id.type',
         string="HU Journal Type",
     )
-    # # ORIGINAL
+    ## ORIGINAL
     l10n_hu_original_account_move = fields.Many2one(
         comodel_name='account.move',
         compute='_compute_l10n_hu_original_account_move',
@@ -99,7 +103,7 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Original Invoice Number",
         tracking=True,
     )
-    # # PARTNER
+    ## PARTNER
     l10n_hu_company_partner = fields.Many2one(
         related='company_id.partner_id',
         string="HU Company Partner",
@@ -127,7 +131,27 @@ class L10nHuPlusAccountMove(models.Model):
         store=True,
         string="HU Trade Position",
     )
-    # # VAT
+    ## PROFORMA
+    l10n_hu_proforma_pdf = fields.Many2one(
+        comodel_name="ir.attachment",
+        string="Proforma PDF",
+        copy=False,
+    )
+    l10n_hu_proforma_date = fields.Date(
+        copy=False,
+        string="Proforma Date",
+        tracking=True,
+    )
+    l10n_hu_proforma_name = fields.Char(
+        copy=False,
+        string="Proforma Name",
+        tracking=True,
+    )
+    l10n_hu_proforma_sequence = fields.Many2one(
+        related='journal_id.l10n_hu_proforma_sequence',
+        string="Proforma Sequence",
+    )
+    ## VAT
     l10n_hu_vat_date = fields.Date(
         copy=False,
         index=True,
@@ -136,7 +160,7 @@ class L10nHuPlusAccountMove(models.Model):
     )
 
     # Compute and search fields, in the same order of field declarations
-    # # SUPER
+    ## SUPER
     @api.depends('country_code', 'move_type')
     def _compute_show_delivery_date(self):
         # EXTENDS 'account'
@@ -145,7 +169,7 @@ class L10nHuPlusAccountMove(models.Model):
             if move.country_code == 'HU':
                 move.show_delivery_date = True
 
-    # # HU+
+    ## HU+
     @api.depends('partner_id')
     def _compute_l10n_hu_cash_accounting(self):
         for record in self:
@@ -239,6 +263,87 @@ class L10nHuPlusAccountMove(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
+    def action_l10n_hu_plus_documentation(self):
+        """ HU+ documentation """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Return
+        return {
+            'target': 'new',
+            'type': 'ir.actions.act_url',
+            'url': 'https://hungarodo.atlassian.net/wiki/spaces/ODOOHU',
+        }
+
+    def action_l10n_hu_send_proforma(self):
+        """Open a window to compose an email using mail template loaded by default"""
+        # Ensure one
+        self.ensure_one()
+
+        # Prepare proforma_name
+        if not self.l10n_hu_proforma_name and self.journal_id and self.journal_id.l10n_hu_proforma_sequence:
+            self.l10n_hu_proforma_name = self.journal_id.l10n_hu_proforma_sequence.next_by_id()
+        elif not self.l10n_hu_proforma_name:
+            self.l10n_hu_proforma_name = self.env["ir.sequence"].next_by_code("l10n.hu.account.move.proforma")
+        else:
+            pass
+
+        # proforma_self
+        proforma_self = self.with_context(l10n_hu_use_proforma=True, proforma=True)
+
+        # Get default template
+        try:
+            template_id = self.env.ref('l10n_hu_plus.account_move_proforma_mail_template').id
+        except ValueError:
+            template_id = False
+
+        # Get composer
+        try:
+            compose_form_id = self.env['ir.model.data']._xmlid_lookup('mail.email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+
+        # Set template
+        template = template_id and self.env['mail.template'].browse(template_id)
+
+        # Set final language
+        if template and template.lang:
+            language_dict = template._render_template(template.lang, 'account.move', proforma_self.ids)
+            # raise exceptions.UserError("language_dict" + str(language_dict))
+            language = language_dict[self.id]
+        else:
+            language = self.env.context.get('lang')
+        # raise exceptions.UserError("language" + str(language))
+
+        # subtype_id
+        subtype_id = self.env.ref('l10n_hu_plus.proforma_send_mail_message_subtype').id
+
+        # Set mail_context
+        mail_context = {
+            'default_composition_mode': 'comment',
+            'default_model': 'account.move',
+            'default_res_ids': proforma_self.ids,
+            'default_subtype_id': subtype_id,
+            'default_template_id': template_id,
+            'default_use_template': bool(template_id),
+            'force_email': True,
+            'l10n_hu_use_proforma': True,
+            # 'model_description': self.with_context(lang=language).move_type,
+            'model_description': _("Proforma"),
+            'proforma': True,
+        }
+
+        # Return
+        return {
+            'context': mail_context,
+            'res_model': 'mail.compose.message',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'view_mode': 'form',
+        }
+
     def action_l10n_hu_refresh_delivery_period(self):
         """ Used by "Refresh" button in HU+ tab Period section """
         # Ensure one record in self
@@ -346,7 +451,14 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     # Business methods
-    # # SUPER
+    ## SUPER
+    def _get_report_base_filename(self) -> str:
+        """ Get the filename for proforma"""
+        if self.state == 'draft' and self.l10n_hu_proforma_name:
+            return str(self.company_id.vat) + "_" + str(self.l10n_hu_proforma_name).replace('/', '_')
+        else:
+            return super()._get_report_base_filename()
+
     def _l10n_hu_edi_get_invoice_values(self):
         """ Super for original method in l10n_hu_edi app
 
@@ -386,7 +498,7 @@ class L10nHuPlusAccountMove(models.Model):
         # Return result
         return result
 
-    # # HU+
+    ## HU+
     @api.model
     def l10n_hu_get_delivery_date_default(self, values):
         """ Get delivery date default
