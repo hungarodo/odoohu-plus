@@ -55,10 +55,21 @@
                position="before"
         >
             <div name="l10n_hu_period_summary"
-                 class="text-muted mb-3"
+                 class="mb-3"
                  t-if="o.l10n_hu_delivery_period_start and o.l10n_hu_delivery_period_end and o.l10n_hu_delivery_period_summary"
             >
                 <span t-field="o.l10n_hu_delivery_period_summary"/>
+            </div>
+        </xpath>
+        <!-- Proforma -->
+        <xpath expr="//div[@name='comment']"
+               position="before"
+        >
+            <div name="l10n_hu_proforma"
+                 class="mb-3"
+                 t-if="state != 'draft' and o.l10n_hu_proforma_name"
+            >
+                Proforma reference: <span t-field="o.l10n_hu_proforma_name"/>
             </div>
         </xpath>
     </template>

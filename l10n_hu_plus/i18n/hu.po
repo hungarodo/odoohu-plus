@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 19:02+0000\n"
-"PO-Revision-Date: 2024-10-10 19:02+0000\n"
+"POT-Creation-Date: 2024-10-10 20:23+0000\n"
+"PO-Revision-Date: 2024-10-10 20:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2085,7 +2085,7 @@ msgstr "Termékek"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #, python-format
 msgid "Proforma"
-msgstr "Proforma"
+msgstr ""
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
@@ -2109,7 +2109,7 @@ msgstr "Proforma név"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_proforma_pdf
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_proforma_pdf
 msgid "Proforma PDF"
-msgstr "Proforma PDF"
+msgstr ""
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -2129,6 +2129,11 @@ msgstr "Proforma elküldve"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Proforma Sequence"
 msgstr "Proforma sorszám"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
+msgid "Proforma reference:"
+msgstr "Proforma hivatkozás:"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
