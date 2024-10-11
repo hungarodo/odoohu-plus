@@ -349,8 +349,8 @@
                     ('partner_id', 'child_of', self),('l10n_hu_proforma_name', 'ilike', self)]
                 </attribute>
             </xpath>
-            <xpath expr="//field[@name='payment_reference']"
-                   position="after"
+            <xpath expr="//field[@name='journal_id']"
+                   position="before"
             >
                 <field name="l10n_hu_proforma_name"/>
             </xpath>
