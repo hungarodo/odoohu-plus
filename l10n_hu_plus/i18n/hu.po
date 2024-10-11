@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 20:23+0000\n"
-"PO-Revision-Date: 2024-10-10 20:23+0000\n"
+"POT-Creation-Date: 2024-10-11 17:38+0000\n"
+"PO-Revision-Date: 2024-10-11 17:38+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -120,7 +120,7 @@ msgid ""
 "                                <span class=\"mr-2\">Settings are managed on the parent partner</span>"
 msgstr ""
 "<i class=\"fa fa-info-circle mr-2\"/>\n"
-"                                <span class=\"mr-2\">A beállítások a szülő partneren lehet szerkeszteni</span>"
+"                                <span class=\"mr-2\">A beállításokat a szülő partneren lehet szerkeszteni</span>"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -333,7 +333,9 @@ msgid "Action Type Visible"
 msgstr "Akció típus látható"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_company_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
 msgid "Actions"
 msgstr "Akciók"
@@ -696,6 +698,17 @@ msgid "Dashboard"
 msgstr "Kezelőpult"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_payment__l10n_hu_proforma_date
+msgid ""
+"Date when the proforma is sent out, automatically updated, also editable "
+"manually"
+msgstr ""
+"Proforma (díjbekérő) kiküldésének dátuma, automatikusan frissül, kézzel is  "
+"módosítható"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
 msgid "Default Delivery Date"
 msgstr "Alapértelmezett teljesítési dátum"
@@ -782,6 +795,8 @@ msgstr "Dokumentum típusok"
 #. module: l10n_hu_plus
 #: model:ir.actions.act_url,name:l10n_hu_plus.documentation_action
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_documentation_menu
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_company_form_inherit
 msgid "Documentation"
 msgstr "Dokumentáció"
 
@@ -975,10 +990,14 @@ msgstr "HTML látható"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_banner_enabled
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_banner_enabled
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_banner_enabled
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_banner_enabled
 msgid "HU Banner"
+msgstr "HU banner"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_banner_enabled
+msgid "HU Banner Enabled"
 msgstr "HU banner"
 
 #. module: l10n_hu_plus
@@ -1167,6 +1186,11 @@ msgid "HU Proforma Sequence"
 msgstr "Proforma sorszám"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence_available
+msgid "HU Proforma Sequence Available"
+msgstr "HU proforma sorszám elérhető"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_rate_difference
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_rate_difference
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_rate_difference
@@ -1350,6 +1374,14 @@ msgstr "HU+ kategória"
 #: model:ir.actions.act_window,name:l10n_hu_plus.configuration_wizard_action
 msgid "HU+ Configuration Wizard"
 msgstr "HU+ konfiguráció varázsló"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_plus_enabled
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_plus_enabled
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_plus_enabled
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_plus_enabled
+msgid "HU+ Enabled"
+msgstr "HU+ bekapcsolva"
 
 #. module: l10n_hu_plus
 #. odoo-python
@@ -1772,6 +1804,16 @@ msgid "Name"
 msgstr "Név"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_name
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_name
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_payment__l10n_hu_proforma_name
+msgid ""
+"Name of the proforma, automatically generated when sending, also editable "
+"manually"
+msgstr ""
+"Proforma (díjbekérő) neve, automatikusan létrehozásra kerül, kézzel is módosítható"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_form
 msgid "Name..."
@@ -2100,6 +2142,7 @@ msgstr "Proforma dátum"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_name
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_proforma_name
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_proforma_name
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Proforma Name"
 msgstr "Proforma név"
@@ -2253,6 +2296,11 @@ msgstr "Egyéni vállalkozó név"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
 msgid "Self-Employed Number"
 msgstr "Egyéni vállalkozó szám"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
+msgid "Set proforma sequence"
+msgstr "Proforma sorszám beállítása"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit

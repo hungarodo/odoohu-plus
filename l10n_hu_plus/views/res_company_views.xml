@@ -41,52 +41,48 @@
                                    for="action_l10n_hu_plus_api_get_objects"
                                    string="Actions"
                             />
-                            <div name="l10n_hu_plus_actions">
-                                <div name="action_l10n_hu_plus_api_create_registration"
-                                     invisible="l10n_hu_plus_api_registered"
-                                >
-                                    <button name="action_l10n_hu_plus_api_create_registration"
-                                            class="btn-link"
-                                            icon="fa-magic"
-                                            string="Create API registration"
-                                            type="object"
-                                    />
-                                </div>
-                                <div name="action_l10n_hu_plus_api_get_objects"
-                                     invisible="not l10n_hu_plus_api_registered"
-                                >
-                                    <button name="action_l10n_hu_plus_api_get_objects"
-                                            class="btn-link"
-                                            icon="fa-download"
-                                            string="Download API objects"
-                                            type="object"
-                                    />
-                                </div>
-                                <div name="l10n_hu_plus_api_check_delete_registration"
-                                     invisible="not l10n_hu_plus_api_registered"
-                                >
-                                    <button name="action_l10n_hu_plus_api_check_registration"
-                                            class="btn-link"
-                                            icon="fa-magic"
-                                            string="Check API registration"
-                                            type="object"
-                                    />
-                                    <br/>
-                                    <button name="action_l10n_hu_plus_api_delete_registration"
-                                            class="btn-link text-danger"
-                                            icon="fa-trash"
-                                            string="Delete API registration"
-                                            type="object"
-                                    />
-                                </div>
-                                <div name="action_l10n_hu_plus_api_list_logs">
-                                    <button name="action_l10n_hu_plus_api_list_logs"
-                                            class="btn btn-link"
-                                            icon="fa-history"
-                                            string="View API logs"
-                                            type="object"
-                                    />
-                                </div>
+                            <div name="l10n_hu_plus_actions"
+                                 class="d-grid gap-2"
+                            >
+                                <button name="action_l10n_hu_plus_documentation"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-info-circle"
+                                        string="Documentation"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_plus_api_create_registration"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-magic"
+                                        string="Create API registration"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_plus_api_get_objects"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-download"
+                                        invisible="not l10n_hu_plus_api_registered"
+                                        string="Download API objects"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_plus_api_check_registration"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-magic"
+                                        invisible="not l10n_hu_plus_api_registered"
+                                        string="Check API registration"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_plus_api_delete_registration"
+                                        class="btn-link btn-sm text-danger text-start"
+                                        icon="fa-trash"
+                                        invisible="not l10n_hu_plus_api_registered"
+                                        string="Delete API registration"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_plus_api_list_logs"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-history"
+                                        string="View API logs"
+                                        type="object"
+                                />
                             </div>
                         </group>
                         <group name="l10n_hu_plus_api_details"

@@ -22,6 +22,9 @@
                 >
                     <group name="l10n_hu_plus_1">
                         <group name="l10n_hu_plus_1_1">
+                            <field name="l10n_hu_plus_enabled"
+                                   widget="boolean_toggle"
+                            />
                             <field name="l10n_hu_document_type"
                                    options="{'no_create': True, 'no_open': True,}"
                                    string="Document Types"
@@ -31,6 +34,7 @@
                                    string="Default Delivery Date"
                             />
                             <field name="l10n_hu_proforma_sequence"
+                                   domain="[('company_id', '=', company_id)]"
                                    invisible="type != 'sale'"
                                    options="{'no_create': True}"
                                    string="Proforma Sequence"
@@ -45,6 +49,29 @@
                                    class="oe_inline"
                                    string="Priority"
                             />
+                            <field name="l10n_hu_proforma_sequence_available"
+                                   invisible="1"
+                            />
+                            <label name="l10n_hu_actions"
+                                   for="action_l10n_hu_plus_documentation"
+                                   string="Actions"
+                            />
+                            <div name="l10n_hu_actions">
+                                <button name="action_l10n_hu_plus_documentation"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-info-circle"
+                                        string="Documentation"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_set_proforma_sequence"
+                                        class="btn-link text-left"
+                                        groups="l10n_hu_plus.user_group"
+                                        icon="fa-bolt"
+                                        invisible="type != 'sale' or l10n_hu_proforma_sequence_available"
+                                        string="Set proforma sequence"
+                                        type="object"
+                                />
+                            </div>
                         </group>
                     </group>
                 </page>

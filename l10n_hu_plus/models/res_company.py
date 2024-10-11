@@ -272,6 +272,18 @@ class L10nHuBaseResCompany(models.Model):
         # Return
         return
 
+    def action_l10n_hu_plus_documentation(self):
+        """ HU+ documentation """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Return
+        return {
+            'target': 'new',
+            'type': 'ir.actions.act_url',
+            'url': 'https://hungarodo.atlassian.net/wiki/spaces/ODOOHU',
+        }
+
     # Business methods
     # # API
     @api.model

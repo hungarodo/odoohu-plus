@@ -6,8 +6,8 @@
         >
             <field name="name">HU+ Proforma Sequence</field>
             <field name="code">l10n.hu.account.move.proforma</field>
-            <field name="prefix">PROFORMA-</field>
             <field name="padding">5</field>
+            <field name="prefix">PROFORMA-</field>
         </record>
     </data>
 </odoo>

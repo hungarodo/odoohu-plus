@@ -87,6 +87,10 @@ class L10nHuPlusAccountMove(models.Model):
         related='journal_id.type',
         string="HU Journal Type",
     )
+    l10n_hu_plus_enabled = fields.Boolean(
+        related='journal_id.l10n_hu_plus_enabled',
+        string="HU+ Enabled",
+    )
     ## ORIGINAL
     l10n_hu_original_account_move = fields.Many2one(
         comodel_name='account.move',
@@ -139,11 +143,13 @@ class L10nHuPlusAccountMove(models.Model):
     )
     l10n_hu_proforma_date = fields.Date(
         copy=False,
+        help="Date when the proforma is sent out, automatically updated, also editable manually",
         string="Proforma Date",
         tracking=True,
     )
     l10n_hu_proforma_name = fields.Char(
         copy=False,
+        help="Name of the proforma, automatically generated when sending, also editable manually",
         string="Proforma Name",
         tracking=True,
     )

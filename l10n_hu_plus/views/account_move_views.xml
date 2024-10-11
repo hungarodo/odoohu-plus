@@ -19,7 +19,7 @@
             >
                 <div name="l10n_hu_plus_div"
                      class="border font-weight-bold mb-2 p-1 text-uppercase"
-                     invisible="not id or not l10n_hu_banner_enabled"
+                     invisible="not l10n_hu_plus_enabled or not l10n_hu_banner_enabled"
                 >
                     <div name="l10n_hu_info"
                          class="d-inline ms-2"
@@ -72,6 +72,7 @@
                    position="after"
             >
                 <page name="l10n_hu_plus"
+                      invisible="not l10n_hu_plus_enabled"
                       string="HU+"
                 >
                     <group name="l10n_hu_plus">
@@ -136,17 +137,6 @@
                                         type="object"
                                 />
                             </div>
-                            <!-- Proforma -->
-                            <field name="l10n_hu_proforma_name"
-                                   invisible="not l10n_hu_proforma_sequence"
-                                   readonly="state != 'draft' and not to_check"
-                                   string="Proforma Name"
-                            />
-                            <field name="l10n_hu_proforma_date"
-                                   invisible="not l10n_hu_proforma_sequence"
-                                   readonly="state != 'draft' and not to_check"
-                                   string="Proforma Date"
-                            />
                         </group>
                         <group name="l10n_hu_plus_2"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
@@ -205,7 +195,34 @@
                                    string="Rate Difference"
                             />
                         </group>
-                        <group name="l10n_hu_plus_3"
+                        <group name="l10n_hu_plus_proforma"
+                               invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence"
+                               string="Proforma"
+                        >
+                            <field name="l10n_hu_proforma_name"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Proforma Name"
+                            />
+                            <field name="l10n_hu_proforma_date"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Proforma Date"
+                            />
+                            <label name="l10n_hu_proforma_actions"
+                                   for="action_l10n_hu_send_proforma"
+                                   string="Actions"
+                            />
+                            <div name="l10n_hu_proforma_actions">
+                                <button name="action_l10n_hu_send_proforma"
+                                        class="btn-link text-left"
+                                        groups="l10n_hu_plus.user_group"
+                                        icon="fa-send"
+                                        invisible="state != 'draft' or not l10n_hu_proforma_sequence"
+                                        string="Proforma Send"
+                                        type="object"
+                                />
+                            </div>
+                        </group>
+                        <group name="l10n_hu_plus_partner"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                string="Partner"
                         >
@@ -230,9 +247,12 @@
                                    string="Partner Country"
                             />
                         </group>
-                        <group name="l10n_hu_plus_4"
+                        <group name="l10n_hu_plus_journal"
                                string="Journal"
                         >
+                            <field name="l10n_hu_plus_enabled"
+                                   string="HU+"
+                            />
                             <field name="l10n_hu_banner_enabled"
                                    string="Banner"
                             />
@@ -262,6 +282,16 @@
         <field name="arch"
                type="xml"
         >
+            <!-- Add proforma -->
+            <field name="name"
+                   position="after"
+            >
+                <field name="l10n_hu_proforma_name"
+                       optional="hide"
+                       readonly="state in ['cancel', 'posted']"
+                       string="Proforma Name"
+                />
+            </field>
             <!-- Add delivery date -->
             <field name="date"
                    position="after"
@@ -308,6 +338,21 @@
         <field name="arch"
                type="xml"
         >
+            <!-- Field -->
+            <xpath expr="//field[@name='name'][1]"
+                   position="attributes"
+            >
+                <attribute name="filter_domain">['|', '|' , '|', '|', '|',
+                    ('name', 'ilike', self), ('invoice_origin', 'ilike', self),
+                    ('ref', 'ilike', self), ('payment_reference', 'ilike', self),
+                    ('partner_id', 'child_of', self),('l10n_hu_proforma_name', 'ilike', self)]
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_reference']"
+                   position="after"
+            >
+                <field name="l10n_hu_proforma_name"/>
+            </xpath>
             <!-- Filter -->
             <xpath expr="//filter[@name='invoice_date']"
                    position="after"
