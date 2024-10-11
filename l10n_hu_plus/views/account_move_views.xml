@@ -211,9 +211,11 @@
                                    for="action_l10n_hu_send_proforma"
                                    string="Actions"
                             />
-                            <div name="l10n_hu_proforma_actions">
+                            <div name="l10n_hu_proforma_actions"
+                                 class="d-grid gap-2"
+                            >
                                 <button name="action_l10n_hu_send_proforma"
-                                        class="btn-link text-left"
+                                        class="btn-link btn-sm text-left"
                                         groups="l10n_hu_plus.user_group"
                                         icon="fa-send"
                                         invisible="state != 'draft' or not l10n_hu_proforma_sequence"
@@ -226,7 +228,6 @@
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                string="Partner"
                         >
-                            <!-- Partner -->
                             <field name="l10n_hu_fiscal_representative"
                                    invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                    options="{'no_create': True,}"

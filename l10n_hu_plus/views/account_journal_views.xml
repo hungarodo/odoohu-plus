@@ -56,7 +56,9 @@
                                    for="action_l10n_hu_plus_documentation"
                                    string="Actions"
                             />
-                            <div name="l10n_hu_actions">
+                            <div name="l10n_hu_actions"
+                                 class="d-grid gap-2"
+                            >
                                 <button name="action_l10n_hu_plus_documentation"
                                         class="btn-link btn-sm text-start"
                                         icon="fa-info-circle"
@@ -64,7 +66,7 @@
                                         type="object"
                                 />
                                 <button name="action_l10n_hu_set_proforma_sequence"
-                                        class="btn-link text-left"
+                                        class="btn-link btn-sm text-left"
                                         groups="l10n_hu_plus.user_group"
                                         icon="fa-bolt"
                                         invisible="type != 'sale' or l10n_hu_proforma_sequence_available"
