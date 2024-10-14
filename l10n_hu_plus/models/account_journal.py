@@ -15,6 +15,9 @@ class L10nHuPlusAccountJournal(models.Model):
     _inherit = 'account.journal'
 
     # Default methods
+    def _get_default_l10n_hu_proforma_mail_template(self):
+        return self.env.ref('l10n_hu_plus.account_move_proforma_mail_template').id
+
     def _get_default_l10n_hu_proforma_mail_template_domain(self):
         return [('model_id', '=', self.env.ref('account.model_account_move').id)]
 
@@ -58,6 +61,7 @@ class L10nHuPlusAccountJournal(models.Model):
     l10n_hu_proforma_mail_template = fields.Many2one(
         comodel_name='mail.template',
         copy=False,
+        default=_get_default_l10n_hu_proforma_mail_template,
         domain=_get_default_l10n_hu_proforma_mail_template_domain,
         index=True,
         string="HU Proforma Mail Template",
