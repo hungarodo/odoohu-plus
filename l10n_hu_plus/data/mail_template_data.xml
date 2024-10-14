@@ -42,7 +42,7 @@
                         </p>
                         <t t-if="object.invoice_origin">
                             <p>
-                                <strong>Origin:</strong><t t-out="object.invoice_origin"/>
+                                <strong>Origin: <t t-out="object.invoice_origin"/></strong>
                             </p>
                         </t>
                         <t t-if="object.ref">

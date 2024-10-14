@@ -297,11 +297,14 @@ class L10nHuPlusAccountMove(models.Model):
         # proforma_self
         proforma_self = self.with_context(l10n_hu_use_proforma=True, proforma=True)
 
-        # Get default template
-        try:
-            template_id = self.env.ref('l10n_hu_plus.account_move_proforma_mail_template').id
-        except ValueError:
-            template_id = False
+        # Get mail template
+        if self.journal_id and self.journal_id.l10n_hu_proforma_mail_template:
+            template_id = self.journal_id.l10n_hu_proforma_mail_template.id
+        else:
+            try:
+                template_id = self.env.ref('l10n_hu_plus.account_move_proforma_mail_template').id
+            except ValueError:
+                template_id = False
 
         # Get composer
         try:

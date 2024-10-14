@@ -15,6 +15,8 @@ class L10nHuPlusAccountJournal(models.Model):
     _inherit = 'account.journal'
 
     # Default methods
+    def _get_default_l10n_hu_proforma_mail_template_domain(self):
+        return [('model_id', '=', self.env.ref('account.model_account_move').id)]
 
     # Field declarations
     l10n_hu_banner_enabled = fields.Boolean(
@@ -52,6 +54,13 @@ class L10nHuPlusAccountJournal(models.Model):
         default=10,
         index=True,
         string="HU Priority",
+    )
+    l10n_hu_proforma_mail_template = fields.Many2one(
+        comodel_name='mail.template',
+        copy=False,
+        domain=_get_default_l10n_hu_proforma_mail_template_domain,
+        index=True,
+        string="HU Proforma Mail Template",
     )
     l10n_hu_proforma_sequence = fields.Many2one(
         comodel_name='ir.sequence',
