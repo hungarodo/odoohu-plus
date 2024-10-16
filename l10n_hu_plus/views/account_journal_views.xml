@@ -71,7 +71,7 @@
                                         type="object"
                                 />
                                 <button name="action_l10n_hu_set_proforma_sequence"
-                                        class="btn-link btn-sm text-left"
+                                        class="btn-link btn-sm text-start"
                                         groups="l10n_hu_plus.user_group"
                                         icon="fa-bolt"
                                         invisible="type != 'sale' or l10n_hu_proforma_sequence_available"

@@ -43,11 +43,21 @@
                     <div name="l10n_hu_details"
                          class="d-inline"
                     >
-                        <span name="l10n_hu_proforma_name"
+                        <span name="l10n_hu_proforma_sent"
                               class="ms-2 me-2"
                               invisible="not l10n_hu_proforma_date or not l10n_hu_proforma_name"
                         >
                             <field name="l10n_hu_proforma_name"
+                                   readonly="1"
+                                   string="Proforma"
+                            />
+                        </span>
+                        <span name="l10n_hu_proforma_not_sent"
+                              class="ms-2 me-2"
+                              invisible="l10n_hu_proforma_date and l10n_hu_proforma_name"
+                        >
+                            <field name="l10n_hu_proforma_name"
+                                   class="text-danger"
                                    readonly="1"
                                    string="Proforma"
                             />
@@ -195,6 +205,7 @@
                                    string="Rate Difference"
                             />
                         </group>
+                        <!-- Proforma -->
                         <group name="l10n_hu_plus_proforma"
                                invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence"
                                string="Proforma"
@@ -215,7 +226,7 @@
                                  class="d-grid gap-2"
                             >
                                 <button name="action_l10n_hu_send_proforma"
-                                        class="btn-link btn-sm text-left"
+                                        class="btn-link btn-sm text-start"
                                         groups="l10n_hu_plus.user_group"
                                         icon="fa-send"
                                         invisible="state != 'draft' or not l10n_hu_proforma_sequence"
@@ -224,6 +235,7 @@
                                 />
                             </div>
                         </group>
+                        <!-- Partner -->
                         <group name="l10n_hu_plus_partner"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                string="Partner"
@@ -248,6 +260,7 @@
                                    string="Partner Country"
                             />
                         </group>
+                        <!-- Journal -->
                         <group name="l10n_hu_plus_journal"
                                string="Journal"
                         >
