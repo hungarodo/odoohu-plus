@@ -18,26 +18,15 @@ class L10nHuPlusResPartner(models.Model):
     # Default methods
 
     # Field declarations
-    l10n_hu_cash_accounting = fields.Boolean(
-        copy=False,
-        default=False,
-        string="HU Cash Accounting",
+    ## Odoo
+    property_account_position_id = fields.Many2one(
         tracking=True,
     )
-    l10n_hu_crn = fields.Char(
-        copy=False,
-        help="Hungarian Company Registration Number",
-        string="HU CRN",
-    )
+    ## HU+
     l10n_hu_financial_representative = fields.Many2one(
         comodel_name='res.partner',
         copy=False,
         string="HU Financial Representative",
-    )
-    l10n_hu_personal_tax_exempt = fields.Boolean(
-        copy=False,
-        default=False,
-        string="HU Personal Tax Exempt",
     )
     l10n_hu_plus_visible = fields.Boolean(
         compute='_compute_l10n_hu_plus_visible',
@@ -48,30 +37,11 @@ class L10nHuPlusResPartner(models.Model):
         default=False,
         string="HU Self Billing",
     )
-    l10n_hu_self_employed_name = fields.Char(
-        copy=False,
-        string="HU Self-Employed Name",
-    )
-    l10n_hu_self_employed_number = fields.Char(
-        copy=False,
-        size=10,
-        string="HU Self-Employed Number",
-    )
-    l10n_hu_small_business = fields.Boolean(
-        copy=False,
-        default=False,
-        string="HU Small Business",
-    )
-    l10n_hu_vat_reverse_charge = fields.Boolean(
-        copy=False,
-        default=False,
-        string="HU VAT Reverse Charge",
-    )
     l10n_hu_vpid = fields.Char(
         copy=False,
         string="HU VPID",
     )
-    # # FISCAL POSITION
+    ## FISCAL POSITION
     l10n_hu_incorporation = fields.Selection(
         copy=False,
         index=True,
@@ -81,6 +51,12 @@ class L10nHuPlusResPartner(models.Model):
             ('taxable_person', "Taxable Person"),
         ],
         string="HU Taxpayer Type",
+    )
+    l10n_hu_tax_regime = fields.Selection(
+        index=True,
+        related='property_account_position_id.l10n_hu_tax_regime',
+        store=True,
+        string="HU Tax Regime",
     )
     l10n_hu_trade_position = fields.Selection(
         index=True,
@@ -115,6 +91,18 @@ class L10nHuPlusResPartner(models.Model):
     # CRUD methods (and name_get, name_search, ...) overrides
 
     # Action methods
+    def action_l10n_hu_plus_documentation(self):
+        """ HU+ documentation """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Return
+        return {
+            'target': 'new',
+            'type': 'ir.actions.act_url',
+            'url': 'https://hungarodo.atlassian.net/wiki/spaces/ODOOHU',
+        }
+
     def action_l10n_hu_plus_set_vat_status(self):
         # Manage only one record
         self.ensure_one()
@@ -133,7 +121,7 @@ class L10nHuPlusResPartner(models.Model):
             return
 
     # Business methods
-    # # HU+
+    ## HU+
     @api.model
     def l10n_hu_plus_get_vat_status(self):
         """ Get HU+ VAT status data

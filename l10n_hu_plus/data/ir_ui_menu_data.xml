@@ -152,6 +152,19 @@
         />
         <field name="sequence">8</field>
     </record>
+    <!-- HU+ > Configuration > Tags -->
+    <record id="configuration_tag_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Tags</field>
+        <field name="action"
+               ref="tag_action"
+        />
+        <field name="parent_id"
+               ref="configuration_menu"
+        />
+        <field name="sequence">10</field>
+    </record>
     <!-- HU+ > Configuration > General -->
     <record id="configuration_general_menu"
             model="ir.ui.menu"
@@ -175,18 +188,18 @@
         />
         <field name="sequence">8</field>
     </record>
-    <!-- HU+ > Configuration > General > Tags -->
-    <record id="configuration_general_tag_menu"
+    <!-- HU+ > Configuration > General > Currencies -->
+    <record id="configuration_general_currency_menu"
             model="ir.ui.menu"
     >
-        <field name="name">Tags</field>
+        <field name="name">Currencies</field>
         <field name="action"
-               ref="tag_action"
+               ref="base.action_currency_form"
         />
         <field name="parent_id"
                ref="configuration_general_menu"
         />
-        <field name="sequence">16</field>
+        <field name="sequence">20</field>
     </record>
     <!-- HU+ > Configuration > General > Unit of measures -->
     <record id="configuration_general_uom_menu"
@@ -211,6 +224,19 @@
         />
         <field name="sequence">64</field>
     </record>
+    <!-- HU+ > Configuration > Accounting > Chart of Accounts -->
+    <record id="configuration_accounting_coa_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Chart of Accounts</field>
+        <field name="action"
+               ref="account.action_account_form"
+        />
+        <field name="parent_id"
+               ref="configuration_accounting_menu"
+        />
+        <field name="sequence">8</field>
+    </record>
     <!-- HU+ > Configuration > Accounting > Account Journals -->
     <record id="configuration_accounting_account_journal_menu"
             model="ir.ui.menu"
@@ -223,19 +249,6 @@
                ref="configuration_accounting_menu"
         />
         <field name="sequence">16</field>
-    </record>
-    <!-- HU+ > Configuration > Accounting > Currencies Journals -->
-    <record id="configuration_accounting_currency_menu"
-            model="ir.ui.menu"
-    >
-        <field name="name">Currencies</field>
-        <field name="action"
-               ref="base.action_currency_form"
-        />
-        <field name="parent_id"
-               ref="configuration_accounting_menu"
-        />
-        <field name="sequence">20</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Fiscal Positions -->
     <record id="configuration_accounting_fiscal_position_menu"
@@ -276,11 +289,11 @@
         />
         <field name="sequence">40</field>
     </record>
-    <!-- HU+ > Configuration > Accounting > Tags -->
-    <record id="configuration_accounting_tag_menu"
+    <!-- HU+ > Configuration > Accounting > Account Tags -->
+    <record id="configuration_accounting_account_tag_menu"
             model="ir.ui.menu"
     >
-        <field name="name">Tags</field>
+        <field name="name">Account Tags</field>
         <field name="action"
                ref="account_tag_action"
         />

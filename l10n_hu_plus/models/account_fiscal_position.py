@@ -35,6 +35,15 @@ class L10nHuPlusFiscalPosition(models.Model):
         copy=False,
         string="HU+ Technical Name",
     )
+    l10n_hu_tax_regime = fields.Selection(
+        copy=False,
+        selection=[
+            ('ie', 'Individual Exemption'),
+            ('ca', 'Cash Accounting'),
+            ('sb', 'Small Business'),
+        ],
+        string="HU Tax Regime",
+    )
     l10n_hu_trade_position = fields.Selection(
         copy=False,
         index=True,

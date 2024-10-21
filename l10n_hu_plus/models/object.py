@@ -159,7 +159,7 @@ class L10nHuBaseObject(models.Model):
         size=1024,
         string="Url",
     )
-    # # API
+    ## API
     api_enabled = fields.Boolean(
         default=False,
         string="API Enabled",
@@ -174,7 +174,7 @@ class L10nHuBaseObject(models.Model):
         readonly=True,
         string="API Timestamp",
     )
-    # # LINKED
+    ## LINKED
     linked_model_name = fields.Char(
         copy=False,
         index=True,
@@ -189,7 +189,7 @@ class L10nHuBaseObject(models.Model):
         compute='_compute_linked_record_name',
         string="Linked Record Name",
     )
-    # # TECHNICAL
+    ## TECHNICAL
     technical_data = fields.Json(
         copy=False,
         string="Technical Data",
@@ -294,7 +294,7 @@ class L10nHuBaseObject(models.Model):
         return result
 
     # Business methods
-    # # API
+    ## API
     @api.model
     def api_object_request(self, values):
         """ Make a request to API and process the response
@@ -547,7 +547,7 @@ class L10nHuBaseObject(models.Model):
         # Return result
         return result
 
-    # # CRON
+    ## CRON
     @api.model
     def run_object_api_cron(self):
         """ Meant to be called by scheduled cron
@@ -627,7 +627,7 @@ class L10nHuBaseObject(models.Model):
         # Return
         return
 
-    # # HELPER
+    ## HELPER
     @api.model
     def get_random_string(self, values=None):
         """ Get a random string

@@ -47,6 +47,11 @@
                            invisible="parent_id"
                     >
                         <group name="l10n_hu_plus_1">
+                            <field name="l10n_hu_tax_regime"
+                                   groups="account.group_account_invoice"
+                                   invisible="not property_account_position_id"
+                                   string="Tax Regime"
+                            />
                             <field name="l10n_hu_trade_position"
                                    groups="account.group_account_invoice"
                                    invisible="not property_account_position_id"
@@ -59,28 +64,18 @@
                                    invisible="l10n_hu_vat_status != 'domestic'"
                                    string="Taxpayer Type"
                             />
-                            <field name="l10n_hu_crn"
+                            <field name="l10n_hu_self_billing"
                                    invisible="l10n_hu_vat_status != 'domestic'"
+                                   string="Self Billing"
+                                   widget="boolean_toggle"
                             />
                             <field name="l10n_hu_vpid"
                                    invisible="l10n_hu_vat_status != 'domestic'"
                                    string="VPID"
                             />
                             <field name="l10n_hu_financial_representative"
-                                   invisible="l10n_hu_incorporation != 'self_employed'"
+                                   invisible="l10n_hu_incorporation != 'domestic'"
                                    options="{'no_quick_create': True,}"
-                            />
-                            <field name="l10n_hu_self_employed_number"
-                                   help="Self-Employed Number"
-                                   invisible="l10n_hu_incorporation != 'self_employed'"
-                                   readonly="not is_company and parent_id"
-                                   string="S.E. Number"
-                            />
-                            <field name="l10n_hu_self_employed_name"
-                                   help="Self-Employed Name"
-                                   invisible="l10n_hu_incorporation != 'self_employed'"
-                                   readonly="not is_company and parent_id"
-                                   string="S.E. Name"
                             />
                         </group>
                         <group name="l10n_hu_plus_2">
@@ -88,39 +83,22 @@
                                    for="action_l10n_hu_plus_set_vat_status"
                                    string="Actions"
                             />
-                            <div name="l10n_hu_plus_actions">
+                            <div name="l10n_hu_plus_actions"
+                                 class="d-grid gap-2"
+                            >
+                                <button name="action_l10n_hu_plus_documentation"
+                                        class="btn-link btn-sm text-start"
+                                        icon="fa-info-circle"
+                                        string="Documentation"
+                                        type="object"
+                                />
                                 <button name="action_l10n_hu_plus_set_vat_status"
-                                        class="btn btn-link"
+                                        class="btn-link btn-sm text-start"
                                         icon="fa-refresh"
                                         string="Refresh VAT status"
                                         type="object"
                                 />
                             </div>
-                            <field name="l10n_hu_cash_accounting"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="Cash Accounting"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_personal_tax_exempt"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="Personal Tax Exempt"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_self_billing"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="Self Billing"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_small_business"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="Small Business"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_vat_reverse_charge"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="VAT Reverse Charge"
-                                   widget="boolean_toggle"
-                            />
                         </group>
                     </group>
                 </page>
@@ -170,6 +148,28 @@
             >
                 <field name="l10n_hu_vpid"
                        string="VPID"
+                />
+            </xpath>
+            <!-- Filter group by -->
+            <xpath expr="//filter[@name='group_country']"
+                   position="after"
+            >
+                <separator/>
+                <filter name="l10n_hu_vat_status_filter_group_by"
+                        context="{'group_by': 'l10n_hu_vat_status'}"
+                        string="VAT Status"
+                />
+                <filter name="l10n_hu_incorporation_filter_group_by"
+                        context="{'group_by': 'l10n_hu_incorporation'}"
+                        string="Taxpayer Type"
+                />
+                <filter name="l10n_hu_trade_position_filter_group_by"
+                        context="{'group_by': 'l10n_hu_trade_position'}"
+                        string="Trade Position"
+                />
+                <filter name="l10n_hu_tax_regime_filter_group_by"
+                        context="{'group_by': 'l10n_hu_tax_regime'}"
+                        string="Tax Regime"
                 />
             </xpath>
         </field>

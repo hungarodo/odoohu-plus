@@ -285,7 +285,7 @@ class L10nHuBaseResCompany(models.Model):
         }
 
     # Business methods
-    # # API
+    ## API
     @api.model
     def l10n_hu_plus_api_registration_request(self, values):
         """ Registration request to HU+ API
@@ -359,7 +359,7 @@ class L10nHuBaseResCompany(models.Model):
         name = "l10n_hu_plus_api_registration" + " " + str(request_type)
 
         # Create l10n_hu_log
-        # # NOTE: we want to log everything, even failed attempts
+        ## NOTE: we want to log everything, even failed attempts
         log_values = {
             'app_name': 'l10n_hu_plus',
             'company': company.id,
@@ -586,7 +586,7 @@ class L10nHuBaseResCompany(models.Model):
             api_enabled = False
             error_list.append("could not set api_enabled")
 
-        # # app_version
+        ## app_version
         try:
             app_module = ir_module_module_class.search([
                 ('name', '=', 'l10n_hu_plus'),
@@ -602,14 +602,14 @@ class L10nHuBaseResCompany(models.Model):
             app_version = False
             error_list.append('could not set app_version')
 
-        # # database_uuid
+        ## database_uuid
         try:
             database_uuid = config_class.get_param('database.uuid')
         except:
             database_uuid = False
             error_list.append("could not set database_uuid")
 
-        # # odoo_edition
+        ## odoo_edition
         try:
             web_enterprise_module = ir_module_module_class.search([('name', '=', 'web_enterprise')])
             if web_enterprise_module:
@@ -620,7 +620,7 @@ class L10nHuBaseResCompany(models.Model):
             odoo_edition = False
             error_list.append('could not set odoo_edition')
 
-        # # odoo_release
+        ## odoo_release
         try:
             exp_version = odoo_service_common.exp_version()
             odoo_release = exp_version['server_serie']

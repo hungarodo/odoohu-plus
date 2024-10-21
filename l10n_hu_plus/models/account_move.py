@@ -179,16 +179,7 @@ class L10nHuPlusAccountMove(models.Model):
     @api.depends('partner_id')
     def _compute_l10n_hu_cash_accounting(self):
         for record in self:
-            if record.is_invoice(True) and record.state == 'draft':
-                if record.move_type in ['in_invoice', 'in_refund'] and record.partner_id:
-                    cash_accounting = record.partner_id.l10n_hu_cash_accounting
-                elif record.move_type in ['out_invoice', 'out_refund']:
-                    cash_accounting = record.company_id.partner_id.l10n_hu_cash_accounting
-                else:
-                    cash_accounting = False
-            else:
-                cash_accounting = record.l10n_hu_cash_accounting
-            record.l10n_hu_cash_accounting = cash_accounting
+            record.l10n_hu_cash_accounting = record.l10n_hu_get_cash_accounting()
 
     @api.depends('l10n_hu_original_invoice_number')
     def _compute_l10n_hu_original_account_move(self):
@@ -508,6 +499,37 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     ## HU+
+    @api.model
+    def l10n_hu_get_cash_accounting(self):
+        """ Use cash accounting for this invoice or not
+
+        :return: boolean
+        """
+        # Initialize variables
+        result = False
+
+        # Set result
+        if self.is_invoice(True) and self.state == 'draft':
+            if self.move_type in ['in_invoice', 'in_refund'] \
+                    and self.partner_id \
+                    and self.partner_id.property_account_position_id \
+                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
+                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca':
+                result = True
+            elif self.move_type in ['out_invoice', 'out_refund'] \
+                    and self.partner_id \
+                    and self.partner_id.property_account_position_id \
+                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
+                    and self.company_id.l10n_hu_tax_regime == 'ca':
+                result = True
+            else:
+                pass
+        else:
+            pass
+
+        # Return result
+        return result
+
     @api.model
     def l10n_hu_get_delivery_date_default(self, values):
         """ Get delivery date default

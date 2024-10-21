@@ -31,6 +31,9 @@
                             <field name="l10n_hu_trade_position"
                                    string="Trade Position"
                             />
+                            <field name="l10n_hu_tax_regime"
+                                   string="Tax Regime"
+                            />
                         </group>
                         <group name="l10n_hu_plus_2">
                             <field name="l10n_hu_plus_api_enabled"

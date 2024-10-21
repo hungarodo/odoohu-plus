@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-14 05:52+0000\n"
-"PO-Revision-Date: 2024-10-14 05:52+0000\n"
+"POT-Creation-Date: 2024-10-17 20:18+0000\n"
+"PO-Revision-Date: 2024-10-17 20:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgid ""
 "                        </t>\n"
 "                        <t t-if=\"object.ref\">\n"
 "                            <p>\n"
-"                                <strong>Client Reference: <t t-out=\"object.ref\"></t></strong>\n"
+"                                <strong>Client Reference:</strong><t t-out=\"object.ref\"></t>\n"
 "                            </p>\n"
 "                        </t>\n"
 "                        <p>\n"
@@ -287,6 +287,7 @@ msgstr "Főkönyvi számla címke"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.account_tag_action
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_account_tag_menu
 msgid "Account Tags"
 msgstr "Könyvelési címkék"
 
@@ -464,8 +465,8 @@ msgid "Cancelled Invoice"
 msgstr "Visszavont számla"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_tax_regime__ca
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
 msgid "Cash Accounting"
 msgstr "Pénzforgalmi elszámolás"
 
@@ -482,6 +483,11 @@ msgstr "Kategória"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__category_technical_name
 msgid "Category Technical Name"
 msgstr "Kategória technikai név"
+
+#. module: l10n_hu_plus
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_coa_menu
+msgid "Chart of Accounts"
+msgstr "Számlatükör"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_company_form_inherit
@@ -641,7 +647,7 @@ msgid "Credit Note"
 msgstr "Jóváírás"
 
 #. module: l10n_hu_plus
-#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_currency_menu
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_general_currency_menu
 msgid "Currencies"
 msgstr "Pénznemek"
 
@@ -797,6 +803,7 @@ msgstr "Dokumentum típusok"
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_documentation_menu
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_company_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
 msgid "Documentation"
 msgstr "Dokumentáció"
 
@@ -852,6 +859,11 @@ msgstr ""
 #: model:ir.model,name:l10n_hu_plus.model_mail_compose_message
 msgid "Email composition wizard"
 msgstr "E-mail összeállító varázsló"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "End date..."
+msgstr "Záró dátum..."
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__status__error
@@ -911,6 +923,8 @@ msgstr "Külső ID"
 
 #. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_account_fiscal_position
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__property_account_position_id
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__property_account_position_id
 msgid "Fiscal Position"
 msgstr "Pénzügyi pozíció"
 
@@ -1001,17 +1015,9 @@ msgid "HU Banner Enabled"
 msgstr "HU banner"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_crn
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_crn
-msgid "HU CRN"
-msgstr "HU cégjegyzékszám"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_cash_accounting
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_cash_accounting
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_cash_accounting
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_cash_accounting
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_cash_accounting
 msgid "HU Cash Accounting"
 msgstr "Pénzforgalmi elszámolás"
 
@@ -1165,12 +1171,6 @@ msgid "HU Partner Country"
 msgstr "Partner ország"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_personal_tax_exempt
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_personal_tax_exempt
-msgid "HU Personal Tax Exempt"
-msgstr "Alanyi adómentes"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move_line__l10n_hu_price_refund
 msgid "HU Price Refund"
 msgstr "Ár jóváírás"
@@ -1178,12 +1178,12 @@ msgstr "Ár jóváírás"
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_priority
 msgid "HU Priority"
-msgstr "HU prioritás"
+msgstr "Prioritás"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_mail_template
 msgid "HU Proforma Mail Template"
-msgstr "HU Proforma email sablon"
+msgstr "Proforma email sablon"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence
@@ -1193,7 +1193,7 @@ msgstr "Proforma sorszám"
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence_available
 msgid "HU Proforma Sequence Available"
-msgstr "HU proforma sorszám elérhető"
+msgstr "Proforma sorszám elérhető"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_rate_difference
@@ -1209,29 +1209,18 @@ msgid "HU Self Billing"
 msgstr "Önszámlázás"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_self_employed_name
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_self_employed_name
-msgid "HU Self-Employed Name"
-msgstr "Egyéni vállalkozó név"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_self_employed_number
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_self_employed_number
-msgid "HU Self-Employed Number"
-msgstr "Egyéni vállalkozó szám"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_small_business
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_small_business
-msgid "HU Small Business"
-msgstr "Kisadózó"
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_fiscal_position__l10n_hu_tax_regime
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_tax_regime
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_tax_regime
+msgid "HU Tax Regime"
+msgstr "Adórendszer"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_fiscal_position__l10n_hu_incorporation
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_incorporation
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_incorporation
 msgid "HU Taxpayer Type"
-msgstr "HU adózó típus"
+msgstr "Adózó típus"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_trade_position
@@ -1265,12 +1254,6 @@ msgstr "HU ÁFA bevallás"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move_line__l10n_hu_vat_reason
 msgid "HU VAT Reason"
 msgstr "ÁFA ok"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_vat_reverse_charge
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_vat_reverse_charge
-msgid "HU VAT Reverse Charge"
-msgstr "Fordított ÁFA"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_fiscal_position__l10n_hu_vat_status
@@ -1495,12 +1478,6 @@ msgid "Has Message"
 msgstr "Van üzenet"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,help:l10n_hu_plus.field_res_partner__l10n_hu_crn
-#: model:ir.model.fields,help:l10n_hu_plus.field_res_users__l10n_hu_crn
-msgid "Hungarian Company Registration Number"
-msgstr "Magyar cégjegyzékszám"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__id
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__id
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__id
@@ -1575,6 +1552,11 @@ msgstr "Kép 512"
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__direction__incoming
 msgid "Incoming"
 msgstr "Bejövő"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_tax_regime__ie
+msgid "Individual Exemption"
+msgstr "Alanyi adómentes"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__direction__internal
@@ -2057,16 +2039,6 @@ msgid "Payment Type"
 msgstr "Fizetés típusa"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Period End"
-msgstr "Időszak vége"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Period Start"
-msgstr "Időszak kezdete"
-
-#. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #, python-format
@@ -2081,11 +2053,6 @@ msgstr ""
 msgid "Period start date must be before period end date!"
 msgstr ""
 "Periódus kezdő dátumának a periódus záró dátumánál korábbinak kell lennie!"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
-msgid "Personal Tax Exempt"
-msgstr "Egyéni adómentes"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_move_line_view_list
@@ -2244,16 +2211,6 @@ msgid "Responsible User"
 msgstr "Felelős felhasználó"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
-msgid "S.E. Name"
-msgstr "E.v. név"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
-msgid "S.E. Number"
-msgstr "E.v. szám"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_has_sms_error
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__message_has_sms_error
 msgid "SMS Delivery error"
@@ -2299,22 +2256,12 @@ msgid "Self Employed"
 msgstr "Egyéni vállalkozó"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
-msgid "Self-Employed Name"
-msgstr "Egyéni vállalkozó név"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
-msgid "Self-Employed Number"
-msgstr "Egyéni vállalkozó szám"
-
-#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
 msgid "Set proforma sequence"
 msgstr "Proforma sorszám beállítása"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_tax_regime__sb
 msgid "Small Business"
 msgstr "Kisvállalkozás"
 
@@ -2339,6 +2286,11 @@ msgstr "Forrás rekord ID"
 #, python-format
 msgid "Source record model name or source record id is empty!"
 msgstr "Forrás rekord modell név vagy rekord ID üres!"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Start date..."
+msgstr "Kezdő dátum..."
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__status
@@ -2384,8 +2336,7 @@ msgid "Tag Type"
 msgstr "Címke típus"
 
 #. module: l10n_hu_plus
-#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_tag_menu
-#: model:ir.ui.menu,name:l10n_hu_plus.configuration_general_tag_menu
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_tag_menu
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_search
 msgid "Tags"
@@ -2408,6 +2359,13 @@ msgid "Tax Groups"
 msgstr "Adócsoportok"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_position_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_res_partner_filter_inherit
+msgid "Tax Regime"
+msgstr "Adórendszer"
+
+#. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.account_tax_repartition_line_action
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_tax_repartition_line_menu
 msgid "Tax Repartition Lines"
@@ -2428,6 +2386,7 @@ msgstr "Adók"
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_position_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_res_partner_filter_inherit
 msgid "Taxpayer Type"
 msgstr "Adózó típusa"
 
@@ -2504,6 +2463,13 @@ msgid "The currency of rate 1 to the rate of the currency."
 msgstr "1 egységnyi pénznemről átváltás árfolyama."
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_res_partner__property_account_position_id
+#: model:ir.model.fields,help:l10n_hu_plus.field_res_users__property_account_position_id
+msgid ""
+"The fiscal position determines the taxes/accounts used for this contact."
+msgstr ""
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_wizard__company_currency_rate_inverse_amount
 msgid "The rate of the currency to the currency of rate 1 "
 msgstr "1 egységnyi pénznemre átváltás árfolyama (inverz). "
@@ -2532,6 +2498,7 @@ msgstr "Ma"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_position_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_res_partner_filter_inherit
 msgid "Trade Position"
 msgstr "Kereskedelmi pozíció"
 
@@ -2622,13 +2589,9 @@ msgid "VAT Reason"
 msgstr "ÁFA ok"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
-msgid "VAT Reverse Charge"
-msgstr "Fordított ÁFA"
-
-#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_position_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_res_partner_filter_inherit
 msgid "VAT Status"
 msgstr "ÁFA státusz"
 

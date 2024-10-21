@@ -27,7 +27,7 @@ class L10nHuPlusAccountMoveSend(models.TransientModel):
     # Action methods
 
     # Business methods
-    # # SUPER
+    ## SUPER
     @api.depends('checkbox_send_mail')
     def _compute_send_mail_extra_fields(self):
         """ Super override of original method in account app"""

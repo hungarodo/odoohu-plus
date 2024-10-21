@@ -400,7 +400,7 @@ class L10nHuPlusWizard(models.TransientModel):
             return result
         ## PARTNER
         elif self.action_type == 'partner':
-            ## # list
+            ### list
             if self.action_partner == 'list':
                 # Check input
                 if not self.partner:
@@ -422,7 +422,7 @@ class L10nHuPlusWizard(models.TransientModel):
                     return result
                 else:
                     raise exceptions.UserError("partner_delete error!")
-            ## # else
+            ### else
             else:
                 raise exceptions.UserError("invalid partner action!")
         ## TECHNICAL

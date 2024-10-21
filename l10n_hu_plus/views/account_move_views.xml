@@ -123,20 +123,22 @@
                             />
                             <div name="l10n_hu_delivery_period">
                                 <field name="l10n_hu_delivery_period_start"
-                                       class="oe_inline o_input_10ch"
-                                       placeholder="Period Start"
+                                       class="oe_inline o_input_12ch"
+                                       placeholder="Start date..."
                                        readonly="state != 'draft' and not to_check"
                                 />
                                 <span class="ps-2 pe-2">-</span>
                                 <field name="l10n_hu_delivery_period_end"
-                                       class="oe_inline o_input_10ch"
-                                       placeholder="Period End"
+                                       class="oe_inline o_input_12ch"
+                                       placeholder="End date..."
                                        readonly="state != 'draft' and not to_check"
                                 />
                                 <field name="l10n_hu_delivery_period_summary"
+                                       class="text-muted"
                                        invisible="l10n_hu_journal_type != 'sale'"
                                 />
                                 <field name="l10n_hu_delivery_period_legal"
+                                       class="text-muted"
                                        invisible="l10n_hu_journal_type != 'sale'"
                                 />
                                 <button name="action_l10n_hu_refresh_delivery_period"

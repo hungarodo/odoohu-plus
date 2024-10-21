@@ -86,7 +86,7 @@ class L10nHuPlusTag(models.Model):
         string="Tag Type",
         tracking=True,
     )
-    # # KEY
+    ## KEY
     key_enabled = fields.Boolean(
         copy=False,
         default=False,
@@ -99,7 +99,7 @@ class L10nHuPlusTag(models.Model):
         ],
         string="Key Method",
     )
-    # # TECHNICAL
+    ## TECHNICAL
     technical_data = fields.Json(
         copy=False,
         readonly=True,
