@@ -19,9 +19,21 @@
                     <div name="button_box"
                          class="oe_button_box"
                     >
+                        <button name="action_list_account_moves"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                invisible="tag_type != 'account_move'"
+                                type="object"
+                        >
+                            <field name="account_move_count"
+                                   string="Account Move"
+                                   widget="statinfo"
+                            />
+                        </button>
                         <button name="action_list_objects"
                                 class="oe_stat_button"
                                 icon="fa-list"
+                                invisible="tag_type != 'object_type'"
                                 type="object"
                         >
                             <field name="object_count"
@@ -44,19 +56,16 @@
                             />
                         </h2>
                     </div>
-                    <group>
-                        <group>
+                    <group name="base">
+                        <group name="base_1">
                             <field name="tag_type"
                                    readonly="locked"
                                    required="1"
                             />
-                            <field name="code"
-                                   readonly="locked"
-                            />
                         </group>
-                        <group>
-                            <field name="description"
-                                   placeholder="Description..."
+                        <group name="base_2">
+                             <field name="code"
+                                    readonly="locked"
                             />
                         </group>
                     </group>
@@ -66,6 +75,17 @@
                         >
                             <group name="details">
                                 <group name="details_1">
+                                    <field name="color"/>
+                                    <field name="priority"/>
+                                </group>
+                                <group name="details_2">
+                                    <field name="description"
+                                           placeholder="Description..."
+                                    />
+                                </group>
+                                <group name="details_object_type"
+                                       invisible="tag_type != 'object_type'"
+                                >
                                     <field name="key_enabled"
                                            readonly="locked"
                                            widget="boolean_toggle"
@@ -74,14 +94,9 @@
                                            readonly="locked"
                                     />
                                 </group>
-                                <group name="details_2">
-                                    <field name="priority"/>
-                                    <field name="color"/>
-                                </group>
                             </group>
                         </page>
                         <page name="audit"
-                              invisible="not id"
                               string="Audit"
                         >
                             <group name="audit">
@@ -161,6 +176,9 @@
                type="xml"
         >
             <tree>
+                <field name="priority"
+                       widget="handle"
+                />
                 <field name="name"/>
                 <field name="tag_type"/>
                 <field name="code"/>

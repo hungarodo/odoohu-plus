@@ -277,12 +277,22 @@ class L10nHuBaseResCompany(models.Model):
         # Make sure there is one record in self
         self.ensure_one()
 
-        # Return
-        return {
-            'target': 'new',
-            'type': 'ir.actions.act_url',
-            'url': 'https://hungarodo.atlassian.net/wiki/spaces/ODOOHU',
-        }
+        # Get config_parameters
+        try:
+            config_param_obj = self.env['ir.config_parameter'].sudo()
+            config_parameters_string = config_param_obj.get_param('l10n_hu_plus.settings')
+            config_parameters = json.loads(config_parameters_string)
+        except:
+            config_parameters = {}
+
+        if config_parameters.get('documentation_url'):
+            return {
+                'target': 'new',
+                'type': 'ir.actions.act_url',
+                'url': config_parameters['documentation_url'],
+            }
+        else:
+            raise exceptions.UserError(_("Documentation URL is not configured!"))
 
     # Business methods
     ## API

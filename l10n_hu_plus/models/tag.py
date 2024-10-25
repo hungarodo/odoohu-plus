@@ -26,6 +26,10 @@ class L10nHuPlusTag(models.Model):
         return randint(1, 11)
 
     # Field declarations
+    account_move_count = fields.Integer(
+        compute='_compute_account_move_count',
+        string="Account Move Count",
+    )
     active = fields.Boolean(
         default=True,
         string="Active",
@@ -78,6 +82,7 @@ class L10nHuPlusTag(models.Model):
         required=True,
         selection=[
             ('general', "General"),
+            ('account_move', "Account Move"),
             ('object_category', "Object Category"),
             ('object_collection', "Object Collection"),
             ('object_type', "Object Type"),
@@ -120,6 +125,10 @@ class L10nHuPlusTag(models.Model):
     )
     
     # Compute and search fields, in the same order of field declarations
+    def _compute_account_move_count(self):
+        for record in self:
+            record.account_move_count = self.env['account.move'].search_count([('l10n_hu_plus_tag', '=', record.id)])
+
     def _compute_object_count(self):
         for record in self:
             record.object_count = self.env['l10n.hu.plus.object'].search_count([
@@ -136,6 +145,27 @@ class L10nHuPlusTag(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
+    def action_list_account_moves(self):
+        """ List related account moves """
+        # Make sure only there is one record in self
+        self.ensure_one()
+
+        # Domain
+        domain = [('l10n_hu_plus_tag', '=', self.id)]
+
+        # Assemble result
+        result = {
+            'name': _("Account Move"),
+            'domain': domain,
+            'res_model': 'account.move',
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree,form',
+        }
+
+        # Return result
+        return result
+
     def action_list_objects(self):
         """ List related objects """
         # Make sure only there is one record in self

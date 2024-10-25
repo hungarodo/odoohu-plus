@@ -40,15 +40,13 @@
                                required="1"
                         />
                         <!-- ACCOUNT MOVE -->
-                        <field name="account_move_visible"
+                        <field name="account_move_action_editable"
                                invisible="1"
                         />
                         <field name="account_move_action"
                                invisible="action_type != 'account_move'"
-                        />
-                        <field name="account_move"
-                               invisible="not account_move_visible"
-                               options="{'no_create': True,}"
+                               readonly="not account_move_action_editable"
+                               string="Action"
                         />
                         <!-- API -->
                         <field name="api_action_editable"
@@ -153,6 +151,29 @@
                         />
                     </group>
                     <group name="cards">
+                        <!-- ACCOUNT MOVE -->
+                        <div name="account_ move_info"
+                             class="card text-white bg-info"
+                             colspan="2"
+                             invisible="action_type != 'account_move'"
+                        >
+                            <div class="card-header">
+                                <i class="fa fa-info-circle mr-1"/>
+                                Information
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"
+                                   invisible="account_move_action"
+                                >
+                                    Please select an action
+                                </p>
+                                <p class="card-text"
+                                   invisible="account_move_action != 'update_fields'"
+                                >
+                                    Update account move fields
+                                </p>
+                            </div>
+                        </div>
                         <!-- API -->
                         <div name="api_info"
                              class="card text-white bg-info"
@@ -261,6 +282,20 @@
                     </group>
                 </group>
                 <notebook>
+                    <page name="account_move"
+                          invisible="not account_move_visible"
+                          string="Account Move"
+                    >
+                        <group>
+                            <field name="account_move_visible"
+                                   invisible="1"
+                            />
+                            <field name="account_move"
+                                   colspan="2"
+                                   nolabel="1"
+                            />
+                        </group>
+                    </page>
                     <page name="api_data"
                           invisible="action_type != 'api' or api_action != 'view_api_data'"
                           string="API Data"

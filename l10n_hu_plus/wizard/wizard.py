@@ -58,6 +58,7 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     action_type = fields.Selection(
         selection=[
+            ('account_move', "Account Move"),
             ('api', "API"),
             ('configuration', "Configuration"),
             ('currency_exchange', "Currency Exchange"),
@@ -109,12 +110,12 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     account_move_action = fields.Selection(
         selection=[
-            ('list', "List"),
+            ('update_fields', "Update fields"),
         ],
         string="Account Move Action",
     )
     account_move_action_editable = fields.Boolean(
-        default=True,
+        default=False,
         string="Account Move Action Editable",
     )
     account_move_count = fields.Integer(
@@ -505,16 +506,16 @@ class L10nHuPlusWizard(models.TransientModel):
         :return: dictionary
         """
         # Initialize variables
-        account_moves = []
         account_move_ids = []
-        account_move_ids_ignored = []
-        account_move_ids_managed = []
         result = {}
 
         # Process scenarios
         if self.action_type == 'account_move':
-            if self.account_move_action == 'list':
-                operation_result = {}
+            if self.account_move_action == 'update_fields':
+                for account_move in self.account_move:
+                    write_values = {}
+                    account_move.write(write_values)
+                    account_move_ids.append(account_move.id)
             else:
                 pass
         else:
@@ -522,10 +523,7 @@ class L10nHuPlusWizard(models.TransientModel):
 
         # Update result
         result.update({
-            'account_moves': account_moves,
             'account_move_ids': account_move_ids,
-            'account_move_ids_ignored': account_move_ids_ignored,
-            'account_move_ids_managed': account_move_ids_managed,
         })
 
         # Return result

@@ -97,11 +97,7 @@ class L10nHuPlusAccountJournal(models.Model):
         self.ensure_one()
 
         # Return
-        return {
-            'target': 'new',
-            'type': 'ir.actions.act_url',
-            'url': 'https://hungarodo.atlassian.net/wiki/spaces/ODOOHU',
-        }
+        return self.company_id.action_l10n_hu_plus_documentation()
 
     def action_l10n_hu_set_proforma_sequence(self):
         """ Set a proforma sequence"""

@@ -6,7 +6,7 @@
                 model="ir.config_parameter"
         >
             <field name="key">l10n_hu_plus.settings</field>
-            <field name="value">{"object_api_key": "", "object_api_pagination": 80, "object_api_url": ""}</field>
+            <field name="value">{"documentation_url": "https://hungarodo.atlassian.net/wiki/spaces/ODOOHU", "object_api_key": "", "object_api_pagination": 80, "object_api_url": ""}</field>
         </record>
     </data>
 </odoo>

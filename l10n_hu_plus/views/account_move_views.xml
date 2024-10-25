@@ -17,11 +17,11 @@
             <xpath expr="//div[1]"
                    position="before"
             >
-                <div name="l10n_hu_plus_div"
-                     class="border font-weight-bold mb-2 p-1 text-uppercase"
+                <div name="l10n_hu_plus_banner"
+                     class="border font-weight-bold mb-2 p-1"
                      invisible="not l10n_hu_plus_enabled or not l10n_hu_banner_enabled"
                 >
-                    <div name="l10n_hu_info"
+                    <div name="l10n_hu_banner_start"
                          class="d-inline ms-2"
                     >
                         <span name="hu_flag">
@@ -40,7 +40,7 @@
                             />
                         </span>
                     </div>
-                    <div name="l10n_hu_details"
+                    <div name="l10n_hu_banner_center"
                          class="d-inline"
                     >
                         <span name="l10n_hu_proforma_sent"
@@ -74,6 +74,82 @@
                                     type="object"
                             />
                         </span>
+                        <span name="l10n_hu_plus_tag"
+                              class="ms-2 me-2"
+                        >
+                            <field name="l10n_hu_plus_tag"
+                                   context="{'default_tag_type': 'account_move'}"
+                                   nolabel="1"
+                                   options="{'color_field': 'color'}"
+                                   placeholder="Tags..."
+                                   widget="many2many_tags"
+                            />
+                        </span>
+                    </div>
+                    <div name="l10n_hu_banner_end"
+                         class="d-inline float-end"
+                    >
+                        <span name="action_l10n_hu_quick_accounting"
+                              class="ms-2"
+                              invisible="state != 'draft'"
+                        >
+                            <button name="action_l10n_hu_quick_accounting"
+                                    class="btn-link btn-sm"
+                                    groups="l10n_hu_plus.user_group"
+                                    icon="fa-bolt"
+                                    string="Accounting"
+                                    type="object"
+                            />
+                        </span>
+                        <div name="l10n_hu_banner_dropdown"
+                             class="btn-group ms-2"
+                             groups="l10n_hu_plus.user_group"
+                        >
+                            <a id="l10nHuDropdownMenuLink"
+                               name="l10n_hu_banner_dropdown_button"
+                               class="btn btn-secondary dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false"
+                            >
+                                Actions
+                            </a>
+                            <ul name="l10n_hu_banner_dropdown_items"
+                                aria-labelledby="l10nHuDropdownMenuLink"
+                                class="dropdown-menu dropdown-menu-end"
+                            >
+                                <li name="l10n_hu_wizard_accounting">
+                                    <button name="action_l10n_hu_wizard_accounting"
+                                            class="dropdown-item"
+                                            icon="fa-magic"
+                                            string="Accounting"
+                                            type="object"
+                                    />
+                                </li>
+                                <li name="l10n_hu_wizard_currency_exchange"
+                                    invisible="currency_id == company_currency_id"
+                                >
+                                    <button name="action_l10n_hu_wizard_currency_exchange"
+                                            class="dropdown-item"
+                                            icon="fa-calculator"
+                                            string="Currency Exchange"
+                                            type="object"
+                                    />
+                                </li>
+                                <li name="l10n_hu_banner_dropdown_divider"
+                                    class="dropdown-divider"
+                                />
+                                <li name="l10n_hu_plus_documentation">
+                                    <button name="action_l10n_hu_plus_documentation"
+                                            class="dropdown-item"
+                                            icon="fa-info-circle"
+                                            string="Documentation"
+                                            type="object"
+                                    />
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </xpath>
@@ -149,6 +225,14 @@
                                         type="object"
                                 />
                             </div>
+                            <!-- Tags -->
+                            <field name="l10n_hu_plus_tag"
+                                   context="{'default_tag_type': 'account_move'}"
+                                   invisible="l10n_hu_banner_enabled"
+                                   options="{'color_field': 'color'}"
+                                   string="Tags"
+                                   widget="many2many_tags"
+                            />
                         </group>
                         <group name="l10n_hu_plus_2"
                                invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
@@ -318,7 +402,7 @@
                        string="Delivery Date"
                 />
             </field>
-            <!-- HU fields -->
+            <!-- Trade position -->
             <xpath expr="//field[@name='date']"
                    position="before"
             >
@@ -330,13 +414,24 @@
                        string="Trade Position"
                 />
             </xpath>
-            <!-- HU fields -->
+            <!-- VAT date -->
             <xpath expr="//field[@name='date']"
                    position="after"
             >
                 <field name="l10n_hu_vat_date"
                        optional="hide"
                        string="VAT Date"
+                />
+            </xpath>
+            <!-- Tag -->
+            <xpath expr="//field[@name='state']"
+                   position="before"
+            >
+                <field name="l10n_hu_plus_tag"
+                       optional="hide"
+                       options="{'color_field': 'color'}"
+                       string="HU+ Tag"
+                       widget="many2many_tags"
                 />
             </xpath>
         </field>
@@ -367,7 +462,12 @@
             <xpath expr="//field[@name='journal_id']"
                    position="before"
             >
-                <field name="l10n_hu_proforma_name"/>
+                <field name="l10n_hu_proforma_name"
+                       string="Proforma"
+                />
+                <field name="l10n_hu_plus_tag"
+                       string="HU+ Tag"
+                />
             </xpath>
             <!-- Filter -->
             <xpath expr="//filter[@name='invoice_date']"
@@ -446,6 +546,11 @@
                 <filter name="partner_id_filter_group_by"
                         context="{'group_by': 'partner_id'}"
                         string="Partner"
+                />
+                <separator/>
+                <filter name="l10n_hu_plus_tag_filter_group_by"
+                        context="{'group_by': 'l10n_hu_plus_tag'}"
+                        string="HU+ Tag"
                 />
             </xpath>
         </field>

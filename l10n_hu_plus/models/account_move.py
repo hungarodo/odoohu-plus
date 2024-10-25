@@ -136,11 +136,6 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Trade Position",
     )
     ## PROFORMA
-    l10n_hu_proforma_pdf = fields.Many2one(
-        comodel_name="ir.attachment",
-        string="Proforma PDF",
-        copy=False,
-    )
     l10n_hu_proforma_date = fields.Date(
         copy=False,
         help="Date when the proforma is sent out, automatically updated, also editable manually",
@@ -150,12 +145,22 @@ class L10nHuPlusAccountMove(models.Model):
     l10n_hu_proforma_name = fields.Char(
         copy=False,
         help="Name of the proforma, automatically generated when sending, also editable manually",
-        string="Proforma Name",
+        string="HU Proforma Name",
         tracking=True,
     )
     l10n_hu_proforma_sequence = fields.Many2one(
         related='journal_id.l10n_hu_proforma_sequence',
-        string="Proforma Sequence",
+        string="HU Proforma Sequence",
+    )
+    ## TAG
+    l10n_hu_plus_tag = fields.Many2many(
+        column1='account_move',
+        column2='tag',
+        comodel_name='l10n.hu.plus.tag',
+        domain=[('tag_type', 'in', ['account_move', 'general'])],
+        index=True,
+        relation='l10n_hu_plus_tag_account_move_rel',
+        string="HU+ Tag",
     )
     ## VAT
     l10n_hu_vat_date = fields.Date(
@@ -266,11 +271,31 @@ class L10nHuPlusAccountMove(models.Model):
         self.ensure_one()
 
         # Return
-        return {
-            'target': 'new',
-            'type': 'ir.actions.act_url',
-            'url': 'https://hungarodo.atlassian.net/wiki/spaces/ODOOHU',
-        }
+        return self.company_id.action_l10n_hu_plus_documentation()
+
+    def action_l10n_hu_refresh_delivery_period(self):
+        """ Used by "Refresh" button in HU+ tab Period section """
+        # Ensure one record in self
+        self.ensure_one()
+
+        # Initialize variables
+        write_values = {}
+
+        # Get summary
+        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
+            delivery_period_result = self.l10n_hu_get_delivery_period({})
+
+            if delivery_period_result.get('delivery_date'):
+                write_values.update({
+                    'delivery_date': delivery_period_result['delivery_date'],
+                })
+
+        # Write
+        if len(write_values) > 0:
+            self.write(write_values)
+
+        # Return
+        return
 
     def action_l10n_hu_send_proforma(self):
         """Open a window to compose an email using mail template loaded by default"""
@@ -344,29 +369,19 @@ class L10nHuPlusAccountMove(models.Model):
             'view_mode': 'form',
         }
 
-    def action_l10n_hu_refresh_delivery_period(self):
-        """ Used by "Refresh" button in HU+ tab Period section """
+    def action_l10n_hu_quick_accounting(self):
+        """ Quick accounting """
         # Ensure one record in self
         self.ensure_one()
 
-        # Initialize variables
-        write_values = {}
-
-        # Get summary
-        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
-            delivery_period_result = self.l10n_hu_get_delivery_period({})
-
-            if delivery_period_result.get('delivery_date'):
-                write_values.update({
-                    'delivery_date': delivery_period_result['delivery_date'],
-                })
-
-        # Write
-        if len(write_values) > 0:
-            self.write(write_values)
-
-        # Return
-        return
+        # Get values
+        values_result = self.l10n_hu_get_field_values({})
+        if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
+            return self.write(values_result['field_values'])
+        elif len(values_result.get('field_values')) == 0:
+            return
+        else:
+            raise exceptions.UserError(str(values_result['error_list']))
 
     def action_l10n_hu_view_original_invoice(self):
         """ View original invoice """
@@ -408,6 +423,33 @@ class L10nHuPlusAccountMove(models.Model):
             return result
         else:
             return
+
+    def action_l10n_hu_wizard_accounting(self):
+        """ Open the HU+ wizard to update accounting fields """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Prepare variables
+
+        # Assemble context
+        context = {
+            'default_action_type': 'account_move',
+            'default_action_type_visible': False,
+            'default_account_move_action': 'update_fields',
+        }
+
+        # Assemble result
+        result = {
+            'name': _("HU+ Wizard"),
+            'context': context,
+            'res_model': 'l10n.hu.plus.wizard',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
+
+        # Return result
+        return result
 
     def action_l10n_hu_wizard_currency_exchange(self):
         """ Open the L10n HU wizard to calculate the document rate """
@@ -833,4 +875,38 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
+        return result
+
+    @api.model
+    def l10n_hu_get_field_values(self, values):
+        """ Get field values for HU accounting
+
+        NOTE:
+        - This method takes care of special hungarian fields
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_get_field_values BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        field_values = {}
+        info_list = []
+        result = {}
+        warning_list = []
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'field_values': field_values,
+            'info_list': info_list,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_get_field_values END" + str(result))
         return result

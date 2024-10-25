@@ -343,6 +343,9 @@
                   delete="1"
                   edit="1"
             >
+                <field name="priority"
+                       widget="handle"
+                />
                 <field name="id"
                        optional="hide"
                 />

@@ -71,6 +71,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.10.1",
+    'version': "1.11.2",
     'website': "https://hungarodo.hu/odoohu",
 }
