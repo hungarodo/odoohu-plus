@@ -5,7 +5,7 @@
             model="ir.actions.act_window"
     >
         <field name="name">Customer Invoices</field>
-        <field name="context">{'default_move_type': 'out_invoice', 'search_default_posted':1, 'search_default_l10n_hu_vat_declaration_filter': 1,}</field>
+        <field name="context">{'default_move_type': 'out_invoice', 'search_default_status': 1}</field>
         <field name="domain">[('move_type', 'in', ['out_invoice', 'out_refund'])]</field>
         <field name="res_model">account.move</field>
         <field name="type">ir.actions.act_window</field>
@@ -55,7 +55,7 @@
             model="ir.actions.act_window"
     >
         <field name="name">Vendor Bills</field>
-        <field name="context">{'default_move_type': 'in_invoice', 'search_default_posted':1, 'search_default_l10n_hu_vat_declaration_filter': 1,}</field>
+        <field name="context">{'default_move_type': 'in_invoice', 'search_default_status': 1}</field>
         <field name="domain">[('move_type', 'in', ['in_invoice', 'in_refund'])]</field>
         <field name="res_model">account.move</field>
         <field name="type">ir.actions.act_window</field>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-24 19:17+0000\n"
-"PO-Revision-Date: 2024-10-24 19:17+0000\n"
+"POT-Creation-Date: 2024-10-28 08:48+0000\n"
+"PO-Revision-Date: 2024-10-28 08:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1415,6 +1415,15 @@ msgid "HU+ Logs"
 msgstr "HU+ naplózások"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_plus_notes
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_plus_notes
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_plus_notes
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
+msgid "HU+ Notes"
+msgstr "HU+ megjegyzések"
+
+#. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #: model:ir.model,name:l10n_hu_plus.model_l10n_hu_plus_object
@@ -1455,6 +1464,7 @@ msgstr "HU+ címke"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.tag_action
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
 msgid "HU+ Tags"
 msgstr "HU+ címkék"
 
@@ -1839,6 +1849,12 @@ msgid "New"
 msgstr "Új"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr ""
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__activity_date_deadline
 msgid "Next Activity Deadline"
@@ -1885,6 +1901,16 @@ msgstr "Nincs"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_search
 msgid "Not Locked"
 msgstr "Nem zárolt"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Notes"
+msgstr "Megjegyzések"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Notes..."
+msgstr "Megjegyzések..."
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_needaction_counter
@@ -2179,6 +2205,12 @@ msgstr "Proforma hivatkozás:"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Rate Difference"
 msgstr "Árfolyam eltérés"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__rating_ids
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__rating_ids
+msgid "Ratings"
+msgstr ""
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_form

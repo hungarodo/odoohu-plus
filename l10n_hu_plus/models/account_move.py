@@ -78,6 +78,21 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Document Type",
         tracking=True,
     )
+    ## HU+
+    l10n_hu_plus_notes = fields.Char(
+        copy=False,
+        index=True,
+        string="HU+ Notes",
+    )
+    l10n_hu_plus_tag = fields.Many2many(
+        column1='account_move',
+        column2='tag',
+        comodel_name='l10n.hu.plus.tag',
+        domain=[('tag_type', 'in', ['account_move', 'general'])],
+        index=True,
+        relation='l10n_hu_plus_tag_account_move_rel',
+        string="HU+ Tag",
+    )
     ## JOURNAL
     l10n_hu_banner_enabled = fields.Boolean(
         related='journal_id.l10n_hu_banner_enabled',
@@ -151,16 +166,6 @@ class L10nHuPlusAccountMove(models.Model):
     l10n_hu_proforma_sequence = fields.Many2one(
         related='journal_id.l10n_hu_proforma_sequence',
         string="HU Proforma Sequence",
-    )
-    ## TAG
-    l10n_hu_plus_tag = fields.Many2many(
-        column1='account_move',
-        column2='tag',
-        comodel_name='l10n.hu.plus.tag',
-        domain=[('tag_type', 'in', ['account_move', 'general'])],
-        index=True,
-        relation='l10n_hu_plus_tag_account_move_rel',
-        string="HU+ Tag",
     )
     ## VAT
     l10n_hu_vat_date = fields.Date(

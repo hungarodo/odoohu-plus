@@ -85,6 +85,15 @@
                                    widget="many2many_tags"
                             />
                         </span>
+                        <span name="l10n_hu_plus_notes"
+                              class="ms-2 me-2"
+                        >
+                            <field name="l10n_hu_plus_notes"
+                                   nolabel="1"
+                                   placeholder="Notes..."
+                                   style="min-width:360px;"
+                            />
+                        </span>
                     </div>
                     <div name="l10n_hu_banner_end"
                          class="d-inline float-end"
@@ -232,6 +241,11 @@
                                    options="{'color_field': 'color'}"
                                    string="Tags"
                                    widget="many2many_tags"
+                            />
+                            <!-- Notes -->
+                            <field name="l10n_hu_plus_notes"
+                                   invisible="l10n_hu_banner_enabled"
+                                   string="Notes"
                             />
                         </group>
                         <group name="l10n_hu_plus_2"
@@ -423,7 +437,7 @@
                        string="VAT Date"
                 />
             </xpath>
-            <!-- Tag -->
+            <!-- Tag and notes -->
             <xpath expr="//field[@name='state']"
                    position="before"
             >
@@ -432,6 +446,10 @@
                        options="{'color_field': 'color'}"
                        string="HU+ Tag"
                        widget="many2many_tags"
+                />
+                <field name="l10n_hu_plus_notes"
+                       optional="hide"
+                       string="HU+ Notes"
                 />
             </xpath>
         </field>
@@ -468,6 +486,9 @@
                 <field name="l10n_hu_plus_tag"
                        string="HU+ Tag"
                 />
+                <field name="l10n_hu_plus_notes"
+                       string="HU+ Notes"
+                />
             </xpath>
             <!-- Filter -->
             <xpath expr="//filter[@name='invoice_date']"
@@ -491,6 +512,14 @@
                         string="Proforma Date"
                 />
                 <separator/>
+                <filter name="l10n_hu_plus_tag_filter"
+                        domain="[('l10n_hu_plus_tag', '!=', False)]"
+                        string="HU+ Tags"
+                />
+                <filter name="l10n_hu_plus_notes_filter"
+                        domain="[('l10n_hu_plus_notes', '!=', False)]"
+                        string="HU+ Notes"
+                />
                 <filter name="l10n_hu_proforma_sent_filter"
                         domain="[('l10n_hu_proforma_date', '!=', False), ('l10n_hu_proforma_name', '!=', False)]"
                         string="Proforma Sent"
@@ -526,6 +555,10 @@
                    position="after"
             >
                 <separator/>
+                <filter name="l10n_hu_plus_tag_filter_group_by"
+                        context="{'group_by': 'l10n_hu_plus_tag'}"
+                        string="HU+ Tag"
+                />
                 <filter name="l10n_hu_vat_date_filter_group_by"
                         context="{'group_by': 'l10n_hu_vat_date'}"
                         string="VAT Date"
@@ -534,7 +567,6 @@
                         context="{'group_by': 'l10n_hu_proforma_date'}"
                         string="Proforma Date"
                 />
-                <separator/>
                 <filter name="l10n_hu_partner_country_filter_group_by"
                         context="{'group_by': 'l10n_hu_partner_country'}"
                         string="Partner Country"
@@ -546,11 +578,6 @@
                 <filter name="partner_id_filter_group_by"
                         context="{'group_by': 'partner_id'}"
                         string="Partner"
-                />
-                <separator/>
-                <filter name="l10n_hu_plus_tag_filter_group_by"
-                        context="{'group_by': 'l10n_hu_plus_tag'}"
-                        string="HU+ Tag"
                 />
             </xpath>
         </field>
