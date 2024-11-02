@@ -83,6 +83,7 @@ class L10nHuPlusTag(models.Model):
         selection=[
             ('general', "General"),
             ('account_move', "Account Move"),
+            ('document_type', "Document Type"),
             ('object_category', "Object Category"),
             ('object_collection', "Object Collection"),
             ('object_type', "Object Type"),
@@ -127,7 +128,11 @@ class L10nHuPlusTag(models.Model):
     # Compute and search fields, in the same order of field declarations
     def _compute_account_move_count(self):
         for record in self:
-            record.account_move_count = self.env['account.move'].search_count([('l10n_hu_plus_tag', '=', record.id)])
+            record.account_move_count = self.env['account.move'].search_count([
+                '|',
+                ('l10n_hu_document_type', '=', record.id),
+                ('l10n_hu_plus_tag', '=', record.id),
+            ])
 
     def _compute_object_count(self):
         for record in self:
@@ -151,11 +156,11 @@ class L10nHuPlusTag(models.Model):
         self.ensure_one()
 
         # Domain
-        domain = [('l10n_hu_plus_tag', '=', self.id)]
+        domain = ['|', ('l10n_hu_document_type', '=', self.id), ('l10n_hu_plus_tag', '=', self.id)]
 
         # Assemble result
         result = {
-            'name': _("Account Move"),
+            'name': _("Account Moves"),
             'domain': domain,
             'res_model': 'account.move',
             'target': 'current',
@@ -193,5 +198,30 @@ class L10nHuPlusTag(models.Model):
 
         # Return result
         return result
+
+    def action_view_technical_data(self):
+        # Ensure one
+        self.ensure_one()
+
+        # data_display
+        if self.technical_data:
+            data_display = json.dumps(self.technical_data, default=str, indent=4)
+            context = {
+                'default_action_type': 'technical',
+                'default_action_execute_visible': False,
+                'default_technical_action': 'view_data',
+                'default_technical_data_display': data_display,
+            }
+            result = {
+                'name': _("HU+ Wizard"),
+                'context': context,
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
+            return result
+        else:
+            raise exceptions.UserError(_("Technical data is empty!"))
 
     # Business methods

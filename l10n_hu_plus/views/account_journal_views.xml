@@ -25,11 +25,6 @@
                             <field name="l10n_hu_plus_enabled"
                                    widget="boolean_toggle"
                             />
-                            <field name="l10n_hu_document_type"
-                                   options="{'no_create': True, 'no_open': True,}"
-                                   string="Document Types"
-                                   widget="many2many_tags"
-                            />
                             <field name="l10n_hu_delivery_date_default"
                                    string="Default Delivery Date"
                             />

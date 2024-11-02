@@ -140,10 +140,6 @@ class L10nHuPlusLog(models.Model):
         readonly=True,
         string="Technical Data",
     )
-    technical_data_display = fields.Text(
-        compute='_compute_technical_data_display',
-        string="Technical Data Display",
-    )
     technical_name = fields.Char(
         copy=False,
         index=True,
@@ -176,19 +172,12 @@ class L10nHuPlusLog(models.Model):
             # Set field
             record.source_display_name = display_name
 
-    def _compute_technical_data_display(self):
-        for record in self:
-            if record.technical_data and len(record.technical_data) > 0:
-                record.technical_data_display = json.dumps(record.technical_data, default=str, indent=4)
-            else:
-                record.technical_data_display = None
-
     # Constraints and onchanges
 
     # CRUD methods (and display_name, name_search, ...) overrides
     def _compute_display_name(self):
         for record in self:
-            record.display_name = "HU-LOG-" + str(record.id)
+            record.display_name = "HU+LOG-" + str(record.id)
 
     # Action methods
     def action_delete(self):

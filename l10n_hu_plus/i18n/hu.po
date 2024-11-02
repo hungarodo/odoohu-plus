@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 08:48+0000\n"
-"PO-Revision-Date: 2024-10-28 08:48+0000\n"
+"POT-Creation-Date: 2024-11-01 20:26+0000\n"
+"PO-Revision-Date: 2024-11-01 20:26+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -237,7 +237,6 @@ msgstr "Könyvelési naplók"
 
 #. module: l10n_hu_plus
 #. odoo-python
-#: code:addons/l10n_hu_plus/models/tag.py:0
 #: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_tag__tag_type__account_move
@@ -281,6 +280,7 @@ msgstr "Könyvelési tétel látható"
 
 #. module: l10n_hu_plus
 #. odoo-python
+#: code:addons/l10n_hu_plus/models/tag.py:0
 #: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #, python-format
 msgid "Account Moves"
@@ -796,14 +796,10 @@ msgid "Document Rate"
 msgstr "Dokumentum árfolyam"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_tag__tag_type__document_type
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Document Type"
 msgstr "Dokumentum típus"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
-msgid "Document Types"
-msgstr "Dokumentum típusok"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_url,name:l10n_hu_plus.documentation_action
@@ -1104,7 +1100,6 @@ msgstr "Dokumentum árfolyam"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_document_type
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_document_type
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_document_type
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_document_type
 msgid "HU Document Type"
@@ -1501,6 +1496,7 @@ msgstr "HU+ látható"
 #: code:addons/l10n_hu_plus/models/object.py:0
 #: code:addons/l10n_hu_plus/models/res_company.py:0
 #: code:addons/l10n_hu_plus/models/res_company.py:0
+#: code:addons/l10n_hu_plus/models/tag.py:0
 #: model:ir.actions.act_window,name:l10n_hu_plus.wizard_action
 #: model:ir.model,name:l10n_hu_plus.model_l10n_hu_plus_wizard
 #, python-format
@@ -1852,7 +1848,7 @@ msgstr "Új"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__activity_calendar_event_id
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "Következő tevékenység naptár esemény"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__activity_date_deadline
@@ -2210,7 +2206,7 @@ msgstr "Árfolyam eltérés"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__rating_ids
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "Értékelések"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_form
@@ -2468,12 +2464,12 @@ msgstr "Technikai akció bekapcsolva"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__technical_data
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__technical_data
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Technical Data"
 msgstr "Technikai adat"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__technical_data_display
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__technical_data_display
 msgid "Technical Data Display"
 msgstr "Technikai adat megjelenítés"
@@ -2497,6 +2493,7 @@ msgstr "Technikai időbélyeg"
 #. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/log.py:0
+#: code:addons/l10n_hu_plus/models/tag.py:0
 #, python-format
 msgid "Technical data is empty!"
 msgstr "Nincs technikai adat!"
@@ -2599,7 +2596,7 @@ msgstr "Mértékegységek"
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Update account move fields"
-msgstr ""
+msgstr "Könyvelési tétel mezők frissítése"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_action__update_fields
@@ -2694,6 +2691,7 @@ msgstr "Szállítói jóváírás"
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "View"
 msgstr "Megtekintés"

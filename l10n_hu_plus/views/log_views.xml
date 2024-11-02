@@ -102,10 +102,8 @@
                                             string="View"
                                             type="object"
                                     />
-                                    <field name="technical_data_display"
-                                           invisible="1"
-                                           style="word-break: break-word;"
-                                    />
+                                    <field name="technical_data"
+                                           invisible="1"/>
                                 </div>
                             </group>
                         </page>

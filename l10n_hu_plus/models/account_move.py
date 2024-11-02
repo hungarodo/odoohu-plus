@@ -72,8 +72,8 @@ class L10nHuPlusAccountMove(models.Model):
     )
     ## DOCUMENT TYPE
     l10n_hu_document_type = fields.Many2one(
-        comodel_name='l10n.hu.plus.object',
-        domain=[('type_technical_name', '=', 'document_type')],
+        comodel_name='l10n.hu.plus.tag',
+        domain=[('tag_type', '=', 'document_type')],
         index=True,
         string="HU Document Type",
         tracking=True,

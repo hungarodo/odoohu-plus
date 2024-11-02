@@ -34,7 +34,6 @@
                         <span name="action_l10n_hu_plus_documentation">
                             <button name="action_l10n_hu_plus_documentation"
                                     class="btn-link"
-                                    groups="l10n_hu_plus.user_group"
                                     string="HU+"
                                     type="object"
                             />
@@ -64,11 +63,11 @@
                         </span>
                         <span name="action_l10n_hu_send_proforma"
                               class="ms-2"
+                              groups="l10n_hu_plus.user_group"
                               invisible="state != 'draft' or not l10n_hu_proforma_sequence"
                         >
                             <button name="action_l10n_hu_send_proforma"
                                     class="btn-secondary btn-sm"
-                                    groups="l10n_hu_plus.user_group"
                                     icon="fa-send"
                                     string="Proforma Send"
                                     type="object"
@@ -76,6 +75,7 @@
                         </span>
                         <span name="l10n_hu_plus_tag"
                               class="ms-2 me-2"
+                              groups="l10n_hu_plus.user_group"
                         >
                             <field name="l10n_hu_plus_tag"
                                    context="{'default_tag_type': 'account_move'}"
@@ -87,6 +87,7 @@
                         </span>
                         <span name="l10n_hu_plus_notes"
                               class="ms-2 me-2"
+                              groups="l10n_hu_plus.user_group"
                         >
                             <field name="l10n_hu_plus_notes"
                                    nolabel="1"
@@ -100,11 +101,11 @@
                     >
                         <span name="action_l10n_hu_quick_accounting"
                               class="ms-2"
+                              groups="l10n_hu_plus.user_group"
                               invisible="state != 'draft'"
                         >
                             <button name="action_l10n_hu_quick_accounting"
                                     class="btn-link btn-sm"
-                                    groups="l10n_hu_plus.user_group"
                                     icon="fa-bolt"
                                     string="Accounting"
                                     type="object"
@@ -112,7 +113,6 @@
                         </span>
                         <div name="l10n_hu_banner_dropdown"
                              class="btn-group ms-2"
-                             groups="l10n_hu_plus.user_group"
                         >
                             <a id="l10nHuDropdownMenuLink"
                                name="l10n_hu_banner_dropdown_button"
@@ -127,8 +127,11 @@
                             <ul name="l10n_hu_banner_dropdown_items"
                                 aria-labelledby="l10nHuDropdownMenuLink"
                                 class="dropdown-menu dropdown-menu-end"
+                                role="menu"
                             >
-                                <li name="l10n_hu_wizard_accounting">
+                                <li name="l10n_hu_wizard_accounting"
+                                    groups="l10n_hu_plus.user_group"
+                                >
                                     <button name="action_l10n_hu_wizard_accounting"
                                             class="dropdown-item"
                                             icon="fa-magic"
@@ -137,6 +140,7 @@
                                     />
                                 </li>
                                 <li name="l10n_hu_wizard_currency_exchange"
+                                    groups="l10n_hu_plus.user_group"
                                     invisible="currency_id == company_currency_id"
                                 >
                                     <button name="action_l10n_hu_wizard_currency_exchange"
@@ -237,6 +241,7 @@
                             <!-- Tags -->
                             <field name="l10n_hu_plus_tag"
                                    context="{'default_tag_type': 'account_move'}"
+                                   groups="l10n_hu_plus.user_group"
                                    invisible="l10n_hu_banner_enabled"
                                    options="{'color_field': 'color'}"
                                    string="Tags"
@@ -244,6 +249,7 @@
                             />
                             <!-- Notes -->
                             <field name="l10n_hu_plus_notes"
+                                   groups="l10n_hu_plus.user_group"
                                    invisible="l10n_hu_banner_enabled"
                                    string="Notes"
                             />

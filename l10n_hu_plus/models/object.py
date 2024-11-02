@@ -461,13 +461,6 @@ class L10nHuBaseObject(models.Model):
 
         :return: dictionary
         """
-        # Oregional log
-        self._oregional_log({
-            'app': "oregional_api_base",
-            'description': str(values),
-            'level': "debug",
-            'name': "application_get_registration_response BEGIN",
-        })
         # raise exceptions.UserError("application_get_registration_response BEGIN" + str(values))
 
         # Initialize variables
@@ -535,16 +528,8 @@ class L10nHuBaseObject(models.Model):
             'warning_list': warning_list,
         })
 
-        # Oregional log
-        self._oregional_log({
-            'app': "oregional_api_base",
-            'description': str(result),
-            'level': "debug",
-            'name': "application_get_registration_response END",
-        })
-        # raise exceptions.UserError('application_get_registration_response END' + str(result))
-
         # Return result
+        # raise exceptions.UserError('application_get_registration_response END' + str(result))
         return result
 
     ## CRON
