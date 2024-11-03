@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-01 20:26+0000\n"
-"PO-Revision-Date: 2024-11-01 20:26+0000\n"
+"POT-Creation-Date: 2024-11-03 14:47+0000\n"
+"PO-Revision-Date: 2024-11-03 14:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -676,6 +676,20 @@ msgstr "Árfolyam átváltás"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Currency From"
 msgstr "Forrás pénznem"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Currency Rate"
+msgstr "Árfolyam"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: model:ir.actions.act_window,name:l10n_hu_plus.res_currency_rate_action
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_general_currency_rate_menu
+#, python-format
+msgid "Currency Rates"
+msgstr "Árfolyamok"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
@@ -1604,6 +1618,13 @@ msgstr "Belső"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
 msgid "Invoice"
 msgstr "Számla"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Invoice currency is same as company currency!"
+msgstr "Számla pénzneme megegyezik a vállalat pénznemével!"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_is_follower

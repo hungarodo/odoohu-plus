@@ -278,6 +278,20 @@ class L10nHuPlusAccountMove(models.Model):
         # Return
         return self.company_id.action_l10n_hu_plus_documentation()
 
+    def action_l10n_hu_quick_accounting(self):
+        """ Quick accounting """
+        # Ensure one record in self
+        self.ensure_one()
+
+        # Get values
+        values_result = self.l10n_hu_get_field_values({})
+        if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
+            return self.write(values_result['field_values'])
+        elif len(values_result.get('field_values')) == 0:
+            return
+        else:
+            raise exceptions.UserError(str(values_result['error_list']))
+
     def action_l10n_hu_refresh_delivery_period(self):
         """ Used by "Refresh" button in HU+ tab Period section """
         # Ensure one record in self
@@ -374,20 +388,6 @@ class L10nHuPlusAccountMove(models.Model):
             'view_mode': 'form',
         }
 
-    def action_l10n_hu_quick_accounting(self):
-        """ Quick accounting """
-        # Ensure one record in self
-        self.ensure_one()
-
-        # Get values
-        values_result = self.l10n_hu_get_field_values({})
-        if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
-            return self.write(values_result['field_values'])
-        elif len(values_result.get('field_values')) == 0:
-            return
-        else:
-            raise exceptions.UserError(str(values_result['error_list']))
-
     def action_l10n_hu_view_original_invoice(self):
         """ View original invoice """
         # Make sure there is one record in self
@@ -428,6 +428,27 @@ class L10nHuPlusAccountMove(models.Model):
             return result
         else:
             return
+
+    def action_l10n_hu_view_currency_rate(self):
+        """ View currency rates """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Check
+        if self.currency_id and self.currency_id == self.company_id.currency_id:
+            raise exceptions.UserError(_("Invoice currency is same as company currency!"))
+
+        # Return
+        result = {
+            'name': _("Currency Rates"),
+            'context': {'search_default_name': self.delivery_date, 'search_default_currency_id_filter_group_by': 1},
+            'domain': [('currency_id', '=', self.currency_id.id)],
+            'res_model': 'res.currency.rate',
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree,form',
+        }
+        return result
 
     def action_l10n_hu_wizard_accounting(self):
         """ Open the HU+ wizard to update accounting fields """

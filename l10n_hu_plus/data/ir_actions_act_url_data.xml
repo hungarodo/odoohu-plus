@@ -5,6 +5,6 @@
             model="ir.actions.act_url"
     >
           <field name="name">Documentation</field>
-          <field name='url'>https://hungarodo.atlassian.net/wiki/spaces/ODOOHU</field>
+          <field name='url'>https://hungarodo.hu/odoohu</field>
       </record>
 </odoo>

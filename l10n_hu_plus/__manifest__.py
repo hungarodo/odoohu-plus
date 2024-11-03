@@ -47,6 +47,8 @@
         'views/product_product_actions.xml',
         'views/res_company_views.xml',
         'views/res_company_actions.xml',
+        'views/res_currency_rate_views.xml',
+        'views/res_currency_rate_actions.xml',
         'views/res_partner_views.xml',
         'views/res_partner_actions.xml',
         'views/tag_views.xml',
@@ -71,6 +73,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.12.6",
+    'version': "1.13.0",
     'website': "https://hungarodo.hu/odoohu",
 }

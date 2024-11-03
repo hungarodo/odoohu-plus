@@ -150,6 +150,17 @@
                                             type="object"
                                     />
                                 </li>
+                                <li name="l10n_hu_view_currency_rate"
+                                    groups="l10n_hu_plus.user_group"
+                                    invisible="currency_id == company_currency_id"
+                                >
+                                    <button name="action_l10n_hu_view_currency_rate"
+                                            class="dropdown-item"
+                                            icon="fa-area-chart"
+                                            string="Currency Rate"
+                                            type="object"
+                                    />
+                                </li>
                                 <li name="l10n_hu_banner_dropdown_divider"
                                     class="dropdown-divider"
                                 />
@@ -285,6 +296,12 @@
                                         class="oe_inline btn-sm btn-link"
                                         icon="fa-calculator"
                                         string="Currency Exchange"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_view_currency_rate"
+                                        class="oe_inline btn-sm btn-link"
+                                        icon="fa-area-chart"
+                                        string="Currency Rate"
                                         type="object"
                                 />
                             </div>

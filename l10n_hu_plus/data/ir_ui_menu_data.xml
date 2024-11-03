@@ -201,6 +201,19 @@
         />
         <field name="sequence">20</field>
     </record>
+    <!-- HU+ > Configuration > General > Currency Rates -->
+    <record id="configuration_general_currency_rate_menu"
+            model="ir.ui.menu"
+    >
+        <field name="name">Currency Rates</field>
+        <field name="action"
+               ref="res_currency_rate_action"
+        />
+        <field name="parent_id"
+               ref="configuration_general_menu"
+        />
+        <field name="sequence">22</field>
+    </record>
     <!-- HU+ > Configuration > General > Unit of measures -->
     <record id="configuration_general_uom_menu"
             model="ir.ui.menu"
