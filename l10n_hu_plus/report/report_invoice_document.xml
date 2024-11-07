@@ -50,26 +50,41 @@
         >
             <attribute name="class">table table-sm o_main_table table-bordered</attribute>
         </xpath>
-        <!-- Period summary -->
+        <!-- HU+ comments -->
         <xpath expr="//div[@name='comment']"
                position="before"
         >
-            <div name="l10n_hu_period_summary"
+            <!-- Period -->
+            <div name="l10n_hu_period"
                  class="mb-3"
                  t-if="o.l10n_hu_delivery_period_start and o.l10n_hu_delivery_period_end and o.l10n_hu_delivery_period_summary"
             >
                 <span t-field="o.l10n_hu_delivery_period_summary"/>
             </div>
-        </xpath>
-        <!-- Proforma -->
-        <xpath expr="//div[@name='comment']"
-               position="before"
-        >
+            <!-- Proforma -->
             <div name="l10n_hu_proforma"
                  class="mb-3"
                  t-if="state != 'draft' and o.l10n_hu_proforma_name"
             >
-                Proforma reference: <span t-field="o.l10n_hu_proforma_name"/>
+                Proforma reference:
+                <span t-field="o.l10n_hu_proforma_name"
+                      class="ms-2"
+                />
+            </div>
+            <!-- Rate -->
+            <div name="l10n_hu_rate"
+                 class="mb-3"
+                 t-if="o.currency_id != o.company_currency_id and o.l10n_hu_currency_rate"
+            >
+                Exchange Rate:
+                <span t-field="o.l10n_hu_currency_rate"
+                      class="ms-1"
+                      t-options="{'widget': 'float', 'precision': 2}"
+                />
+                <span t-field="o.company_currency_id.name"/>/<span t-field="o.currency_id.name"/>
+                <span t-field="o.l10n_hu_currency_date"
+                      class="ms-1"
+                />
             </div>
         </xpath>
     </template>

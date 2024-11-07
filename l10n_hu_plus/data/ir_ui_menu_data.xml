@@ -5,6 +5,9 @@
             model="ir.ui.menu"
     >
         <field name="name">HU+</field>
+        <field name="groups_id"
+               eval="[(4, ref('l10n_hu_plus.user_group'))]"
+        />
         <field name="sequence">3636</field>
         <field name="web_icon">l10n_hu_plus,static/description/l10n_hu_plus_menu.png</field>
     </record>

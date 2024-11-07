@@ -18,7 +18,7 @@
                ref="l10n_hu_plus_module_category"
         />
         <field name="implied_ids"
-               eval="[(4, ref('user_group'))]"
+               eval="[(4, ref('l10n_hu_plus.user_group'))]"
         />
         <field name="users"
                eval="[(4, ref('base.user_admin'))]"

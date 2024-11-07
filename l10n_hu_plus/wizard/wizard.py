@@ -126,6 +126,42 @@ class L10nHuPlusWizard(models.TransientModel):
         default=False,
         string="Account Move Visible",
     )
+    accounting_cash_enabled = fields.Boolean(
+        default=False,
+        string="Cash Accounting Enabled",
+    )
+    accounting_cash_visible = fields.Boolean(
+        default=False,
+        string="Cash Accounting Visible",
+    )
+    accounting_date = fields.Date(
+        string="Accounting Date",
+    )
+    accounting_delivery_date = fields.Date(
+        string="Accounting Delivery Date",
+    )
+    accounting_document_rate_amount = fields.Float(
+        string="Accounting Document Rate Amount",
+    )
+    accounting_document_rate_visible = fields.Boolean(
+        default=False,
+        string="Accounting Document Rate Visible",
+    )
+    accounting_document_type = fields.Many2one(
+        comodel_name='l10n.hu.plus.tag',
+        domain=[('tag_type', '=', 'document_type')],
+        string="Accounting Document Type",
+    )
+    accounting_journal = fields.Many2one(
+        comodel_name='account.journal',
+        string="Accounting Journal",
+    )
+    accounting_origin = fields.Char(
+        string="Accounting Origin",
+    )
+    accounting_vat_date = fields.Date(
+        string="Accounting VAT Date",
+    )
     ## API
     api_action = fields.Selection(
         selection=[
@@ -283,6 +319,13 @@ class L10nHuPlusWizard(models.TransientModel):
         # Process actions
         ## ACCOUNT MOVE
         if self.action_type == 'account_move' and self.account_move:
+            # Check
+            if self.account_move_action == 'update_fields':
+                if len(self.account_move) != 1:
+                    raise exceptions.UserError(_("Action only allowed on one invoice!"))
+                if self.account_move[0].state != 'draft':
+                    raise exceptions.UserError(_("Action only allowed for draft invoices!"))
+
             # Manage result
             manage_result = self.manage_account_move()
 
@@ -507,14 +550,30 @@ class L10nHuPlusWizard(models.TransientModel):
         """
         # Initialize variables
         account_move_ids = []
+        error_list = []
         result = {}
 
         # Process scenarios
         if self.action_type == 'account_move':
             if self.account_move_action == 'update_fields':
                 for account_move in self.account_move:
-                    write_values = {}
-                    account_move.write(write_values)
+                    values_parameters = {
+                        'date': self.accounting_date,
+                        'delivery_date': self.accounting_delivery_date,
+                        'invoice_origin': self.accounting_origin,
+                        'l10n_hu_document_type': self.accounting_document_type,
+                        'l10n_hu_vat_date': self.accounting_vat_date,
+                    }
+                    if self.accounting_cash_visible:
+                        values_parameters.update({'l10n_hu_cash_accounting': self.accounting_cash_enabled})
+                    if self.accounting_document_rate_visible:
+                        values_parameters.update({'l10n_hu_document_rate': self.accounting_document_rate_amount})
+                    values_result = account_move.l10n_hu_get_field_values(values_parameters)
+                    if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
+                        account_move.write(values_result['field_values'])
+                    else:
+                        error_list += values_result.get('error_list', [])
+
                     account_move_ids.append(account_move.id)
             else:
                 pass
@@ -524,6 +583,7 @@ class L10nHuPlusWizard(models.TransientModel):
         # Update result
         result.update({
             'account_move_ids': account_move_ids,
+            'error_list': error_list,
         })
 
         # Return result

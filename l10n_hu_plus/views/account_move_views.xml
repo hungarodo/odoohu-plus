@@ -61,18 +61,6 @@
                                    string="Proforma"
                             />
                         </span>
-                        <span name="action_l10n_hu_send_proforma"
-                              class="ms-2"
-                              groups="l10n_hu_plus.user_group"
-                              invisible="state != 'draft' or not l10n_hu_proforma_sequence"
-                        >
-                            <button name="action_l10n_hu_send_proforma"
-                                    class="btn-secondary btn-sm"
-                                    icon="fa-send"
-                                    string="Proforma Send"
-                                    type="object"
-                            />
-                        </span>
                         <span name="l10n_hu_plus_tag"
                               class="ms-2 me-2"
                               groups="l10n_hu_plus.user_group"
@@ -92,7 +80,7 @@
                             <field name="l10n_hu_plus_notes"
                                    nolabel="1"
                                    placeholder="Notes..."
-                                   style="min-width:360px;"
+                                   style="min-width:200px;"
                             />
                         </span>
                     </div>
@@ -129,8 +117,23 @@
                                 class="dropdown-menu dropdown-menu-end"
                                 role="menu"
                             >
+                                <li name="l10n_hu_send_proforma"
+                                    invisible="state != 'draft' or not l10n_hu_proforma_sequence"
+                                >
+                                    <button name="action_l10n_hu_send_proforma"
+                                            class="dropdown-item"
+                                            icon="fa-send"
+                                            string="Proforma Send"
+                                            type="object"
+                                    />
+                                </li>
+                                <li name="l10n_hu_send_proforma_divider"
+                                    class="dropdown-divider"
+                                    invisible="state != 'draft' or not l10n_hu_proforma_sequence"
+                                />
                                 <li name="l10n_hu_wizard_accounting"
                                     groups="l10n_hu_plus.user_group"
+                                    invisible="state != 'draft'"
                                 >
                                     <button name="action_l10n_hu_wizard_accounting"
                                             class="dropdown-item"
@@ -139,6 +142,11 @@
                                             type="object"
                                     />
                                 </li>
+                                <li name="l10n_hu_wizard_accounting_divider"
+                                    class="dropdown-divider"
+                                    groups="l10n_hu_plus.user_group"
+                                    invisible="state != 'draft'"
+                                />
                                 <li name="l10n_hu_wizard_currency_exchange"
                                     groups="l10n_hu_plus.user_group"
                                     invisible="currency_id == company_currency_id"
@@ -161,8 +169,10 @@
                                             type="object"
                                     />
                                 </li>
-                                <li name="l10n_hu_banner_dropdown_divider"
+                                <li name="l10n_hu_currency_divider"
                                     class="dropdown-divider"
+                                    groups="l10n_hu_plus.user_group"
+                                    invisible="currency_id == company_currency_id"
                                 />
                                 <li name="l10n_hu_plus_documentation">
                                     <button name="action_l10n_hu_plus_documentation"

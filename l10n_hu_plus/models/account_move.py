@@ -283,6 +283,10 @@ class L10nHuPlusAccountMove(models.Model):
         # Ensure one record in self
         self.ensure_one()
 
+        # Check
+        if self.state != 'draft':
+            raise exceptions.UserError(_("Action only allowed for draft invoices!"))
+
         # Get values
         values_result = self.l10n_hu_get_field_values({})
         if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
@@ -455,14 +459,28 @@ class L10nHuPlusAccountMove(models.Model):
         # Make sure there is one record in self
         self.ensure_one()
 
-        # Prepare variables
+        # Check
+        if self.state != 'draft':
+            raise exceptions.UserError(_("Action only allowed for draft invoices!"))
 
         # Assemble context
         context = {
             'default_action_type': 'account_move',
             'default_action_type_visible': False,
             'default_account_move_action': 'update_fields',
+            'default_accounting_date': self.date,
+            'default_accounting_delivery_date': self.delivery_date,
+            'default_accounting_origin': self.invoice_origin,
+            'default_accounting_vat_date': self.l10n_hu_vat_date,
         }
+        if self.l10n_hu_document_type:
+            context.update({'default_accounting_document_type': self.l10n_hu_document_type.id})
+        if self.move_type in ['in_invoice', 'in_refund']:
+            context.update({'default_accounting_cash_enabled': self.l10n_hu_cash_accounting})
+            context.update({'default_accounting_cash_visible': True})
+        if self.currency_id != self.company_currency_id:
+            context.update({'default_accounting_document_rate_amount': self.l10n_hu_document_rate})
+            context.update({'default_accounting_document_rate_visible': True})
 
         # Assemble result
         result = {
@@ -478,7 +496,7 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     def action_l10n_hu_wizard_currency_exchange(self):
-        """ Open the L10n HU wizard to calculate the document rate """
+        """ Open the HU+ wizard to calculate the document rate """
         # Make sure there is one record in self
         self.ensure_one()
 
@@ -923,6 +941,86 @@ class L10nHuPlusAccountMove(models.Model):
         info_list = []
         result = {}
         warning_list = []
+
+        # Check move type
+        if len(self) == 1 and self.id and self.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
+            debug_list.append("move type check passed")
+        else:
+            error_list.append("invalid account move type")
+
+        # Check state
+        if self.state == 'draft':
+            debug_list.append("state check passed")
+        else:
+            error_list.append("invalid state, only draft is allowed")
+
+        # Last rate
+        if self.date and self.currency_id != self.company_currency_id:
+            last_rate = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', self.currency_id.id),
+                ('name', '<=', self.date)
+            ], limit=1)
+            if last_rate:
+                debug_list.append("last_rate found")
+            else:
+                error_list.append("last_rate not found")
+        else:
+            last_rate = None
+            debug_list.append("last_rate skipped")
+
+        # Process field values
+        if len(error_list) == 0:
+            # date
+            if values.get('date') and self.state == 'draft':
+                field_values.update({'date': values['date']})
+                debug_list.append("date set from values: " + str(values['date']))
+
+            # delivery_date
+            if values.get('delivery_date'):
+                field_values.update({'delivery_date': values['delivery_date']})
+                debug_list.append("delivery_date set from values: " + str(values['delivery_date']))
+
+            # invoice_origin
+            if values.get('invoice_origin') and len(values['invoice_origin']) > 0:
+                field_values.update({'invoice_origin': values['invoice_origin']})
+                debug_list.append("invoice_origin set from values: " + str(values['invoice_origin']))
+
+            # l10n_hu_cash_accounting
+            if values.get('l10n_hu_cash_accounting') is not None:
+                field_values.update({'l10n_hu_cash_accounting': values['l10n_hu_cash_accounting']})
+                debug_list.append("l10n_hu_cash_accounting set from values: " + str(values['l10n_hu_cash_accounting']))
+
+            # l10n_hu_document_rate
+            if values.get('l10n_hu_document_rate') and self.move_type in ['in_invoice', 'in_refund']:
+                field_values.update({'l10n_hu_document_rate': values['l10n_hu_document_rate']})
+                debug_list.append("l10n_hu_document_rate set from values: " +str(values['l10n_hu_document_rate']))
+            elif self.currency_id == self.company_currency_id and self.l10n_hu_document_rate != 1.0:
+                field_values.update({'l10n_hu_document_rate': 1.0})
+                debug_list.append("l10n_hu_document_rate set to 1.0")
+            elif self.l10n_hu_document_rate in [0, 1] and last_rate:
+                field_values.update({'l10n_hu_document_rate': last_rate.inverse_company_rate})
+                debug_list.append("l10n_hu_document_rate set from last rate: " + str(last_rate.id))
+            else:
+                debug_list.append("l10n_hu_document_rate passed")
+
+            # l10n_hu_document_type
+            if values.get('l10n_hu_document_type'):
+                field_values.update({'l10n_hu_document_type': values['l10n_hu_document_type'].id})
+            elif not self.l10n_hu_document_type:
+                l10n_hu_document_type = self.env['l10n.hu.plus.tag'].search([
+                    ('company_id', '=', self.company_id.id),
+                    ('tag_type', '=', 'document_type'),
+                ], limit=1, order='priority asc, id desc')
+                if l10n_hu_document_type:
+                    field_values.update({'l10n_hu_document_type': l10n_hu_document_type.id})
+
+            # l10n_hu_vat_date
+            if values.get('l10n_hu_vat_date'):
+                field_values.update({'l10n_hu_vat_date': values['l10n_hu_vat_date']})
+                debug_list.append("l10n_hu_vat_date set from values: " + str(values['l10n_hu_vat_date']))
+        else:
+            debug_list.append("processing skipped due to previous errors")
 
         # Update result
         result.update({

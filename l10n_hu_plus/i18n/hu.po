@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-03 14:47+0000\n"
-"PO-Revision-Date: 2024-11-03 14:47+0000\n"
+"POT-Creation-Date: 2024-11-04 21:47+0000\n"
+"PO-Revision-Date: 2024-11-04 21:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -310,9 +310,44 @@ msgid "Accounting"
 msgstr "Könyvelés"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_date
+msgid "Accounting Date"
+msgstr "Könyvelési dátum"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_delivery_date
+msgid "Accounting Delivery Date"
+msgstr "Könyvelési teljesítési dátum"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_document_rate_amount
+msgid "Accounting Document Rate Amount"
+msgstr "Könyvelési dokumentum árfolyam összeg"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_document_rate_visible
+msgid "Accounting Document Rate Visible"
+msgstr "Könyvelési dokumentum árfolyam látható"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_document_type
+msgid "Accounting Document Type"
+msgstr "Könyvelési dokumentum típus"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_journal
+msgid "Accounting Journal"
+msgstr "Könyvelési napló"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Accounting Rate"
 msgstr "Könyvelési árfolyam"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_vat_date
+msgid "Accounting VAT Date"
+msgstr "Könyvelési ÁFA dátum"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
@@ -339,6 +374,22 @@ msgstr "Akció típus"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__action_type_visible
 msgid "Action Type Visible"
 msgstr "Akció típus látható"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: code:addons/l10n_hu_plus/wizard/wizard.py:0
+#, python-format
+msgid "Action only allowed for draft invoices!"
+msgstr "Ez az akció csak piszkozat számlákra engedélyezett!"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/wizard/wizard.py:0
+#, python-format
+msgid "Action only allowed on one invoice!"
+msgstr "Ez az akció csak egy számlán hajtható végre!"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
@@ -474,8 +525,19 @@ msgstr "Visszavont számla"
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_tax_regime__ca
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Cash Accounting"
 msgstr "Pénzforgalmi elszámolás"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_cash_enabled
+msgid "Cash Accounting Enabled"
+msgstr "Pénzforgalmi bekapcsolva"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_cash_visible
+msgid "Cash Accounting Visible"
+msgstr "Pénzforgalmi látható"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__category_tag
@@ -754,6 +816,7 @@ msgstr "Regisztráció törlése"
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Delivery Date"
 msgstr "Teljesítés dátuma"
 
@@ -806,12 +869,14 @@ msgstr "Megjelenített név"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Document Rate"
 msgstr "Dokumentum árfolyam"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_tag__tag_type__document_type
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Document Type"
 msgstr "Dokumentum típus"
 
@@ -935,6 +1000,11 @@ msgstr "Átváltási mód"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Exchange Rate"
 msgstr "Átváltási árfolyam"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
+msgid "Exchange Rate:"
+msgstr "Átváltási árfolyam:"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
@@ -1635,6 +1705,7 @@ msgstr "Követő"
 #. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_account_journal
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Journal"
 msgstr "Napló"
 
@@ -2657,6 +2728,7 @@ msgstr "ÁFA könyvelési tételsorok"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_move_line_filter_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "VAT Date"
 msgstr "ÁFA dátum"
 

@@ -48,6 +48,46 @@
                                readonly="not account_move_action_editable"
                                string="Action"
                         />
+                        <field name="accounting_journal"
+                               invisible="1"
+                               options="{'no_create': True}"
+                               string="Journal"
+                        />
+                        <field name="accounting_date"
+                               invisible="account_move_action != 'update_fields'"
+                        />
+                        <field name="accounting_delivery_date"
+                               invisible="account_move_action != 'update_fields'"
+                               string="Delivery Date"
+                        />
+                        <field name="accounting_document_rate_amount"
+                               invisible="account_move_action != 'update_fields' or not accounting_document_rate_visible"
+                               string="Document Rate"
+                        />
+                        <field name="accounting_document_rate_visible"
+                               invisible="1"
+                        />
+                        <field name="accounting_document_type"
+                               invisible="account_move_action != 'update_fields'"
+                               options="{'no_create': True, 'no_open': True}"
+                               string="Document Type"
+                        />
+                        <field name="accounting_cash_enabled"
+                               invisible="account_move_action != 'update_fields' or not accounting_cash_visible"
+                               string="Cash Accounting"
+                               widget="boolean_toggle"
+                        />
+                        <field name="accounting_cash_visible"
+                               invisible="1"
+                        />
+                        <field name="accounting_origin"
+                               invisible="account_move_action != 'update_fields'"
+                               string="Origin"
+                        />
+                        <field name="accounting_vat_date"
+                               invisible="account_move_action != 'update_fields'"
+                               string="VAT Date"
+                        />
                         <!-- API -->
                         <field name="api_action_editable"
                                invisible="1"
