@@ -31,6 +31,10 @@ class L10nHuPlusAccountMove(models.Model):
         tracking=True,
     )
     ## CURRENCY
+    l10n_hu_company_currency_name = fields.Char(
+        related='company_currency_id.name',
+        string="HU Company Currency Name",
+    )
     l10n_hu_currency_date = fields.Date(
         compute='_compute_l10n_hu_currency',
         string="HU Currency Date",
@@ -45,11 +49,17 @@ class L10nHuPlusAccountMove(models.Model):
     )
     l10n_hu_document_rate = fields.Float(
         copy=False,
+        default=0,
         string="HU Document Rate",
     )
-    l10n_hu_rate_difference = fields.Float(
-        compute='_compute_l10n_hu_rate_difference',
-        string="HU Rate Difference",
+    l10n_hu_document_rate_difference = fields.Float(
+        compute='_compute_l10n_hu_document_rate_difference',
+        string="HU Document Rate Difference",
+    )
+    l10n_hu_huf_rate = fields.Float(
+        copy=False,
+        default=0,
+        string="HU HUF Rate",
     )
     ## DELIVERY PERIOD
     l10n_hu_delivery_period_end = fields.Date(
@@ -249,10 +259,10 @@ class L10nHuPlusAccountMove(models.Model):
             record.l10n_hu_delivery_period_legal = period_legal
             record.l10n_hu_delivery_period_summary = period_summary
 
-    def _compute_l10n_hu_rate_difference(self):
+    def _compute_l10n_hu_document_rate_difference(self):
         for record in self:
             difference = record.l10n_hu_currency_rate - record.l10n_hu_document_rate
-            record.l10n_hu_rate_difference = difference
+            record.l10n_hu_document_rate_difference = difference
 
     # Constraints and onchanges
     @api.onchange('l10n_hu_delivery_period_end', 'l10n_hu_delivery_period_start')
@@ -954,20 +964,54 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             error_list.append("invalid state, only draft is allowed")
 
-        # Last rate
+        # currency_huf
+        currency_huf = self.env.ref('base.HUF')
+
+        # Get last_accounting_rate
+        ## Company ccy != invoice ccy
         if self.date and self.currency_id != self.company_currency_id:
-            last_rate = self.env['res.currency.rate'].search([
+            last_accounting_rate = self.env['res.currency.rate'].search([
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', self.currency_id.id),
                 ('name', '<=', self.date)
             ], limit=1)
-            if last_rate:
-                debug_list.append("last_rate found")
+            if last_accounting_rate:
+                debug_list.append("last_accounting_rate found")
             else:
-                error_list.append("last_rate not found")
+                error_list.append("last_accounting_rate not found")
         else:
-            last_rate = None
-            debug_list.append("last_rate skipped")
+            last_accounting_rate = None
+            debug_list.append("last_accounting_rate skipped")
+
+        # Get last_huf_rate
+        ## Company HUF AND invoice HUF
+        if self.company_currency_id.name == 'HUF' and self.currency_id.name == 'HUF':
+            last_huf_rate = None
+        ## Company HUF and invoice NOT HUF
+        elif self.date and self.company_currency_id.name == 'HUF' and self.currency_id.name != 'HUF':
+            last_huf_rate = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', self.currency_id.id),
+                ('name', '<=', self.date)
+            ], limit=1)
+            if last_huf_rate:
+                debug_list.append("last_huf_rate found")
+            else:
+                error_list.append("last_huf_rate not found for company HUF and invoice NOT HUF")
+        ## Company NOT HUF
+        elif self.date and self.company_currency_id.name != 'HUF':
+            last_huf_rate = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', currency_huf.id),
+                ('name', '<=', self.date)
+            ], limit=1)
+            if last_huf_rate:
+                debug_list.append("last_huf_rate found for company NOT HUF")
+            else:
+                error_list.append("last_huf_rate not found")
+        else:
+            last_huf_rate = None
+            debug_list.append("last_huf_rate else scenario, probably date not set")
 
         # Process field values
         if len(error_list) == 0:
@@ -994,13 +1038,14 @@ class L10nHuPlusAccountMove(models.Model):
             # l10n_hu_document_rate
             if values.get('l10n_hu_document_rate') and self.move_type in ['in_invoice', 'in_refund']:
                 field_values.update({'l10n_hu_document_rate': values['l10n_hu_document_rate']})
-                debug_list.append("l10n_hu_document_rate set from values: " +str(values['l10n_hu_document_rate']))
+                debug_list.append("l10n_hu_document_rate set from values: " + str(values['l10n_hu_document_rate']))
             elif self.currency_id == self.company_currency_id and self.l10n_hu_document_rate != 1.0:
                 field_values.update({'l10n_hu_document_rate': 1.0})
                 debug_list.append("l10n_hu_document_rate set to 1.0")
-            elif self.l10n_hu_document_rate in [0, 1] and last_rate:
-                field_values.update({'l10n_hu_document_rate': last_rate.inverse_company_rate})
-                debug_list.append("l10n_hu_document_rate set from last rate: " + str(last_rate.id))
+            elif self.l10n_hu_document_rate in [0, 1] and last_accounting_rate:
+                l10n_hu_document_rate = last_accounting_rate.inverse_company_rate
+                field_values.update({'l10n_hu_document_rate': l10n_hu_document_rate})
+                debug_list.append("l10n_hu_document_rate set from last accounting rate: " + str(l10n_hu_document_rate))
             else:
                 debug_list.append("l10n_hu_document_rate passed")
 
@@ -1009,11 +1054,22 @@ class L10nHuPlusAccountMove(models.Model):
                 field_values.update({'l10n_hu_document_type': values['l10n_hu_document_type'].id})
             elif not self.l10n_hu_document_type:
                 l10n_hu_document_type = self.env['l10n.hu.plus.tag'].search([
-                    ('company_id', '=', self.company_id.id),
+                    ('company', '=', self.company_id.id),
                     ('tag_type', '=', 'document_type'),
                 ], limit=1, order='priority asc, id desc')
                 if l10n_hu_document_type:
                     field_values.update({'l10n_hu_document_type': l10n_hu_document_type.id})
+
+            # l10n_hu_huf_rate
+            if self.company_currency_id.name != 'HUF' and values.get('l10n_hu_huf_rate'):
+                field_values.update({'l10n_hu_huf_rate': values['l10n_hu_huf_rate']})
+                debug_list.append("l10n_hu_huf_rate set from values: " + str(values['l10n_hu_huf_rate']))
+            elif last_huf_rate:
+                l10n_hu_last_huf_rate = last_huf_rate.inverse_company_rate
+                field_values.update({'l10n_hu_huf_rate': l10n_hu_last_huf_rate})
+                debug_list.append("l10n_hu_huf_rate set last_huf_rate: " + str(l10n_hu_last_huf_rate))
+            else:
+                field_values.update({'l10n_hu_huf_rate': 1.0})
 
             # l10n_hu_vat_date
             if values.get('l10n_hu_vat_date'):

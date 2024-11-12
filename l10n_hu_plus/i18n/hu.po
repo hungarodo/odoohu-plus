@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 21:47+0000\n"
-"PO-Revision-Date: 2024-11-04 21:47+0000\n"
+"POT-Creation-Date: 2024-11-12 08:53+0000\n"
+"PO-Revision-Date: 2024-11-12 08:53+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -340,6 +340,11 @@ msgid "Accounting Journal"
 msgstr "Könyvelési napló"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_origin
+msgid "Accounting Origin"
+msgstr "Könyvelési eredet"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Accounting Rate"
 msgstr "Könyvelési árfolyam"
@@ -527,7 +532,7 @@ msgstr "Visszavont számla"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Cash Accounting"
-msgstr "Pénzforgalmi elszámolás"
+msgstr "Pénzforgalmi"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_cash_enabled
@@ -721,8 +726,16 @@ msgid "Currencies"
 msgstr "Pénznemek"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Currency"
+msgstr "Pénznem"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_company_currency_name
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_currency_name
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_company_currency_name
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_currency_name
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_payment__l10n_hu_company_currency_name
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_payment__l10n_hu_currency_name
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_wizard__company_currency_code
 msgid "Currency Code (ISO 4217)"
@@ -740,15 +753,11 @@ msgid "Currency From"
 msgstr "Forrás pénznem"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Currency Rate"
-msgstr "Árfolyam"
-
-#. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #: model:ir.actions.act_window,name:l10n_hu_plus.res_currency_rate_action
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_general_currency_rate_menu
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #, python-format
 msgid "Currency Rates"
 msgstr "Árfolyamok"
@@ -879,6 +888,11 @@ msgstr "Dokumentum árfolyam"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Document Type"
 msgstr "Dokumentum típus"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "This document uses the company currency"
+msgstr "Ez a dokumentum a vállalati pénznemet használja"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_url,name:l10n_hu_plus.documentation_action
@@ -1117,6 +1131,13 @@ msgid "HU Cash Accounting"
 msgstr "Pénzforgalmi elszámolás"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_company_currency_name
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_company_currency_name
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_company_currency_name
+msgid "HU Company Currency Name"
+msgstr "HU vállalati pénznem név"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_company_partner
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_company_partner
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_company_partner
@@ -1183,6 +1204,13 @@ msgid "HU Document Rate"
 msgstr "Dokumentum árfolyam"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_document_rate_difference
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_document_rate_difference
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_document_rate_difference
+msgid "HU Document Rate Difference"
+msgstr "HU dokumentum árfolyam eltérés"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_document_type
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_document_type
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_document_type
@@ -1213,6 +1241,13 @@ msgstr "Pénzügyi képviselő bankszámla"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "HU Flag"
 msgstr "HU zászló"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_huf_rate
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_huf_rate
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_huf_rate
+msgid "HU HUF Rate"
+msgstr "HU HUF árfolyam"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_delivery_period_legal
@@ -1298,13 +1333,6 @@ msgstr "Proforma sorszám"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence_available
 msgid "HU Proforma Sequence Available"
 msgstr "Proforma sorszám elérhető"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_rate_difference
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_rate_difference
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_rate_difference
-msgid "HU Rate Difference"
-msgstr "Árfolyam eltérés"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_self_billing
@@ -1591,6 +1619,21 @@ msgstr "HU+ varázsló"
 #: model:ir.model,name:l10n_hu_plus.model_l10n_hu_plus_wizard_line
 msgid "HU+ Wizard Line"
 msgstr "HU+ varázsló sor"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "HUF Rate"
+msgstr "HUF árfolyam"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
+msgid "HUF Rate:"
+msgstr "HUF árfolyam:"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
+msgid "HUF/"
+msgstr ""
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__has_message
@@ -2075,6 +2118,11 @@ msgid "Organization"
 msgstr "Szervezet"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Origin"
+msgstr "Eredet"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_move_line_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_move_line_view_list_readonly
 msgid "Original Account Move"
@@ -2177,6 +2225,11 @@ msgstr "Fizetési feltételek"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_payment_method_view_search
 msgid "Payment Type"
 msgstr "Fizetés típusa"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Period"
+msgstr "Időszak"
 
 #. module: l10n_hu_plus
 #. odoo-python
@@ -2290,11 +2343,6 @@ msgid "Proforma reference:"
 msgstr "Proforma hivatkozás:"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Rate Difference"
-msgstr "Árfolyam eltérés"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__rating_ids
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__rating_ids
 msgid "Ratings"
@@ -2309,11 +2357,6 @@ msgstr "Rekord ID"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__reference
 msgid "Reference"
 msgstr "Hivatkozás"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Refresh"
-msgstr "Frissítés"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
@@ -2689,6 +2732,11 @@ msgstr "Mértékegységek"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Update account move fields"
 msgstr "Könyvelési tétel mezők frissítése"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Update delivery period fields"
+msgstr "Teljesítési időszak mezők frissítése"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_action__update_fields
