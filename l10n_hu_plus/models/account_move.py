@@ -452,11 +452,16 @@ class L10nHuPlusAccountMove(models.Model):
         if self.currency_id and self.currency_id == self.company_id.currency_id:
             raise exceptions.UserError(_("Invoice currency is same as company currency!"))
 
+        # currency_ids
+        currency_ids = [self.currency_id.id]
+        if self.company_id.currency_id.name != 'HUF':
+            currency_ids.append(self.env.ref('base.HUF').id)
+
         # Return
         result = {
             'name': _("Currency Rates"),
-            'context': {'search_default_name': self.delivery_date, 'search_default_currency_id_filter_group_by': 1},
-            'domain': [('currency_id', '=', self.currency_id.id)],
+            'context': {'search_default_name': self.delivery_date, 'search_default_currency_id_filter_group_by': 1, 'default_currency_id': self.currency_id.id},
+            'domain': [('currency_id', 'in', currency_ids)],
             'res_model': 'res.currency.rate',
             'target': 'current',
             'type': 'ir.actions.act_window',
@@ -1065,7 +1070,7 @@ class L10nHuPlusAccountMove(models.Model):
                 field_values.update({'l10n_hu_huf_rate': values['l10n_hu_huf_rate']})
                 debug_list.append("l10n_hu_huf_rate set from values: " + str(values['l10n_hu_huf_rate']))
             elif last_huf_rate:
-                l10n_hu_last_huf_rate = last_huf_rate.inverse_company_rate
+                l10n_hu_last_huf_rate = last_huf_rate.company_rate
                 field_values.update({'l10n_hu_huf_rate': l10n_hu_last_huf_rate})
                 debug_list.append("l10n_hu_huf_rate set last_huf_rate: " + str(l10n_hu_last_huf_rate))
             else:

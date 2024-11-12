@@ -337,7 +337,7 @@
                                    for="l10n_hu_document_rate"
                                    string="Document Rate"
                             />
-                            <div name="l10_hu_document_rate">
+                            <div name="l10n_hu_document_rate">
                                 <field name="l10n_hu_document_rate"
                                        class="oe_inline"
                                        readonly="(state != 'draft' and not to_check) or currency_id == company_currency_id"
