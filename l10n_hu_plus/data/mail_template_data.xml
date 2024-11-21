@@ -33,6 +33,7 @@
                             <p>
                                 <strong>Reference: <t t-out="object.l10n_hu_proforma_name"/></strong>
                             </p>
+                            <div>Please use this reference when making payment!</div>
                         </t>
                         <t t-else="">
                             <strong>Reference: Proforma</strong>
@@ -40,14 +41,15 @@
                         <p>
                             <strong>Amount: <t t-out="format_amount(object.amount_total,object.currency_id)"/></strong>
                         </p>
+                        <div>Please pay the exact amount!</div>
                         <t t-if="object.invoice_origin">
                             <p>
-                                <strong>Origin: <t t-out="object.invoice_origin"/></strong>
+                                Origin: <t t-out="object.invoice_origin"/>
                             </p>
                         </t>
                         <t t-if="object.ref">
                             <p>
-                                <strong>Client Reference:</strong><t t-out="object.ref"/>
+                                Client Reference: <t t-out="object.ref"/>
                             </p>
                         </t>
                         <p>

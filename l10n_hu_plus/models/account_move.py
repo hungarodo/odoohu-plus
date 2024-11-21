@@ -207,13 +207,13 @@ class L10nHuPlusAccountMove(models.Model):
             original_invoice = None
             if record.is_invoice(True) and record.l10n_hu_original_invoice_number:
                 if record.move_type in ['in_invoice', 'in_refund']:
-                    original_invoice = self.env['account_move'].search([
+                    original_invoice = self.env['account.move'].search([
                         ('company_id', '=', record.company_id.id),
                         ('move_type', 'in', ['in_invoice', 'in_refund']),
                         ('ref', 'ilike', record.l10n_hu_original_invoice_number)
                     ], limit=1)
                 elif record.move_type in ['out_invoice', 'out_refund']:
-                    original_invoice = self.env['account_move'].search([
+                    original_invoice = self.env['account.move'].search([
                         ('company_id', '=', record.company_id.id),
                         ('move_type', 'in', ['out_invoice', 'out_refund']),
                         ('name', 'ilike', record.l10n_hu_original_invoice_number)
@@ -415,13 +415,13 @@ class L10nHuPlusAccountMove(models.Model):
             original_invoice = self.l10n_hu_original_account_move
         elif self.l10n_hu_original_invoice_number and not self.l10n_hu_original_account_move:
             if self.move_type in ['in_invoice', 'in_refund']:
-                original_invoice = self.env['account_move'].search([
+                original_invoice = self.env['account.move'].search([
                     ('company_id', '=', self.company_id.id),
                     ('move_type', 'in', ['in_invoice', 'in_refund']),
                     ('ref', 'ilike', self.l10n_hu_original_invoice_number)
                 ], limit=1)
             elif self.move_type in ['out_invoice', 'out_refund']:
-                original_invoice = self.env['account_move'].search([
+                original_invoice = self.env['account.move'].search([
                     ('company_id', '=', self.company_id.id),
                     ('move_type', 'in', ['out_invoice', 'out_refund']),
                     ('name', 'ilike', self.l10n_hu_original_invoice_number)
@@ -595,6 +595,23 @@ class L10nHuPlusAccountMove(models.Model):
             'invoiceDeliveryPeriodStart': self.l10n_hu_delivery_period_start,
             'periodicalSettlement': periodical_settlement
         })
+
+        # Customer tax number
+        ## NOTE: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
+        customer = result.get('customer', None)
+        if customer \
+                and customer.is_company \
+                and customer.vat \
+                and customer.country_code != 'HU' \
+                and self.fiscal_position_id \
+                and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
+            result.update({
+                'customer_vat_data': {
+                    'tax_number': customer.l10n_hu_group_vat or customer.vat,
+                    'group_member_tax_number': customer.l10n_hu_group_vat and customer.vat,
+                },
+                'customerVatStatus': 'DOMESTIC'
+            })
 
         # Return result
         return result
