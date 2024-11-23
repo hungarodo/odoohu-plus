@@ -211,21 +211,22 @@
                                    string="Original Invoice Number"
                             />
                             <div name="l10n_hu_original_invoice">
+                                <field name="reversed_entry_id"
+                                       invisible="not reversed_entry_id"
+                                />
                                 <field name="l10n_hu_original_invoice_number"
                                        class="oe_inline"
+                                       invisible="reversed_entry_id"
                                        readonly="state != 'draft' and not to_check"
                                 />
                                 <button name="action_l10n_hu_view_original_invoice"
                                         class="oe_inline btn-sm btn-link"
                                         icon="fa-folder-open"
-                                        invisible="not l10n_hu_original_invoice_number"
+                                        invisible="reversed_entry_id or not l10n_hu_original_invoice_number"
                                         string="View"
                                         type="object"
                                 />
                             </div>
-                            <field name="l10n_hu_original_account_move"
-                                   invisible="1"
-                            />
                             <!-- Tags -->
                             <field name="l10n_hu_plus_tag"
                                    context="{'default_tag_type': 'account_move'}"

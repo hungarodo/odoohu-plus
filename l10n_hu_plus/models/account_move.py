@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
+import base64
 import datetime
 from typing import Dict, List
 
@@ -7,6 +8,7 @@ from typing import Dict, List
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 # 3 : imports from odoo modules
+from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L10nHuEdiConnection, L10nHuEdiConnectionError
 
 # 4 : variable declarations
 
@@ -117,16 +119,6 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU+ Enabled",
     )
     ## ORIGINAL
-    l10n_hu_original_account_move = fields.Many2one(
-        comodel_name='account.move',
-        compute='_compute_l10n_hu_original_account_move',
-        copy=False,
-        index=True,
-        readonly=False,
-        store=True,
-        string="HU Original Account Move",
-        tracking=True,
-    )
     l10n_hu_original_invoice_number = fields.Char(
         copy=False,
         string="HU Original Invoice Number",
@@ -200,33 +192,6 @@ class L10nHuPlusAccountMove(models.Model):
     def _compute_l10n_hu_cash_accounting(self):
         for record in self:
             record.l10n_hu_cash_accounting = record.l10n_hu_get_cash_accounting()
-
-    @api.depends('l10n_hu_original_invoice_number')
-    def _compute_l10n_hu_original_account_move(self):
-        for record in self:
-            original_invoice = None
-            if record.is_invoice(True) and record.l10n_hu_original_invoice_number:
-                if record.move_type in ['in_invoice', 'in_refund']:
-                    original_invoice = self.env['account.move'].search([
-                        ('company_id', '=', record.company_id.id),
-                        ('move_type', 'in', ['in_invoice', 'in_refund']),
-                        ('ref', 'ilike', record.l10n_hu_original_invoice_number)
-                    ], limit=1)
-                elif record.move_type in ['out_invoice', 'out_refund']:
-                    original_invoice = self.env['account.move'].search([
-                        ('company_id', '=', record.company_id.id),
-                        ('move_type', 'in', ['out_invoice', 'out_refund']),
-                        ('name', 'ilike', record.l10n_hu_original_invoice_number)
-                    ], limit=1)
-                else:
-                    pass
-            else:
-                pass
-            if original_invoice:
-                original_account_move_id = original_invoice.id
-            else:
-                original_account_move_id = None
-            record.l10n_hu_original_account_move = original_account_move_id
 
     def _compute_l10n_hu_currency(self):
         for record in self:
@@ -407,13 +372,8 @@ class L10nHuPlusAccountMove(models.Model):
         # Make sure there is one record in self
         self.ensure_one()
 
-        # Initialize variables
-        original_invoice = None
-
         # Search
-        if self.l10n_hu_original_account_move:
-            original_invoice = self.l10n_hu_original_account_move
-        elif self.l10n_hu_original_invoice_number and not self.l10n_hu_original_account_move:
+        if self.l10n_hu_original_invoice_number:
             if self.move_type in ['in_invoice', 'in_refund']:
                 original_invoice = self.env['account.move'].search([
                     ('company_id', '=', self.company_id.id),
@@ -427,7 +387,7 @@ class L10nHuPlusAccountMove(models.Model):
                     ('name', 'ilike', self.l10n_hu_original_invoice_number)
                 ], limit=1)
             else:
-                pass
+                original_invoice = None
 
         # Return
         if original_invoice:
@@ -552,6 +512,80 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     # Business methods
+    ## REPLACE
+    ## NOTE: unfortunately SUPER is not viable, so this complete method replace is necessary to support STORNO
+    def _l10n_hu_edi_upload_single_batch(self, connection):
+        try:
+            token_result = connection.do_token_exchange(self.company_id.sudo()._l10n_hu_edi_get_credentials_dict())
+        except L10nHuEdiConnectionError as e:
+            return self.write({
+                'l10n_hu_edi_state': 'rejected',
+                'l10n_hu_edi_transaction_code': False,
+                'l10n_hu_edi_messages': {
+                    'error_title': _('Could not authenticate with NAV. Check your credentials and try again.'),
+                    'errors': e.errors,
+                    'blocking_level': 'error',
+                },
+            })
+
+        for i, invoice in enumerate(self, start=1):
+            invoice.l10n_hu_edi_batch_upload_index = i
+
+        ## L10NHU_PLUS BEGIN
+        operation = 'CREATE' if invoice._l10n_hu_get_chain_base() == invoice else 'MODIFY'
+        if invoice.l10n_hu_document_type and invoice.l10n_hu_document_type.technical_name == 'invoice_storno':
+            operation = 'STORNO'
+        ## L10NHU_PLUS END
+
+        invoice_operations = [
+            {
+                'index': invoice.l10n_hu_edi_batch_upload_index,
+                'operation': operation,  # NOTE: moved to variable
+                'invoice_data': base64.b64decode(invoice.l10n_hu_edi_attachment),
+            }
+            for invoice in self
+        ]
+
+        self.write({'l10n_hu_edi_send_time': fields.Datetime.now()})
+
+        try:
+            transaction_code = connection.do_manage_invoice(
+                self.company_id.sudo()._l10n_hu_edi_get_credentials_dict(),
+                token_result['token'],
+                invoice_operations,
+            )
+        except L10nHuEdiConnectionError as e:
+            if e.code == 'timeout':
+                return self.write({
+                    'l10n_hu_edi_state': 'send_timeout',
+                    'l10n_hu_edi_transaction_code': False,
+                    'l10n_hu_edi_messages': {
+                        'error_title': _(
+                            'Invoice submission timed out. Please wait at least 6 minutes, then update the status.'),
+                        'errors': e.errors,
+                        'blocking_level': 'warning',
+                    },
+                })
+            return self.write({
+                'l10n_hu_edi_state': 'rejected',
+                'l10n_hu_edi_transaction_code': False,
+                'l10n_hu_invoice_chain_index': 0,
+                'l10n_hu_edi_messages': {
+                    'error_title': _('Invoice submission failed.'),
+                    'errors': e.errors,
+                    'blocking_level': 'error',
+                },
+            })
+
+        self.write({
+            'l10n_hu_edi_state': 'sent',
+            'l10n_hu_edi_transaction_code': transaction_code,
+            'l10n_hu_edi_messages': {
+                'error_title': _('Invoice submitted, waiting for response.'),
+                'errors': [],
+            }
+        })
+
     ## SUPER
     def _get_report_base_filename(self) -> str:
         """ Get the filename for proforma"""
@@ -1112,3 +1146,39 @@ class L10nHuPlusAccountMove(models.Model):
         # Return result
         # raise exceptions.UserError("l10n_hu_get_field_values END" + str(result))
         return result
+
+    @api.model
+    def l10n_hu_get_storno_allowed(self):
+        """ Determine if it is allowed to storno an account move
+
+        NOTE:
+        - in certain cases (eg: issued to wrong partner) storno must be used instead of modification
+        - we collect points, if all collected, storno is allowed
+
+        :return: boolean
+        """
+        # Initialize variables
+        points = 0
+
+        # document type available
+        storno_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_storno'),
+        ], limit=1)
+        if storno_document_type:
+            points += 1
+
+        # posted out_invoice
+        if self.move_type == 'out_invoice' and self.state == 'posted':
+            points += 1
+
+        # nav configured for the company
+        if self.company_id.l10n_hu_edi_server_mode:
+            points += 1
+
+        # Determine points
+        if points == 3:
+            return True
+        else:
+            return False

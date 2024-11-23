@@ -55,6 +55,7 @@
         'views/tag_actions.xml',
         'views/uom_uom_views.xml',
         'views/uom_uom_actions.xml',
+        'wizard/account_move_reversal_views.xml',
         'wizard/wizard_views.xml',
         'wizard/wizard_actions.xml',
         'wizard/wizard_line_views.xml',
@@ -73,6 +74,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.15.5",
+    'version': "1.16.0",
     'website': "https://hungarodo.hu/odoohu",
 }

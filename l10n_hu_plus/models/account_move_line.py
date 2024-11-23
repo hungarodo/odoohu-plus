@@ -18,7 +18,7 @@ class L10nHuPlusAccountMoveLine(models.Model):
 
     # Field declarations
     l10n_hu_original_account_move = fields.Many2one(
-        related='move_id.l10n_hu_original_account_move',
+        related='l10n_hu_original_account_move_line.move_id',
         string="HU Original Move",
     )
     l10n_hu_original_account_move_line = fields.Many2one(
