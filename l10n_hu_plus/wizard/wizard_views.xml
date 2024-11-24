@@ -43,10 +43,18 @@
                         <field name="account_move_action_editable"
                                invisible="1"
                         />
+                        <field name="account_move_action_visible"
+                               invisible="1"
+                        />
                         <field name="account_move_action"
-                               invisible="action_type != 'account_move'"
+                               force_save="1"
+                               invisible="action_type != 'account_move' or not account_move_action_visible"
                                readonly="not account_move_action_editable"
                                string="Action"
+                        />
+                        <field name="account_move_plus_status"
+                               invisible="account_move_action != 'check_status'"
+                               string="HU+ Status"
                         />
                         <field name="accounting_journal"
                                invisible="1"
@@ -208,6 +216,11 @@
                                     Please select an action
                                 </p>
                                 <p class="card-text"
+                                   invisible="account_move_action != 'check_status'"
+                                >
+                                    Check HU+ status of the account move
+                                </p>
+                                <p class="card-text"
                                    invisible="account_move_action != 'update_fields'"
                                 >
                                     Update account move fields
@@ -320,6 +333,15 @@
                             </div>
                         </div>
                     </group>
+                </group>
+                <group name="account_move_plus_overview"
+                       colspan="2"
+                       invisible="action_type != 'account_move' or account_move_action != 'check_status'"
+                >
+                    <field name="account_move_plus_overview"
+                           colspan="2"
+                           nolabel="1"
+                    />
                 </group>
                 <notebook>
                     <page name="account_move"

@@ -110,6 +110,7 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     account_move_action = fields.Selection(
         selection=[
+            ('check_status', "Check status"),
             ('update_fields', "Update fields"),
         ],
         string="Account Move Action",
@@ -118,9 +119,29 @@ class L10nHuPlusWizard(models.TransientModel):
         default=False,
         string="Account Move Action Editable",
     )
+    account_move_action_visible = fields.Boolean(
+        default=False,
+        string="Account Move Action Visible",
+    )
     account_move_count = fields.Integer(
         compute='_compute_account_move_count',
         string="Account Move Count",
+    )
+    account_move_plus_overview = fields.Html(
+        copy=False,
+        readonly=True,
+        string="Account Move HU+ Overview",
+    )
+    account_move_plus_status = fields.Selection(
+        copy=False,
+        selection=[
+            ('error', "Error"),
+            ('info', "Information"),
+            ('ok', "Ok"),
+            ('other', "Other"),
+            ('warning', "Warning"),
+        ],
+        string="Account Move HU+ Status",
     )
     account_move_visible = fields.Boolean(
         default=False,
@@ -299,6 +320,35 @@ class L10nHuPlusWizard(models.TransientModel):
 
 
     # Constraints and onchanges
+    @api.onchange('account_move')
+    def onchange_account_move(self):
+        # When only one record in account_move m2m and action is reasonable
+        if self.account_move \
+                and len(self.account_move) == 1 \
+                and self.action_type == 'account_move' \
+                and self.account_move_action in ['check_status', 'update_fields']:
+            account_move = self.account_move[0]
+            self.accounting_date = account_move.date
+            self.accounting_delivery_date = account_move.delivery_date
+            self.accounting_origin = account_move.invoice_origin
+            self.accounting_vat_date = account_move.l10n_hu_vat_date
+            if account_move.l10n_hu_document_type:
+                self.accounting_document_type = account_move.l10n_hu_document_type
+            else:
+                pass
+            if account_move.move_type in ['in_invoice', 'in_refund']:
+                self.accounting_cash_enabled = account_move.l10n_hu_cash_accounting
+                self.accounting_cash_visible = True
+            else:
+                pass
+            if account_move.currency_id != account_move.company_currency_id:
+                self.accounting_document_rate_amount = account_move.l10n_hu_document_rate
+                self.accounting_document_rate_visible = True
+            else:
+                pass
+        else:
+            pass
+
     @api.onchange('partner')
     def onchange_partner(self):
         self.partner_action_summary = self.get_partner_summary()
@@ -319,7 +369,12 @@ class L10nHuPlusWizard(models.TransientModel):
         # Process actions
         ## ACCOUNT MOVE
         if self.action_type == 'account_move' and self.account_move:
-            # Check
+            # check_status
+            if self.account_move_action == 'check_status':
+                if len(self.account_move) != 1:
+                    raise exceptions.UserError(_("Action only allowed on one invoice!"))
+
+            # update_fields
             if self.account_move_action == 'update_fields':
                 if len(self.account_move) != 1:
                     raise exceptions.UserError(_("Action only allowed on one invoice!"))
@@ -356,20 +411,12 @@ class L10nHuPlusWizard(models.TransientModel):
             # Update company API data
             api_data = self.company.l10n_hu_plus_api_data
             if self.api_key:
-                api_data.update({
-                    'api_key': self.api_key,
-                })
+                api_data.update({'api_key': self.api_key})
             if self.api_url:
-                api_data.update({
-                    'api_url': self.api_url,
-                })
+                api_data.update({'api_url': self.api_url})
             if self.api_license_code:
-                api_data.update({
-                    'license_code': self.api_license_code,
-                })
-            self.company.write({
-                'l10n_hu_plus_api_data': api_data
-            })
+                api_data.update({'license_code': self.api_license_code})
+            self.company.write({'l10n_hu_plus_api_data': api_data})
 
             # Manage result
             manage_result = self.manage_api()
@@ -431,14 +478,10 @@ class L10nHuPlusWizard(models.TransientModel):
         elif self.action_type == 'currency_exchange' and self.account_move:
             # Write
             for account_move in self.account_move:
-                account_move.write({
-                    'l10n_hu_document_rate': self.exchange_rate
-                })
+                account_move.write({'l10n_hu_document_rate': self.exchange_rate})
 
             # Assemble result
-            result = {
-                'type': 'ir.actions.act_window_close'
-            }
+            result = {'type': 'ir.actions.act_window_close'}
 
             # Return result
             return result
@@ -555,7 +598,11 @@ class L10nHuPlusWizard(models.TransientModel):
 
         # Process scenarios
         if self.action_type == 'account_move':
-            if self.account_move_action == 'update_fields':
+            if self.account_move_action == 'check_status':
+                for account_move in self.account_move:
+                    account_move.write({'l10n_hu_status': self.account_move_plus_status})
+                    account_move_ids.append(account_move.id)
+            elif self.account_move_action == 'update_fields':
                 for account_move in self.account_move:
                     values_parameters = {
                         'date': self.accounting_date,
@@ -570,6 +617,11 @@ class L10nHuPlusWizard(models.TransientModel):
                         values_parameters.update({'l10n_hu_document_rate': self.accounting_document_rate_amount})
                     values_result = account_move.l10n_hu_get_field_values(values_parameters)
                     if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
+                        # run onchange to make sure HUF amounts are recalculated
+                        if account_move.currency_id != account_move.company_currency_id:
+                            account_move._inverse_amount_currency()
+
+                        # Do write
                         account_move.write(values_result['field_values'])
                     else:
                         error_list += values_result.get('error_list', [])
@@ -611,30 +663,22 @@ class L10nHuPlusWizard(models.TransientModel):
             debug_list.append("processing api action_type")
             if self.api_action == 'check_registration':
                 debug_list.append("processing check_registration api_action")
-                api_values = {
-                    'request_type': 'get_registration',
-                }
+                api_values = {'request_type': 'get_registration'}
                 api_result = self.company.l10n_hu_plus_api_registration_request(api_values)
             ## Create registration
             elif self.api_action == 'create_registration':
                 debug_list.append("processing create_registration api_action")
-                api_values = {
-                    'request_type': 'post_registration',
-                }
+                api_values = {'request_type': 'post_registration'}
                 api_result = self.company.l10n_hu_plus_api_registration_request(api_values)
             ## Delete registration
             elif self.api_action == 'delete_registration':
                 debug_list.append("processing delete_registration api_action")
-                api_values = {
-                    'request_type': 'delete_registration',
-                }
+                api_values = {'request_type': 'delete_registration'}
                 api_result = self.company.l10n_hu_plus_api_registration_request(api_values)
             ## Get objects
             elif self.api_action == 'download_objects':
                 debug_list.append("processing download_objects api_action")
-                api_values = {
-                    'request_type': 'get_object',
-                }
+                api_values = {'request_type': 'get_object'}
                 object_class = self.env['l10n.hu.plus.object']
                 api_result = object_class.api_object_request(api_values)
             else:

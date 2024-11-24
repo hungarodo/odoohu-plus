@@ -96,6 +96,17 @@ class L10nHuPlusAccountMove(models.Model):
         index=True,
         string="HU+ Notes",
     )
+    l10n_hu_plus_status = fields.Selection(
+        copy=False,
+        selection=[
+            ('error', "Error"),
+            ('info', "Information"),
+            ('ok', "Ok"),
+            ('other', "Other"),
+            ('warning', "Warning"),
+        ],
+        string="HU+ Status",
+    )
     l10n_hu_plus_tag = fields.Many2many(
         column1='account_move',
         column2='tag',
@@ -253,24 +264,6 @@ class L10nHuPlusAccountMove(models.Model):
         # Return
         return self.company_id.action_l10n_hu_plus_documentation()
 
-    def action_l10n_hu_quick_accounting(self):
-        """ Quick accounting """
-        # Ensure one record in self
-        self.ensure_one()
-
-        # Check
-        if self.state != 'draft':
-            raise exceptions.UserError(_("Action only allowed for draft invoices!"))
-
-        # Get values
-        values_result = self.l10n_hu_get_field_values({})
-        if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
-            return self.write(values_result['field_values'])
-        elif len(values_result.get('field_values')) == 0:
-            return
-        else:
-            raise exceptions.UserError(str(values_result['error_list']))
-
     def action_l10n_hu_refresh_delivery_period(self):
         """ Used by "Refresh" button in HU+ tab Period section """
         # Ensure one record in self
@@ -367,6 +360,24 @@ class L10nHuPlusAccountMove(models.Model):
             'view_mode': 'form',
         }
 
+    def action_l10n_hu_update_fields(self):
+        """ Update HU+ relevant fields """
+        # Ensure one record in self
+        self.ensure_one()
+
+        # Check
+        if self.state != 'draft':
+            raise exceptions.UserError(_("Action only allowed for draft invoices!"))
+
+        # Get values
+        values_result = self.l10n_hu_get_field_values({})
+        if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
+            return self.write(values_result['field_values'])
+        elif len(values_result.get('field_values')) == 0:
+            return
+        else:
+            raise exceptions.UserError(str(values_result['error_list']))
+
     def action_l10n_hu_view_original_invoice(self):
         """ View original invoice """
         # Make sure there is one record in self
@@ -443,19 +454,38 @@ class L10nHuPlusAccountMove(models.Model):
             'default_action_type': 'account_move',
             'default_action_type_visible': False,
             'default_account_move_action': 'update_fields',
-            'default_accounting_date': self.date,
-            'default_accounting_delivery_date': self.delivery_date,
-            'default_accounting_origin': self.invoice_origin,
-            'default_accounting_vat_date': self.l10n_hu_vat_date,
         }
-        if self.l10n_hu_document_type:
-            context.update({'default_accounting_document_type': self.l10n_hu_document_type.id})
-        if self.move_type in ['in_invoice', 'in_refund']:
-            context.update({'default_accounting_cash_enabled': self.l10n_hu_cash_accounting})
-            context.update({'default_accounting_cash_visible': True})
-        if self.currency_id != self.company_currency_id:
-            context.update({'default_accounting_document_rate_amount': self.l10n_hu_document_rate})
-            context.update({'default_accounting_document_rate_visible': True})
+
+        # Assemble result
+        result = {
+            'name': _("HU+ Wizard"),
+            'context': context,
+            'res_model': 'l10n.hu.plus.wizard',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
+
+        # Return result
+        return result
+
+    def action_l10n_hu_wizard_check_status(self):
+        """ Open the HU+ wizard to check status for HU+ """
+        # Make sure there is one record in self
+        self.ensure_one()
+
+        # Get overview
+        status_overview = self.l10n_hu_get_plus_status_overview()
+
+        # Assemble context
+        context = {
+            'default_action_type': 'account_move',
+            'default_action_type_visible': False,
+            'default_account_move_action': 'check_status',
+            'default_account_move_action_visible': False,
+            'default_account_move_plus_overview': status_overview,
+            'default_account_move_plus_status': self.l10n_hu_plus_status,
+        }
 
         # Assemble result
         result = {
@@ -1145,6 +1175,256 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Return result
         # raise exceptions.UserError("l10n_hu_get_field_values END" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_get_plus_status_checklist(self):
+        """ Get HU+ status checklist
+
+        NOTE:
+        - we run here a lot of status checks
+        - we include Odoo _l10n_hu_edi_check_invoices() method
+
+        :return: dictionary
+        """
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        success_list = []
+        warning_list = []
+
+        # Odoo errors
+        l10n_hu_edi_error_dict = self._l10n_hu_edi_check_invoices()
+        for check, values in l10n_hu_edi_error_dict.items():
+            l10n_hu_edi_error = {
+                'action_text': values.get('action_text', ""),
+                'code': check,
+                'description': values.get('message', ""),
+                'records': values.get('records', None),
+                'result': 'error'
+            }
+            error_list.append(l10n_hu_edi_error)
+
+        # HU+1: document type
+        if self.l10n_hu_document_type:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+1',
+                'description': _("Document type set") + ": " + str(self.l10n_hu_document_type.display_name),
+                'records': self.l10n_hu_document_type,
+                'result': 'ok',
+            })
+        else:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+1',
+                'description': _("Document type not set"),
+                'records': None,
+                'result': 'warning',
+            })
+
+        # HU+2: account move fiscal position
+        if self.fiscal_position_id:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+2',
+                'description': _("Invoice fiscal position set") + " " + str(self.fiscal_position_id.display_name),
+                'records': self.filtered(lambda am: am.fiscal_position_id),
+                'result': 'ok',
+            })
+        else:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+2',
+                'description': _("Invoice fiscal position not set"),
+                'records': self.filtered(lambda am: not am.fiscal_position_id),
+                'result': 'warning',
+            })
+
+        # HU+3: partner fiscal position
+        if self.partner_id.property_account_position_id:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+3',
+                'description': _("Partner fiscal position set") + " " + self.partner_id.property_account_position_id.display_name,
+                'records': self.partner_id.commercial_partner_id.filtered(lambda p: p.property_account_position_id),
+                'result': 'ok',
+            })
+        else:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+3',
+                'description': _("Partner fiscal position not set"),
+                'records': self.partner_id.commercial_partner_id.filtered(lambda p: not p.property_account_position_id),
+                'result': 'warning',
+            })
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        return result
+
+    @api.model
+    def l10n_hu_get_plus_status_overview(self):
+        """ Get HU+ status overview as an HTML table
+
+        NOTE:
+        - we return status check results
+        - we also return an overview html table assembled by a different method
+
+        """
+        # Initialize variables
+        result = ""
+
+        # Run status check
+        checklist_result = self.l10n_hu_get_plus_status_checklist()
+        error_list = checklist_result.get('error_list', [])
+        info_list = checklist_result.get('info_list', [])
+        success_list = checklist_result.get('success_list', [])
+        warning_list = checklist_result.get('warning_list', [])
+
+        # Counts
+        error_count = len(error_list)
+        info_count = len(info_list)
+        success_count = len(success_list)
+        warning_count = len(warning_list)
+        total_count = error_count + info_count + success_count + warning_count
+        if total_count > 0:
+            error_rate = error_count / total_count
+            info_rate = info_count / total_count
+            success_rate = success_count / total_count
+            warning_rate = warning_count / total_count
+            health_count = error_count + (warning_count * 0.5)
+            health_rate = int(round((health_count / total_count * 100), 0))
+        else:
+            error_rate = 0
+            info_rate = 0
+            success_rate = 0
+            warning_rate = 0
+            health_rate = 0
+
+        # Assemble table
+        ### TITLE
+        result += '<h2 class="text-center mt-2">'
+        result += str(self.display_name)
+        result += '</h2>'
+        ### SUBTITLE
+        result += '<div class="fw-bold text-center mb-2">'
+        result += _("HU+ check result") + " " + str(fields.Datetime.now())
+        result += '</div>'
+        ### STATS
+        result += '<div class="row p-1 mt-2 mb-2">'  # div row BEGIN
+        result += '<div class="col-2 text-center text-uppercase text-success">'
+        result += '<span class="fa fa-check text-success pe-1"/>'
+        result += '<span class="fw-bold">' + _("Success") + ": " + str(success_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(success_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-2 text-center text-uppercase text-warning">'
+        result += '<span class="fa fa-exclamation-triangle text-warning pe-1"/>'
+        result += '<span class="fw-bold">' + _("Warning") + ": " + str(warning_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(warning_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-2 text-center text-uppercase text-danger">'
+        result += '<span class="fa fa-exclamation-circle text-danger pe-1"/>'
+        result += '<span class="fw-bold">' + _("Error") + ": " + str(error_count) + '</span>'
+        # result += '<span class="fst-italic text-muted">' + str(error_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-2 text-center text-uppercase text-info">'
+        result += '<span class="fa fa-info-circle text-info pe-1"/>'
+        result += '<span class="fw-bold">' + _("Information") + ": " + str(info_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(info_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-4 fw-bold text-end text-uppercase">'
+        result += '<span class="fw-bold">' + _("Health rate") + ": " + str(health_rate) + '%</span>'
+        result += '</div>'
+        result += '</div>'  # div row END
+        ## TABLE BEGIN
+        result += '<table class="table table-bordered table-sm" style="width:100%;">'
+        ## THEAD BEGIN
+        result += '<thead>'
+        ### TH COLUMN NAMES
+        result += '<tr>'
+        result += '<th class="text-center" style="width:10%;">'
+        result += _("Result")  # Result (eg: error, info, ok, other, warning)
+        result += '</th>'
+        result += '<th class="text-center" style="width:10%;">'
+        result += _("Code")  # Code
+        result += '</th>'
+        result += '<th class="text-center" style="width:80%;">'
+        result += _("Description")  # Description
+        result += '</th>'
+        result += '</tr>'
+        ## THEAD END
+        result += '</thead>'
+        ## TBODY BEGIN
+        result += '<tbody>'
+        ### 1) errors
+        for error_item in error_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-exclamation-circle text-danger me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += error_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += error_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ### 2) warnings
+        for warning_item in warning_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-exclamation-triangle text-warning me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += warning_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += warning_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ### 3) info
+        for info_item in info_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-info-circle text-info me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += info_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += info_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ### 4) success
+        for success_item in success_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-check text-success me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += success_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += success_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ## TBODY END
+        result += '</tbody>'
+        ## TABLE END
+        result += '</table>'
+
+        # Return result
         return result
 
     @api.model

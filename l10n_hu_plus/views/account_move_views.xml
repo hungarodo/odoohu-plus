@@ -87,15 +87,63 @@
                     <div name="l10n_hu_banner_end"
                          class="d-inline float-end"
                     >
-                        <span name="action_l10n_hu_quick_accounting"
+                        <span name="l10n_hu_update_fields"
                               class="ms-2"
                               groups="l10n_hu_plus.user_group"
                               invisible="state != 'draft'"
                         >
-                            <button name="action_l10n_hu_quick_accounting"
-                                    class="btn-link btn-sm"
+                            <button name="action_l10n_hu_update_fields"
+                                    class="btn-primary"
                                     icon="fa-bolt"
-                                    string="Accounting"
+                                    title="Update fields"
+                                    type="object"
+                            />
+                        </span>
+                        <span name="l10n_hu_plus_status_error"
+                              class="ms-2"
+                              groups="l10n_hu_plus.user_group"
+                              invisible="l10n_hu_plus_status != 'error'"
+                        >
+                            <button name="action_l10n_hu_wizard_check_status"
+                                    class="btn-danger"
+                                    icon="fa-heartbeat"
+                                    title="Check status"
+                                    type="object"
+                            />
+                        </span>
+                        <span name="l10n_hu_plus_status_info"
+                              class="ms-2"
+                              groups="l10n_hu_plus.user_group"
+                              invisible="l10n_hu_plus_status not in [False, 'info', 'other']"
+                        >
+                            <button name="action_l10n_hu_wizard_check_status"
+                                    class="btn-info"
+                                    icon="fa-heartbeat"
+                                    title="Check status"
+                                    type="object"
+                            />
+                        </span>
+                        <span name="l10n_hu_plus_status_ok"
+                              class="ms-2"
+                              groups="l10n_hu_plus.user_group"
+                              invisible="l10n_hu_plus_status != 'ok'"
+                        >
+                            <button name="action_l10n_hu_wizard_check_status"
+                                    class="btn-success"
+                                    icon="fa-heartbeat"
+                                    title="Check status"
+                                    type="object"
+                            />
+                        </span>
+                        <span name="l10n_hu_plus_status_warning"
+                              class="ms-2"
+                              groups="l10n_hu_plus.user_group"
+                              invisible="l10n_hu_plus_status != 'warning'"
+                        >
+                            <button name="action_l10n_hu_wizard_check_status"
+                                    class="btn-warning text-white"
+                                    icon="fa-heartbeat"
+                                    title="Check status"
                                     type="object"
                             />
                         </span>
@@ -227,7 +275,7 @@
                                         type="object"
                                 />
                             </div>
-                            <!-- Tags -->
+                            <!-- HU+ Tags -->
                             <field name="l10n_hu_plus_tag"
                                    context="{'default_tag_type': 'account_move'}"
                                    groups="l10n_hu_plus.user_group"
@@ -236,11 +284,17 @@
                                    string="Tags"
                                    widget="many2many_tags"
                             />
-                            <!-- Notes -->
+                            <!-- HU+ Notes -->
                             <field name="l10n_hu_plus_notes"
                                    groups="l10n_hu_plus.user_group"
                                    invisible="l10n_hu_banner_enabled"
                                    string="Notes"
+                            />
+                            <!-- HU+ Status -->
+                            <field name="l10n_hu_plus_status"
+                                   invisible="l10n_hu_banner_enabled"
+                                   readonly="state != 'draft' and not to_check"
+                                   string="HU+ Status"
                             />
                         </group>
                         <group name="l10n_hu_plus_2"
