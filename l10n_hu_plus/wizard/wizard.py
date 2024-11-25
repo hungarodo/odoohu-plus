@@ -600,7 +600,7 @@ class L10nHuPlusWizard(models.TransientModel):
         if self.action_type == 'account_move':
             if self.account_move_action == 'check_status':
                 for account_move in self.account_move:
-                    account_move.write({'l10n_hu_status': self.account_move_plus_status})
+                    account_move.write({'l10n_hu_plus_status': self.account_move_plus_status})
                     account_move_ids.append(account_move.id)
             elif self.account_move_action == 'update_fields':
                 for account_move in self.account_move:
