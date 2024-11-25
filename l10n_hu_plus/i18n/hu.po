@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-17 16:42+0000\n"
-"PO-Revision-Date: 2024-11-17 16:42+0000\n"
+"POT-Creation-Date: 2024-11-25 16:14+0000\n"
+"PO-Revision-Date: 2024-11-25 16:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -262,15 +262,35 @@ msgid "Account Move Action Editable"
 msgstr "Könyvelési tétel akció szerkeszthető"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move_action_visible
+msgid "Account Move Action Visible"
+msgstr "Könyvelési tétel akció látható"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__account_move_count
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move_count
 msgid "Account Move Count"
 msgstr "Könyvelési tételek száma"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move_plus_overview
+msgid "Account Move HU+ Overview"
+msgstr "Könyvelés tétel HU+ áttekintés"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move_plus_status
+msgid "Account Move HU+ Status"
+msgstr "Könyvelési tétel HU+ állapot"
+
+#. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.account_move_line_vat_action
 msgid "Account Move Lines"
 msgstr "Könyvelési tétel sorok"
+
+#. module: l10n_hu_plus
+#: model:ir.model,name:l10n_hu_plus.model_account_move_reversal
+msgid "Account Move Reversal"
+msgstr "Könyvelési tétel visszafordítás"
 
 #. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_account_move_send
@@ -395,6 +415,7 @@ msgstr "Ez az akció csak piszkozat számlákra engedélyezett!"
 
 #. module: l10n_hu_plus
 #. odoo-python
+#: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #, python-format
 msgid "Action only allowed on one invoice!"
@@ -574,9 +595,20 @@ msgid "Check API registration"
 msgstr "API regisztráció ellenőrzése"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Check HU+ status of the account move"
+msgstr "Könyvelési tétel HU+ állapot ellenőrzés"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__api_action__check_registration
 msgid "Check registration"
 msgstr "Regisztráció ellenőrzése"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_action__check_status
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Check status"
+msgstr "Állapot ellenőrzés"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
@@ -584,9 +616,12 @@ msgid "Close"
 msgstr "Bezárás"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__code
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__code
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_list
+#, python-format
 msgid "Code"
 msgstr "Kód"
 
@@ -679,6 +714,13 @@ msgstr "Konfiguráció"
 #: model:ir.model,name:l10n_hu_plus.model_res_partner
 msgid "Contact"
 msgstr "Kapcsolat"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Could not authenticate with NAV. Check your credentials and try again."
+msgstr "Nem sikerült a NAV hitelesítés. Kérjük, ellenőrizze az adatait és próbálja újra."
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_tag_view_form_inherit
@@ -846,9 +888,12 @@ msgid "Delivery period"
 msgstr "Teljesítési időszak"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__description
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__description
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__description
+#, python-format
 msgid "Description"
 msgstr "Leírás"
 
@@ -892,6 +937,20 @@ msgstr "Dokumentum árfolyam"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Document Type"
 msgstr "Dokumentum típus"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Document type not set"
+msgstr "Dokumentum típus nincs beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Document type set"
+msgstr "Dokumentum típus beállítva"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_url,name:l10n_hu_plus.documentation_action
@@ -969,7 +1028,12 @@ msgid "End date..."
 msgstr "Záró dátum..."
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__error
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__status__error
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__error
+#, python-format
 msgid "Error"
 msgstr "Hiba"
 
@@ -1268,13 +1332,6 @@ msgid "HU NAV Method"
 msgstr "NAV módszer"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_original_account_move
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_original_account_move
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_original_account_move
-msgid "HU Original Account Move"
-msgstr "Eredeti könyvelési tétel"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_original_invoice_number
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_original_invoice_number
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_original_invoice_number
@@ -1338,6 +1395,16 @@ msgstr "Proforma sorszám elérhető"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_res_users__l10n_hu_self_billing
 msgid "HU Self Billing"
 msgstr "Önszámlázás"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move_reversal__l10n_hu_storno_enabled
+msgid "HU Storno Enabled"
+msgstr "Stornó bekapcsolva"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move_reversal__l10n_hu_storno_visible
+msgid "HU Storno Visible"
+msgstr "Stornó látható"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_fiscal_position__l10n_hu_tax_regime
@@ -1559,6 +1626,15 @@ msgid "HU+ Proforma Send"
 msgstr "HU+ Proforma küldés"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_plus_status
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_plus_status
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment__l10n_hu_plus_status
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "HU+ Status"
+msgstr "HU+ állapot"
+
+#. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_l10n_hu_plus_tag
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_plus_tag
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_plus_tag
@@ -1603,6 +1679,7 @@ msgstr "HU+ látható"
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #: code:addons/l10n_hu_plus/models/account_move.py:0
+#: code:addons/l10n_hu_plus/models/account_move.py:0
 #: code:addons/l10n_hu_plus/models/log.py:0
 #: code:addons/l10n_hu_plus/models/object.py:0
 #: code:addons/l10n_hu_plus/models/res_company.py:0
@@ -1618,6 +1695,13 @@ msgstr "HU+ varázsló"
 #: model:ir.model,name:l10n_hu_plus.model_l10n_hu_plus_wizard_line
 msgid "HU+ Wizard Line"
 msgstr "HU+ varázsló sor"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "HU+ check result"
+msgstr "HU+ ellenőrzés eredmény"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -1639,6 +1723,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__has_message
 msgid "Has Message"
 msgstr "Van üzenet"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Health rate"
+msgstr "Egészség"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__id
@@ -1722,6 +1813,15 @@ msgid "Individual Exemption"
 msgstr "Alanyi adómentes"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__info
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__info
+#, python-format
+msgid "Information"
+msgstr "Információ"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__direction__internal
 msgid "Internal"
 msgstr "Belső"
@@ -1737,6 +1837,45 @@ msgstr "Számla"
 #, python-format
 msgid "Invoice currency is same as company currency!"
 msgstr "Számla pénzneme megegyezik a vállalat pénznemével!"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Invoice fiscal position not set"
+msgstr "Számla pénzügyi pozíció nincs beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Invoice fiscal position set"
+msgstr "Számla pénzügyi pozícíó beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Invoice submission failed."
+msgstr "Számlabeküldés sikertelen."
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid ""
+"Invoice submission timed out. Please wait at least 6 minutes, then update "
+"the status."
+msgstr ""
+"Számlabeküldés időtúllépés. Kérjük, várjon legalább 6 percet, aztán frissítse "
+"az állapotot."
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Invoice submitted, waiting for response."
+msgstr "Számla beküldve, válaszra vár."
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_is_follower
@@ -2106,6 +2245,12 @@ msgid "Objects"
 msgstr "Objektumok"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__ok
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__ok
+msgid "Ok"
+msgstr ""
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
 msgid "Open Parent"
 msgstr "Szülő megnyitása"
@@ -2141,6 +2286,8 @@ msgstr "Eredeti számla sorszám"
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_trade_position__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_vat_status__other
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__other
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__res_partner__l10n_hu_vat_status__other
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_move_line_filter_inherit
@@ -2200,6 +2347,20 @@ msgstr "Partner látható"
 #, python-format
 msgid "Partner belongs to this commercial partner"
 msgstr "A partner ehhez az üzleti partnerhez tartozik"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Partner fiscal position not set"
+msgstr "Partner pénzügyi pozíció nincs beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Partner fiscal position set"
+msgstr "Partner pénzügyi pozíció beállítva"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.res_partner_action
@@ -2392,6 +2553,13 @@ msgid "Responsible User"
 msgstr "Felelős felhasználó"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Result"
+msgstr "Eredmény"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_has_sms_error
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__message_has_sms_error
 msgid "SMS Delivery error"
@@ -2498,6 +2666,18 @@ msgstr ""
 "Lejárt: a határidő már elmúlt\n"
 "Ma: határidő a mai nap\n"
 "Tervezett: jövőbeli tevékenységek."
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_move_reversal_inherit
+msgid "Storno"
+msgstr "Stornó"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Success"
+msgstr "Siker"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.config_parameter_action
@@ -2744,6 +2924,7 @@ msgstr "Teljesítési időszak mezők frissítése"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_action__update_fields
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Update fields"
 msgstr "Mezők frissítése"
 
@@ -2872,6 +3053,15 @@ msgstr "Technikai adatok megtekintése JSON formátumban"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_search
 msgid "WARNING"
 msgstr ""
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__warning
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__warning
+#, python-format
+msgid "Warning"
+msgstr "Figyelmeztetés"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__website_message_ids

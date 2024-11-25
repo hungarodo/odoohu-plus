@@ -2,7 +2,6 @@
 # 1 : imports of python lib
 import base64
 import datetime
-from typing import Dict, List
 
 # 2 : imports of odoo
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
@@ -1183,7 +1182,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         NOTE:
         - we run here a lot of status checks
-        - we include Odoo _l10n_hu_edi_check_invoices() method
+        - Odoo _l10n_hu_edi_check_invoices() method is not included as it returns only errors when posting
 
         :return: dictionary
         """
@@ -1195,7 +1194,8 @@ class L10nHuPlusAccountMove(models.Model):
         success_list = []
         warning_list = []
 
-        # Odoo errors
+        # Odoo errors (actually, no need to include, it returns only errors for invoice issue)
+        """
         l10n_hu_edi_error_dict = self._l10n_hu_edi_check_invoices()
         for check, values in l10n_hu_edi_error_dict.items():
             l10n_hu_edi_error = {
@@ -1206,6 +1206,7 @@ class L10nHuPlusAccountMove(models.Model):
                 'result': 'error'
             }
             error_list.append(l10n_hu_edi_error)
+        """
 
         # HU+1: document type
         if self.l10n_hu_document_type:
@@ -1230,7 +1231,7 @@ class L10nHuPlusAccountMove(models.Model):
             success_list.append({
                 'action_text': None,
                 'code': 'HU+2',
-                'description': _("Invoice fiscal position set") + " " + str(self.fiscal_position_id.display_name),
+                'description': _("Invoice fiscal position set") + ": " + str(self.fiscal_position_id.display_name),
                 'records': self.filtered(lambda am: am.fiscal_position_id),
                 'result': 'ok',
             })
@@ -1248,7 +1249,7 @@ class L10nHuPlusAccountMove(models.Model):
             success_list.append({
                 'action_text': None,
                 'code': 'HU+3',
-                'description': _("Partner fiscal position set") + " " + self.partner_id.property_account_position_id.display_name,
+                'description': _("Partner fiscal position set") + ": " + self.partner_id.property_account_position_id.display_name,
                 'records': self.partner_id.commercial_partner_id.filtered(lambda p: p.property_account_position_id),
                 'result': 'ok',
             })
@@ -1303,8 +1304,8 @@ class L10nHuPlusAccountMove(models.Model):
             info_rate = info_count / total_count
             success_rate = success_count / total_count
             warning_rate = warning_count / total_count
-            health_count = error_count + (warning_count * 0.5)
-            health_rate = int(round((health_count / total_count * 100), 0))
+            bad_count = error_count + (warning_count * 0.5)
+            health_rate = int(round(((total_count - bad_count) / total_count * 100), 0))
         else:
             error_rate = 0
             info_rate = 0
@@ -1314,37 +1315,36 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Assemble table
         ### TITLE
-        result += '<h2 class="text-center mt-2">'
+        result += '<h2 class="text-center mt-4">'
         result += str(self.display_name)
         result += '</h2>'
         ### SUBTITLE
         result += '<div class="fw-bold text-center mb-2">'
-        result += _("HU+ check result") + " " + str(fields.Datetime.now())
+        result += _("HU+ check result")
+        result += " " + str(fields.Datetime.now())
+        result += " " + str(health_rate) + "%"
         result += '</div>'
         ### STATS
         result += '<div class="row p-1 mt-2 mb-2">'  # div row BEGIN
-        result += '<div class="col-2 text-center text-uppercase text-success">'
+        result += '<div class="col-3 text-center text-uppercase text-success">'
         result += '<span class="fa fa-check text-success pe-1"/>'
         result += '<span class="fw-bold">' + _("Success") + ": " + str(success_count) + '</span>'
         # result += '<span class="fst-italic ps-1 text-muted">' + str(success_rate) + '</span>'
         result += '</div>'
-        result += '<div class="col-2 text-center text-uppercase text-warning">'
+        result += '<div class="col-3 text-center text-uppercase text-warning">'
         result += '<span class="fa fa-exclamation-triangle text-warning pe-1"/>'
         result += '<span class="fw-bold">' + _("Warning") + ": " + str(warning_count) + '</span>'
         # result += '<span class="fst-italic ps-1 text-muted">' + str(warning_rate) + '</span>'
         result += '</div>'
-        result += '<div class="col-2 text-center text-uppercase text-danger">'
+        result += '<div class="col-3 text-center text-uppercase text-danger">'
         result += '<span class="fa fa-exclamation-circle text-danger pe-1"/>'
         result += '<span class="fw-bold">' + _("Error") + ": " + str(error_count) + '</span>'
         # result += '<span class="fst-italic text-muted">' + str(error_rate) + '</span>'
         result += '</div>'
-        result += '<div class="col-2 text-center text-uppercase text-info">'
+        result += '<div class="col-3 text-center text-uppercase text-info">'
         result += '<span class="fa fa-info-circle text-info pe-1"/>'
         result += '<span class="fw-bold">' + _("Information") + ": " + str(info_count) + '</span>'
         # result += '<span class="fst-italic ps-1 text-muted">' + str(info_rate) + '</span>'
-        result += '</div>'
-        result += '<div class="col-4 fw-bold text-end text-uppercase">'
-        result += '<span class="fw-bold">' + _("Health rate") + ": " + str(health_rate) + '%</span>'
         result += '</div>'
         result += '</div>'  # div row END
         ## TABLE BEGIN

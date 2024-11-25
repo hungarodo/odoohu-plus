@@ -619,7 +619,7 @@ class L10nHuPlusWizard(models.TransientModel):
                     if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
                         # run onchange to make sure HUF amounts are recalculated
                         if account_move.currency_id != account_move.company_currency_id:
-                            account_move._inverse_amount_currency()
+                            account_move.line_ids._inverse_amount_currency()
 
                         # Do write
                         account_move.write(values_result['field_values'])
