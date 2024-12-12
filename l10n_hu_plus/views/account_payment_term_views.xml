@@ -13,12 +13,19 @@
         <field name="arch"
                type="xml"
         >
-            <xpath expr="//field[@name='name']"
+             <!-- Add fields -->
+            <xpath expr="//group[last()]"
                    position="after"
             >
-                <field name="l10n_hu_nav_method"
-                       string="NAV Method"
-                />
+                <group name="l10n_hu_plus"
+                       string="HU+"
+                >
+                    <group name="l10n_hu_plus_1">
+                        <field name="l10n_hu_nav_method"
+                               string="NAV Method"
+                        />
+                    </group>
+                </group>
             </xpath>
         </field>
     </record>

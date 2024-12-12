@@ -21,7 +21,7 @@ class L10nHuBaseObject(models.Model):
     _name = 'l10n.hu.plus.object'
     _description = "HU+ Object"
     _inherit = ['image.mixin', 'mail.activity.mixin', 'mail.thread']
-    _order = 'name asc, id desc'
+    _order = 'priority asc, name asc, id desc'
 
     # Default methods
 

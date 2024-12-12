@@ -18,7 +18,7 @@ class L10nHuPlusTag(models.Model):
     _name = 'l10n.hu.plus.tag'
     _description = "HU+ Tag"
     _inherit = ['image.mixin', 'mail.activity.mixin', 'mail.thread']
-    _order = 'name asc, id desc'
+    _order = 'priority asc, name asc, id desc'
 
     # Default methods
     @api.model

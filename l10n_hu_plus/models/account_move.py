@@ -226,7 +226,7 @@ class L10nHuPlusAccountMove(models.Model):
                     and record.l10n_hu_delivery_period_start \
                     and record.l10n_hu_delivery_period_end:
                 # Get period info
-                delivery_period_result = record.l10n_hu_get_delivery_period({})
+                delivery_period_result = record.l10n_hu_get_delivery_period_data({})
                 if delivery_period_result.get('period_legal'):
                     period_legal = delivery_period_result['period_legal']
                 if delivery_period_result.get('period_summary'):
@@ -244,9 +244,7 @@ class L10nHuPlusAccountMove(models.Model):
     def onchange_l10n_hu_delivery_period(self):
         if self.l10n_hu_delivery_period_end and self.l10n_hu_delivery_period_start:
             if self.l10n_hu_delivery_period_end < self.l10n_hu_delivery_period_start:
-                raise exceptions.UserError(_("Period end date must be after period start date!"))
-            elif self.l10n_hu_delivery_period_start > self.l10n_hu_delivery_period_end:
-                raise exceptions.UserError(_("Period start date must be before period end date!"))
+                raise exceptions.ValidationError(_("Period end date must be after period start date!"))
             else:
                 pass
         else:
@@ -262,30 +260,6 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Return
         return self.company_id.action_l10n_hu_plus_documentation()
-
-    def action_l10n_hu_refresh_delivery_period(self):
-        """ Used by "Refresh" button in HU+ tab Period section """
-        # Ensure one record in self
-        self.ensure_one()
-
-        # Initialize variables
-        write_values = {}
-
-        # Get summary
-        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
-            delivery_period_result = self.l10n_hu_get_delivery_period({})
-
-            if delivery_period_result.get('delivery_date'):
-                write_values.update({
-                    'delivery_date': delivery_period_result['delivery_date'],
-                })
-
-        # Write
-        if len(write_values) > 0:
-            self.write(write_values)
-
-        # Return
-        return
 
     def action_l10n_hu_send_proforma(self):
         """Open a window to compose an email using mail template loaded by default"""
@@ -478,6 +452,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Assemble context
         context = {
+            'default_action_execute_visible': False,
             'default_action_type': 'account_move',
             'default_action_type_visible': False,
             'default_account_move_action': 'check_status',
@@ -779,11 +754,11 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     @api.model
-    def l10n_hu_get_delivery_period(self, values):
+    def l10n_hu_get_delivery_period_data(self, values):
         """ Get delivery period data
 
         NOTE:
-        - This method takes care of special hungarian rules
+        - This method computes special hungarian rules
         - Specification: 2007. CXXVII. 58.§ (1)
         - NJT: https://njt.hu/jogszabaly/2007-127-00-00
 
@@ -791,7 +766,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_delivery_period BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_get_delivery_period_data BEGIN" + str(values))
 
         # Initialize variables
         debug_list = []
@@ -1014,6 +989,7 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
+        raise exceptions.UserError("l10n_hu_get_delivery_period_data" + "\n" + str(result))
         return result
 
     @api.model
@@ -1105,10 +1081,36 @@ class L10nHuPlusAccountMove(models.Model):
                 field_values.update({'date': values['date']})
                 debug_list.append("date set from values: " + str(values['date']))
 
-            # delivery_date
-            if values.get('delivery_date'):
-                field_values.update({'delivery_date': values['delivery_date']})
+            # delivery_period, delivery_date
+            if values.get('delivery_period_start'):
+                delivery_period_start = values['delivery_period_start']
+            elif self.l10n_hu_delivery_period_start:
+                delivery_period_start = self.l10n_hu_delivery_period_start
+            else:
+                delivery_period_start = None
+            if values.get('delivery_period_end'):
+                delivery_period_end = values['delivery_period_end']
+            elif self.l10n_hu_delivery_period_end:
+                delivery_period_end = self.l10n_hu_delivery_period_end
+            else:
+                delivery_period_end = None
+
+            ## automation only for outgoing invoices
+            if delivery_period_start and delivery_period_end and self.move_type in ['out_invoice', 'out_refund']:
+                delivery_period_result = self.l10n_hu_get_delivery_period_data({
+                    'period_end': delivery_period_end,
+                    'period_start': delivery_period_start,
+                })
+                delivery_date = delivery_period_result.get('delivery_date', None)
+            ## manual for any invoice
+            elif values.get('delivery_date'):
+                delivery_date = values['delivery_date']
                 debug_list.append("delivery_date set from values: " + str(values['delivery_date']))
+            else:
+                delivery_date = self.delivery_date
+            field_values.update({'delivery_date': delivery_date})
+            field_values.update({'l10n_hu_delivery_period_end': delivery_period_end})
+            field_values.update({'l10n_hu_delivery_period_start': delivery_period_start})
 
             # invoice_origin
             if values.get('invoice_origin') and len(values['invoice_origin']) > 0:
@@ -1262,6 +1264,64 @@ class L10nHuPlusAccountMove(models.Model):
                 'result': 'warning',
             })
 
+        # HU+4: delivery date
+        if self.delivery_date:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+4',
+                'description': _("Delivery date set") + ": " + str(self.delivery_date),
+                'records': self,
+                'result': 'ok',
+            })
+        else:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+4',
+                'description': _("Delivery date not set"),
+                'records': self,
+                'result': 'error',
+            })
+
+        # HU+5: delivery period
+        hu_5_description = str(self.l10n_hu_delivery_period_start)
+        hu_5_description += " - "
+        hu_5_description += str(self.l10n_hu_delivery_period_end)
+        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
+            ## for outgoing invoices
+            if self.move_type in ['out_invoice', 'out_refund']:
+                hu_5_description += " (" + self.l10n_hu_delivery_period_legal + ")"
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period set") + ": " + hu_5_description,
+                'records': self,
+                'result': 'info',
+            })
+        elif self.l10n_hu_delivery_period_start and not self.l10n_hu_delivery_period_end:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period not set") + ": " + hu_5_description,
+                'records': self,
+                'result': 'error',
+            })
+        elif not self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period not set") + ": " + hu_5_description,
+                'records': self,
+                'result': 'error',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period not set"),
+                'records': self,
+                'result': 'info',
+            })
+
         # Update result
         result.update({
             'debug_list': debug_list,
@@ -1326,20 +1386,20 @@ class L10nHuPlusAccountMove(models.Model):
         result += '</div>'
         ### STATS
         result += '<div class="row p-1 mt-2 mb-2">'  # div row BEGIN
-        result += '<div class="col-3 text-center text-uppercase text-success">'
-        result += '<span class="fa fa-check text-success pe-1"/>'
-        result += '<span class="fw-bold">' + _("Success") + ": " + str(success_count) + '</span>'
-        # result += '<span class="fst-italic ps-1 text-muted">' + str(success_rate) + '</span>'
+        result += '<div class="col-3 text-center text-uppercase text-danger">'
+        result += '<span class="fa fa-exclamation-circle text-danger pe-1"/>'
+        result += '<span class="fw-bold">' + _("Error") + ": " + str(error_count) + '</span>'
+        # result += '<span class="fst-italic text-muted">' + str(error_rate) + '</span>'
         result += '</div>'
         result += '<div class="col-3 text-center text-uppercase text-warning">'
         result += '<span class="fa fa-exclamation-triangle text-warning pe-1"/>'
         result += '<span class="fw-bold">' + _("Warning") + ": " + str(warning_count) + '</span>'
         # result += '<span class="fst-italic ps-1 text-muted">' + str(warning_rate) + '</span>'
         result += '</div>'
-        result += '<div class="col-3 text-center text-uppercase text-danger">'
-        result += '<span class="fa fa-exclamation-circle text-danger pe-1"/>'
-        result += '<span class="fw-bold">' + _("Error") + ": " + str(error_count) + '</span>'
-        # result += '<span class="fst-italic text-muted">' + str(error_rate) + '</span>'
+        result += '<div class="col-3 text-center text-uppercase text-success">'
+        result += '<span class="fa fa-check text-success pe-1"/>'
+        result += '<span class="fw-bold">' + _("Success") + ": " + str(success_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(success_rate) + '</span>'
         result += '</div>'
         result += '<div class="col-3 text-center text-uppercase text-info">'
         result += '<span class="fa fa-info-circle text-info pe-1"/>'
@@ -1393,20 +1453,7 @@ class L10nHuPlusAccountMove(models.Model):
             result += warning_item.get('description', "-")
             result += '</td>'
             result += '<tr>'
-        ### 3) info
-        for info_item in info_list:
-            result += '<tr>'
-            result += '<td class="text-center">'
-            result += '<span class="fa fa-info-circle text-info me-2"/>'
-            result += '</td>'
-            result += '<td>'
-            result += info_item.get('code', "-")
-            result += '</td>'
-            result += '<td>'
-            result += info_item.get('description', "-")
-            result += '</td>'
-            result += '<tr>'
-        ### 4) success
+        ### 3) success
         for success_item in success_list:
             result += '<tr>'
             result += '<td class="text-center">'
@@ -1419,6 +1466,19 @@ class L10nHuPlusAccountMove(models.Model):
             result += success_item.get('description', "-")
             result += '</td>'
             result += '<tr>'
+        ### 4) info
+        for info_item in info_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-info-circle text-info me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += info_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += info_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
         ## TBODY END
         result += '</tbody>'
         ## TABLE END
@@ -1429,7 +1489,7 @@ class L10nHuPlusAccountMove(models.Model):
 
     @api.model
     def l10n_hu_get_storno_allowed(self):
-        """ Determine if it is allowed to storno an account move
+        """ Determine if storno is allowed for an account move
 
         NOTE:
         - in certain cases (eg: issued to wrong partner) storno must be used instead of modification

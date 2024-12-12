@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 16:14+0000\n"
-"PO-Revision-Date: 2024-11-25 16:14+0000\n"
+"POT-Creation-Date: 2024-12-12 20:04+0000\n"
+"PO-Revision-Date: 2024-12-12 20:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -127,9 +127,13 @@ msgstr ""
 "                                <span class=\"mr-2\">A beállításokat a szülő partneren lehet szerkeszteni</span>"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "<span class=\"ps-2 pe-2\">-</span>"
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid ""
+"<span class=\"ps-2 pe-2\" invisible=\"not "
+"accounting_delivery_period_enabled\">-</span>"
 msgstr ""
+"<span class=\"ms-1 me-1\" invisible=\"not "
+"accounting_delivery_period_enabled\">-</span>"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__action_type__api
@@ -344,6 +348,26 @@ msgid "Accounting Delivery Date"
 msgstr "Könyvelési teljesítési dátum"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_delivery_period_enabled
+msgid "Accounting Delivery Period Enabled"
+msgstr "Könyvelési teljesítési időszak bekapcsolva"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_delivery_period_end
+msgid "Accounting Delivery Period End"
+msgstr "Könyvelési teljesítési időszak vége"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_delivery_period_legal
+msgid "Accounting Delivery Period Legal"
+msgstr "Könyvelési teljesítési időszak jogalap"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_delivery_period_start
+msgid "Accounting Delivery Period Start"
+msgstr "Könyvelési teljesítési időszak kezdete"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_document_rate_amount
 msgid "Accounting Document Rate Amount"
 msgstr "Könyvelési dokumentum árfolyam összeg"
@@ -362,6 +386,11 @@ msgstr "Könyvelési dokumentum típus"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_journal
 msgid "Accounting Journal"
 msgstr "Könyvelési napló"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_move_type
+msgid "Accounting Move Type"
+msgstr "Könyvelési tétel típus"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_origin
@@ -720,7 +749,9 @@ msgstr "Kapcsolat"
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #, python-format
 msgid "Could not authenticate with NAV. Check your credentials and try again."
-msgstr "Nem sikerült a NAV hitelesítés. Kérjük, ellenőrizze az adatait és próbálja újra."
+msgstr ""
+"Nem sikerült a NAV hitelesítés. Kérjük, ellenőrizze az adatait és próbálja "
+"újra."
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_tag_view_form_inherit
@@ -877,6 +908,7 @@ msgstr "Teljesítés dátuma"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Delivery Period"
 msgstr "Teljesítési időszak"
 
@@ -884,8 +916,38 @@ msgstr "Teljesítési időszak"
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #, python-format
+msgid "Delivery date not set"
+msgstr "Teljesítés dátuma nincs beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Delivery date set"
+msgstr "Teljesítés dátuma beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
 msgid "Delivery period"
 msgstr "Teljesítési időszak"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Delivery period not set"
+msgstr "Teljesítési időszak nincs beállítva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#, python-format
+msgid "Delivery period set"
+msgstr "Teljesítési időszak beállítva"
 
 #. module: l10n_hu_plus
 #. odoo-python
@@ -1498,6 +1560,7 @@ msgstr "HU eÁFA sztenderd kód"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_company_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_payment_term_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_tax_form_inherit
 msgid "HU+"
 msgstr ""
@@ -1725,13 +1788,6 @@ msgid "Has Message"
 msgstr "Van üzenet"
 
 #. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-#, python-format
-msgid "Health rate"
-msgstr "Egészség"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__id
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__id
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__id
@@ -1867,8 +1923,8 @@ msgid ""
 "Invoice submission timed out. Please wait at least 6 minutes, then update "
 "the status."
 msgstr ""
-"Számlabeküldés időtúllépés. Kérjük, várjon legalább 6 percet, aztán frissítse "
-"az állapotot."
+"Számlabeküldés időtúllépés. Kérjük, várjon legalább 6 percet, aztán "
+"frissítse az állapotot."
 
 #. module: l10n_hu_plus
 #. odoo-python
@@ -2388,24 +2444,29 @@ msgstr "Fizetés típusa"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Period"
-msgstr "Időszak"
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Period End"
+msgstr "Időszak vége"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Period Legal:"
+msgstr "Időszak jogalap:"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Period Start"
+msgstr "Időszak kezdete"
 
 #. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
+#: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #, python-format
 msgid "Period end date must be after period start date!"
 msgstr ""
 "Az időszak kezdő dátumának a periódus záró dátumánál korábbinak kell lennie!"
-
-#. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-#, python-format
-msgid "Period start date must be before period end date!"
-msgstr ""
-"Periódus kezdő dátumának a periódus záró dátumánál korábbinak kell lennie!"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
@@ -2916,11 +2977,6 @@ msgstr "Mértékegységek"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Update account move fields"
 msgstr "Könyvelési tétel mezők frissítése"
-
-#. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-msgid "Update delivery period fields"
-msgstr "Teljesítési időszak mezők frissítése"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_action__update_fields

@@ -314,49 +314,26 @@
                         </group>
                         <!-- Delivery period -->
                         <group name="l10n_hu_delivery_period"
-                               string="Period"
+                               string="Delivery Period"
                         >
-                            <label name="l10n_hu_delivery_period"
-                                   for="l10n_hu_delivery_period_start"
-                                   string="Delivery Period"
+                            <field name="l10n_hu_delivery_period_start"
+                                   placeholder="Start date..."
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Period Start"
                             />
-                            <div name="l10n_hu_delivery_period">
-                                <field name="l10n_hu_delivery_period_start"
-                                       class="oe_inline o_input_12ch"
-                                       placeholder="Start date..."
-                                       readonly="state != 'draft' and not to_check"
-                                />
-                                <span class="ps-2 pe-2">-</span>
-                                <field name="l10n_hu_delivery_period_end"
-                                       class="oe_inline o_input_12ch"
-                                       placeholder="End date..."
-                                       readonly="state != 'draft' and not to_check"
-                                />
-                                <field name="l10n_hu_delivery_period_summary"
-                                       class="fst-italic text-muted"
-                                       invisible="1"
-                                />
-                                <field name="l10n_hu_delivery_period_legal"
-                                       class="fst-italic text-muted"
-                                       invisible="l10n_hu_journal_type != 'sale' or l10n_hu_delivery_period_legal in [False, '']"
-                                />
-                            </div>
-                            <label name="l10n_hu_delivery_period_actions"
-                                   for="action_l10n_hu_refresh_delivery_period"
-                                   invisible="state != 'draft' or l10n_hu_journal_type != 'sale' or not l10n_hu_delivery_period_start or not l10n_hu_delivery_period_end"
-                                   string="Actions"
+                            <field name="l10n_hu_delivery_period_end"
+                                   placeholder="End date..."
+                                   readonly="state != 'draft' and not to_check"
+                                   string="Period End"
                             />
-                            <div name="l10n_hu_delivery_period_actions"
-                                 class="gap-2"
-                                 invisible="state != 'draft' or l10n_hu_journal_type != 'sale' or not l10n_hu_delivery_period_start or not l10n_hu_delivery_period_end"
-                            >
-                                <button name="action_l10n_hu_refresh_delivery_period"
-                                        class="btn-sm btn-link text-start"
-                                        icon="fa-refresh"
-                                        string="Update delivery period fields"
-                                        type="object"
-                                />
-                            </div>
+                            <field name="l10n_hu_delivery_period_summary"
+                                   class="fst-italic text-muted"
+                                   invisible="1"
+                            />
+                            <field name="l10n_hu_delivery_period_legal"
+                                   class="fst-italic text-muted"
+                                   invisible="l10n_hu_journal_type != 'sale' or l10n_hu_delivery_period_legal in [False, '']"
+                            />
                         </group>
                         <!-- Currency -->
                         <group name="l10n_hu_plus_currency"

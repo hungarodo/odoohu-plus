@@ -61,13 +61,40 @@
                                options="{'no_create': True}"
                                string="Journal"
                         />
+                        <field name="accounting_move_type"
+                               invisible="1"
+                        />
                         <field name="accounting_date"
                                invisible="account_move_action != 'update_fields'"
                         />
                         <field name="accounting_delivery_date"
+                               force_save="1"
                                invisible="account_move_action != 'update_fields'"
+                               readonly="accounting_delivery_period_enabled and accounting_move_type in ['out_invoice', 'out_refund']"
                                string="Delivery Date"
                         />
+                        <label for="accounting_delivery_period_enabled"
+                               invisible="account_move_action != 'update_fields'"
+                               string="Delivery Period"
+                        />
+                        <div name="accounting_delivery_period_enabled"
+                             invisible="account_move_action != 'update_fields'"
+                        >
+                            <field name="accounting_delivery_period_enabled"
+                                   widget="boolean_toggle"
+                            />
+                            <field name="accounting_delivery_period_start"
+                                   class="oe_inline o_input_12ch"
+                                   invisible="not accounting_delivery_period_enabled"
+                                   placeholder="Period Start"
+                            />
+                            <span class="ps-2 pe-2" invisible="not accounting_delivery_period_enabled">-</span>
+                            <field name="accounting_delivery_period_end"
+                                   class="oe_inline o_input_12ch"
+                                   invisible="not accounting_delivery_period_enabled"
+                                   placeholder="Period End"
+                            />
+                        </div>
                         <field name="accounting_document_rate_amount"
                                invisible="account_move_action != 'update_fields' or not accounting_document_rate_visible"
                                string="Document Rate"
@@ -224,6 +251,14 @@
                                    invisible="account_move_action != 'update_fields'"
                                 >
                                     Update account move fields
+                                </p>
+                                <p class="card-text"
+                                   invisible="account_move_action != 'update_fields' or not accounting_delivery_period_enabled or accounting_move_type in ['in_invoice', 'in_refund']"
+                                >
+                                    Period Legal:
+                                    <field name="accounting_delivery_period_legal"
+                                           class="oe_inline ms-1"
+                                    />
                                 </p>
                             </div>
                         </div>
