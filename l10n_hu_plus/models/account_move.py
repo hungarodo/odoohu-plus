@@ -989,7 +989,7 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
-        raise exceptions.UserError("l10n_hu_get_delivery_period_data" + "\n" + str(result))
+        # raise exceptions.UserError("l10n_hu_get_delivery_period_data" + "\n" + str(result))
         return result
 
     @api.model
