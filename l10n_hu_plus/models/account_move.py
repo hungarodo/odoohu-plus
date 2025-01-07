@@ -520,6 +520,8 @@ class L10nHuPlusAccountMove(models.Model):
     ## REPLACE
     ## NOTE: unfortunately SUPER is not viable, so this complete method replace is necessary
     ##       the issue was in invert_dict(), currency_obj should be the invoice currency, not the company currency
+    ##       there is a fix for 18.0 https://github.com/odoo/odoo/commit/62620e705d8c0a5da1e863733b8baa4f5a489b52
+    ##       this fix does not work on 17.0
     def _l10n_hu_get_invoice_totals_for_report(self):
         """ In Hungary, tax amounts should appear negative on credit notes.
             We therefore apply a post-processing to the tax totals to make them negative. """
@@ -552,14 +554,16 @@ class L10nHuPlusAccountMove(models.Model):
 
             for tax_list in tax_totals['groups_by_subtotal'].values():
                 for tax in tax_list:
-                    keys_to_invert = ['tax_group_amount', 'tax_group_base_amount', 'tax_group_amount_company_currency', 'tax_group_base_amount_company_currency']
+                    keys_to_invert = ['tax_group_amount', 'tax_group_base_amount',
+                                      'tax_group_amount_company_currency', 'tax_group_base_amount_company_currency']
                     invert_dict(tax, keys_to_invert)
 
         currency_huf = self.env.ref('base.HUF')
         currency_rate = self._l10n_hu_get_currency_rate()
 
         tax_totals['total_vat_amount_in_huf'] = sum(
-            -line.balance if self.company_id.currency_id == currency_huf else currency_huf.round(-line.amount_currency * currency_rate)
+            -line.balance if self.company_id.currency_id == currency_huf else currency_huf.round(
+                -line.amount_currency * currency_rate)
             for line in self.line_ids.filtered(lambda l: l.tax_line_id.l10n_hu_tax_type)
         )
 
