@@ -43,11 +43,11 @@ class L10nHuPlusPaymentTerm(models.Model):
         """
         # Assemble result
         result = [
-            ('transfer', "Transfer"),
-            ('cash', "Cash"),
-            ('card', "Card"),
-            ('voucher', "Voucher"),
-            ('other', "Other"),
+            ('TRANSFER', "Transfer"),
+            ('CASH', "Cash"),
+            ('CARD', "Card"),
+            ('VOUCHER', "Voucher"),
+            ('OTHER', "Other"),
         ]
 
         # Return result

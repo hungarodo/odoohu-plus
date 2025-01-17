@@ -64,9 +64,6 @@
                         <field name="accounting_move_type"
                                invisible="1"
                         />
-                        <field name="accounting_date"
-                               invisible="account_move_action != 'update_fields'"
-                        />
                         <field name="accounting_delivery_date"
                                force_save="1"
                                invisible="account_move_action != 'update_fields'"
@@ -95,34 +92,6 @@
                                    placeholder="Period End"
                             />
                         </div>
-                        <field name="accounting_document_rate_amount"
-                               invisible="account_move_action != 'update_fields' or not accounting_document_rate_visible"
-                               string="Document Rate"
-                        />
-                        <field name="accounting_document_rate_visible"
-                               invisible="1"
-                        />
-                        <field name="accounting_document_type"
-                               invisible="account_move_action != 'update_fields'"
-                               options="{'no_create': True, 'no_open': True}"
-                               string="Document Type"
-                        />
-                        <field name="accounting_cash_enabled"
-                               invisible="account_move_action != 'update_fields' or not accounting_cash_visible"
-                               string="Cash Accounting"
-                               widget="boolean_toggle"
-                        />
-                        <field name="accounting_cash_visible"
-                               invisible="1"
-                        />
-                        <field name="accounting_origin"
-                               invisible="account_move_action != 'update_fields'"
-                               string="Origin"
-                        />
-                        <field name="accounting_vat_date"
-                               invisible="account_move_action != 'update_fields'"
-                               string="VAT Date"
-                        />
                         <!-- API -->
                         <field name="api_action_editable"
                                invisible="1"
@@ -368,6 +337,66 @@
                             </div>
                         </div>
                     </group>
+                </group>
+                <group name="accounting_fields"
+                       invisible="action_type != 'account_move' or account_move_action != 'update_fields'"
+                >
+                    <group name="accounting_fields_1">
+                        <field name="accounting_document_type"
+                               invisible="account_move_action != 'update_fields'"
+                               options="{'no_create': True, 'no_open': True}"
+                               string="Document Type"
+                        />
+                        <field name="accounting_document_rate_amount"
+                               invisible="account_move_action != 'update_fields' or not accounting_document_rate_visible"
+                               string="Document Rate"
+                        />
+                        <field name="accounting_document_rate_visible"
+                               invisible="1"
+                        />
+                        <field name="accounting_cash_enabled"
+                               invisible="account_move_action != 'update_fields' or not accounting_cash_visible"
+                               string="Cash Accounting"
+                               widget="boolean_toggle"
+                        />
+                        <field name="accounting_cash_visible"
+                               invisible="1"
+                        />
+                        <field name="accounting_vat_date"
+                               invisible="account_move_action != 'update_fields'"
+                               string="VAT Date"
+                        />
+                    </group>
+                    <group name="accounting_fields_2">
+                        <field name="accounting_origin"
+                               invisible="account_move_action != 'update_fields'"
+                               string="Origin"
+                        />
+                        <field name="accounting_nav_payment_method"
+                               invisible="account_move_action != 'update_fields'"
+                               string="NAV Payment Method"
+                        />
+                        <field name="accounting_date"
+                               invisible="account_move_action != 'update_fields'"
+                        />
+                    </group>
+                </group>
+                <group name="accounting_hu_plus"
+                       colspan="2"
+                       invisible="action_type != 'account_move' or account_move_action != 'update_fields'"
+                >
+                    <field name="accounting_hu_plus_tag"
+                           colspan="2"
+                           context="{'default_tag_type': 'account_move'}"
+                           domain="[]"
+                           options="{'color_field': 'color'}"
+                           placeholder="Tags..."
+                           widget="many2many_tags"
+                    />
+                    <field name="accounting_hu_plus_notes"
+                           colspan="2"
+                           placeholder="Notes..."
+                    />
                 </group>
                 <group name="account_move_plus_overview"
                        colspan="2"

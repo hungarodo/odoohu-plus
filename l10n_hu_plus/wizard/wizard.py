@@ -50,6 +50,10 @@ class L10nHuPlusWizard(models.TransientModel):
             partner_ids = []
         return [(4, x, 0) for x in partner_ids]
 
+    @api.model
+    def _get_selection_accounting_nav_payment_method(self):
+        return self.env['account.payment.term'].l10n_hu_get_nav_method_selection()
+
     # Field declarations
     ## COMMON
     action_execute_visible = fields.Boolean(
@@ -190,9 +194,24 @@ class L10nHuPlusWizard(models.TransientModel):
         comodel_name='account.journal',
         string="Accounting Journal",
     )
+    accounting_hu_plus_notes = fields.Char(
+        string="HU+ Notes",
+    )
+    accounting_hu_plus_tag = fields.Many2many(
+        comodel_name='l10n.hu.plus.tag',
+        column1='wizard',
+        column2='tag',
+        domain=[('tag_type', 'in', ['account_move', 'general'])],
+        relation='l10n_hu_plus_wizard_hu_plus_tag_rel',
+        string="HU+ Tag",
+    )
     accounting_move_type = fields.Char(
         compute='_compute_accounting_move_type',
         string="Accounting Move Type",
+    )
+    accounting_nav_payment_method = fields.Selection(
+        selection=_get_selection_accounting_nav_payment_method,
+        string="Accounting NAV Payment Method",
     )
     accounting_origin = fields.Char(
         string="Accounting Origin",
@@ -347,8 +366,13 @@ class L10nHuPlusWizard(models.TransientModel):
         for record in self:
             record.account_move_count = len(record.account_move)
 
-
     # Constraints and onchanges
+    @api.onchange('accounting_delivery_date')
+    def onchange_accounting_delivery_date(self):
+        # Most common case is that there delivery date is the same as the date of the account move
+        if self.accounting_delivery_date:
+            self.accounting_date = self.accounting_delivery_date
+
     @api.onchange('accounting_delivery_period_end', 'accounting_delivery_period_start')
     def onchange_accounting_delivery_period(self):
         # Check delivery date sanity
@@ -375,6 +399,7 @@ class L10nHuPlusWizard(models.TransientModel):
                 'period_start': self.accounting_delivery_period_start,
             })
             # raise exceptions.ValidationError(str(delivery_period_result))
+            self.accounting_date = delivery_period_result.get('delivery_date', None)
             self.accounting_delivery_date = delivery_period_result.get('delivery_date', None)
             self.accounting_delivery_period_legal = delivery_period_result.get('period_legal', None)
         else:
@@ -389,7 +414,6 @@ class L10nHuPlusWizard(models.TransientModel):
                 and self.account_move_action in ['check_status', 'update_fields']:
             account_move = self.account_move[0]
             self.accounting_date = account_move.date
-            self.accounting_delivery_date = account_move.delivery_date
             self.accounting_move_type = account_move.move_type
             self.accounting_origin = account_move.invoice_origin
             self.accounting_vat_date = account_move.l10n_hu_vat_date
@@ -408,6 +432,12 @@ class L10nHuPlusWizard(models.TransientModel):
             else:
                 pass
 
+            # delivery date
+            if account_move.delivery_date:
+                self.accounting_delivery_date = account_move.delivery_date
+            else:
+                self.accounting_delivery_date = account_move.date
+
             # delivery period
             if account_move.l10n_hu_delivery_period_end and account_move.l10n_hu_delivery_period_start:
                 self.accounting_delivery_period_enabled = True
@@ -417,6 +447,24 @@ class L10nHuPlusWizard(models.TransientModel):
             # document type
             if account_move.l10n_hu_document_type:
                 self.accounting_document_type = account_move.l10n_hu_document_type
+            else:
+                self.accounting_document_type = account_move.journal_id.l10n_hu_get_default_document_type()
+
+            # HU+ notes
+            if account_move.l10n_hu_plus_notes:
+                self.accounting_hu_plus_notes = account_move.l10n_hu_plus_notes
+
+            # HU+ tag
+            if account_move.l10n_hu_plus_tag:
+                self.accounting_hu_plus_tag = account_move.l10n_hu_plus_tag
+
+            # NAV payment method
+            if account_move.l10n_hu_payment_mode:
+                self.accounting_nav_payment_method = account_move.l10n_hu_payment_mode
+            elif account_move.invoice_payment_term_id and account_move.invoice_payment_term_id.l10n_hu_nav_method:
+                self.accounting_nav_payment_method = account_move.invoice_payment_term_id.l10n_hu_nav_method
+            elif account_move.journal_id.l10n_hu_nav_payment_method:
+                self.accounting_nav_payment_method = account_move.journal_id.l10n_hu_nav_payment_method
             else:
                 pass
 
@@ -678,6 +726,7 @@ class L10nHuPlusWizard(models.TransientModel):
                     account_move_ids.append(account_move.id)
             elif self.account_move_action == 'update_fields':
                 for account_move in self.account_move:
+                    # Prepare values
                     values_parameters = {
                         'date': self.accounting_date,
                         'delivery_date': self.accounting_delivery_date,
@@ -693,16 +742,28 @@ class L10nHuPlusWizard(models.TransientModel):
                         values_parameters.update({'l10n_hu_document_rate': self.accounting_document_rate_amount})
                     values_result = account_move.l10n_hu_get_field_values(values_parameters)
                     # raise exceptions.ValidationError(str(values_result))
+
+                    # Write when necessary
                     if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
-                        # run onchange to make sure HUF amounts are recalculated
+                        # Refresh currency rate for foreign currency invoices
                         if account_move.currency_id != account_move.company_currency_id:
-                            account_move.line_ids._inverse_amount_currency()
+                            pass
+                            ## TODO: test _inverse_amount_currency()
+                            # account_move.line_ids._inverse_amount_currency()
+                            ## TODO: test _compute_currency_rate()
+                            #account_move.line_ids._compute_currency_rate()
 
                         # Do write
-                        account_move.write(values_result['field_values'])
+                        write_values = values_result['field_values']
+                        write_values.update({
+                            'l10n_hu_plus_notes': self.accounting_hu_plus_notes,
+                            'l10n_hu_plus_tag': [(6, None, self.accounting_hu_plus_tag.ids)]
+                        })
+                        account_move.write(write_values)
                     else:
                         error_list += values_result.get('error_list', [])
 
+                    # Append to list
                     account_move_ids.append(account_move.id)
             else:
                 pass

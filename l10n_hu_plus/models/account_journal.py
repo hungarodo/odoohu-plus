@@ -15,8 +15,13 @@ class L10nHuPlusAccountJournal(models.Model):
     _inherit = 'account.journal'
 
     # Default methods
+    @api.model
     def _get_default_l10n_hu_proforma_mail_template_domain(self):
         return [('model_id', '=', self.env.ref('account.model_account_move').id)]
+
+    @api.model
+    def _get_selection_l10n_hu_nav_payment_method(self):
+        return self.env['account.payment.term'].l10n_hu_get_nav_method_selection()
 
     # Field declarations
     l10n_hu_banner_enabled = fields.Boolean(
@@ -33,6 +38,11 @@ class L10nHuPlusAccountJournal(models.Model):
             ('today', "Today"),
         ],
         string="HU Delivery Date Default",
+    )
+    l10n_hu_nav_payment_method = fields.Selection(
+        copy=False,
+        selection=_get_selection_l10n_hu_nav_payment_method,
+        string="HU NAV Payment Method",
     )
     l10n_hu_plus_enabled = fields.Boolean(
         copy=False,
@@ -119,3 +129,9 @@ class L10nHuPlusAccountJournal(models.Model):
             return
 
     # Business methods
+    @api.model
+    def l10n_hu_get_default_document_type(self):
+        return self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+        ], limit=1, order='priority asc, id desc')

@@ -26,7 +26,12 @@
                                    widget="boolean_toggle"
                             />
                             <field name="l10n_hu_delivery_date_default"
-                                   string="Default Delivery Date"
+                                   help="Used as default value when necessary"
+                                   string="Delivery Date"
+                            />
+                            <field name="l10n_hu_nav_payment_method"
+                                   help="Used as default value when necessary"
+                                   string="NAV Payment Method"
                             />
                             <field name="l10n_hu_proforma_sequence"
                                    domain="[('code', 'like', 'proforma'), ('company_id', '=', company_id)]"

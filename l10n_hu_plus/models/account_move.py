@@ -1137,6 +1137,8 @@ class L10nHuPlusAccountMove(models.Model):
             if values.get('date') and self.state == 'draft':
                 field_values.update({'date': values['date']})
                 debug_list.append("date set from values: " + str(values['date']))
+            else:
+                pass
 
             # delivery_period, delivery_date
             if values.get('delivery_period_start'):
@@ -1173,11 +1175,15 @@ class L10nHuPlusAccountMove(models.Model):
             if values.get('invoice_origin') and len(values['invoice_origin']) > 0:
                 field_values.update({'invoice_origin': values['invoice_origin']})
                 debug_list.append("invoice_origin set from values: " + str(values['invoice_origin']))
+            else:
+                pass
 
             # l10n_hu_cash_accounting
             if values.get('l10n_hu_cash_accounting') is not None:
                 field_values.update({'l10n_hu_cash_accounting': values['l10n_hu_cash_accounting']})
                 debug_list.append("l10n_hu_cash_accounting set from values: " + str(values['l10n_hu_cash_accounting']))
+            else:
+                pass
 
             # l10n_hu_document_rate
             if values.get('l10n_hu_document_rate') and self.move_type in ['in_invoice', 'in_refund']:
@@ -1197,12 +1203,13 @@ class L10nHuPlusAccountMove(models.Model):
             if values.get('l10n_hu_document_type'):
                 field_values.update({'l10n_hu_document_type': values['l10n_hu_document_type'].id})
             elif not self.l10n_hu_document_type:
-                l10n_hu_document_type = self.env['l10n.hu.plus.tag'].search([
-                    ('company', '=', self.company_id.id),
-                    ('tag_type', '=', 'document_type'),
-                ], limit=1, order='priority asc, id desc')
+                l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
                 if l10n_hu_document_type:
                     field_values.update({'l10n_hu_document_type': l10n_hu_document_type.id})
+                else:
+                    pass
+            else:
+                pass
 
             # l10n_hu_huf_rate
             if self.company_currency_id.name != 'HUF' and values.get('l10n_hu_huf_rate'):
@@ -1215,10 +1222,29 @@ class L10nHuPlusAccountMove(models.Model):
             else:
                 field_values.update({'l10n_hu_huf_rate': 1.0})
 
+            # l10n_hu_payment_mode
+            if values.get('l10n_hu_payment_mode'):
+                field_values.update({'l10n_hu_payment_mode': values['l10n_hu_payment_mode']})
+                debug_list.append("l10n_hu_payment_mode set from values: " + str(values['l10n_hu_payment_mode']))
+            elif not self.l10n_hu_payment_mode \
+                    and self.invoice_payment_term_id \
+                    and self.invoice_payment_term_id.l10n_hu_nav_method:
+                l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method
+                field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_2})
+                debug_list.append("l10n_hu_payment_mode set from payment term: " + str(l10n_hu_payment_mode_2))
+            elif not self.l10n_hu_payment_mode and self.journal_id.l10n_hu_nav_payment_method:
+                l10n_hu_payment_mode_3 = self.journal_id.l10n_hu_nav_payment_method
+                field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_3})
+                debug_list.append("l10n_hu_payment_mode set from journal: " + str(l10n_hu_payment_mode_3))
+            else:
+                pass
+
             # l10n_hu_vat_date
-            if values.get('l10n_hu_vat_date'):
+            if values.get('l10n_hu_vat_date') is not None:
                 field_values.update({'l10n_hu_vat_date': values['l10n_hu_vat_date']})
                 debug_list.append("l10n_hu_vat_date set from values: " + str(values['l10n_hu_vat_date']))
+            else:
+                pass
         else:
             debug_list.append("processing skipped due to previous errors")
 
