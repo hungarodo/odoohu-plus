@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
 import json
-import re
 
 # 2 : imports of odoo
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
@@ -531,14 +530,20 @@ class L10nHuPlusWizard(models.TransientModel):
         ## API
         elif self.action_type == 'api':
             # Update company API data
-            api_data = self.company.l10n_hu_plus_api_data
+            try:
+                technical_data = json.loads(self.company.l10n_hu_plus_technical_data)
+                api_data = technical_data.get('hu_plus_api', {})
+            except:
+                technical_data = {}
+                api_data = {}
             if self.api_key:
                 api_data.update({'api_key': self.api_key})
             if self.api_url:
                 api_data.update({'api_url': self.api_url})
             if self.api_license_code:
                 api_data.update({'license_code': self.api_license_code})
-            self.company.write({'l10n_hu_plus_api_data': api_data})
+            technical_data.update({'hu_plus_api': api_data})
+            self.company.write({'l10n_hu_plus_technical_data': json.dumps(technical_data, default=str)})
 
             # Manage result
             manage_result = self.manage_api()

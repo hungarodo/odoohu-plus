@@ -20,7 +20,33 @@
                 <page name="l10n_hu_plus"
                       string="HU+"
                 >
-                    <group name="l10n_hu_plus_api">
+                    <group name="l10n_hu_plus">
+                        <group name="l10n_hu_plus_1">
+
+                        </group>
+                        <group name="l10n_hu_plus_2">
+                            <div name="l10n_hu_plus_actions"
+                                 colspan="2"
+                            >
+                                <button name="action_l10n_hu_plus_documentation"
+                                        class="btn-secondary btn-sm m-2"
+                                        icon="fa-info-circle"
+                                        string="Documentation"
+                                        type="object"
+                                />
+                                <button name="action_l10n_hu_plus_view_technical_data"
+                                        class="btn-link btn-sm m-2"
+                                        groups="base.group_no_one"
+                                        icon="fa-code"
+                                        string="View technical data"
+                                        type="object"
+                                />
+                            </div>
+                        </group>
+                    </group>
+                    <group name="l10n_hu_plus_api"
+                           string="HU+ API"
+                    >
                         <group name="l10n_hu_plus_api_1">
                             <field name="l10n_hu_plus_api_enabled"
                                    string="API Enabled"
@@ -37,70 +63,49 @@
                             />
                         </group>
                         <group name="l10n_hu_plus_api_2">
-                            <label name="l10n_hu_plus_actions"
-                                   for="action_l10n_hu_plus_api_get_objects"
-                                   string="Actions"
-                            />
-                            <div name="l10n_hu_plus_actions"
-                                 class="d-grid gap-2"
+                            <div name="l10n_hu_plus_api_actions"
+                                 colspan="2"
                             >
-                                <button name="action_l10n_hu_plus_documentation"
-                                        class="btn-link btn-sm text-start"
-                                        icon="fa-info-circle"
-                                        string="Documentation"
-                                        type="object"
-                                />
                                 <button name="action_l10n_hu_plus_api_create_registration"
-                                        class="btn-link btn-sm text-start"
+                                        class="btn-secondary btn-sm m-2"
                                         icon="fa-magic"
+                                        invisible="l10n_hu_plus_api_registered"
                                         string="Create API registration"
                                         type="object"
                                 />
                                 <button name="action_l10n_hu_plus_api_get_objects"
-                                        class="btn-link btn-sm text-start"
+                                        class="btn-secondary btn-sm m-2"
                                         icon="fa-download"
                                         invisible="not l10n_hu_plus_api_registered"
                                         string="Download API objects"
                                         type="object"
                                 />
                                 <button name="action_l10n_hu_plus_api_check_registration"
-                                        class="btn-link btn-sm text-start"
+                                        class="btn-secondary btn-sm m-2"
                                         icon="fa-magic"
                                         invisible="not l10n_hu_plus_api_registered"
                                         string="Check API registration"
                                         type="object"
                                 />
                                 <button name="action_l10n_hu_plus_api_delete_registration"
-                                        class="btn-link btn-sm text-danger text-start"
+                                        class="btn-warning btn-sm m-2 text-white"
                                         icon="fa-trash"
                                         invisible="not l10n_hu_plus_api_registered"
                                         string="Delete API registration"
                                         type="object"
                                 />
-                                <button name="action_l10n_hu_plus_api_list_logs"
-                                        class="btn-link btn-sm text-start"
-                                        icon="fa-history"
-                                        string="View API logs"
+                                <button name="action_l10n_hu_plus_api_reset_registration"
+                                        class="btn-danger btn-sm m-2 text-white "
+                                        groups="l10n_hu_plus.manager_group"
+                                        icon="fa-eraser"
+                                        string="Reset API registration"
                                         type="object"
                                 />
-                            </div>
-                        </group>
-                        <group name="l10n_hu_plus_api_details"
-                               colspan="2"
-                               groups="l10n_hu_plus.manager_group"
-                               invisible="l10n_hu_plus_api_details in [False, '']"
-                               string="API Data"
-                        >
-                            <div name="l10n_hu_api_details"
-                                 invisible="l10n_hu_plus_api_details in [False, '']"
-                                 colspan="2"
-                            >
-                                <field name="l10n_hu_plus_api_details"/>
-                                <br/>
-                                <button name="action_l10n_hu_plus_api_reset_registration"
-                                        class="btn btn-link text-danger"
-                                        icon="fa-eraser"
-                                        string="Reset"
+                                <button name="action_l10n_hu_plus_api_list_logs"
+                                        class="btn-link btn-sm m-2"
+                                        groups="base.group_no_one"
+                                        icon="fa-history"
+                                        string="View API logs"
                                         type="object"
                                 />
                             </div>

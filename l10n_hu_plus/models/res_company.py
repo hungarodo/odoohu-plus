@@ -19,16 +19,7 @@ class L10nHuBaseResCompany(models.Model):
     # Default methods
 
     # Field declarations
-    l10n_hu_plus_api_data = fields.Json(
-        copy=False,
-        default=False,
-        readonly=True,
-        string="HU+ API Data",
-    )
-    l10n_hu_plus_api_details = fields.Text(
-        compute='_compute_l10n_hu_plus_api_details',
-        string="HU+ API Details",
-    )
+    ## API
     l10n_hu_plus_api_enabled = fields.Boolean(
         copy=False,
         default=False,
@@ -50,14 +41,15 @@ class L10nHuBaseResCompany(models.Model):
         readonly=True,
         string="HU+ API Timestamp",
     )
+    ## TECHNICAL
+    l10n_hu_plus_technical_data = fields.Json(
+        copy=False,
+        default=False,
+        readonly=True,
+        string="HU+ Technical Data",
+    )
 
     # Compute and search fields, in the same order of fields declaration
-    def _compute_l10n_hu_plus_api_details(self):
-        for record in self:
-            if record.l10n_hu_plus_api_data:
-                record.l10n_hu_plus_api_details = json.dumps(record.l10n_hu_plus_api_data)
-            else:
-                record.l10n_hu_plus_api_details = None
 
     # Constraints and onchanges
 
@@ -72,16 +64,20 @@ class L10nHuBaseResCompany(models.Model):
         # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
-        if not self.l10n_hu_plus_api_data:
+        if not self.l10n_hu_plus_technical_data:
+            raise exceptions.UserError(_("Technical data not available!"))
+        try:
+            api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
+        except:
             raise exceptions.UserError(_("API data not available!"))
 
         # API details
-        api_details = _("Registered") + ": " + str(self.l10n_hu_plus_api_data.get('registered'))
-        api_details += "\n" + _("License Type") + ": " + str(self.l10n_hu_plus_api_data.get('license_type'))
-        api_details += "\n" + _("License Owner") + ": " + str(self.l10n_hu_plus_api_data.get('license_owner'))
-        api_details += "\n" + _("License Status") + ": " + str(self.l10n_hu_plus_api_data.get('license_status'))
-        api_details += "\n" + _("License Valid") + ": " + str(self.l10n_hu_plus_api_data.get('license_valid'))
-        api_details += "\n" + _("Valid To") + ": " + str(self.l10n_hu_plus_api_data.get('license_valid_to'))
+        api_details = _("Registered") + ": " + str(api_data.get('registered'))
+        api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
+        api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
+        api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
+        api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
+        api_details += "\n" + _("Valid To") + ": " + str(api_data.get('license_valid_to'))
 
         # Assemble context
         context = {
@@ -89,9 +85,9 @@ class L10nHuBaseResCompany(models.Model):
             'default_api_action': 'check_registration',
             'default_api_action_editable': False,
             'default_api_details': api_details,
-            'default_api_key': self.l10n_hu_plus_api_data.get('api_key', "free"),
-            'default_api_license_code': self.l10n_hu_plus_api_data.get('license_code', "free"),
-            'default_api_url': self.l10n_hu_plus_api_data.get('api_url', None),
+            'default_api_key': api_data.get('api_key', "free"),
+            'default_api_license_code': api_data.get('license_code', "free"),
+            'default_api_url': api_data.get('api_url', None),
         }
 
         # Assemble result
@@ -117,10 +113,15 @@ class L10nHuBaseResCompany(models.Model):
             raise exceptions.UserError(_("API is not enabled!"))
 
         # Data
-        if self.l10n_hu_plus_api_data:
-            api_key = self.l10n_hu_plus_api_data.get('api_key', "free")
-            api_url = self.l10n_hu_plus_api_data.get('api_url', None)
-            license_code = self.l10n_hu_plus_api_data.get('license_code', "free")
+        try:
+            api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
+        except:
+            api_data = {}
+
+        if api_data:
+            api_key = api_data.get('api_key', "free")
+            api_url = api_data.get('api_url', None)
+            license_code = api_data.get('license_code', "free")
         else:
             api_key = "free"
             api_url = "https://odoohu17e.hungarodo.hu/v1/l10n_hu_api/registration"
@@ -157,16 +158,18 @@ class L10nHuBaseResCompany(models.Model):
         # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
-        if not self.l10n_hu_plus_api_data:
+        try:
+            api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
+        except:
             raise exceptions.UserError(_("API data not available!"))
 
         # API details
-        api_details = _("Registered") + ": " + str(self.l10n_hu_plus_api_data.get('registered'))
-        api_details += "\n" +_("License Type") + ": " + str(self.l10n_hu_plus_api_data.get('license_type'))
-        api_details += "\n" + _("License Owner") + ": " + str(self.l10n_hu_plus_api_data.get('license_owner'))
-        api_details += "\n" + _("License Status") + ": " + str(self.l10n_hu_plus_api_data.get('license_status'))
-        api_details += "\n" + _("License Valid") + ": " + str(self.l10n_hu_plus_api_data.get('license_valid'))
-        api_details += "\n" + _("Valid To") + ": " + str(self.l10n_hu_plus_api_data.get('license_valid_to'))
+        api_details = _("Registered") + ": " + str(api_data.get('registered'))
+        api_details += "\n" +_("License Type") + ": " + str(api_data.get('license_type'))
+        api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
+        api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
+        api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
+        api_details += "\n" + _("Valid To") + ": " + str(api_data.get('license_valid_to'))
 
         # Assemble context
         context = {
@@ -174,9 +177,9 @@ class L10nHuBaseResCompany(models.Model):
             'default_api_action': 'delete_registration',
             'default_api_action_editable': False,
             'default_api_details': api_details,
-            'default_api_key':  self.l10n_hu_plus_api_data.get('api_key', "free"),
-            'default_api_license_code':  self.l10n_hu_plus_api_data.get('license_code', "free"),
-            'default_api_url':  self.l10n_hu_plus_api_data.get('api_url', "free"),
+            'default_api_key':  api_data.get('api_key', "free"),
+            'default_api_license_code':  api_data.get('license_code', "free"),
+            'default_api_url':  api_data.get('api_url', "free"),
         }
 
         # Assemble result
@@ -251,9 +254,10 @@ class L10nHuBaseResCompany(models.Model):
         self.ensure_one()
 
         # api_url
-        if self.l10n_hu_plus_api_data:
-            api_url = self.l10n_hu_plus_api_data.get('api_url', None)
-        else:
+        try:
+            api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
+            api_url = api_data.get('api_url', None)
+        except:
             api_url = None
 
         # Reset
@@ -262,8 +266,13 @@ class L10nHuBaseResCompany(models.Model):
             'api_url': api_url,
             'license_code': 'free',
         }
+        try:
+            technical_data = json.loads(self.l10n_hu_plus_technical_data)
+        except:
+            technical_data = {}
+        technical_data.update({'hu_plus_api': api_data})
         company_values = {
-            'l10n_hu_plus_api_data': api_data,
+            'l10n_hu_plus_technical_data': json.dumps(technical_data, default=str),
             'l10n_hu_plus_api_license_valid': False,
             'l10n_hu_plus_api_registered': False,
         }
@@ -293,6 +302,31 @@ class L10nHuBaseResCompany(models.Model):
             }
         else:
             raise exceptions.UserError(_("Documentation URL is not configured!"))
+
+    def action_l10n_hu_plus_view_technical_data(self):
+        # Ensure one record in self
+        self.ensure_one()
+
+        # Return
+        if self.l10n_hu_plus_technical_data:
+            data_display = json.dumps(self.l10n_hu_plus_technical_data, default=str, indent=4)
+            context = {
+                'default_action_type': 'technical',
+                'default_action_execute_visible': False,
+                'default_technical_action': 'view_data',
+                'default_technical_data_display': data_display,
+            }
+            result = {
+                'name': _("HU+ Wizard"),
+                'context': context,
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
+            return result
+        else:
+            raise exceptions.UserError(_("Technical data is empty!"))
 
     # Business methods
     ## API
@@ -334,23 +368,24 @@ class L10nHuBaseResCompany(models.Model):
             error_list.append("request_type not found in values")
 
         # api_data, api_environment
-        api_data = company.l10n_hu_plus_api_data
+        try:
+            technical_data = json.loads(company.l10n_hu_plus_technical_data)
+            api_data = technical_data.get('hu_plus_api')
+        except:
+            api_data = {}
         api_environment_result = company.l10n_hu_plus_get_api_environment()
 
         # payload
         if len(error_list) == 0:
-            payload = {
-                'license_code': api_data.get('license_code'),
-            }
+            payload = {'license_code': api_data.get('license_code')}
             payload.update(api_environment_result.get('api_environment', {}))
         else:
             payload = {}
             debug_list.append("payload skipped due to previous errors")
 
         # request_data
-        request_data = {
-            'payload': payload,
-        }
+        request_data = {'payload': payload}
+
         # request_method
         request_method = None
         if len(error_list) == 0:
@@ -406,9 +441,7 @@ class L10nHuBaseResCompany(models.Model):
             'info_list': info_list,
             'warning_list': warning_list,
         }
-        log_record.write({
-            'description': json.dumps(description_json, default=str),
-        })
+        log_record.write({'description': json.dumps(description_json, default=str)})
 
         # Update result
         result.update({
@@ -488,12 +521,8 @@ class L10nHuBaseResCompany(models.Model):
         # Update log technical_data
         try:
             log_technical_data = log.technical_data
-            log_technical_data.update({
-                'response_payload': payload,
-            })
-            log.sudo().write({
-                'technical_data': log_technical_data
-            })
+            log_technical_data.update({'response_payload': payload})
+            log.sudo().write({'technical_data': log_technical_data})
             debug_list.append("log technical_data update success")
         except:
             error_list.append("log technical_data update exception")
@@ -501,31 +530,40 @@ class L10nHuBaseResCompany(models.Model):
         # Process
         if len(error_list) == 0:
             if request_type in ['get_registration', 'post_registration']:
-                api_data = log.company.l10n_hu_plus_api_data
-                api_data.update(registration_data)
+                try:
+                    technical_data = json.loads(log.company.l10n_hu_plus_technical_data)
+                except:
+                    technical_data = {}
+                technical_data.update({'hu_plus_api': registration_data})
                 if registration_data.get('api_key'):
                     l10n_hu_plus_api_registered = True
                 else:
                     l10n_hu_plus_api_registered = False
                 company_values.update({
-                    'l10n_hu_plus_api_data': api_data,
                     'l10n_hu_plus_api_license_valid': registration_data.get('license_valid', False),
                     'l10n_hu_plus_api_registered': l10n_hu_plus_api_registered,
+                    'l10n_hu_plus_technical_data': json.dumps(technical_data, default=str),
                 })
-                debug_list.append("l10n_hu_plus_api_data set to registration_data")
+                debug_list.append("l10n_hu_plus api_data set to registration_data")
             elif request_type == 'delete_registration':
-                current_api_data = log.company.l10n_hu_plus_api_data
+                try:
+                    technical_data = json.loads(log.company.l10n_hu_plus_technical_data)
+                    current_api_data = technical_data.get('hu_plus_api')
+                except:
+                    technical_data = {}
+                    current_api_data = {}
                 api_data = {
                     'api_key': 'free',
                     'api_url': current_api_data.get('api_url'),
                     'license_code': 'free',
                 }
+                technical_data.update({'hu_plus_api': api_data})
                 company_values.update({
-                    'l10n_hu_plus_api_data': api_data,
                     'l10n_hu_plus_api_license_valid': False,
                     'l10n_hu_plus_api_registered': False,
+                    'l10n_hu_plus_technical_data': json.dumps(technical_data, default=str),
                 })
-                debug_list.append("l10n_hu_plus_api_data set to empty dict")
+                debug_list.append("l10n_hu_plus api_data set to empty dict")
             else:
                 error_list.append("invalid request_type for company_values")
         else:
@@ -534,9 +572,7 @@ class L10nHuBaseResCompany(models.Model):
         # crud
         if len(error_list) == 0:
             log.company.sudo().write(company_values)
-            result.update({
-                'result_type': 'success',
-            })
+            result.update({'result_type': 'success'})
             debug_list.append("company updated")
         else:
             error_list.append("crud skipped due to previous errors")
