@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="tag_view_form"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tag.view.form</field>
+        <field name="model">l10n.hu.plus.tag</field>
+        <field name="priority">16</field>
+        <field name="type">form</field>
+        <field name="arch"
+               type="xml"
+        >
+            <form>
+                <header>
+
+                </header>
+                <sheet>
+                    <div name="button_box"
+                         class="oe_button_box"
+                    >
+                        <button name="action_list_account_moves"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                invisible="tag_type not in ['account_move', 'document_type']"
+                                type="object"
+                        >
+                            <field name="account_move_count"
+                                   string="Account Move"
+                                   widget="statinfo"
+                            />
+                        </button>
+                        <button name="action_list_objects"
+                                class="oe_stat_button"
+                                icon="fa-list"
+                                invisible="tag_type != 'object_type'"
+                                type="object"
+                        >
+                            <field name="object_count"
+                                   string="Object"
+                                   widget="statinfo"
+                            />
+                        </button>
+                    </div>
+                    <widget name="web_ribbon"
+                            bg_color="bg-danger"
+                            invisible="active"
+                            title="Archived"
+                    />
+                    <div class="oe_title">
+                        <h2>
+                            <field name="name"
+                                   placeholder="Name..."
+                                   readonly="locked"
+                                   required="1"
+                            />
+                        </h2>
+                    </div>
+                    <group name="base">
+                        <group name="base_1">
+                            <field name="tag_type"
+                                   readonly="locked"
+                                   required="1"
+                            />
+                        </group>
+                        <group name="base_2">
+                             <field name="code"
+                                    readonly="locked"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="details"
+                              string="Details"
+                        >
+                            <group name="details">
+                                <group name="details_1">
+                                    <field name="color"/>
+                                    <field name="priority"/>
+                                </group>
+                                <group name="details_2">
+                                    <field name="description"
+                                           placeholder="Description..."
+                                    />
+                                </group>
+                                <group name="details_object_type"
+                                       invisible="tag_type != 'object_type'"
+                                >
+                                    <field name="key_enabled"
+                                           readonly="locked"
+                                           widget="boolean_toggle"
+                                    />
+                                    <field name="key_method"
+                                           readonly="locked"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="audit"
+                              string="Audit"
+                        >
+                            <group name="audit">
+                                <group name="audit_1">
+                                    <field name="id"/>
+                                    <field name="active"
+                                           readonly="1"
+                                    />
+                                    <field name="company"
+                                           readonly="1"
+                                    />
+                                    <field name="locked"
+                                           widget="boolean_toggle"
+                                    />
+                                </group>
+                                <group name="audit_2">
+                                    <field name="create_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="create_date"
+                                           readonly="1"
+                                    />
+                                    <field name="write_uid"
+                                           readonly="1"
+                                    />
+                                    <field name="write_date"
+                                           readonly="1"
+                                    />
+                                </group>
+                            </group>
+                            <group name="technical"
+                                   string="Technical"
+                            >
+                                <group name="technical_1">
+                                    <field name="technical_name"
+                                           readonly="locked"
+                                    />
+                                </group>
+                                <group name="technical_2">
+                                    <field name="technical_timestamp"/>
+                                </group>
+                                <group name="technical_data"
+                                       colspan="2"
+                                >
+                                    <label name="view_technical_data"
+                                           for="action_view_technical_data"
+                                           string="Technical Data"
+                                    />
+                                    <div name="view_technical_data">
+                                        <button name="action_view_technical_data"
+                                                class="btn-link btn-sm"
+                                                icon="fa-code"
+                                                string="View"
+                                                type="object"
+                                        />
+                                        <field name="technical_data"
+                                               invisible="1"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids"
+                           widget="mail_activity"
+                    />
+                    <field name="message_follower_ids"
+                           widget="mail_followers"
+                    />
+                    <field name="message_ids"
+                           widget="mail_thread"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="tag_view_list"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tag.view.list</field>
+        <field name="model">l10n.hu.plus.tag</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <list>
+                <field name="priority"
+                       widget="handle"
+                />
+                <field name="name"/>
+                <field name="tag_type"/>
+                <field name="code"/>
+                <field name="color"
+                       optional="hide"
+                />
+                <field name="priority"
+                       optional="hide"
+                />
+                <field name="key_enabled"
+                       optional="hide"
+                />
+                <field name="key_method"
+                       optional="hide"
+                />
+                <field name="technical_name"
+                       optional="hide"
+                />
+                <field name="company"
+                       optional="hide"
+                />
+            </list>
+        </field>
+    </record>
+    <!-- Search view -->
+    <record id="tag_view_search"
+            model="ir.ui.view"
+    >
+        <field name="name">l10n.hu.plus.tag.view.search</field>
+        <field name="model">l10n.hu.plus.tag</field>
+        <field name="priority">16</field>
+        <field name="arch"
+               type="xml"
+        >
+            <search>
+                <!-- Field -->
+                <field name="name"/>
+                <field name="tag_type"/>
+                <field name="description"/>
+                <!-- Filter -->
+                <filter name="tag_archived_filter"
+                        domain="[('active', '=', False)]"
+                        string="Archived"
+                />
+                <filter name="tag_all_filter"
+                        domain="[('active', 'in', [True, False])]"
+                        string="All"
+                />
+                <!-- Filter group by -->
+                <filter name="tag_type_filter_group_by"
+                        context="{'group_by': 'tag_type'}"
+                        string="Tag Type"
+                />
+                <separator/>
+                <filter name="write_date_filter_group_by"
+                        context="{'group_by': 'write_date'}"
+                        string="Write Date"
+                />
+                <filter name="company_filter_group_by"
+                        context="{'group_by': 'company'}"
+                        string="Company"
+                />
+            </search>
+        </field>
+    </record>
+</odoo>
