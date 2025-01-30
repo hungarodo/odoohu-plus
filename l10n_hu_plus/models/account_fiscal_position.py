@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+# 1 : imports of python lib
+
+# 2 : imports of odoo
+from odoo import _, api, exceptions, fields, models  # alphabetically ordered
+
+# 3 : imports from odoo modules
+
+# 4 : variable declarations
+
+
+# Class
+class L10nHuPlusFiscalPosition(models.Model):
+    # Private attributes
+    _inherit = 'account.fiscal.position'
+
+    # Default methods
+
+    # Field declarations
+    l10n_hu_incorporation = fields.Selection(
+        copy=False,
+        index=True,
+        selection=[
+            ('organization', "Organization"),
+            ('self_employed', "Self Employed"),
+            ('taxable_person', "Taxable Person"),
+        ],
+        string="HU Taxpayer Type",
+    )
+    l10n_hu_plus_api_enabled = fields.Boolean(
+        default=False,
+        string="HU+ API",
+    )
+    l10n_hu_plus_technical_name = fields.Char(
+        copy=False,
+        string="HU+ Technical Name",
+    )
+    l10n_hu_tax_regime = fields.Selection(
+        copy=False,
+        selection=[
+            ('ie', 'Individual Exemption'),
+            ('ca', 'Cash Accounting'),
+            ('sb', 'Small Business'),
+        ],
+        string="HU Tax Regime",
+    )
+    l10n_hu_trade_position = fields.Selection(
+        copy=False,
+        index=True,
+        selection=[
+            ('domestic', "Domestic"),
+            ('eu', "EU"),
+            ('other', "Other"),
+        ],
+        string="HU Trade Position",
+    )
+    l10n_hu_vat_status = fields.Selection(
+        copy=False,
+        index=True,
+        selection=[
+            ('domestic', "Domestic"),
+            ('private_person', "Private Person"),
+            ('other', "Other"),
+        ],
+        string="HU VAT Status",
+    )
+
+    # Compute and search fields, in the same order of field declarations
+
+    # Constraints and onchanges
+
+    # CRUD methods (and display_name, name_search, ...) overrides
+
+    # Action methods
+
+    # Business methods
+
