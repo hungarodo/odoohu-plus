@@ -21,7 +21,7 @@
                                 <span t-elif="o.move_type in['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] and o.l10n_hu_document_type">
                                     <span t-field="o.l10n_hu_document_type"/>
                                 </span>
-                                <span t-elif="o.state='draft'">DRAFT</span>
+                                <span t-elif="o.state=='draft'">DRAFT</span>
                                 <span t-else=""/>
                             </h2>
                         </div>
@@ -53,12 +53,6 @@
                     <span t-if="o.name != '/'" t-field="o.name">INV/2023/0001</span>
                 </t>
             </t>
-        </xpath>
-        <!-- Bordered table -->
-        <xpath expr="//table[@name='invoice_line_table']"
-               position="attributes"
-        >
-            <attribute name="class">table table-sm o_main_table table-bordered</attribute>
         </xpath>
         <!-- HU+ comments -->
         <xpath expr="//div[@name='comment']"
