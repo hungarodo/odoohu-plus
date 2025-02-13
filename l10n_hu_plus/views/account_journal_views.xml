@@ -55,9 +55,9 @@
                                    class="oe_inline"
                                    string="Priority"
                             />
-                            <field name="l10n_hu_edi_external"
+                            <field name="l10n_hu_edi_send_disabled"
                                    invisible="type != 'sale'"
-                                   string="External EDI"
+                                   string="EDI Send Disabled"
                                    widget="boolean_toggle"
                             />
                             <label name="l10n_hu_actions"

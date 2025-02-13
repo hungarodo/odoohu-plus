@@ -41,12 +41,12 @@ class L10nHuPlusAccountJournal(models.Model):
         ],
         string="HU Delivery Date Default",
     )
-    l10n_hu_edi_external = fields.Boolean(
+    l10n_hu_edi_send_disabled = fields.Boolean(
         copy=False,
         default=False,
-        help="Invoices are issued and sent to NAV Online Szamla system from another software",
+        help="Disable EDI sending when the journal is used for externally issued or OSS reported invoices",
         index=True,
-        string="HU EDI External",
+        string="HU EDI Send Disabled",
     )
     l10n_hu_nav_payment_method = fields.Selection(
         copy=False,

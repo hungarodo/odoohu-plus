@@ -518,7 +518,7 @@ class L10nHuPlusAccountMove(models.Model):
 
     # Business methods
     ## REPLACE
-    ## NOTE: unfortunately SUPER is not viable, so this complete method replace is necessary
+    ## NOTES: unfortunately SUPER is not viable, so this complete method replace is necessary
     ##       the issue was in invert_dict(), currency_obj should be the invoice currency, not the company currency
     ##       there is a fix for 18.0 https://github.com/odoo/odoo/commit/62620e705d8c0a5da1e863733b8baa4f5a489b52
     ##       this fix does not work on 17.0
@@ -574,7 +574,7 @@ class L10nHuPlusAccountMove(models.Model):
         return tax_totals
 
     ## REPLACE
-    ## NOTE: unfortunately SUPER is not viable, so this complete method replace is necessary to support STORNO
+    ## NOTES: unfortunately SUPER is not viable, so this complete method replace is necessary to support STORNO
     def _l10n_hu_edi_upload_single_batch(self, connection):
         try:
             token_result = connection.do_token_exchange(self.company_id.sudo()._l10n_hu_edi_get_credentials_dict())
@@ -601,7 +601,7 @@ class L10nHuPlusAccountMove(models.Model):
         invoice_operations = [
             {
                 'index': invoice.l10n_hu_edi_batch_upload_index,
-                'operation': operation,  # NOTE: moved to variable
+                'operation': operation,  # NOTES: moved to variable
                 'invoice_data': base64.b64decode(invoice.l10n_hu_edi_attachment),
             }
             for invoice in self
@@ -658,7 +658,7 @@ class L10nHuPlusAccountMove(models.Model):
     def _l10n_hu_edi_get_invoice_values(self):
         """ Super for original method in l10n_hu_edi app
 
-        NOTE:
+        NOTES:
         - super result is a dictionary containing invoice_values
         - we update the dictionary with some values
         - for xml rendering see file: data/template_invoice_xml.data
@@ -692,7 +692,7 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Customer tax number
-        ## NOTE: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
+        ## NOTES: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
         customer = result.get('customer', None)
         if customer \
                 and customer.is_company \
@@ -709,6 +709,22 @@ class L10nHuPlusAccountMove(models.Model):
             })
 
         # Return result
+        return result
+
+    def _l10n_hu_edi_get_valid_actions(self):
+        """ Super for original method in l10n_hu_edi app
+
+        NOTES:
+        - super result is a list containing possible HU EDI actions
+        - we empty the list in case EDI is disabled on the journal
+        """
+        # Execute super
+        result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_valid_actions()
+
+        # No action when EDI is disabled on the journal (eg: externally issued invoices, OSS)
+        if self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted' \
+                and self.journal_id and self.journal_id.l10n_hu_edi_send_disabled:
+            result = []
         return result
 
     ## HU+
@@ -814,7 +830,7 @@ class L10nHuPlusAccountMove(models.Model):
     def l10n_hu_get_delivery_period_data(self, values):
         """ Get delivery period data
 
-        NOTE:
+        NOTES:
         - This method computes special hungarian rules
         - Specification: 2007. CXXVII. 58.§ (1)
         - NJT: https://njt.hu/jogszabaly/2007-127-00-00
@@ -942,7 +958,7 @@ class L10nHuPlusAccountMove(models.Model):
             else:
                 invoice_date_due = False
         elif self.invoice_payment_term_id:
-            # NOTE: using a payment term needs a recompute, see _compute_invoice_date_due()
+            # NOTES: using a payment term needs a recompute, see _compute_invoice_date_due()
             context_today = fields.Date.context_today(self)
             invoice_date_due = self.needed_terms and max(
                 (k['date_maturity'] for k in self.needed_terms.keys() if k),
@@ -1053,7 +1069,7 @@ class L10nHuPlusAccountMove(models.Model):
     def l10n_hu_get_field_values(self, values):
         """ Get field values for HU accounting
 
-        NOTE:
+        NOTES:
         - This method takes care of special hungarian fields
 
         :param values: dictionary
@@ -1271,7 +1287,7 @@ class L10nHuPlusAccountMove(models.Model):
     def l10n_hu_get_plus_status_checklist(self):
         """ Get HU+ status checklist
 
-        NOTE:
+        NOTES:
         - we run here a lot of status checks
         - Odoo _l10n_hu_edi_check_invoices() method is not included as it returns only errors when posting
 
@@ -1427,7 +1443,7 @@ class L10nHuPlusAccountMove(models.Model):
     def l10n_hu_get_plus_status_overview(self):
         """ Get HU+ status overview as an HTML table
 
-        NOTE:
+        NOTES:
         - we return status check results
         - we also return an overview html table assembled by a different method
 
@@ -1580,7 +1596,7 @@ class L10nHuPlusAccountMove(models.Model):
     def l10n_hu_get_storno_allowed(self):
         """ Determine if storno is allowed for an account move
 
-        NOTE:
+        NOTES:
         - in certain cases (eg: issued to wrong partner) storno must be used instead of modification
         - we collect points, if all collected, storno is allowed
 

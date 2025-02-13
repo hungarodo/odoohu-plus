@@ -62,7 +62,7 @@ class L10nHuPlusAccountMoveReversal(models.TransientModel):
             ('technical_name', '=', 'invoice_storno'),
         ], limit=1)
         if self.l10n_hu_storno_enabled and storno_document_type:
-            # NOTE: is_modify = storno & create draft
+            # NOTES: is_modify = storno & create draft
             # In this case self.new_move_ids contains only the drafts, not the storno ones
             # So it is safer to search instead of relying on self.new_move_ids
             new_storno_moves = self.env['account.move'].search([

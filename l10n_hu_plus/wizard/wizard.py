@@ -713,7 +713,7 @@ class L10nHuPlusWizard(models.TransientModel):
     def manage_account_move(self):
         """ Manage account move actions
 
-        NOTE:
+        NOTES:
         - We may iterate because account move field is m2m to support mass management
 
         :return: dictionary

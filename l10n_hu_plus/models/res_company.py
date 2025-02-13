@@ -334,7 +334,7 @@ class L10nHuBaseResCompany(models.Model):
     def l10n_hu_plus_api_registration_request(self, values):
         """ Registration request to HU+ API
 
-        NOTE:
+        NOTES:
         - we send one message here, manage iterations on the caller side
 
         :return: dictionary
@@ -404,7 +404,7 @@ class L10nHuBaseResCompany(models.Model):
         name = "l10n_hu_plus_api_registration" + " " + str(request_type)
 
         # Create l10n_hu_log
-        ## NOTE: we want to log everything, even failed attempts
+        ## NOTES: we want to log everything, even failed attempts
         log_values = {
             'app_name': 'l10n_hu_plus',
             'company': company.id,
@@ -462,7 +462,7 @@ class L10nHuBaseResCompany(models.Model):
     def l10n_hu_plus_api_registration_response(self, values):
         """ Process response for registration request
 
-        NOTE:
+        NOTES:
         - common method for DELETE, GET, POST operations
 
         :return: dictionary
