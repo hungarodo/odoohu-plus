@@ -1070,6 +1070,12 @@ class L10nHuPlusAccountMove(models.Model):
         result = {}
         warning_list = []
 
+        # HU+ enabled
+        if self.journal_id and self.journal_id.l10n_hu_plus_enabled:
+            debug_list.append("HU+ enabled journal check passed")
+        else:
+            error_list.append("HU+ enabled journal check failed")
+
         # Check move type
         if len(self) == 1 and self.id and self.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
             debug_list.append("move type check passed")
