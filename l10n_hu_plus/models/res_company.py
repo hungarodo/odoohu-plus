@@ -404,7 +404,7 @@ class L10nHuBaseResCompany(models.Model):
         name = "l10n_hu_plus_api_registration" + " " + str(request_type)
 
         # Create l10n_hu_log
-        ## NOTE: we want to log everything, even failed attempts
+        ## NOTES: we want to log everything, even failed attempts
         log_values = {
             'app_name': 'l10n_hu_plus',
             'company': company.id,

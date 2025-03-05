@@ -27,32 +27,44 @@ class L10nHuPlusAccountJournal(models.Model):
     l10n_hu_banner_enabled = fields.Boolean(
         copy=False,
         default=True,
+        help="Display banner on the invoice form",
         index=True,
         string="HU Banner Enabled",
     )
     l10n_hu_delivery_date_default = fields.Selection(
         copy=False,
         default='none',
+        help="Used as default value when necessary",
         selection=[
             ('none', "None"),
             ('today', "Today"),
         ],
         string="HU Delivery Date Default",
     )
+    l10n_hu_edi_send_disabled = fields.Boolean(
+        copy=False,
+        default=False,
+        help="Disable EDI sending when the journal is used for externally issued or OSS reported invoices",
+        index=True,
+        string="HU EDI Send Disabled",
+    )
     l10n_hu_nav_payment_method = fields.Selection(
         copy=False,
+        help="Used as default value when necessary",
         selection=_get_selection_l10n_hu_nav_payment_method,
         string="HU NAV Payment Method",
     )
     l10n_hu_plus_enabled = fields.Boolean(
         copy=False,
         default=True,
+        help="Allow HU+ features for this journal",
         index=True,
         string="HU+ Enabled",
     )
     l10n_hu_priority = fields.Integer(
         copy=False,
         default=10,
+        help="Lower number means higher priority",
         index=True,
         string="HU Priority",
     )
@@ -60,6 +72,7 @@ class L10nHuPlusAccountJournal(models.Model):
         comodel_name='mail.template',
         copy=False,
         domain=_get_default_l10n_hu_proforma_mail_template_domain,
+        help="Default template for sending proforma emails",
         index=True,
         string="HU Proforma Mail Template",
     )
@@ -67,6 +80,7 @@ class L10nHuPlusAccountJournal(models.Model):
         comodel_name='ir.sequence',
         copy=False,
         domain=[('code', 'like', 'proforma')],
+        help="Proforma numbering sequence",
         index=True,
         string="HU Proforma Sequence",
     )
