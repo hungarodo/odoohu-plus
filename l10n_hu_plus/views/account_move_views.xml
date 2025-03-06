@@ -1,35 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Form view inherit -->
-    <record id="view_move_form_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_move_form_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.move.form.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_move_form"
-        />
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="model">account.move</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- HU+ banner -->
-            <xpath expr="//div[1]"
-                   position="before"
-            >
-                <div name="l10n_hu_plus_banner"
-                     class="border font-weight-bold mb-2 p-1"
-                     invisible="not l10n_hu_plus_enabled or not l10n_hu_banner_enabled"
-                >
-                    <div name="l10n_hu_banner_start"
-                         class="d-inline ms-2"
-                    >
+            <xpath expr="//div[1]" position="before">
+                <div name="l10n_hu_plus_banner" class="border font-weight-bold mb-2 p-1" invisible="not l10n_hu_plus_enabled or not l10n_hu_banner_enabled">
+                    <div name="l10n_hu_banner_start" class="d-inline ms-2">
                         <span name="hu_flag">
-                            <img src="/l10n_hu_plus/static/description/hu_flag.png"
-                                 alt="HU Flag"
-                                 class="p-0"
-                                 width="36px"
-                            />
+                            <img src="/l10n_hu_plus/static/description/hu_flag.png" alt="HU Flag" class="p-0" width="36px"/>
                         </span>
                         <span name="action_l10n_hu_plus_documentation">
                             <button name="action_l10n_hu_plus_documentation"
@@ -39,32 +22,14 @@
                             />
                         </span>
                     </div>
-                    <div name="l10n_hu_banner_center"
-                         class="d-inline"
-                    >
-                        <span name="l10n_hu_proforma_sent"
-                              class="ms-2 me-2"
-                              invisible="not l10n_hu_proforma_date or not l10n_hu_proforma_name"
-                        >
-                            <field name="l10n_hu_proforma_name"
-                                   readonly="1"
-                                   string="Proforma"
-                            />
+                    <div name="l10n_hu_banner_center" class="d-inline">
+                        <span name="l10n_hu_proforma_sent" class="ms-2 me-2" invisible="not l10n_hu_proforma_date or not l10n_hu_proforma_name">
+                            <field name="l10n_hu_proforma_name" readonly="1" string="Proforma"/>
                         </span>
-                        <span name="l10n_hu_proforma_not_sent"
-                              class="ms-2 me-2"
-                              invisible="l10n_hu_proforma_date and l10n_hu_proforma_name"
-                        >
-                            <field name="l10n_hu_proforma_name"
-                                   class="text-danger"
-                                   readonly="1"
-                                   string="Proforma"
-                            />
+                        <span name="l10n_hu_proforma_not_sent" class="ms-2 me-2" invisible="l10n_hu_proforma_date and l10n_hu_proforma_name">
+                            <field name="l10n_hu_proforma_name" class="text-danger" readonly="1" string="Proforma"/>
                         </span>
-                        <span name="l10n_hu_plus_tag"
-                              class="ms-2 me-2"
-                              groups="l10n_hu_plus.user_group"
-                        >
+                        <span name="l10n_hu_plus_tag" class="ms-2 me-2" groups="l10n_hu_plus.user_group">
                             <field name="l10n_hu_plus_tag"
                                    context="{'default_tag_type': 'account_move'}"
                                    nolabel="1"
@@ -73,25 +38,12 @@
                                    widget="many2many_tags"
                             />
                         </span>
-                        <span name="l10n_hu_plus_notes"
-                              class="ms-2 me-2"
-                              groups="l10n_hu_plus.user_group"
-                        >
-                            <field name="l10n_hu_plus_notes"
-                                   nolabel="1"
-                                   placeholder="Notes..."
-                                   style="min-width:200px;"
-                            />
+                        <span name="l10n_hu_plus_notes" class="ms-2 me-2" groups="l10n_hu_plus.user_group">
+                            <field name="l10n_hu_plus_notes" nolabel="1" placeholder="Notes..." style="min-width:200px;"/>
                         </span>
                     </div>
-                    <div name="l10n_hu_banner_end"
-                         class="d-inline float-end"
-                    >
-                        <span name="l10n_hu_update_fields"
-                              class="ms-2"
-                              groups="l10n_hu_plus.user_group"
-                              invisible="state != 'draft'"
-                        >
+                    <div name="l10n_hu_banner_end" class="d-inline float-end">
+                        <span name="l10n_hu_update_fields" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'draft'">
                             <button name="action_l10n_hu_update_fields"
                                     class="btn-primary"
                                     icon="fa-bolt"
@@ -99,11 +51,7 @@
                                     type="object"
                             />
                         </span>
-                        <span name="l10n_hu_plus_status_error"
-                              class="ms-2"
-                              groups="l10n_hu_plus.user_group"
-                              invisible="l10n_hu_plus_status != 'error'"
-                        >
+                        <span name="l10n_hu_plus_status_error" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'error'">
                             <button name="action_l10n_hu_wizard_check_status"
                                     class="btn-danger"
                                     icon="fa-heartbeat"
@@ -111,11 +59,7 @@
                                     type="object"
                             />
                         </span>
-                        <span name="l10n_hu_plus_status_info"
-                              class="ms-2"
-                              groups="l10n_hu_plus.user_group"
-                              invisible="l10n_hu_plus_status not in [False, 'info', 'other']"
-                        >
+                        <span name="l10n_hu_plus_status_info" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status not in [False, 'info', 'other']">
                             <button name="action_l10n_hu_wizard_check_status"
                                     class="btn-info"
                                     icon="fa-heartbeat"
@@ -123,11 +67,7 @@
                                     type="object"
                             />
                         </span>
-                        <span name="l10n_hu_plus_status_ok"
-                              class="ms-2"
-                              groups="l10n_hu_plus.user_group"
-                              invisible="l10n_hu_plus_status != 'ok'"
-                        >
+                        <span name="l10n_hu_plus_status_ok" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'ok'">
                             <button name="action_l10n_hu_wizard_check_status"
                                     class="btn-success"
                                     icon="fa-heartbeat"
@@ -135,11 +75,7 @@
                                     type="object"
                             />
                         </span>
-                        <span name="l10n_hu_plus_status_warning"
-                              class="ms-2"
-                              groups="l10n_hu_plus.user_group"
-                              invisible="l10n_hu_plus_status != 'warning'"
-                        >
+                        <span name="l10n_hu_plus_status_warning" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'warning'">
                             <button name="action_l10n_hu_wizard_check_status"
                                     class="btn-warning text-white"
                                     icon="fa-heartbeat"
@@ -147,9 +83,7 @@
                                     type="object"
                             />
                         </span>
-                        <div name="l10n_hu_banner_dropdown"
-                             class="btn-group ms-2"
-                        >
+                        <div name="l10n_hu_banner_dropdown" class="btn-group ms-2">
                             <a id="l10nHuDropdownMenuLink"
                                name="l10n_hu_banner_dropdown_button"
                                class="btn btn-secondary dropdown-toggle"
@@ -165,9 +99,7 @@
                                 class="dropdown-menu dropdown-menu-end"
                                 role="menu"
                             >
-                                <li name="l10n_hu_send_proforma"
-                                    invisible="state != 'draft' or not l10n_hu_proforma_sequence"
-                                >
+                                <li name="l10n_hu_send_proforma" invisible="state != 'draft' or not l10n_hu_proforma_sequence">
                                     <button name="action_l10n_hu_send_proforma"
                                             class="dropdown-item"
                                             icon="fa-send"
@@ -175,14 +107,8 @@
                                             type="object"
                                     />
                                 </li>
-                                <li name="l10n_hu_send_proforma_divider"
-                                    class="dropdown-divider"
-                                    invisible="state != 'draft' or not l10n_hu_proforma_sequence"
-                                />
-                                <li name="l10n_hu_wizard_accounting"
-                                    groups="l10n_hu_plus.user_group"
-                                    invisible="state != 'draft'"
-                                >
+                                <li name="l10n_hu_send_proforma_divider" class="dropdown-divider" invisible="state != 'draft' or not l10n_hu_proforma_sequence"/>
+                                <li name="l10n_hu_wizard_accounting" groups="l10n_hu_plus.user_group" invisible="state != 'draft'">
                                     <button name="action_l10n_hu_wizard_accounting"
                                             class="dropdown-item"
                                             icon="fa-magic"
@@ -190,15 +116,8 @@
                                             type="object"
                                     />
                                 </li>
-                                <li name="l10n_hu_wizard_accounting_divider"
-                                    class="dropdown-divider"
-                                    groups="l10n_hu_plus.user_group"
-                                    invisible="state != 'draft'"
-                                />
-                                <li name="l10n_hu_wizard_currency_exchange"
-                                    groups="l10n_hu_plus.user_group"
-                                    invisible="currency_id == company_currency_id"
-                                >
+                                <li name="l10n_hu_wizard_accounting_divider" class="dropdown-divider" groups="l10n_hu_plus.user_group" invisible="state != 'draft'"/>
+                                <li name="l10n_hu_wizard_currency_exchange" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
                                     <button name="action_l10n_hu_wizard_currency_exchange"
                                             class="dropdown-item"
                                             icon="fa-calculator"
@@ -206,10 +125,7 @@
                                             type="object"
                                     />
                                 </li>
-                                <li name="l10n_hu_view_currency_rate"
-                                    groups="l10n_hu_plus.user_group"
-                                    invisible="currency_id == company_currency_id"
-                                >
+                                <li name="l10n_hu_view_currency_rate" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
                                     <button name="action_l10n_hu_view_currency_rate"
                                             class="dropdown-item"
                                             icon="fa-area-chart"
@@ -217,11 +133,7 @@
                                             type="object"
                                     />
                                 </li>
-                                <li name="l10n_hu_currency_divider"
-                                    class="dropdown-divider"
-                                    groups="l10n_hu_plus.user_group"
-                                    invisible="currency_id == company_currency_id"
-                                />
+                                <li name="l10n_hu_currency_divider" class="dropdown-divider" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id"/>
                                 <li name="l10n_hu_plus_documentation">
                                     <button name="action_l10n_hu_plus_documentation"
                                             class="dropdown-item"
@@ -236,17 +148,10 @@
                 </div>
             </xpath>
             <!-- HU+ fields -->
-            <xpath expr="//page[@name='aml_tab']"
-                   position="after"
-            >
-                <page name="l10n_hu_plus"
-                      invisible="not l10n_hu_plus_enabled"
-                      string="HU+"
-                >
+            <xpath expr="//page[@name='aml_tab']" position="after">
+                <page name="l10n_hu_plus" invisible="not l10n_hu_plus_enabled" string="HU+">
                     <group name="l10n_hu_plus">
-                        <group name="l10n_hu_plus_1"
-                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
-                        >
+                        <group name="l10n_hu_plus_1" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
                             <!-- Document type -->
                             <field name="l10n_hu_document_type"
                                    options="{'no_create': True,}"
@@ -254,14 +159,9 @@
                                    string="Document Type"
                             />
                             <!-- Original invoice -->
-                            <label name="l10n_hu_original_invoice"
-                                   for="l10n_hu_original_invoice_number"
-                                   string="Original Invoice Number"
-                            />
+                            <label name="l10n_hu_original_invoice" for="l10n_hu_original_invoice_number" string="Original Invoice Number"/>
                             <div name="l10n_hu_original_invoice">
-                                <field name="reversed_entry_id"
-                                       invisible="not reversed_entry_id"
-                                />
+                                <field name="reversed_entry_id" invisible="not reversed_entry_id"/>
                                 <field name="l10n_hu_original_invoice_number"
                                        class="oe_inline"
                                        invisible="reversed_entry_id"
@@ -297,14 +197,9 @@
                                    string="HU+ Status"
                             />
                         </group>
-                        <group name="l10n_hu_plus_2"
-                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
-                        >
+                        <group name="l10n_hu_plus_2" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
                             <!-- VAT -->
-                            <field name="l10n_hu_vat_date"
-                                   readonly="state != 'draft' and checked"
-                                   string="VAT Date"
-                            />
+                            <field name="l10n_hu_vat_date" readonly="state != 'draft' and checked" string="VAT Date"/>
                             <!-- Cash accounting -->
                             <field name="l10n_hu_cash_accounting"
                                    force_save="1"
@@ -313,9 +208,7 @@
                             />
                         </group>
                         <!-- Delivery period -->
-                        <group name="l10n_hu_delivery_period"
-                               string="Delivery Period"
-                        >
+                        <group name="l10n_hu_delivery_period" string="Delivery Period">
                             <field name="l10n_hu_delivery_period_start"
                                    placeholder="Start date..."
                                    readonly="state != 'draft' and checked"
@@ -336,39 +229,18 @@
                             />
                         </group>
                         <!-- Currency -->
-                        <group name="l10n_hu_plus_currency"
-                               string="Currency"
-                        >
-                            <field name="l10n_hu_company_currency_name"
-                                   invisible="1"
-                            />
-                            <label name="l10n_hu_accounting_rate"
-                                   for="l10n_hu_currency_rate"
-                                   string="Accounting Rate"
-                            />
-                            <div name="currency_exchange_ignored"
-                                 class="fst-italic text-muted"
-                                 invisible="currency_id != company_currency_id"
-                            >
+                        <group name="l10n_hu_plus_currency" string="Currency">
+                            <field name="l10n_hu_company_currency_name" invisible="1"/>
+                            <label name="l10n_hu_accounting_rate" for="l10n_hu_currency_rate" string="Accounting Rate"/>
+                            <div name="currency_exchange_ignored" class="fst-italic text-muted" invisible="currency_id != company_currency_id">
                                 This document uses the company currency
                             </div>
-                            <div name="l10n_hu_accounting_rate"
-                                 invisible="currency_id == company_currency_id"
-                            >
-                                <field name="l10n_hu_currency_rate"
-                                       class="oe_inline"
-                                />
-                                <field name="l10n_hu_currency_name"
-                                       class="oe_inline ps-2 pe-2"
-                                />
-                                <field name="l10n_hu_currency_date"
-                                       class="oe_inline"
-                                />
+                            <div name="l10n_hu_accounting_rate" invisible="currency_id == company_currency_id">
+                                <field name="l10n_hu_currency_rate" class="oe_inline"/>
+                                <field name="l10n_hu_currency_name" class="oe_inline ps-2 pe-2"/>
+                                <field name="l10n_hu_currency_date" class="oe_inline"/>
                             </div>
-                            <label name="l10n_hu_document_rate"
-                                   for="l10n_hu_document_rate"
-                                   string="Document Rate"
-                            />
+                            <label name="l10n_hu_document_rate" for="l10n_hu_document_rate" string="Document Rate"/>
                             <div name="l10n_hu_document_rate">
                                 <field name="l10n_hu_document_rate"
                                        class="oe_inline"
@@ -383,15 +255,8 @@
                                    invisible="l10n_hu_company_currency_name == 'HUF'"
                                    string="HUF Rate"
                             />
-                            <label name="l10n_hu_currency_actions"
-                                   for="action_l10n_hu_view_currency_rate"
-                                   invisible="l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF'"
-                                   string="Actions"
-                            />
-                            <div name="l10n_hu_currency_actions"
-                                 class="gap-2"
-                                 invisible="l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF'"
-                            >
+                            <label name="l10n_hu_currency_actions" for="action_l10n_hu_view_currency_rate" invisible="l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF'" string="Actions"/>
+                            <div name="l10n_hu_currency_actions" class="gap-2" invisible="l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF'">
                                 <button name="action_l10n_hu_wizard_currency_exchange"
                                         class="btn-link btn-sm text-start"
                                         groups="l10n_hu_plus.user_group"
@@ -410,25 +275,11 @@
                             </div>
                         </group>
                         <!-- Proforma -->
-                        <group name="l10n_hu_plus_proforma"
-                               invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence"
-                               string="Proforma"
-                        >
-                            <field name="l10n_hu_proforma_name"
-                                   readonly="state != 'draft' and checked"
-                                   string="Proforma Name"
-                            />
-                            <field name="l10n_hu_proforma_date"
-                                   readonly="state != 'draft' and checked"
-                                   string="Proforma Date"
-                            />
-                            <label name="l10n_hu_proforma_actions"
-                                   for="action_l10n_hu_send_proforma"
-                                   string="Actions"
-                            />
-                            <div name="l10n_hu_proforma_actions"
-                                 class="gap-2"
-                            >
+                        <group name="l10n_hu_plus_proforma" invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence" string="Proforma">
+                            <field name="l10n_hu_proforma_name" readonly="state != 'draft' and checked" string="Proforma Name"/>
+                            <field name="l10n_hu_proforma_date" readonly="state != 'draft' and checked" string="Proforma Date"/>
+                            <label name="l10n_hu_proforma_actions" for="action_l10n_hu_send_proforma" string="Actions"/>
+                            <div name="l10n_hu_proforma_actions" class="gap-2">
                                 <button name="action_l10n_hu_send_proforma"
                                         class="btn-link btn-sm text-start"
                                         groups="l10n_hu_plus.user_group"
@@ -440,10 +291,7 @@
                             </div>
                         </group>
                         <!-- Partner -->
-                        <group name="l10n_hu_plus_partner"
-                               invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
-                               string="Partner"
-                        >
+                        <group name="l10n_hu_plus_partner" invisible="l10n_hu_journal_type not in ['purchase', 'sale']" string="Partner">
                             <field name="l10n_hu_fiscal_representative"
                                    invisible="l10n_hu_journal_type not in ['purchase', 'sale']"
                                    options="{'no_create': True,}"
@@ -457,30 +305,15 @@
                                    readonly="state != 'draft' and checked"
                                    string="Fiscal Representative Bank Account"
                             />
-                            <field name="l10n_hu_company_partner"
-                                   string="Company Partner"
-                            />
-                            <field name="l10n_hu_partner_country"
-                                   string="Partner Country"
-                            />
+                            <field name="l10n_hu_company_partner" string="Company Partner"/>
+                            <field name="l10n_hu_partner_country" string="Partner Country"/>
                         </group>
                         <!-- Journal -->
-                        <group name="l10n_hu_plus_journal"
-                               string="Journal"
-                        >
-                            <field name="l10n_hu_plus_enabled"
-                                   string="HU+"
-                            />
-                            <field name="l10n_hu_banner_enabled"
-                                   string="Banner"
-                            />
-                            <field name="l10n_hu_proforma_sequence"
-                                   invisible="not l10n_hu_proforma_sequence"
-                                   string="Proforma Sequence"
-                            />
-                            <field name="l10n_hu_journal_type"
-                                   string="Journal Type"
-                            />
+                        <group name="l10n_hu_plus_journal" string="Journal">
+                            <field name="l10n_hu_plus_enabled" string="HU+"/>
+                            <field name="l10n_hu_banner_enabled" string="Banner"/>
+                            <field name="l10n_hu_proforma_sequence" invisible="not l10n_hu_proforma_sequence" string="Proforma Sequence"/>
+                            <field name="l10n_hu_journal_type" string="Journal Type"/>
                         </group>
                     </group>
                 </page>
@@ -488,201 +321,86 @@
         </field>
     </record>
     <!-- List view inherit  -->
-    <record id="view_invoice_tree_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_invoice_tree_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.account.view.invoice.tree.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_invoice_tree"
-        />
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
         <field name="model">account.move</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Add proforma -->
-            <field name="name"
-                   position="after"
-            >
-                <field name="l10n_hu_proforma_name"
-                       optional="hide"
-                       readonly="state in ['cancel', 'posted']"
-                       string="Proforma Name"
-                />
+            <field name="name" position="after">
+                <field name="l10n_hu_proforma_name" optional="hide" readonly="state in ['cancel', 'posted']" string="Proforma Name"/>
             </field>
             <!-- Add delivery date -->
-            <field name="date"
-                   position="after"
-            >
-                <field name="delivery_date"
-                       optional="hide"
-                       readonly="state in ['cancel', 'posted']"
-                       string="Delivery Date"
-                />
+            <field name="date" position="after">
+                <field name="delivery_date" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery Date"/>
             </field>
             <!-- Trade position -->
-            <xpath expr="//field[@name='date']"
-                   position="before"
-            >
-                <field name="l10n_hu_partner_country"
-                       optional="hide"
-                />
-                <field name="l10n_hu_trade_position"
-                       optional="hide"
-                       string="Trade Position"
-                />
+            <xpath expr="//field[@name='date']" position="before">
+                <field name="l10n_hu_partner_country" optional="hide"/>
+                <field name="l10n_hu_trade_position" optional="hide" string="Trade Position"/>
             </xpath>
             <!-- VAT date -->
-            <xpath expr="//field[@name='date']"
-                   position="after"
-            >
-                <field name="l10n_hu_vat_date"
-                       optional="hide"
-                       string="VAT Date"
-                />
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="l10n_hu_vat_date" optional="hide" string="VAT Date"/>
             </xpath>
             <!-- Tag and notes -->
-            <xpath expr="//field[@name='checked']"
-                   position="before"
-            >
-                <field name="l10n_hu_plus_tag"
-                       optional="hide"
-                       options="{'color_field': 'color'}"
-                       string="HU+ Tag"
-                       widget="many2many_tags"
-                />
-                <field name="l10n_hu_plus_notes"
-                       optional="hide"
-                       string="HU+ Notes"
-                />
+            <xpath expr="//field[@name='checked']" position="before">
+                <field name="l10n_hu_plus_tag" optional="hide" options="{'color_field': 'color'}" string="HU+ Tag" widget="many2many_tags"/>
+                <field name="l10n_hu_plus_notes" optional="hide" string="HU+ Notes"/>
             </xpath>
         </field>
     </record>
     <!-- Search view inherit  -->
-    <record id="view_account_invoice_filter_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.account.view.account.invoice.filter.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_account_invoice_filter"
-        />
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="model">account.move</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Field -->
-            <xpath expr="//field[@name='name'][1]"
-                   position="attributes"
-            >
+            <xpath expr="//field[@name='name'][1]" position="attributes">
                 <attribute name="filter_domain">['|', '|' , '|', '|', '|',
                     ('name', 'ilike', self), ('invoice_origin', 'ilike', self),
                     ('ref', 'ilike', self), ('payment_reference', 'ilike', self),
                     ('partner_id', 'child_of', self),('l10n_hu_proforma_name', 'ilike', self)]
                 </attribute>
             </xpath>
-            <xpath expr="//field[@name='journal_id']"
-                   position="before"
-            >
-                <field name="l10n_hu_proforma_name"
-                       string="Proforma"
-                />
-                <field name="l10n_hu_plus_tag"
-                       string="HU+ Tag"
-                />
-                <field name="l10n_hu_plus_notes"
-                       string="HU+ Notes"
-                />
+            <xpath expr="//field[@name='journal_id']" position="before">
+                <field name="l10n_hu_proforma_name" string="Proforma"/>
+                <field name="l10n_hu_plus_tag" string="HU+ Tag"/>
+                <field name="l10n_hu_plus_notes" string="HU+ Notes"/>
             </xpath>
             <!-- Filter -->
-            <xpath expr="//filter[@name='invoice_date']"
-                   position="after"
-            >
-                <filter name="delivery_date_filter"
-                        date="delivery_date"
-                        string="Delivery Date"
-                />
+            <xpath expr="//filter[@name='invoice_date']" position="after">
+                <filter name="delivery_date_filter" date="delivery_date" string="Delivery Date"/>
             </xpath>
-            <xpath expr="//filter[@name='due_date']"
-                   position="after"
-            >
+            <xpath expr="//filter[@name='due_date']" position="after">
                 <separator/>
-                <filter name="l10n_hu_vat_date_filter"
-                        date="l10n_hu_vat_date"
-                        string="VAT Date"
-                />
-                <filter name="l10n_hu_proforma_date_filter"
-                        date="l10n_hu_proforma_date"
-                        string="Proforma Date"
-                />
+                <filter name="l10n_hu_vat_date_filter" date="l10n_hu_vat_date" string="VAT Date"/>
+                <filter name="l10n_hu_proforma_date_filter" date="l10n_hu_proforma_date" string="Proforma Date"/>
                 <separator/>
-                <filter name="l10n_hu_plus_tag_filter"
-                        domain="[('l10n_hu_plus_tag', '!=', False)]"
-                        string="HU+ Tags"
-                />
-                <filter name="l10n_hu_plus_notes_filter"
-                        domain="[('l10n_hu_plus_notes', '!=', False)]"
-                        string="HU+ Notes"
-                />
-                <filter name="l10n_hu_proforma_sent_filter"
-                        domain="[('l10n_hu_proforma_date', '!=', False), ('l10n_hu_proforma_name', '!=', False)]"
-                        string="Proforma Sent"
-                />
+                <filter name="l10n_hu_plus_tag_filter" domain="[('l10n_hu_plus_tag', '!=', False)]" string="HU+ Tags"/>
+                <filter name="l10n_hu_plus_notes_filter" domain="[('l10n_hu_plus_notes', '!=', False)]" string="HU+ Notes"/>
+                <filter name="l10n_hu_proforma_sent_filter" domain="[('l10n_hu_proforma_date', '!=', False), ('l10n_hu_proforma_name', '!=', False)]" string="Proforma Sent"/>
                 <separator/>
-                <filter name="l10n_hu_trade_position_domestic_filter"
-                        domain="[('l10n_hu_trade_position', '=', 'domestic')]"
-                        string="Domestic"
-                />
-                <filter name="l10n_hu_trade_position_eu_filter"
-                        domain="[('l10n_hu_trade_position', '=', 'eu')]"
-                        string="EU"
-                />
-                <filter name="l10n_hu_trade_position_other_filter"
-                        domain="[('l10n_hu_trade_position', '=', 'other')]"
-                        string="Other"
-                />
-                <filter name="l10n_hu_trade_position_none_filter"
-                        domain="[('l10n_hu_trade_position', '=', False)]"
-                        string="No Trade Position"
-                />
+                <filter name="l10n_hu_trade_position_domestic_filter" domain="[('l10n_hu_trade_position', '=', 'domestic')]" string="Domestic"/>
+                <filter name="l10n_hu_trade_position_eu_filter" domain="[('l10n_hu_trade_position', '=', 'eu')]" string="EU"/>
+                <filter name="l10n_hu_trade_position_other_filter" domain="[('l10n_hu_trade_position', '=', 'other')]" string="Other"/>
+                <filter name="l10n_hu_trade_position_none_filter" domain="[('l10n_hu_trade_position', '=', False)]" string="No Trade Position"/>
             </xpath>
             <!-- Filter group by -->
-            <xpath expr="//filter[@name='invoicedate']"
-                   position="after"
-            >
-                <filter name="delivery_date_filter_group_by"
-                        context="{'group_by': 'delivery_date'}"
-                        string="Delivery Date"
-                />
+            <xpath expr="//filter[@name='invoicedate']" position="after">
+                <filter name="delivery_date_filter_group_by" context="{'group_by': 'delivery_date'}" string="Delivery Date"/>
             </xpath>
-            <xpath expr="//filter[@name='group_by_sequence_prefix']"
-                   position="after"
-            >
+            <xpath expr="//filter[@name='group_by_sequence_prefix']" position="after">
                 <separator/>
-                <filter name="l10n_hu_plus_tag_filter_group_by"
-                        context="{'group_by': 'l10n_hu_plus_tag'}"
-                        string="HU+ Tag"
-                />
-                <filter name="l10n_hu_vat_date_filter_group_by"
-                        context="{'group_by': 'l10n_hu_vat_date'}"
-                        string="VAT Date"
-                />
-                <filter name="l10n_hu_proforma_date_filter_group_by"
-                        context="{'group_by': 'l10n_hu_proforma_date'}"
-                        string="Proforma Date"
-                />
-                <filter name="l10n_hu_partner_country_filter_group_by"
-                        context="{'group_by': 'l10n_hu_partner_country'}"
-                        string="Partner Country"
-                />
-                <filter name="l10n_hu_trade_position_filter_group_by"
-                        context="{'group_by': 'l10n_hu_trade_position'}"
-                        string="Trade Position"
-                />
-                <filter name="commercial_partner_id_filter_group_by"
-                        context="{'group_by': 'commercial_partner_id'}"
-                        string="Commercial Partner"
-                />
+                <filter name="l10n_hu_plus_tag_filter_group_by" context="{'group_by': 'l10n_hu_plus_tag'}" string="HU+ Tag"/>
+                <filter name="l10n_hu_vat_date_filter_group_by" context="{'group_by': 'l10n_hu_vat_date'}" string="VAT Date"/>
+                <filter name="l10n_hu_proforma_date_filter_group_by" context="{'group_by': 'l10n_hu_proforma_date'}" string="Proforma Date"/>
+                <filter name="l10n_hu_partner_country_filter_group_by" context="{'group_by': 'l10n_hu_partner_country'}" string="Partner Country"/>
+                <filter name="l10n_hu_trade_position_filter_group_by" context="{'group_by': 'l10n_hu_trade_position'}" string="Trade Position"/>
+                <filter name="commercial_partner_id_filter_group_by" context="{'group_by': 'commercial_partner_id'}" string="Commercial Partner"/>
             </xpath>
         </field>
     </record>

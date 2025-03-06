@@ -1,36 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Form view -->
-    <record id="log_view_form"
-            model="ir.ui.view"
-    >
+    <record id="log_view_form" model="ir.ui.view">
         <field name="name">l10n.hu.plus.log.view.form</field>
         <field name="model">l10n.hu.plus.log</field>
         <field name="priority">16</field>
-        <field name="arch"
-               type="xml"
-        >
-            <form create="0"
-                  edit="0"
-            >
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
                 <header>
 
                 </header>
                 <sheet>
-                    <div name="button_box"
-                         class="oe_button_box"
-                    >
-                    </div>
-                    <widget name="web_ribbon"
-                            bg_color="bg-danger"
-                            invisible="active"
-                            title="Archived"
-                    />
+                    <div name="button_box" class="oe_button_box"></div>
+                    <widget name="web_ribbon" bg_color="bg-danger" invisible="active" title="Archived"/>
                     <div class="oe_title">
                         <h4>
-                            <field name="name"
-                                   style="word-break: break-word;"
-                            />
+                            <field name="name" style="word-break: break-word;"/>
                         </h4>
                     </div>
                     <group name="base">
@@ -39,58 +24,33 @@
                             <field name="direction"/>
                         </group>
                         <group name="base_2">
-                            <field name="description"
-                                   style="word-break: break-word;"
-                            />
+                            <field name="description" style="word-break: break-word;"/>
                         </group>
                     </group>
                     <notebook>
-                        <page name="details"
-                              string="Details"
-                        >
+                        <page name="details" string="Details">
                             <group name="details">
                                 <group name="base">
                                     <field name="id"/>
                                     <field name="active"/>
                                     <field name="company"/>
                                     <field name="level"/>
-                                    <field name="app_name"
-                                           string="App"
-                                    />
-                                    <field name="source_model_name"
-                                           string="Model"
-                                    />
-                                    <field name="source_record_id"
-                                           string="Record ID"
-                                    />
-                                    <field name="source_display_name"
-                                           string="Display Name"
-                                    />
+                                    <field name="app_name" string="App"/>
+                                    <field name="source_model_name" string="Model"/>
+                                    <field name="source_record_id" string="Record ID"/>
+                                    <field name="source_display_name" string="Display Name"/>
                                 </group>
                                 <group name="audit">
                                     <field name="user_id"/>
                                     <field name="timestamp"/>
-                                    <field name="create_uid"
-                                           readonly="1"
-                                    />
-                                    <field name="create_date"
-                                           readonly="1"
-                                    />
-                                    <field name="write_uid"
-                                           readonly="1"
-                                    />
-                                    <field name="write_date"
-                                           readonly="1"
-                                    />
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="write_uid" readonly="1"/>
+                                    <field name="write_date" readonly="1"/>
                                 </group>
                             </group>
-                            <group name="technical"
-                                   colspan="2"
-                                   string="Technical"
-                            >
-                                <field name="technical_name"
-                                       style="word-break: break-word;"
-                                />
+                            <group name="technical" colspan="2" string="Technical">
+                                <field name="technical_name" style="word-break: break-word;"/>
                                 <label name="view_technical_data"
                                        for="action_view_technical_data"
                                        string="Technical Data"
@@ -102,8 +62,7 @@
                                             string="View"
                                             type="object"
                                     />
-                                    <field name="technical_data"
-                                           invisible="1"/>
+                                    <field name="technical_data" invisible="1"/>
                                 </div>
                             </group>
                         </page>
@@ -113,60 +72,33 @@
         </field>
     </record>
     <!-- List view -->
-    <record id="log_view_list"
-            model="ir.ui.view"
-    >
+    <record id="log_view_list" model="ir.ui.view">
         <field name="name">l10n.hu.plus.log.view.list</field>
         <field name="model">l10n.hu.plus.log</field>
         <field name="priority">16</field>
-        <field name="arch"
-               type="xml"
-        >
-            <list create="0"
-                  edit="0"
-            >
-                <field name="display_name"
-                       optional="show"
-                />
-                <field name="id"
-                       optional="hide"
-                />
-                <field name="log_type"
-                       string="Type"
-                />
+        <field name="arch" type="xml">
+            <list create="0" edit="0">
+                <field name="display_name" optional="show"/>
+                <field name="id" optional="hide"/>
+                <field name="log_type" string="Type"/>
                 <field name="name"/>
-                <field name="description"
-                       optional="show"
-                />
+                <field name="description" optional="show"/>
                 <field name="level"/>
-                <field name="app_name"
-                       optional="hide"
-                       string="App"
-                />
-                <field name="source_model_name"
-                       optional="hide"
-                       string="Model"
-                />
+                <field name="app_name" optional="hide" string="App"/>
+                <field name="source_model_name" optional="hide" string="Model"/>
                 <field name="user_id"/>
                 <field name="create_date"/>
-                <field name="write_date"
-                       optional="hide"
-                />
-                <field name="company"
-                       optional="hide"
-                />
+                <field name="write_date" optional="hide"/>
+                <field name="company" optional="hide"/>
             </list>
         </field>
     </record>
     <!-- Search view -->
-    <record id="log_view_search"
-            model="ir.ui.view">
+    <record id="log_view_search" model="ir.ui.view">
         <field name="name">l10n.hu.plus.log.view.search</field>
         <field name="model">l10n.hu.plus.log</field>
         <field name="priority">16</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <search>
                 <!-- Field -->
                 <field name="name"/>
@@ -175,29 +107,13 @@
                 <field name="level"/>
                 <field name="technical_name"/>
                 <field name="status"/>
-                <field name="app_name"
-                       string="App"
-                />
-                <field name="source_model_name"
-                       string="Model"
-                />
+                <field name="app_name" string="App"/>
+                <field name="source_model_name" string="Model"/>
                 <!-- Filter -->
-                <filter name="level_info_filter"
-                        domain="[('level', '=', 'info')]"
-                        string="INFO"
-                />
-                <filter name="level_warning_filter"
-                        domain="[('level', '=', 'warning')]"
-                        string="WARNING"
-                />
-                <filter name="level_error_filter"
-                        domain="[('level', '=', 'error')]"
-                        string="ERROR"
-                />
-                <filter name="level_debug_filter"
-                        domain="[('level', '=', 'debug')]"
-                        string="DEBUG"
-                />
+                <filter name="level_info_filter" domain="[('level', '=', 'info')]" string="INFO"/>
+                <filter name="level_warning_filter" domain="[('level', '=', 'warning')]" string="WARNING"/>
+                <filter name="level_error_filter" domain="[('level', '=', 'error')]" string="ERROR"/>
+                <filter name="level_debug_filter" domain="[('level', '=', 'debug')]" string="DEBUG"/>
                 <separator/>
                 <filter name="created_today_filter"
                         domain="[
@@ -207,36 +123,15 @@
                         string="Today"
                 />
                 <!-- Filter group by -->
-                <filter name="log_type_filter_group_by"
-                        context="{'group_by': 'log_type'}"
-                        string="Log Type"
-                />
-                <filter name="level_filter_group_by"
-                        context="{'group_by': 'level'}"
-                        string="Level"
-                />
-                <filter name="direction_filter_group_by"
-                        context="{'group_by': 'direction'}"
-                        string="Direction"
-                />
+                <filter name="log_type_filter_group_by" context="{'group_by': 'log_type'}" string="Log Type"/>
+                <filter name="level_filter_group_by" context="{'group_by': 'level'}" string="Level"/>
+                <filter name="direction_filter_group_by" context="{'group_by': 'direction'}" string="Direction"/>
                 <separator/>
-                <filter name="app_name_filter_group_by"
-                        context="{'group_by': 'app_name'}"
-                        string="App"
-                />
-                <filter name="source_model_name_filter_group_by"
-                        context="{'group_by': 'source_model_name'}"
-                        string="Model"
-                />
+                <filter name="app_name_filter_group_by" context="{'group_by': 'app_name'}" string="App"/>
+                <filter name="model_name_filter_group_by" context="{'group_by': 'source_model_name'}" string="Model"/>
                 <separator/>
-                <filter name="user_id_filter_group_by"
-                        context="{'group_by': 'user_id'}"
-                        string="User ID"
-                />
-                <filter name="create_date_filter_group_by"
-                        context="{'group_by': 'create_date'}"
-                        string="Create Date"
-                />
+                <filter name="user_id_filter_group_by" context="{'group_by': 'user_id'}" string="User ID"/>
+                <filter name="create_date_filter_group_by" context="{'group_by': 'create_date'}" string="Create Date"/>
                 <filter name="company_filter_group_by"
                         context="{'group_by': 'company'}"
                         groups="base.group_multi_company"
