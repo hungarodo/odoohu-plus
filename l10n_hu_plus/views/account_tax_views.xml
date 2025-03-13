@@ -1,43 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Form view inherit -->
-    <record id="view_tax_form_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_tax_form_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.tax.form.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_tax_form"
-        />
+        <field name="inherit_id" ref="account.view_tax_form"/>
         <field name="model">account.tax</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
-            <xpath expr="//page[@name='advanced_options']//group[1]"
-                   position="after"
-            >
-                <group name="l10n_hu_plus"
-                       string="HU+"
-                >
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='advanced_options']//group[1]" position="after">
+                <group name="l10n_hu_plus" string="HU+">
                     <group name="l10n_hu_plus_1">
-                        <field name="l10n_hu_plus_category"
-                               options="{'no_create': True,}"
-                               string="Category"
-                        />
-                        <field name="l10n_hu_vat_declaration"
-                               string="VAT Declaration"
-                               widget="boolean_toggle"
-                        />
+                        <field name="l10n_hu_plus_category" options="{'no_create': True,}" string="Category"/>
+                        <field name="l10n_hu_vat_declaration" string="VAT Declaration" widget="boolean_toggle"/>
                     </group>
                     <group name="l10n_hu_plus_2">
-                        <field name="l10n_hu_plus_api_enabled"
-                               string="API"
-                               widget="boolean_toggle"
-                        />
-                        <field name="l10n_hu_plus_technical_name"
-                               readonly="l10n_hu_plus_api_enabled"
-                               string="Technical Name"
-                        />
+                        <field name="l10n_hu_plus_api_enabled" string="API" widget="boolean_toggle"/>
+                        <field name="l10n_hu_plus_technical_name" readonly="l10n_hu_plus_api_enabled" string="Technical Name"/>
                     </group>
                 </group>
             </xpath>

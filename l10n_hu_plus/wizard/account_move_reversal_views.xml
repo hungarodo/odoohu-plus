@@ -1,25 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Form view inherit -->
-    <record id="view_account_move_reversal_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_account_move_reversal_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.account.move.reversal.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_account_move_reversal"
-        />
+        <field name="inherit_id" ref="account.view_account_move_reversal"/>
         <field name="model">account.move.reversal</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Add fields -->
-            <xpath expr="//field[@name='date']"
-                   position="after"
-            >
-                <field name="l10n_hu_storno_visible"
-                       invisible="1"
-                />
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="l10n_hu_storno_visible" invisible="1"/>
                 <field name="l10n_hu_storno_enabled"
                        invisible="not l10n_hu_storno_visible"
                        string="Storno"

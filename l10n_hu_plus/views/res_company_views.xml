@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Form view inherit -->
-    <record id="view_company_form_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_company_form_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.company.form.inherit</field>
-        <field name="inherit_id"
-               ref="base.view_company_form"
-        />
+        <field name="inherit_id" ref="base.view_company_form"/>
         <field name="model">res.company</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Fields -->
-            <xpath expr="//page[last()]"
-                   position="after"
-            >
-                <page name="l10n_hu_plus"
-                      string="HU+"
-                >
+            <xpath expr="//page[last()]" position="after">
+                <page name="l10n_hu_plus" string="HU+">
                     <group name="l10n_hu_plus">
                         <group name="l10n_hu_plus_1">
 
                         </group>
                         <group name="l10n_hu_plus_2">
-                            <div name="l10n_hu_plus_actions"
-                                 colspan="2"
-                            >
+                            <div name="l10n_hu_plus_actions" colspan="2">
                                 <button name="action_l10n_hu_plus_documentation"
                                         class="btn-secondary btn-sm m-2"
                                         icon="fa-info-circle"
@@ -44,28 +32,15 @@
                             </div>
                         </group>
                     </group>
-                    <group name="l10n_hu_plus_api"
-                           string="HU+ API"
-                    >
+                    <group name="l10n_hu_plus_api" string="HU+ API">
                         <group name="l10n_hu_plus_api_1">
-                            <field name="l10n_hu_plus_api_enabled"
-                                   string="API Enabled"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_plus_api_registered"
-                                   string="API Registered"
-                            />
-                            <field name="l10n_hu_plus_api_timestamp"
-                                   string="API Timestamp"
-                            />
-                            <field name="l10n_hu_plus_api_license_valid"
-                                   string="API License Valid"
-                            />
+                            <field name="l10n_hu_plus_api_enabled" string="API Enabled" widget="boolean_toggle"/>
+                            <field name="l10n_hu_plus_api_registered" string="API Registered"/>
+                            <field name="l10n_hu_plus_api_timestamp" string="API Timestamp"/>
+                            <field name="l10n_hu_plus_api_license_valid" string="API License Valid"/>
                         </group>
                         <group name="l10n_hu_plus_api_2">
-                            <div name="l10n_hu_plus_api_actions"
-                                 colspan="2"
-                            >
+                            <div name="l10n_hu_plus_api_actions" colspan="2">
                                 <button name="action_l10n_hu_plus_api_create_registration"
                                         class="btn-secondary btn-sm m-2"
                                         icon="fa-magic"

@@ -1,47 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- List view inherit -->
-    <record id="view_currency_rate_tree_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_currency_rate_tree_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.currency.rate.tree.inherit</field>
-        <field name="inherit_id"
-               ref="base.view_currency_rate_tree"
-        />
+        <field name="inherit_id" ref="base.view_currency_rate_tree"/>
         <field name="model">res.currency.rate</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
-            <xpath expr="//field[@name='name']"
-                   position="before"
-            >
-                <field name="currency_id"
-                       groups="l10n_hu_plus.user_group"
-                       optional="hide"
-                />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="currency_id" groups="l10n_hu_plus.user_group" optional="hide"/>
             </xpath>
         </field>
     </record>
     <!-- Search view inherit -->
-    <record id="view_currency_rate_search_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_currency_rate_search_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.currency.rate.tree.inherit</field>
-        <field name="inherit_id"
-               ref="base.view_currency_rate_search"
-        />
+        <field name="inherit_id" ref="base.view_currency_rate_search"/>
         <field name="model">res.currency.rate</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Field -->
             <!-- Filter -->
             <!-- Filter group by -->
-            <xpath expr="//field[@name='name']"
-                   position="after"
-            >
+            <xpath expr="//field[@name='name']" position="after">
                 <separator/>
                 <filter name="currency_id_filter_group_by"
                         context="{'group_by': 'currency_id'}"

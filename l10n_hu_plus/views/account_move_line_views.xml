@@ -1,144 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- List view -->
-    <record id="account_move_line_view_list"
-            model="ir.ui.view"
-    >
+    <record id="account_move_line_view_list" model="ir.ui.view">
         <field name="name">l10n.hu.plus.move.line.view.list</field>
         <field name="model">account.move.line</field>
         <field name="priority">32</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <list string="Line">
                 <field name="move_id"/>
                 <field name="name"/>
-                <field name="account_id"
-                       groups="account.group_account_user"
-                />
-                <field name="l10n_hu_original_account_move"
-                       optional="hide"
-                       string="Original Account Move"
-                />
-                <field name="l10n_hu_original_account_move_line"
-                       optional="hide"
-                       string="Original Account Move Line"
-                />
-                <field name="l10n_hu_price_refund"
-                       optional="hide"
-                       string="Price Refund"
-                />
-                <field name="l10n_hu_move_trade_position"
-                       optional="hide"
-                       string="Trade Position"
-                />
-                <field name="l10n_hu_move_vat_date"
-                       optional="hide"
-                       string="VAT Date"
-                />
-                <field name="l10n_hu_vat_reason"
-                       optional="hide"
-                       string="VAT Reason"
-                />
-                <field name="product_id"
-                       optional="show"
-                />
+                <field name="account_id" groups="account.group_account_user"/>
+                <field name="l10n_hu_original_account_move" optional="hide" string="Original Account Move"/>
+                <field name="l10n_hu_original_account_move_line" optional="hide" string="Original Account Move Line"/>
+                <field name="l10n_hu_price_refund" optional="hide" string="Price Refund"/>
+                <field name="l10n_hu_move_trade_position" optional="hide" string="Trade Position"/>
+                <field name="l10n_hu_move_vat_date" optional="hide" string="VAT Date"/>
+                <field name="l10n_hu_vat_reason" optional="hide" string="VAT Reason"/>
+                <field name="product_id" optional="show"/>
                 <field name="quantity"/>
-                <field name="product_uom_id"
-                       groups="uom.group_uom"
-                />
+                <field name="product_uom_id" groups="uom.group_uom"/>
                 <field name="price_unit"/>
-                <field name="discount"
-                       groups="base.group_no_one"
-                />
+                <field name="discount" groups="base.group_no_one"/>
                 <field name="price_subtotal"/>
                 <field name="price_total"/>
-                <field name="currency_id"
-                       invisible="1"
-                />
+                <field name="currency_id" invisible="1"/>
             </list>
         </field>
     </record>
     <!-- List view readonly -->
-    <record id="account_move_line_view_list_readonly"
-            model="ir.ui.view"
-    >
+    <record id="account_move_line_view_list_readonly" model="ir.ui.view">
         <field name="name">l10n.hu.account.move.line.view.list.readonly</field>
         <field name="model">account.move.line</field>
         <field name="priority">40</field>
-        <field name="arch"
-               type="xml"
-        >
-            <list create="0"
-                  delete="0"
-                  edit="0"
-                  string="Line"
-            >
+        <field name="arch" type="xml">
+            <list create="0" delete="0" edit="0" string="Line">
                 <field name="move_id"/>
                 <field name="name"/>
-                <field name="account_id"
-                       groups="account.group_account_user"
-                />
-                 <field name="l10n_hu_original_account_move"
-                       optional="hide"
-                        string="Original Account Move"
-                />
-                <field name="l10n_hu_original_account_move_line"
-                       optional="hide"
-                       string="Original Account Move Line"
-                />
-                <field name="l10n_hu_price_refund"
-                       optional="hide"
-                       string="Price Refund"
-                />
-                <field name="l10n_hu_move_trade_position"
-                       optional="hide"
-                       string="Trade Position"
-                />
-                <field name="l10n_hu_move_vat_date"
-                       optional="hide"
-                       string="VAT Date"
-                />
-                <field name="l10n_hu_vat_reason"
-                       optional="hide"
-                       string="VAT Reason"
-                />
-                <field name="product_id"
-                       optional="show"
-                />
+                <field name="account_id" groups="account.group_account_user"/>
+                <field name="l10n_hu_original_account_move" optional="hide" string="Original Account Move"/>
+                <field name="l10n_hu_original_account_move_line" optional="hide" string="Original Account Move Line"/>
+                <field name="l10n_hu_price_refund" optional="hide" string="Price Refund"/>
+                <field name="l10n_hu_move_trade_position" optional="hide" string="Trade Position"/>
+                <field name="l10n_hu_move_vat_date" optional="hide" string="VAT Date"/>
+                <field name="l10n_hu_vat_reason" optional="hide" string="VAT Reason"/>
+                <field name="product_id" optional="show"/>
                 <field name="quantity"/>
-                <field name="product_uom_id"
-                       groups="uom.group_uom"
-                />
+                <field name="product_uom_id" groups="uom.group_uom"/>
                 <field name="price_unit"/>
-                <field name="discount"
-                       groups="base.group_no_one"
-                />
+                <field name="discount" groups="base.group_no_one"/>
                 <field name="price_subtotal"/>
                 <field name="price_total"/>
-                <field name="currency_id"
-                       invisible="1"
-                />
+                <field name="currency_id" invisible="1"/>
             </list>
         </field>
     </record>
     <!-- Search view inherit -->
-    <record id="view_account_move_line_filter_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.account.view.account.move.line.filter.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_account_move_line_filter"
-        />
+        <field name="inherit_id" ref="account.view_account_move_line_filter"/>
         <field name="model">account.move.line</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Filter -->
-            <xpath expr="//filter[@name='date']"
-                   position="after"
-            >
+            <xpath expr="//filter[@name='date']" position="after">
                 <separator/>
                 <filter name="l10n_hu_move_vat_date_filter"
                         date="l10n_hu_move_vat_date"
@@ -164,9 +88,7 @@
                 />
             </xpath>
             <!-- Filter group by -->
-            <xpath expr="//filter[@name='group_by_matching']"
-                   position="after"
-            >
+            <xpath expr="//filter[@name='group_by_matching']" position="after">
                 <separator/>
                 <filter name="l10n_hu_move_vat_date_filter_group_by"
                         domain="[]"

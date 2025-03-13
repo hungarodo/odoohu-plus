@@ -1,39 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Form view inherit -->
-    <record id="view_account_journal_form_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_account_journal_form_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.account.journal.form.inherit</field>
-        <field name="inherit_id"
-               ref="account.view_account_journal_form"
-        />
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
         <field name="model">account.journal</field>
         <field name="priority">24</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Add l10n_hu page and fields -->
-            <xpath expr="//page[@name='advanced_settings']"
-                   position="after"
-            >
-                <page name="l10n_hu_plus"
-                      string="HU+"
-                >
+            <xpath expr="//page[@name='advanced_settings']" position="after">
+                <page name="l10n_hu_plus" string="HU+">
                     <group name="l10n_hu_plus_1">
                         <group name="l10n_hu_plus_1_1">
-                            <field name="l10n_hu_plus_enabled"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_delivery_date_default"
-                                   string="Delivery Date"
-                            />
-                            <field name="l10n_hu_nav_payment_method"
-                                   string="NAV Payment Method"
-                            />
-                            <field name="l10n_hu_proforma_sequence_available"
-                                   invisible="1"
-                            />
+                            <field name="l10n_hu_plus_enabled" widget="boolean_toggle"/>
+                            <field name="l10n_hu_delivery_date_default" string="Delivery Date"/>
+                            <field name="l10n_hu_nav_payment_method" string="NAV Payment Method"/>
+                            <field name="l10n_hu_proforma_sequence_available" invisible="1"/>
                             <field name="l10n_hu_proforma_sequence"
                                    domain="[('code', 'like', 'proforma'), ('company_id', '=', company_id)]"
                                    invisible="type != 'sale'"
@@ -47,23 +29,14 @@
                             />
                         </group>
                         <group name="l10n_hu_plus_1_2">
-                            <field name="l10n_hu_banner_enabled"
-                                   string="Banner"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_priority"
-                                   class="oe_inline"
-                                   string="Priority"
-                            />
+                            <field name="l10n_hu_banner_enabled" string="Banner" widget="boolean_toggle"/>
+                            <field name="l10n_hu_priority" class="oe_inline" string="Priority"/>
                             <field name="l10n_hu_edi_send_disabled"
                                    invisible="type != 'sale'"
                                    string="EDI Send Disabled"
                                    widget="boolean_toggle"
                             />
-                            <label name="l10n_hu_actions"
-                                   for="action_l10n_hu_plus_documentation"
-                                   string="Actions"
-                            />
+                            <label name="l10n_hu_actions" for="action_l10n_hu_plus_documentation" string="Actions"/>
                             <div name="l10n_hu_actions">
                                 <button name="action_l10n_hu_plus_documentation"
                                         class="btn-secondary m-2"

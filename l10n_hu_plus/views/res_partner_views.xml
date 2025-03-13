@@ -1,37 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Form view inherit -->
-    <record id="view_partner_form_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_partner_form_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.partner.form.inherit</field>
-        <field name="inherit_id"
-               ref="base.view_partner_form"
-        />
+        <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="model">res.partner</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Fields -->
-            <xpath expr="//page[@name='internal_notes']"
-                   position="after"
-            >
-                <page name="l10n_hu_plus"
-                      invisible="not l10n_hu_plus_visible"
-                      string="HU+"
-                >
-                    <field name="l10n_hu_plus_visible"
-                           invisible="1"
-                    />
-                    <group name="l10n_hu_plus_hidden"
-                           colspan="2"
-                           invisible="not parent_id"
-                    >
-                        <div name="l10n_hu_plus_hidden"
-                             class="card bg-info mr-4"
-                             colspan="2"
-                        >
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page name="l10n_hu_plus" invisible="not l10n_hu_plus_visible" string="HU+">
+                    <field name="l10n_hu_plus_visible" invisible="1"/>
+                    <group name="l10n_hu_plus_hidden" colspan="2" invisible="not parent_id">
+                        <div name="l10n_hu_plus_hidden" class="card bg-info mr-4" colspan="2">
                             <div class="card-header">
                                 <i class="fa fa-info-circle mr-2"/>
                                 <span class="mr-2">Settings are managed on the parent partner</span>
@@ -43,9 +24,7 @@
                             </div>
                         </div>
                     </group>
-                    <group name="l10n_hu_plus_displayed"
-                           invisible="parent_id"
-                    >
+                    <group name="l10n_hu_plus_displayed" invisible="parent_id">
                         <group name="l10n_hu_plus_1">
                             <field name="l10n_hu_tax_regime"
                                    groups="account.group_account_invoice"
@@ -57,9 +36,7 @@
                                    invisible="not property_account_position_id"
                                    string="Trade Position"
                             />
-                            <field name="l10n_hu_vat_status"
-                                   string="VAT Status"
-                            />
+                            <field name="l10n_hu_vat_status" string="VAT Status"/>
                             <field name="l10n_hu_incorporation"
                                    invisible="l10n_hu_vat_status != 'domestic'"
                                    string="Taxpayer Type"
@@ -83,9 +60,7 @@
                                    for="action_l10n_hu_plus_set_vat_status"
                                    string="Actions"
                             />
-                            <div name="l10n_hu_plus_actions"
-                                 class="d-grid gap-2"
-                            >
+                            <div name="l10n_hu_plus_actions" class="d-grid gap-2">
                                 <button name="action_l10n_hu_plus_documentation"
                                         class="btn-link btn-sm text-start"
                                         icon="fa-info-circle"
@@ -106,54 +81,31 @@
         </field>
     </record>
     <!-- List view inherit -->
-    <record id="view_partner_tree_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_partner_tree_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.base.view.partner.tree.inherit</field>
-        <field name="inherit_id"
-               ref="base.view_partner_tree"
-        />
+        <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="model">res.partner</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Add partner fields -->
-            <xpath expr="//field[@name='vat']"
-                   position="after"
-            >
-                <field name="l10n_hu_vpid"
-                       optional="hide"
-                       string="VPID"
-                />
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="l10n_hu_vpid" optional="hide" string="VPID"/>
             </xpath>
         </field>
     </record>
     <!-- Search view inherit -->
-    <record id="view_res_partner_filter_inherit"
-            model="ir.ui.view"
-    >
+    <record id="view_res_partner_filter_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.base.view.res.partner.filter.inherit</field>
-        <field name="inherit_id"
-               ref="base.view_res_partner_filter"
-        />
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="model">res.partner</field>
         <field name="priority">36</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <!-- Field -->
-            <xpath expr="//field[@name='parent_id']"
-                   position="after"
-            >
-                <field name="l10n_hu_vpid"
-                       string="VPID"
-                />
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="l10n_hu_vpid" string="VPID"/>
             </xpath>
             <!-- Filter group by -->
-            <xpath expr="//filter[@name='group_country']"
-                   position="after"
-            >
+            <xpath expr="//filter[@name='group_country']" position="after">
                 <separator/>
                 <filter name="l10n_hu_vat_status_filter_group_by"
                         context="{'group_by': 'l10n_hu_vat_status'}"

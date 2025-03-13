@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Form view -->
-    <record id="wizard_view_form"
-            model="ir.ui.view"
-    >
+    <record id="wizard_view_form" model="ir.ui.view">
         <field name="name">l10n.hu.plus.wizard.view.form</field>
         <field name="model">l10n.hu.plus.wizard</field>
         <field name="priority">16</field>
-        <field name="arch"
-               type="xml"
-        >
+        <field name="arch" type="xml">
             <form>
                 <group name="main">
                     <group name="fields">
@@ -20,32 +16,15 @@
                                options="{'no_open': True,}"
                                readonly="1"
                         />
-                        <field name="active_model_id"
-                               force_save="1"
-                               invisible="1"
-                        />
-                        <field name="active_model_name"
-                               invisible="1"
-                        />
-                        <field name="company"
-                               force_save="1"
-                               invisible="1"
-                        />
+                        <field name="active_model_id" force_save="1" invisible="1"/>
+                        <field name="active_model_name" invisible="1"/>
+                        <field name="company" force_save="1" invisible="1"/>
                         <!-- ACTION TYPES -->
-                        <field name="action_type_visible"
-                               invisible="1"
-                        />
-                        <field name="action_type"
-                               invisible="not action_type_visible"
-                               required="1"
-                        />
+                        <field name="action_type_visible" invisible="1"/>
+                        <field name="action_type" invisible="not action_type_visible" required="1"/>
                         <!-- ACCOUNT MOVE -->
-                        <field name="account_move_action_editable"
-                               invisible="1"
-                        />
-                        <field name="account_move_action_visible"
-                               invisible="1"
-                        />
+                        <field name="account_move_action_editable" invisible="1"/>
+                        <field name="account_move_action_visible" invisible="1"/>
                         <field name="account_move_action"
                                force_save="1"
                                invisible="action_type != 'account_move' or not account_move_action_visible"
@@ -61,9 +40,7 @@
                                options="{'no_create': True}"
                                string="Journal"
                         />
-                        <field name="accounting_move_type"
-                               invisible="1"
-                        />
+                        <field name="accounting_move_type" invisible="1"/>
                         <field name="accounting_delivery_date"
                                force_save="1"
                                invisible="account_move_action != 'update_fields'"
@@ -77,9 +54,7 @@
                         <div name="accounting_delivery_period_enabled"
                              invisible="account_move_action != 'update_fields'"
                         >
-                            <field name="accounting_delivery_period_enabled"
-                                   widget="boolean_toggle"
-                            />
+                            <field name="accounting_delivery_period_enabled" widget="boolean_toggle"/>
                             <field name="accounting_delivery_period_start"
                                    class="oe_inline o_input_12ch"
                                    invisible="not accounting_delivery_period_enabled"
@@ -93,9 +68,7 @@
                             />
                         </div>
                         <!-- API -->
-                        <field name="api_action_editable"
-                               invisible="1"
-                        />
+                        <field name="api_action_editable" invisible="1"/>
                         <field name="api_action"
                                force_save="1"
                                invisible="action_type != 'api'"
@@ -123,12 +96,8 @@
                                string="API URL"
                         />
                         <!-- CURRENCY EXCHANGE -->
-                        <field name="exchange_action_editable"
-                               invisible="1"
-                        />
-                        <field name="exchange_visible"
-                               invisible="1"
-                        />
+                        <field name="exchange_action_editable" invisible="1"/>
+                        <field name="exchange_visible" invisible="1"/>
                         <field name="exchange_action"
                                force_save="1"
                                invisible="action_type != 'currency_exchange'"
@@ -136,35 +105,23 @@
                                required="action_type == 'currency_exchange'"
                                string="Action"
                         />
-                        <div name="exchange_currency_from"
-                             invisible="action_type != 'currency_exchange'"
-                        >
+                        <div name="exchange_currency_from" invisible="action_type != 'currency_exchange'">
                             <field name="exchange_currency_from"
                                    options="{'no_create': True, 'no_open': True}"
                                    placeholder="Currency From"
                             />
                         </div>
-                        <div name="exchange_amount_from"
-                             invisible="action_type != 'currency_exchange'"
-                        >
-                            <field name="exchange_amount_from"
-                                   placeholder="Amount From"
-                            />
+                        <div name="exchange_amount_from" invisible="action_type != 'currency_exchange'">
+                            <field name="exchange_amount_from" placeholder="Amount From"/>
                         </div>
-                        <div name="exchange_currency_to"
-                             invisible="action_type != 'currency_exchange'"
-                        >
+                        <div name="exchange_currency_to" invisible="action_type != 'currency_exchange'">
                             <field name="exchange_currency_to"
                                    options="{'no_create': True, 'no_open': True}"
                                    placeholder="Currency To"
                             />
                         </div>
-                        <div name="exchange_amount_to"
-                             invisible="action_type != 'currency_exchange'"
-                        >
-                            <field name="exchange_amount_to"
-                                   placeholder="Amount To"
-                            />
+                        <div name="exchange_amount_to" invisible="action_type != 'currency_exchange'">
+                            <field name="exchange_amount_to" placeholder="Amount To"/>
                         </div>
                         <field name="exchange_rate"
                                invisible="action_type != 'currency_exchange'"
@@ -172,9 +129,7 @@
                                string="Exchange Rate"
                         />
                         <!-- PARTNER -->
-                        <field name="partner_action_editable"
-                               invisible="1"
-                        />
+                        <field name="partner_action_editable" invisible="1"/>
                         <field name="partner_action"
                                force_save="1"
                                invisible="action_type != 'partner'"
@@ -183,9 +138,7 @@
                                string="Action"
                         />
                         <!-- TECHNICAL -->
-                        <field name="technical_action_editable"
-                               invisible="1"
-                        />
+                        <field name="technical_action_editable" invisible="1"/>
                         <field name="technical_action"
                                force_save="1"
                                invisible="action_type != 'technical'"
@@ -202,32 +155,23 @@
                              invisible="action_type != 'account_move'"
                         >
                             <div class="card-header">
-                                <i class="fa fa-info-circle mr-1"/>
-                                Information
+                                <i class="fa fa-info-circle mr-1"/>Information
                             </div>
                             <div class="card-body">
-                                <p class="card-text"
-                                   invisible="account_move_action"
-                                >
+                                <p class="card-text" invisible="account_move_action">
                                     Please select an action
                                 </p>
-                                <p class="card-text"
-                                   invisible="account_move_action != 'check_status'"
-                                >
+                                <p class="card-text" invisible="account_move_action != 'check_status'">
                                     Check HU+ status of the account move
                                 </p>
-                                <p class="card-text"
-                                   invisible="account_move_action != 'update_fields'"
-                                >
+                                <p class="card-text" invisible="account_move_action != 'update_fields'">
                                     Update account move fields
                                 </p>
                                 <p class="card-text"
                                    invisible="account_move_action != 'update_fields' or not accounting_delivery_period_enabled or accounting_move_type in ['in_invoice', 'in_refund']"
                                 >
                                     Period Legal:
-                                    <field name="accounting_delivery_period_legal"
-                                           class="oe_inline ms-1"
-                                    />
+                                    <field name="accounting_delivery_period_legal" class="oe_inline ms-1"/>
                                 </p>
                             </div>
                         </div>
@@ -238,23 +182,16 @@
                              invisible="action_type != 'api'"
                         >
                             <div class="card-header">
-                                <i class="fa fa-info-circle mr-1"/>
-                                Information
+                                <i class="fa fa-info-circle mr-1"/>Information
                             </div>
                             <div class="card-body">
-                                <p class="card-text"
-                                   invisible="api_action != 'check_registration'"
-                                >
+                                <p class="card-text" invisible="api_action != 'check_registration'">
                                     Check API registration
                                 </p>
-                                <p class="card-text"
-                                   invisible="api_action != 'create_registration'"
-                                >
+                                <p class="card-text" invisible="api_action != 'create_registration'">
                                     Create API registration
                                 </p>
-                                <p class="card-text"
-                                   invisible="api_action != 'delete_registration'"
-                                >
+                                <p class="card-text" invisible="api_action != 'delete_registration'">
                                     Delete API registration
                                 </p>
                                 <p class="card-text"
@@ -262,14 +199,10 @@
                                 >
                                     <field name="api_details"/>
                                 </p>
-                                <p class="card-text"
-                                   invisible="api_action != 'download_objects'"
-                                >
+                                <p class="card-text" invisible="api_action != 'download_objects'">
                                     Download API objects
                                 </p>
-                                <p class="card-text"
-                                   invisible="api_action != 'view_api_data'"
-                                >
+                                <p class="card-text" invisible="api_action != 'view_api_data'">
                                     View API data
                                 </p>
                             </div>
@@ -281,8 +214,7 @@
                              invisible="action_type != 'currency_exchange'"
                         >
                             <div class="card-header">
-                                <i class="fa fa-info-circle mr-1"/>
-                                Information
+                                <i class="fa fa-info-circle mr-1"/>Information
                             </div>
                             <div class="card-body">
                                 <p class="card-text">
@@ -301,14 +233,10 @@
                                 Information
                             </div>
                             <div class="card-body">
-                                <p class="card-text"
-                                   invisible="partner_action != False"
-                                >
+                                <p class="card-text" invisible="partner_action != False">
                                     Manage partners
                                 </p>
-                                <p class="card-text"
-                                   invisible="partner_action != 'list'"
-                                >
+                                <p class="card-text" invisible="partner_action != 'list'">
                                     List partners
                                 </p>
                             </div>
@@ -320,18 +248,13 @@
                              invisible="action_type != 'technical'"
                         >
                             <div class="card-header">
-                                <i class="fa fa-info-circle mr-1"/>
-                                Information
+                                <i class="fa fa-info-circle mr-1"/>Information
                             </div>
                             <div class="card-body">
-                                <p class="card-text"
-                                   invisible="technical_action != False"
-                                >
+                                <p class="card-text" invisible="technical_action != False">
                                     Manage technical actions
                                 </p>
-                                <p class="card-text"
-                                   invisible="technical_action != 'view_data'"
-                                >
+                                <p class="card-text" invisible="technical_action != 'view_data'">
                                     View technical data in JSON format
                                 </p>
                             </div>
@@ -351,17 +274,13 @@
                                invisible="account_move_action != 'update_fields' or not accounting_document_rate_visible"
                                string="Document Rate"
                         />
-                        <field name="accounting_document_rate_visible"
-                               invisible="1"
-                        />
+                        <field name="accounting_document_rate_visible" invisible="1"/>
                         <field name="accounting_cash_enabled"
                                invisible="account_move_action != 'update_fields' or not accounting_cash_visible"
                                string="Cash Accounting"
                                widget="boolean_toggle"
                         />
-                        <field name="accounting_cash_visible"
-                               invisible="1"
-                        />
+                        <field name="accounting_cash_visible" invisible="1"/>
                         <field name="accounting_vat_date"
                                invisible="account_move_action != 'update_fields'"
                                string="VAT Date"
@@ -393,81 +312,46 @@
                            placeholder="Tags..."
                            widget="many2many_tags"
                     />
-                    <field name="accounting_hu_plus_notes"
-                           colspan="2"
-                           placeholder="Notes..."
-                    />
+                    <field name="accounting_hu_plus_notes" colspan="2" placeholder="Notes..."/>
                 </group>
                 <group name="account_move_plus_overview"
                        colspan="2"
                        invisible="action_type != 'account_move' or account_move_action != 'check_status'"
                 >
-                    <field name="account_move_plus_overview"
-                           colspan="2"
-                           nolabel="1"
-                    />
+                    <field name="account_move_plus_overview" colspan="2" nolabel="1"/>
                 </group>
                 <notebook>
-                    <page name="account_move"
-                          invisible="not account_move_visible"
-                          string="Account Move"
-                    >
+                    <page name="account_move" invisible="not account_move_visible" string="Account Move">
                         <group>
-                            <field name="account_move_visible"
-                                   invisible="1"
-                            />
-                            <field name="account_move"
-                                   colspan="2"
-                                   nolabel="1"
-                            />
+                            <field name="account_move_visible" invisible="1"/>
+                            <field name="account_move" colspan="2" nolabel="1"/>
                         </group>
                     </page>
                     <page name="api_data"
                           invisible="action_type != 'api' or api_action != 'view_api_data'"
                           string="API Data"
                     >
-                        <div name="api_data_display"
-                             colspan="2"
-                        >
-                            <field name="api_data_display"
-                                   style="word-break: break-word;"
-                                   widget="code"
-                            />
+                        <div name="api_data_display" colspan="2">
+                            <field name="api_data_display" style="word-break: break-word;" widget="code"/>
                         </div>
                     </page>
-                    <page name="partner"
-                          invisible="not partner_visible"
-                          string="Partner"
-                    >
+                    <page name="partner" invisible="not partner_visible" string="Partner">
                         <group>
-                            <field name="partner_visible"
-                                   invisible="1"
-                            />
-                            <field name="partner"
-                                   colspan="2"
-                                   nolabel="1"
-                                   widget="many2many_tags"
-                            />
+                            <field name="partner_visible" invisible="1"/>
+                            <field name="partner" colspan="2" nolabel="1" widget="many2many_tags"/>
                         </group>
                     </page>
                     <page name="technical_data"
                           invisible="action_type != 'technical' or technical_action != 'view_data'"
                           string="Technical Data"
                     >
-                        <div name="technical_data_display"
-                             colspan="2"
-                        >
-                            <field name="technical_data_display"
-                                   style="word-break: break-word;"
-                                   widget="code"
-                            />
+                        <div name="technical_data_display" colspan="2">
+                            <field name="technical_data_display" style="word-break: break-word;" widget="code"/>
                         </div>
                     </page>
                 </notebook>
                 <footer>
-                    <field name="action_execute_visible"
-                           invisible="1"
-                    />
+                    <field name="action_execute_visible" invisible="1"/>
                     <button name="action_execute"
                             class="btn-primary"
                             default_focus="1"
@@ -475,10 +359,7 @@
                             string="Execute"
                             type="object"
                     />
-                    <button special="cancel"
-                            class="btn-default"
-                            string="Close"
-                    />
+                    <button special="cancel" class="btn-default" string="Close"/>
                 </footer>
             </form>
         </field>
