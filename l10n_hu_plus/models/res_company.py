@@ -18,7 +18,9 @@ class L10nHuBaseResCompany(models.Model):
 
     # Default methods
 
-    # Field declarations
+    # Field declarations    
+    check_account_audit_trail = fields.Boolean(default=True)
+
     ## API
     l10n_hu_plus_api_enabled = fields.Boolean(
         copy=False,

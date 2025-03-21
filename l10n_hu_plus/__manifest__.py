@@ -70,6 +70,7 @@
         'static/description/l10n_hu_plus_banner.png',
     ],
     'installable': True,
+    'post_init_hook': '_l10nhuplus_post_init',
     'license': "OPL-1",
     'price': 36,
     'summary': "Hungary plus",
