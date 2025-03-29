@@ -9,42 +9,22 @@
         <field name="arch" type="xml">
             <form create="1" delete="1" edit="1">
                 <header>
-                    <button name="action_generate_key"
-                            class="btn btn-link"
-                            icon="fa-bolt"
-                            invisible="not type_key_enabled or not type_key_method or key"
-                            string="Generate key"
-                            type="object"
-                    />
-                    <button name="action_view_linked_record"
-                            class="btn btn-link"
-                            icon="fa-folder-open"
-                            invisible="not linked_model_name or not linked_record_id"
-                            string="View linked record"
-                            type="object"
-                    />
+                    <button name="action_generate_key" class="btn btn-link" icon="fa-bolt" invisible="not type_key_enabled or not type_key_method or key" string="Generate key" type="object"/>
+                    <button name="action_view_linked_record" class="btn btn-link" icon="fa-folder-open" invisible="not linked_model_name or not linked_record_id" string="View linked record" type="object"/>
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
+                        <button name="action_view_api_data" class="oe_stat_button" icon="fa-arrows-h" string="API" type="object"/>
+                        <button name="action_view_technical_data" class="oe_stat_button" icon="fa-code" string="Technical" type="object"/>
                     </div>
                     <widget name="web_ribbon" bg_color="bg-danger" invisible="active" title="Archived"/>
-                    <field name="image_1920"
-                           class="oe_avatar"
-                           options="{&quot;preview_image&quot;: &quot;image_128&quot;}"
-                           widget="image"
-                    />
+                    <field name="image_1920" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;image_128&quot;}" widget="image"/>
                     <div class="oe_title">
                         <h4 name="object_name">
                             <field name="name" placeholder="Name..." readonly="locked"/>
                         </h4>
                         <div>
-                            <field name="tag"
-                                   context="{'default_type': 'object'}"
-                                   options="{'color_field': 'color'}"
-                                   placeholder="Tags..."
-                                   readonly="locked"
-                                   widget="many2many_tags"
-                            />
+                            <field name="tag" context="{'default_type': 'object'}" options="{'color_field': 'color'}" placeholder="Tags..." readonly="locked" widget="many2many_tags"/>
                         </div>
                     </div>
                     <group name="base">
@@ -78,15 +58,6 @@
                                 <group name="api_1">
                                     <field name="api_enabled" readonly="locked" widget="boolean_toggle"/>
                                     <field name="api_timestamp"/>
-                                    <label name="view_api_data" for="action_view_api_data" string="API Data"/>
-                                    <div name="view_api_data">
-                                        <button name="action_view_api_data"
-                                                class="btn-link btn-sm"
-                                                icon="fa-code"
-                                                string="View"
-                                                type="object"
-                                        />
-                                    </div>
                                 </group>
                                 <group name="api_2">
                                     <field name="linked_model_name" readonly="locked"/>
@@ -129,9 +100,6 @@
                                 </group>
                                 <group name="technical_2">
                                     <field name="technical_timestamp"/>
-                                </group>
-                                <group name="technical_data" colspan="2">
-                                    <field name="technical_data" readonly="locked" style="word-break: break-word;" type="object"/>
                                 </group>
                             </group>
                         </page>

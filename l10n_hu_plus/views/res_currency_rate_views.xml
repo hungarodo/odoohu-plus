@@ -24,10 +24,7 @@
             <!-- Filter group by -->
             <xpath expr="//field[@name='name']" position="after">
                 <separator/>
-                <filter name="currency_id_filter_group_by"
-                        context="{'group_by': 'currency_id'}"
-                        groups="l10n_hu_plus.user_group"
-                />
+                <filter name="currency_id_filter_group_by" context="{'group_by': 'currency_id'}" groups="l10n_hu_plus.user_group"/>
             </xpath>
         </field>
     </record>

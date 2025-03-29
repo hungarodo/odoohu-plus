@@ -16,63 +16,24 @@
                             <div class="card-header">
                                 <i class="fa fa-info-circle mr-2"/>
                                 <span class="mr-2">Settings are managed on the parent partner</span>
-                                <button name="open_commercial_entity"
-                                        class="btn btn-sm btn-primary"
-                                        string="Open Parent"
-                                        type="object"
-                                />
+                                <button name="open_commercial_entity" class="btn btn-sm btn-primary" string="Open Parent" type="object"/>
                             </div>
                         </div>
                     </group>
                     <group name="l10n_hu_plus_displayed" invisible="parent_id">
                         <group name="l10n_hu_plus_1">
-                            <field name="l10n_hu_tax_regime"
-                                   groups="account.group_account_invoice"
-                                   invisible="not property_account_position_id"
-                                   string="Tax Regime"
-                            />
-                            <field name="l10n_hu_trade_position"
-                                   groups="account.group_account_invoice"
-                                   invisible="not property_account_position_id"
-                                   string="Trade Position"
-                            />
+                            <field name="l10n_hu_tax_regime" groups="account.group_account_invoice" invisible="not property_account_position_id" string="Tax Regime"/>
+                            <field name="l10n_hu_trade_position" groups="account.group_account_invoice" invisible="not property_account_position_id" string="Trade Position"/>
                             <field name="l10n_hu_vat_status" string="VAT Status"/>
-                            <field name="l10n_hu_incorporation"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="Taxpayer Type"
-                            />
-                            <field name="l10n_hu_self_billing"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="Self Billing"
-                                   widget="boolean_toggle"
-                            />
-                            <field name="l10n_hu_vpid"
-                                   invisible="l10n_hu_vat_status != 'domestic'"
-                                   string="VPID"
-                            />
-                            <field name="l10n_hu_financial_representative"
-                                   invisible="l10n_hu_incorporation != 'domestic'"
-                                   options="{'no_quick_create': True,}"
-                            />
+                            <field name="l10n_hu_incorporation" invisible="l10n_hu_vat_status != 'domestic'" string="Taxpayer Type"/>
+                            <field name="l10n_hu_self_billing" invisible="l10n_hu_vat_status != 'domestic'" string="Self Billing" widget="boolean_toggle"/>
+                            <field name="l10n_hu_vpid" invisible="l10n_hu_vat_status != 'domestic'" string="VPID"/>
+                            <field name="l10n_hu_financial_representative" invisible="l10n_hu_incorporation != 'domestic'" options="{'no_quick_create': True,}"/>
                         </group>
                         <group name="l10n_hu_plus_2">
-                            <label name="l10n_hu_plus_actions"
-                                   for="action_l10n_hu_plus_set_vat_status"
-                                   string="Actions"
-                            />
-                            <div name="l10n_hu_plus_actions" class="d-grid gap-2">
-                                <button name="action_l10n_hu_plus_documentation"
-                                        class="btn-link btn-sm text-start"
-                                        icon="fa-info-circle"
-                                        string="Documentation"
-                                        type="object"
-                                />
-                                <button name="action_l10n_hu_plus_set_vat_status"
-                                        class="btn-link btn-sm text-start"
-                                        icon="fa-refresh"
-                                        string="Refresh VAT status"
-                                        type="object"
-                                />
+                            <div name="l10n_hu_plus_actions" colspan="2">
+                                <button name="action_l10n_hu_plus_view_documentation" class="btn-secondary btn-sm m-2" icon="fa-info-circle" string="Documentation" type="object"/>
+                                <button name="action_l10n_hu_plus_set_vat_status" class="btn-primary btn-sm m-2" icon="fa-refresh" string="Refresh VAT status" type="object"/>
                             </div>
                         </group>
                     </group>
@@ -107,22 +68,10 @@
             <!-- Filter group by -->
             <xpath expr="//filter[@name='group_country']" position="after">
                 <separator/>
-                <filter name="l10n_hu_vat_status_filter_group_by"
-                        context="{'group_by': 'l10n_hu_vat_status'}"
-                        string="VAT Status"
-                />
-                <filter name="l10n_hu_incorporation_filter_group_by"
-                        context="{'group_by': 'l10n_hu_incorporation'}"
-                        string="Taxpayer Type"
-                />
-                <filter name="l10n_hu_trade_position_filter_group_by"
-                        context="{'group_by': 'l10n_hu_trade_position'}"
-                        string="Trade Position"
-                />
-                <filter name="l10n_hu_tax_regime_filter_group_by"
-                        context="{'group_by': 'l10n_hu_tax_regime'}"
-                        string="Tax Regime"
-                />
+                <filter name="l10n_hu_vat_status_filter_group_by" context="{'group_by': 'l10n_hu_vat_status'}" string="VAT Status"/>
+                <filter name="l10n_hu_incorporation_filter_group_by" context="{'group_by': 'l10n_hu_incorporation'}" string="Taxpayer Type"/>
+                <filter name="l10n_hu_trade_position_filter_group_by" context="{'group_by': 'l10n_hu_trade_position'}" string="Trade Position"/>
+                <filter name="l10n_hu_tax_regime_filter_group_by" context="{'group_by': 'l10n_hu_tax_regime'}" string="Tax Regime"/>
             </xpath>
         </field>
     </record>

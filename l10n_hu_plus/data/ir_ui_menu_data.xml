@@ -74,6 +74,20 @@
         <field name="parent_id" ref="reporting_accounting_menu"/>
         <field name="sequence">32</field>
     </record>
+    <!-- HU+ > Reporting > Technical -->
+    <record id="reporting_technical_menu" model="ir.ui.menu">
+        <field name="name">Technical</field>
+        <field name="groups_id" eval="[(4, ref('l10n_hu_plus.manager_group'))]"/>
+        <field name="parent_id" ref="reporting_menu"/>
+        <field name="sequence">96</field>
+    </record>
+    <!-- HU+ > Reporting > Technical > Logs -->
+    <record id="reporting_technical_log_menu" model="ir.ui.menu">
+        <field name="name">Logs</field>
+        <field name="action" ref="log_action"/>
+        <field name="parent_id" ref="reporting_technical_menu"/>
+        <field name="sequence">8</field>
+    </record>
     <!-- HU+ > Configuration -->
     <record id="configuration_menu" model="ir.ui.menu">
         <field name="name">Configuration</field>
@@ -210,13 +224,6 @@
         <field name="action" ref="app_action"/>
         <field name="parent_id" ref="configuration_technical_menu"/>
         <field name="sequence">8</field>
-    </record>
-    <!-- HU+ > Configuration > Technical > Logs -->
-    <record id="configuration_technical_log_menu" model="ir.ui.menu">
-        <field name="name">Logs</field>
-        <field name="action" ref="log_action"/>
-        <field name="parent_id" ref="configuration_technical_menu"/>
-        <field name="sequence">16</field>
     </record>
     <!-- HU+ > Configuration > Technical > Scheduled Actions -->
     <record id="configuration_technical_cron_menu" model="ir.ui.menu">

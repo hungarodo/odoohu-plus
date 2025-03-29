@@ -32,9 +32,7 @@ class L10nHuPlusWizard(models.TransientModel):
         model_id = False
         if self._context.get('active_model'):
             model_name = self._context.get('active_model')
-            model = self.env['ir.model'].sudo().search([
-                ('model', '=', model_name)
-            ], limit=1)
+            model = self.env['ir.model'].sudo().search([('model', '=', model_name)], limit=1)
             if model:
                 model_id = model.id
         return model_id
@@ -70,6 +68,10 @@ class L10nHuPlusWizard(models.TransientModel):
         ],
         string="Action Type",
     )
+    action_type_editable = fields.Boolean(
+        default=False,
+        string="Action Type Editable",
+    )
     action_type_visible = fields.Boolean(
         default=False,
         string="Action Type Visible",
@@ -100,7 +102,27 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     company_currency_code = fields.Char(
         related='company.currency_id.name',
-        string="Company Currency Code",
+        string="Company Currency C7ode",
+    )
+    error_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Error Text",
+    )
+    info_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Info Text",
+    )
+    success_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Success Text",
+    )
+    warning_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Warning Text",
     )
     ## ACCOUNT MOVE
     account_move = fields.Many2many(
@@ -249,6 +271,11 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     api_url = fields.Char(
         string="API URL",
+    )
+    ## CONFIGURATION
+    configuration_document_types = fields.Boolean(
+        default=True,
+        string="Configuration Document Types",
     )
     ## CURRENCY EXCHANGE
     company_currency_rate = fields.Many2one(
@@ -601,6 +628,28 @@ class L10nHuPlusWizard(models.TransientModel):
                 return result
             else:
                 raise exceptions.UserError("api action error!")
+        ## CONFIGURATION
+        elif self.action_type == 'configuration':
+            # Manage result
+            manage_result = self.manage_configuration()
+
+            # Wizard result
+            result_context = {
+                'default_action_execute_visible': False,
+                'default_error_text': manage_result.get('error_text', None),
+                'default_info_text': manage_result.get('info_text', None),
+                'default_success_text': manage_result.get('success_text', None),
+                'default_warning_text': manage_result.get('warning_text', None),
+            }
+            result = {
+                'name': _("HU+ Wizard"),
+                'context': result_context,
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
+            return result
         ## CURRENCY EXCHANGE
         elif self.action_type == 'currency_exchange' and self.account_move:
             # Write
@@ -844,6 +893,67 @@ class L10nHuPlusWizard(models.TransientModel):
             'log_ids': log_ids,
             'object_ids': object_ids,
             'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError(str(result))
+        return result
+
+    @api.model
+    def manage_configuration(self):
+        """ Manage configuration actions
+
+        :return: dictionary
+        """
+        # Initialize variables
+        configuration_result = {}
+        debug_list = []
+        error_list = []
+        error_text = ""
+        info_list = []
+        info_text = ""
+        result = {}
+        success_list = []
+        success_text = ""
+        warning_list = []
+        warning_text = ""
+
+        # Process scenarios
+        if self.action_type == 'configuration':
+            debug_list.append("processing configuration action_type")
+            configuration_values = {'document_types': self.configuration_document_types}
+            configuration_result = self.company.l10n_hu_plus_apply_configuration(configuration_values)
+            error_list += configuration_result.get('error_list', [])
+            if configuration_result.get('error_list'):
+                for error_item in configuration_result['error_list']:
+                    error_text += str(error_item) + "\n"
+            info_list += configuration_result.get('info_list', [])
+            if configuration_result.get('info_list'):
+                for info_item in configuration_result['info_list']:
+                    info_text += str(info_item) + "\n"
+            success_list += configuration_result.get('success_list', [])
+            if configuration_result.get('success_list'):
+                for success_item in configuration_result['success_list']:
+                    success_text += str(success_item) + "\n"
+            warning_list += configuration_result.get('warning_list', [])
+            if configuration_result.get('warning_list'):
+                for warning_item in configuration_result['warning_list']:
+                    warning_text += str(warning_item) + "\n"
+        else:
+            error_list.append("invalid action_type")
+
+        # Update result
+        result.update({
+            'configuration_result': configuration_result,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'error_text': error_text,
+            'info_list': info_list,
+            'info_text': info_text,
+            'success_list': success_list,
+            'success_text': success_text,
+            'warning_list': warning_list,
+            'warning_text': warning_text,
         })
 
         # Return result

@@ -254,13 +254,13 @@ class L10nHuPlusAccountMove(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_plus_documentation(self):
-        """ HU+ documentation """
+    def action_l10n_hu_plus_view_documentation(self):
+        """ View HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
 
         # Return
-        return self.company_id.action_l10n_hu_plus_documentation()
+        return self.company_id.action_l10n_hu_plus_view_documentation()
 
     def action_l10n_hu_send_proforma(self):
         """Open a window to compose an email using mail template loaded by default"""

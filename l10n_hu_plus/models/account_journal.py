@@ -34,7 +34,7 @@ class L10nHuPlusAccountJournal(models.Model):
     l10n_hu_delivery_date_default = fields.Selection(
         copy=False,
         default='none',
-        help="Used as default value when necessary",
+        help="Used as default value (when necessary)",
         selection=[
             ('none', "None"),
             ('today', "Today"),
@@ -50,7 +50,7 @@ class L10nHuPlusAccountJournal(models.Model):
     )
     l10n_hu_nav_payment_method = fields.Selection(
         copy=False,
-        help="Used as default value when necessary",
+        help="Used as default value (when necessary)",
         selection=_get_selection_l10n_hu_nav_payment_method,
         string="HU NAV Payment Method",
     )
@@ -106,13 +106,13 @@ class L10nHuPlusAccountJournal(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_plus_documentation(self):
-        """ HU+ documentation """
+    def action_l10n_hu_plus_view_documentation(self):
+        """ View HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
 
         # Return
-        return self.company_id.action_l10n_hu_plus_documentation()
+        return self.company_id.action_l10n_hu_plus_view_documentation()
 
     def action_l10n_hu_set_proforma_sequence(self):
         """ Set a proforma sequence"""
