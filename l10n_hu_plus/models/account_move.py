@@ -206,16 +206,25 @@ class L10nHuPlusAccountMove(models.Model):
 
     def _compute_l10n_hu_currency(self):
         for record in self:
-            last_rate = self.env['res.currency.rate'].search([
-                ('company_id', '=', record.company_id.id),
-                ('currency_id', '=', record.currency_id.id),
-                ('name', '<=', record.date)
-            ], limit=1)
+            if record.delivery_date:
+                currency_date = record.delivery_date
+                last_rate = self.env['res.currency.rate'].search([
+                    ('company_id', '=', record.company_id.id),
+                    ('currency_id', '=', record.currency_id.id),
+                    ('name', '<=', record.delivery_date)
+                ], limit=1)
+            else:
+                currency_date = record.date
+                last_rate = self.env['res.currency.rate'].search([
+                    ('company_id', '=', record.company_id.id),
+                    ('currency_id', '=', record.currency_id.id),
+                    ('name', '<=', record.date)
+                ], limit=1)
             if last_rate:
-                record.l10n_hu_currency_date = last_rate.name
+                record.l10n_hu_currency_date = currency_date
                 record.l10n_hu_currency_rate = last_rate.inverse_company_rate
             else:
-                record.l10n_hu_currency_date = record.date
+                record.l10n_hu_currency_date = currency_date
                 record.l10n_hu_currency_rate = 1.0
                 record.l10n_hu_document_rate = 1.0
 
