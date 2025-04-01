@@ -100,6 +100,7 @@
                         <group name="l10n_hu_plus_2" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
                             <!-- VAT -->
                             <field name="l10n_hu_vat_date" readonly="state != 'draft' and checked" string="VAT Date"/>
+                            <field name="l10n_hu_vat_status" readonly="state != 'draft' and checked" string="VAT Status"/>
                             <!-- Cash accounting -->
                             <field name="l10n_hu_cash_accounting" force_save="1" readonly="state != 'draft' and checked" string="Cash Accounting"/>
                         </group>
@@ -185,6 +186,7 @@
             <!-- VAT date -->
             <xpath expr="//field[@name='date']" position="after">
                 <field name="l10n_hu_vat_date" optional="hide" string="VAT Date"/>
+                <field name="l10n_hu_vat_status" optional="hide" string="VAT Status"/>
             </xpath>
             <!-- Tag and notes -->
             <xpath expr="//field[@name='checked']" position="before">
@@ -212,6 +214,7 @@
                 <field name="l10n_hu_proforma_name" string="Proforma"/>
                 <field name="l10n_hu_plus_tag" string="HU+ Tag"/>
                 <field name="l10n_hu_plus_notes" string="HU+ Notes"/>
+                <field name="l10n_hu_vat_status" string="VAT Status"/>
             </xpath>
             <!-- Filter -->
             <xpath expr="//filter[@name='invoice_date']" position="after">
@@ -239,6 +242,7 @@
                 <separator/>
                 <filter name="l10n_hu_plus_tag_filter_group_by" context="{'group_by': 'l10n_hu_plus_tag'}" string="HU+ Tag"/>
                 <filter name="l10n_hu_vat_date_filter_group_by" context="{'group_by': 'l10n_hu_vat_date'}" string="VAT Date"/>
+                <filter name="l10n_hu_vat_status_filter_group_by" context="{'group_by': 'l10n_hu_vat_status'}" string="VAT Status"/>
                 <filter name="l10n_hu_proforma_date_filter_group_by" context="{'group_by': 'l10n_hu_proforma_date'}" string="Proforma Date"/>
                 <filter name="l10n_hu_partner_country_filter_group_by" context="{'group_by': 'l10n_hu_partner_country'}" string="Partner Country"/>
                 <filter name="l10n_hu_trade_position_filter_group_by" context="{'group_by': 'l10n_hu_trade_position'}" string="Trade Position"/>

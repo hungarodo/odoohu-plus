@@ -166,6 +166,7 @@
                         <field name="accounting_cash_enabled" invisible="account_move_action != 'update_fields' or not accounting_cash_visible" string="Cash Accounting" widget="boolean_toggle"/>
                         <field name="accounting_cash_visible" invisible="1"/>
                         <field name="accounting_vat_date" invisible="account_move_action != 'update_fields'" string="VAT Date"/>
+                        <field name="accounting_vat_status" invisible="account_move_action != 'update_fields'" string="VAT Status"/>
                     </group>
                     <group name="accounting_fields_2">
                         <field name="accounting_origin" invisible="account_move_action != 'update_fields'" string="Origin"/>

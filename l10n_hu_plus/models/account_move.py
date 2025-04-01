@@ -187,6 +187,19 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU VAT Date",
         tracking=True,
     )
+    l10n_hu_vat_status = fields.Selection(
+        copy=False,
+        index=True,
+        selection=[
+            ('declared', "Declared"),
+            ('to_declare', "To Declare"),
+            ('postponed', "Postponed"),
+            ('out_of_scope', "Out of Scope"),
+            ('legacy', "Legacy"),
+        ],
+        string="HU VAT Status",
+        tracking=True,
+    )
 
     # Compute and search fields, in the same order of field declarations
     ## SUPER
@@ -1209,6 +1222,12 @@ class L10nHuPlusAccountMove(models.Model):
             if values.get('l10n_hu_vat_date') is not None:
                 field_values.update({'l10n_hu_vat_date': values['l10n_hu_vat_date']})
                 debug_list.append("l10n_hu_vat_date set from values: " + str(values['l10n_hu_vat_date']))
+            else:
+                pass
+            # l10n_hu_vat_status
+            if values.get('l10n_hu_vat_status') is not None:
+                field_values.update({'l10n_hu_vat_status': values['l10n_hu_vat_status']})
+                debug_list.append("l10n_hu_vat_status set from values: " + str(values['l10n_hu_vat_status']))
             else:
                 pass
         else:

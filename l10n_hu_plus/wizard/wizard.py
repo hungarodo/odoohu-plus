@@ -240,6 +240,16 @@ class L10nHuPlusWizard(models.TransientModel):
     accounting_vat_date = fields.Date(
         string="Accounting VAT Date",
     )
+    accounting_vat_status = fields.Selection(
+        selection=[
+            ('declared', "Declared"),
+            ('in_progress', "In Progress"),
+            ('postponed', "Postponed"),
+            ('out_of_scope', "Out of Scope"),
+            ('legacy', "Legacy"),
+        ],
+        string="Accounting VAT Status",
+    )
     ## API
     api_action = fields.Selection(
         selection=[
@@ -789,6 +799,7 @@ class L10nHuPlusWizard(models.TransientModel):
                         'invoice_origin': self.accounting_origin,
                         'l10n_hu_document_type': self.accounting_document_type,
                         'l10n_hu_vat_date': self.accounting_vat_date,
+                        'l10n_hu_vat_status': self.accounting_vat_status,
                     }
                     if self.accounting_cash_visible:
                         values_parameters.update({'l10n_hu_cash_accounting': self.accounting_cash_enabled})
