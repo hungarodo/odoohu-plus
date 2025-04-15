@@ -243,7 +243,7 @@ class L10nHuPlusWizard(models.TransientModel):
     accounting_vat_status = fields.Selection(
         selection=[
             ('declared', "Declared"),
-            ('in_progress', "In Progress"),
+            ('to_declare', "To Declare"),
             ('postponed', "Postponed"),
             ('out_of_scope', "Out of Scope"),
             ('legacy', "Legacy"),
@@ -453,6 +453,7 @@ class L10nHuPlusWizard(models.TransientModel):
             self.accounting_move_type = account_move.move_type
             self.accounting_origin = account_move.invoice_origin
             self.accounting_vat_date = account_move.l10n_hu_vat_date
+            self.accounting_vat_status = account_move.l10n_hu_vat_status
 
             # cash accounting
             if account_move.move_type in ['in_invoice', 'in_refund']:
