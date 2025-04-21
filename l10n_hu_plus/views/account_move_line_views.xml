@@ -29,7 +29,7 @@
     </record>
     <!-- List view readonly -->
     <record id="account_move_line_view_list_readonly" model="ir.ui.view">
-        <field name="name">l10n.hu.account.move.line.view.list.readonly</field>
+        <field name="name">l10n.hu.plus.move.line.view.list.readonly</field>
         <field name="model">account.move.line</field>
         <field name="priority">40</field>
         <field name="arch" type="xml">
@@ -56,7 +56,7 @@
     </record>
     <!-- Search view inherit -->
     <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
-        <field name="name">l10n.hu.account.view.account.move.line.filter.inherit</field>
+        <field name="name">l10n.hu.plus.view.account.move.line.filter.inherit</field>
         <field name="inherit_id" ref="account.view_account_move_line_filter"/>
         <field name="model">account.move.line</field>
         <field name="priority">36</field>

@@ -7,7 +7,7 @@
         <field name="domain">[('display_type', 'not in', ('line_section', 'line_note')), ('parent_state', '!=', 'cancel')]</field>
         <field name="res_model">account.move.line</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">list,pivot,graph,kanban</field>
+        <field name="view_mode">list,pivot,graph,kanban,form</field>
     </record>
     <!-- Window action list view -->
     <record id="account_move_line_vat_action_list" model="ir.actions.act_window.view">
@@ -36,5 +36,12 @@
         <field name="sequence">32</field>
         <field name="view_id" ref="account.account_move_line_view_kanban"/>
         <field name="view_mode">kanban</field>
+    </record>
+    <!-- Window action form view -->
+    <record id="account_move_line_vat_action_form" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="account_move_line_vat_action"/>
+        <field name="sequence">40</field>
+        <field name="view_id" ref="account.view_move_line_form"/>
+        <field name="view_mode">form</field>
     </record>
 </odoo>

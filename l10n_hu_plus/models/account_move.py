@@ -194,6 +194,7 @@ class L10nHuPlusAccountMove(models.Model):
             ('declared', "Declared"),
             ('to_declare', "To Declare"),
             ('postponed', "Postponed"),
+            ('excluded', "Excluded"),
             ('out_of_scope', "Out of Scope"),
             ('legacy', "Legacy"),
         ],

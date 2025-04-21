@@ -165,7 +165,7 @@
     </record>
     <!-- List view inherit  -->
     <record id="view_invoice_tree_inherit" model="ir.ui.view">
-        <field name="name">l10n.hu.account.view.invoice.tree.inherit</field>
+        <field name="name">l10n.hu.plus.view.invoice.tree.inherit</field>
         <field name="inherit_id" ref="account.view_invoice_tree"/>
         <field name="model">account.move</field>
         <field name="priority">36</field>
@@ -174,20 +174,17 @@
             <field name="name" position="after">
                 <field name="l10n_hu_proforma_name" optional="hide" readonly="state in ['cancel', 'posted']" string="Proforma Name"/>
             </field>
-            <!-- Add delivery date -->
-            <field name="date" position="after">
-                <field name="delivery_date" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery Date"/>
-            </field>
             <!-- Trade position -->
             <xpath expr="//field[@name='date']" position="before">
                 <field name="l10n_hu_partner_country" optional="hide"/>
                 <field name="l10n_hu_trade_position" optional="hide" string="Trade Position"/>
             </xpath>
-            <!-- VAT date -->
-            <xpath expr="//field[@name='date']" position="after">
+            <!-- Delivery date and VAT -->
+            <field name="date" position="after">
+                <field name="delivery_date" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery Date"/>
                 <field name="l10n_hu_vat_date" optional="hide" string="VAT Date"/>
                 <field name="l10n_hu_vat_status" optional="hide" string="VAT Status"/>
-            </xpath>
+            </field>
             <!-- Tag and notes -->
             <xpath expr="//field[@name='checked']" position="before">
                 <field name="l10n_hu_plus_tag" optional="hide" options="{'color_field': 'color'}" string="HU+ Tag" widget="many2many_tags"/>
@@ -195,9 +192,83 @@
             </xpath>
         </field>
     </record>
+    <!-- List view HU+  -->
+    <record id="invoice_view_list" model="ir.ui.view">
+        <field name="name">l10n.hu.plus.invoice.view.list</field>
+        <field name="model">account.move</field>
+        <field name="priority">36</field>
+        <field name="arch" type="xml">
+            <list string="Invoices" js_class="account_tree" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" expand="context.get('expand', False)" sample="1">
+                <field name="name" decoration-bf="1" decoration-danger="made_sequence_gap and state == 'posted'" widget="char_with_placeholder_field" placeholder="/"/>
+                <field name="state" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-success="state == 'posted'" optional="hide" string="Accounting Status"  widget="badge"/>
+                <field name="l10n_hu_edi_state" decoration-success="l10n_hu_edi_state == 'confirmed'" decoration-warning="l10n_hu_edi_state != 'confirmed'" optional="hide" string="EDI Status"  widget="badge"/>
+                <field name="l10n_hu_document_type" optional="hide" readonly="state in ['cancel', 'posted']" string="Document Type"/>
+                <field name="ref" optional="show"/>
+                <field name="invoice_origin" optional="hide" string="Source Document"/>
+                <field name="l10n_hu_proforma_name" optional="hide" readonly="state in ['cancel', 'posted']" string="Proforma Name"/>
+                <field name="invoice_partner_display_name" column_invisible="context.get('default_move_type') not in ('in_invoice', 'in_refund', 'in_receipt')" groups="base.group_user" string="Vendor"/>
+                <field name="invoice_partner_display_name" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')" groups="base.group_user" string="Customer"/>
+                <field name="l10n_hu_partner_country" optional="hide"/>
+                <field name="l10n_hu_trade_position" optional="hide" string="Trade Position"/>
+                <!-- Dates -->
+                <field name="invoice_date" optional="show" column_invisible="context.get('default_move_type') not in ('in_invoice', 'in_refund', 'in_receipt')" readonly="state != 'draft'" string="Bill Date" decoration-warning="abnormal_date_warning"/>
+                <field name="invoice_date" optional="show" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')" readonly="state != 'draft'" string="Invoice Date" decoration-warning="abnormal_date_warning"/>
+                <field name="date" optional="hide" string="Accounting Date" readonly="state in ['cancel', 'posted']"/>
+                <field name="l10n_hu_delivery_period_start" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery Start"/>
+                <field name="l10n_hu_delivery_period_end" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery End"/>
+                <field name="delivery_date" optional="show" readonly="state in ['cancel', 'posted']" string="Delivery Date"/>
+                <field name="l10n_hu_cash_accounting" optional="hide" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')"/>
+                <field name="l10n_hu_vat_date" optional="show" string="VAT Date"/>
+                <field name="l10n_hu_vat_status" decoration-info="l10n_hu_vat_status == 'to_declare'" decoration-muted="l10n_hu_vat_status in ('excluded', 'legacy', 'out_of_scope')" decoration-success="l10n_hu_vat_status == 'declared'" decoration-warning="l10n_hu_vat_status == 'postponed'" optional="show" string="VAT Status" widget="badge"/>
+                <!-- Amounts -->
+                <field name="currency_id" optional="hide" readonly="state in ['cancel', 'posted']" string="Currency"/>
+                <field name="amount_untaxed" optional="show" string="Net" sum="Total"/>
+                <field name="amount_tax" optional="show" string="Tax" sum="Total"/>
+                <field name="amount_total" decoration-bf="1" optional="show" string="Total" sum="Total"/>
+                <field name="amount_total_in_currency_signed" decoration-bf="1" decoration-warning="abnormal_amount_warning" groups="base.group_multi_currency" optional="hide" string="Total" sum="Signed Total"/>
+                <field name="amount_untaxed_signed" optional="hide" string="Accounting Net" sum="Total"/>
+                <field name="amount_tax_signed" optional="show" string="Accounting Tax" sum="Total"/>
+                <field name="amount_total_signed" optional="hide" string="Accounting Total" sum="Total"/>
+                <!-- Payment -->
+                <field name="status_in_payment" decoration-info="state == 'draft'" decoration-danger="payment_state == 'not_paid' and invoice_date_due &lt; context_today().strftime('%Y-%m-%d')" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" invisible="payment_state == 'invoicing_legacy' or move_type == 'entry'" optional="show" string="Payment Status" widget="badge"/>
+                <field name="invoice_date_due" invisible="payment_state in ('paid', 'in_payment', 'reversed') or state == 'cancel'" optional="hide" widget="remaining_days" />
+                <field name="amount_residual_signed" optional="hide" string="Amount Due" sum="Amount Due" />
+                <!-- Workflow -->
+                <field name="invoice_user_id" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')" optional="hide" string="Salesperson" widget="many2one_avatar_user"/>
+                <field name="activity_ids" optional="show" widget="list_activity"/>
+                <field name="l10n_hu_plus_tag" optional="show" options="{'color_field': 'color'}" string="HU+ Tag" widget="many2many_tags"/>
+                <field name="l10n_hu_plus_notes" optional="show" string="HU+ Notes"/>
+                <field name="checked" optional="hide" widget="boolean_toggle"/>
+                <field name="move_sent_values" string="Sent" widget="badge" decoration-success="move_sent_values == 'sent'" decoration-danger="move_sent_values == 'not_sent'" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')" optional="hide"/>
+                <!-- Parent -->
+                <field name="journal_id" optional="hide" string="Journal"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" optional="hide"/>
+                <field name="company_id" groups="!base.group_multi_company" column_invisible="True"/>
+                <!-- Invisible -->
+                <field name="made_sequence_gap" column_invisible="True"/>
+                <field name="duplicated_ref_ids" column_invisible="True"/>  <!-- Needed for custome view account_tree-->
+                <field name="move_type" column_invisible="context.get('default_move_type', True)"/>
+                <field name="company_currency_id" column_invisible="1"/>
+                <field name="abnormal_amount_warning" column_invisible="1"/>
+                <field name="abnormal_date_warning" column_invisible="1"/>
+              </list>
+        </field>
+    </record>
+    <!-- Pivot view HU+  -->
+    <record id="invoice_view_pivot" model="ir.ui.view">
+        <field name="name">l10n.hu.plus.invoice.view.pivot</field>
+        <field name="model">account.move</field>
+        <field name="priority">36</field>
+        <field name="arch" type="xml">
+            <pivot string="Account Move" sample="1">
+                <field name="move_type" type="row"/>
+                <field name="delivery_date" interval="year" type="col"/>
+            </pivot>
+        </field>
+    </record>
     <!-- Search view inherit  -->
     <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
-        <field name="name">l10n.hu.account.view.account.invoice.filter.inherit</field>
+        <field name="name">l10n.hu.plus.view.account.invoice.filter.inherit</field>
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="model">account.move</field>
         <field name="priority">36</field>
@@ -225,9 +296,12 @@
                 <filter name="l10n_hu_vat_date_filter" date="l10n_hu_vat_date" string="VAT Date"/>
                 <filter name="l10n_hu_proforma_date_filter" date="l10n_hu_proforma_date" string="Proforma Date"/>
                 <separator/>
+                <filter name="l10n_hu_proforma_sent_filter" domain="[('l10n_hu_proforma_date', '!=', False), ('l10n_hu_proforma_name', '!=', False)]" string="Proforma Sent"/>
+                <filter name="l10n_hu_cash_accounting_filter" domain="[('l10n_hu_cash_accounting', '=', True)]" string="Cash Accounting"/>
+                <filter name="l10n_hu_delivery_period_filter" domain="['|', ('l10n_hu_delivery_period_start', '!=', False), ('l10n_hu_delivery_period_end', '!=', False)]" string="Delivery Period"/>
+                <separator/>
                 <filter name="l10n_hu_plus_tag_filter" domain="[('l10n_hu_plus_tag', '!=', False)]" string="HU+ Tags"/>
                 <filter name="l10n_hu_plus_notes_filter" domain="[('l10n_hu_plus_notes', '!=', False)]" string="HU+ Notes"/>
-                <filter name="l10n_hu_proforma_sent_filter" domain="[('l10n_hu_proforma_date', '!=', False), ('l10n_hu_proforma_name', '!=', False)]" string="Proforma Sent"/>
                 <separator/>
                 <filter name="l10n_hu_trade_position_domestic_filter" domain="[('l10n_hu_trade_position', '=', 'domestic')]" string="Domestic"/>
                 <filter name="l10n_hu_trade_position_eu_filter" domain="[('l10n_hu_trade_position', '=', 'eu')]" string="EU"/>
@@ -241,8 +315,11 @@
             <xpath expr="//filter[@name='group_by_sequence_prefix']" position="after">
                 <separator/>
                 <filter name="l10n_hu_plus_tag_filter_group_by" context="{'group_by': 'l10n_hu_plus_tag'}" string="HU+ Tag"/>
+                <filter name="l10n_hu_edi_state_filter_group_by" context="{'group_by': 'l10n_hu_edi_state'}" string="EDI Status"/>
+                <filter name="l10n_hu_document_type_filter_group_by" context="{'group_by': 'l10n_hu_document_type'}" string="Document Type"/>
                 <filter name="l10n_hu_vat_date_filter_group_by" context="{'group_by': 'l10n_hu_vat_date'}" string="VAT Date"/>
                 <filter name="l10n_hu_vat_status_filter_group_by" context="{'group_by': 'l10n_hu_vat_status'}" string="VAT Status"/>
+                <filter name="l10n_hu_cash_accounting_group_by" context="{'group_by': 'l10n_hu_cash_accounting'}" string="Cash Accounting"/>
                 <filter name="l10n_hu_proforma_date_filter_group_by" context="{'group_by': 'l10n_hu_proforma_date'}" string="Proforma Date"/>
                 <filter name="l10n_hu_partner_country_filter_group_by" context="{'group_by': 'l10n_hu_partner_country'}" string="Partner Country"/>
                 <filter name="l10n_hu_trade_position_filter_group_by" context="{'group_by': 'l10n_hu_trade_position'}" string="Trade Position"/>
