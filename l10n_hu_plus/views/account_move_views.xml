@@ -198,8 +198,9 @@
         <field name="model">account.move</field>
         <field name="priority">36</field>
         <field name="arch" type="xml">
-            <list string="Invoices" js_class="account_tree" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" expand="context.get('expand', False)" sample="1">
+            <list string="Invoices" js_class="account_tree" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" expand="context.get('expand', False)" multi_edit="1" sample="1">
                 <field name="name" decoration-bf="1" decoration-danger="made_sequence_gap and state == 'posted'" widget="char_with_placeholder_field" placeholder="/"/>
+                <field name="checked" optional="show" widget="boolean_toggle"/>
                 <field name="state" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-success="state == 'posted'" optional="hide" string="Accounting Status"  widget="badge"/>
                 <field name="l10n_hu_edi_state" decoration-success="l10n_hu_edi_state == 'confirmed'" decoration-warning="l10n_hu_edi_state != 'confirmed'" optional="hide" string="EDI Status"  widget="badge"/>
                 <field name="l10n_hu_document_type" optional="hide" readonly="state in ['cancel', 'posted']" string="Document Type"/>
@@ -217,9 +218,10 @@
                 <field name="l10n_hu_delivery_period_start" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery Start"/>
                 <field name="l10n_hu_delivery_period_end" optional="hide" readonly="state in ['cancel', 'posted']" string="Delivery End"/>
                 <field name="delivery_date" optional="show" readonly="state in ['cancel', 'posted']" string="Delivery Date"/>
+                <!-- VAT -->
                 <field name="l10n_hu_cash_accounting" optional="hide" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')"/>
                 <field name="l10n_hu_vat_date" optional="show" string="VAT Date"/>
-                <field name="l10n_hu_vat_status" decoration-info="l10n_hu_vat_status == 'to_declare'" decoration-muted="l10n_hu_vat_status in ('excluded', 'legacy', 'out_of_scope')" decoration-success="l10n_hu_vat_status == 'declared'" decoration-warning="l10n_hu_vat_status == 'postponed'" optional="show" string="VAT Status" widget="badge"/>
+                <field name="l10n_hu_vat_status" decoration-info="l10n_hu_vat_status == 'to_declare'" decoration-muted="l10n_hu_vat_status in ('excluded', 'legacy', 'out_of_scope')" decoration-success="l10n_hu_vat_status == 'declared'" decoration-warning="l10n_hu_vat_status == 'postponed'" optional="show" string="VAT Status"/>
                 <!-- Amounts -->
                 <field name="currency_id" optional="hide" readonly="state in ['cancel', 'posted']" string="Currency"/>
                 <field name="amount_untaxed" optional="show" string="Net" sum="Total"/>
@@ -238,7 +240,6 @@
                 <field name="activity_ids" optional="show" widget="list_activity"/>
                 <field name="l10n_hu_plus_tag" optional="show" options="{'color_field': 'color'}" string="HU+ Tag" widget="many2many_tags"/>
                 <field name="l10n_hu_plus_notes" optional="show" string="HU+ Notes"/>
-                <field name="checked" optional="hide" widget="boolean_toggle"/>
                 <field name="move_sent_values" string="Sent" widget="badge" decoration-success="move_sent_values == 'sent'" decoration-danger="move_sent_values == 'not_sent'" column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'out_receipt')" optional="hide"/>
                 <!-- Parent -->
                 <field name="journal_id" optional="hide" string="Journal"/>
