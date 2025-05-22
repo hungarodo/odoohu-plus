@@ -711,6 +711,13 @@ class L10nHuBaseResCompany(models.Model):
                 success_list.append(_("Document types configured"))
             else:
                 info_list.append(_("Document type configuration skipped"))
+            # 2) AUDIT TRAIL
+            if values.get('audit_trail'):
+                company.write({'check_account_audit_trail': True})
+                operations.append({'model_name': 'res.company', 'record_id': company.id, 'operation': 'write'})
+                success_list.append(_("Audit trail configured"))
+            else:
+                info_list.append(_("Audit trail configuration skipped"))
         else:
             debug_list.append("operations skipped due to previous errors")
 

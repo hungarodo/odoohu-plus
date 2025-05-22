@@ -284,6 +284,10 @@ class L10nHuPlusWizard(models.TransientModel):
         string="API URL",
     )
     ## CONFIGURATION
+    configuration_audit_trail = fields.Boolean(
+        default=True,
+        string="Configuration Audit Trail",
+    )
     configuration_document_types = fields.Boolean(
         default=True,
         string="Configuration Document Types",
@@ -934,7 +938,10 @@ class L10nHuPlusWizard(models.TransientModel):
         # Process scenarios
         if self.action_type == 'configuration':
             debug_list.append("processing configuration action_type")
-            configuration_values = {'document_types': self.configuration_document_types}
+            configuration_values = {
+                'audit_trail': self.configuration_audit_trail,
+                'document_types': self.configuration_document_types
+            }
             configuration_result = self.company.l10n_hu_plus_apply_configuration(configuration_values)
             error_list += configuration_result.get('error_list', [])
             if configuration_result.get('error_list'):

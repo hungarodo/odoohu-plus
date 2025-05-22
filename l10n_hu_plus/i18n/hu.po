@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-22 21:41+0000\n"
-"PO-Revision-Date: 2025-05-22 21:41+0000\n"
+"POT-Creation-Date: 2025-05-22 22:26+0000\n"
+"PO-Revision-Date: 2025-05-22 22:26+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -38,8 +38,7 @@ msgid ""
 "%(attachment_name)s (detached by %(user)s on "
 "%(date)s)%(attachment_extension)s"
 msgstr ""
-"%(attachment_name)s (leválasztva: %(user)s "
-"%(date)s)%(attachment_extension)s"
+"%(attachment_name)s (leválasztva: %(user)s %(date)s)%(attachment_extension)s"
 
 #. module: l10n_hu_plus
 #: model:mail.template,body_html:l10n_hu_plus.account_move_proforma_mail_template
@@ -640,6 +639,23 @@ msgid "Audit"
 msgstr ""
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Audit Trail"
+msgstr "Audit napló"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/res_company.py:0
+msgid "Audit trail configuration skipped"
+msgstr "Audit napló konfiguráció kihagyva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/res_company.py:0
+msgid "Audit trail configured"
+msgstr "Audit napló konfigurálva"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Banner"
@@ -831,9 +847,14 @@ msgid "Configuration"
 msgstr "Konfiguráció"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__configuration_audit_trail
+msgid "Configuration Audit Trail"
+msgstr "Konfiguráció audit napló"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__configuration_document_types
 msgid "Configuration Document Types"
-msgstr ""
+msgstr "Konfiguráció dokumentum típusok"
 
 #. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_res_partner
@@ -2036,7 +2057,8 @@ msgstr "Számla pénzügyi pozícíó beállítva"
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/ir_attachment.py:0
 msgid "Invoice is checked, can not detach invoice pdf!"
-msgstr "A számla ellenőrizve van, a számlakép pdf leválasztása nem megengedett!"
+msgstr ""
+"A számla ellenőrizve van, a számlakép pdf leválasztása nem megengedett!"
 
 #. module: l10n_hu_plus
 #. odoo-python

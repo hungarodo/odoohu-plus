@@ -42,6 +42,7 @@
                         <field name="api_key" invisible="api_action not in ['check_registration', 'create_registration', 'delete_registration']" readonly="api_action in ['check_registration', 'delete_registration']" required="api_action in ['check_registration', 'create_registration', 'delete_registration']" string="API Key"/>
                         <field name="api_url" groups="l10n_hu_plus.manager_group" invisible="api_action not in ['check_registration', 'create_registration', 'delete_registration']" readonly="api_action in ['check_registration', 'delete_registration']" required="api_action in ['check_registration', 'create_registration', 'delete_registration']" string="API URL"/>
                         <!-- CONFIGURATION -->
+                        <field name="configuration_audit_trail" invisible="action_type != 'configuration'" string="Audit Trail"/>
                         <field name="configuration_document_types" invisible="action_type != 'configuration'" string="Document Types"/>
                         <!-- CURRENCY EXCHANGE -->
                         <field name="exchange_action_editable" invisible="1"/>
