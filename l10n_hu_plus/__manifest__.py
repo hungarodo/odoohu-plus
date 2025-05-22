@@ -71,9 +71,10 @@
     ],
     'installable': True,
     'license': "OPL-1",
+    'post_init_hook': '_l10n_hu_plus_post_init',
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "18.0.1.4.0",
+    'version': "18.0.1.4.1",
     'website': "https://mopsz.odoo.com",
 }

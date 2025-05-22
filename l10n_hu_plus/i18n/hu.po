@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-21 09:59+0000\n"
-"PO-Revision-Date: 2025-04-21 09:59+0000\n"
+"POT-Creation-Date: 2025-05-22 21:41+0000\n"
+"PO-Revision-Date: 2025-05-22 21:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -30,6 +30,16 @@ msgstr ""
 "'Beszerzés': szállítói (bejövő) számlákhoz.\n"
 "'Készpénz' vagy 'Bank': vevői vagy szállítói fizetésekhez.\n"
 "'Általános': vegyes, különleges könyvelési tételekhez."
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/ir_attachment.py:0
+msgid ""
+"%(attachment_name)s (detached by %(user)s on "
+"%(date)s)%(attachment_extension)s"
+msgstr ""
+"%(attachment_name)s (leválasztva: %(user)s "
+"%(date)s)%(attachment_extension)s"
 
 #. module: l10n_hu_plus
 #: model:mail.template,body_html:l10n_hu_plus.account_move_proforma_mail_template
@@ -610,6 +620,11 @@ msgstr "App-ok"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_search
 msgid "Archived"
 msgstr "Archivált"
+
+#. module: l10n_hu_plus
+#: model:ir.model,name:l10n_hu_plus.model_ir_attachment
+msgid "Attachment"
+msgstr "Melléklet"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_attachment_count
@@ -2019,6 +2034,18 @@ msgstr "Számla pénzügyi pozícíó beállítva"
 
 #. module: l10n_hu_plus
 #. odoo-python
+#: code:addons/l10n_hu_plus/models/ir_attachment.py:0
+msgid "Invoice is checked, can not detach invoice pdf!"
+msgstr "A számla ellenőrizve van, a számlakép pdf leválasztása nem megengedett!"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/ir_attachment.py:0
+msgid "Invoice pdf detached"
+msgstr "Számlakép pdf leválasztva"
+
+#. module: l10n_hu_plus
+#. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 msgid "Invoice submission failed."
 msgstr "Számlabeküldés sikertelen."
@@ -2484,6 +2511,12 @@ msgstr "Hatókörön kívűl"
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__direction__outgoing
 msgid "Outgoing"
 msgstr "Kimenő"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__invoice_pdf_report_id
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__invoice_pdf_report_id
+msgid "PDF Attachment"
+msgstr "PDF melléklet"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
@@ -3322,6 +3355,12 @@ msgstr "Varázsló"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_search
 msgid "Write Date"
 msgstr "Írás dátuma"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/ir_attachment.py:0
+msgid "You cannot remove parts of the audit trail."
+msgstr "Nem lehetséges eltávolítani az audit napló tételeit."
 
 #. module: l10n_hu_plus
 #. odoo-python
