@@ -21,6 +21,10 @@ class L10nHuPlusAccountMove(models.Model):
     # Default methods
     
     # Field declarations
+    ## ODOO
+    invoice_pdf_report_id = fields.Many2one(
+        tracking=True,
+    )
     ## CASH ACCOUNTING
     l10n_hu_cash_accounting = fields.Boolean(
         compute='_compute_l10n_hu_cash_accounting',

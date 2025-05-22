@@ -6,6 +6,7 @@ from . import account_move_line
 from . import account_payment_term
 from . import account_tag
 from . import account_tax
+from . import ir_attachment
 from . import log
 from . import object
 from . import res_company
