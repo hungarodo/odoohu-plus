@@ -26,7 +26,7 @@
                             <field name="l10n_hu_proforma_name" class="text-danger" readonly="1" string="Proforma"/>
                         </span>
                         <span name="l10n_hu_plus_tag" class="ms-2 me-2" groups="l10n_hu_plus.user_group">
-                            <field name="l10n_hu_plus_tag" context="{'default_tag_type': 'account_move'}" nolabel="1" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
+                            <field name="l10n_hu_plus_tag" context="{'default_tag_type': 'account_move'}" domain="[('company', '=', company_id), ('tag_type', 'in', ['account_move', 'general'])]" nolabel="1" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
                         </span>
                         <span name="l10n_hu_plus_notes" class="ms-2 me-2" groups="l10n_hu_plus.user_group">
                             <field name="l10n_hu_plus_notes" nolabel="1" placeholder="Notes..." style="min-width:200px;"/>
@@ -82,7 +82,7 @@
                     <group name="l10n_hu_plus">
                         <group name="l10n_hu_plus_1" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
                             <!-- Document type -->
-                            <field name="l10n_hu_document_type" options="{'no_create': True,}" readonly="state != 'draft' and checked" string="Document Type"/>
+                            <field name="l10n_hu_document_type" domain="[('company', '=', company_id), ('tag_type', '=', 'document_type')]" options="{'no_create': True,}" readonly="state != 'draft' and checked" string="Document Type"/>
                             <!-- Original invoice -->
                             <label name="l10n_hu_original_invoice" for="l10n_hu_original_invoice_number" string="Original Invoice Number"/>
                             <div name="l10n_hu_original_invoice">
@@ -91,7 +91,7 @@
                                 <button name="action_l10n_hu_view_original_invoice" class="oe_inline btn-sm btn-link" icon="fa-folder-open" invisible="reversed_entry_id or not l10n_hu_original_invoice_number" string="View" type="object"/>
                             </div>
                             <!-- HU+ Tags -->
-                            <field name="l10n_hu_plus_tag" context="{'default_tag_type': 'account_move'}" groups="l10n_hu_plus.user_group" invisible="l10n_hu_banner_enabled" options="{'color_field': 'color'}" string="Tags" widget="many2many_tags"/>
+                            <field name="l10n_hu_plus_tag" context="{'default_tag_type': 'account_move'}" domain="[('company', '=', company_id), ('tag_type', 'in', ['account_move', 'general'])]" groups="l10n_hu_plus.user_group" invisible="l10n_hu_banner_enabled" options="{'color_field': 'color'}" string="Tags" widget="many2many_tags"/>
                             <!-- HU+ Notes -->
                             <field name="l10n_hu_plus_notes" groups="l10n_hu_plus.user_group" invisible="l10n_hu_banner_enabled" string="Notes"/>
                             <!-- HU+ Status -->
