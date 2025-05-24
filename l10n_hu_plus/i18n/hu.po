@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-22 22:26+0000\n"
-"PO-Revision-Date: 2025-05-22 22:26+0000\n"
+"POT-Creation-Date: 2025-05-24 09:45+0000\n"
+"PO-Revision-Date: 2025-05-24 09:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2820,11 +2820,6 @@ msgid "SMS Delivery error"
 msgstr "SMS kézbesítési hiba"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
-msgid "Salesperson"
-msgstr "Értékesítő"
-
-#. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.cron_action
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_technical_cron_menu
 msgid "Scheduled Actions"
@@ -3222,6 +3217,7 @@ msgstr "Alapértelmezett érték (ahol szükséges)"
 
 #. module: l10n_hu_plus
 #: model:res.groups,name:l10n_hu_plus.user_group
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
 msgid "User"
 msgstr "Felhasználó"
 
