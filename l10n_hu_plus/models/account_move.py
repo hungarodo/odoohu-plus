@@ -207,7 +207,12 @@ class L10nHuPlusAccountMove(models.Model):
     def _compute_l10n_hu_currency(self):
         for record in self:
             if record.delivery_date:
-                currency_date = record.delivery_date
+                if record.invoice_date and record.delivery_date > record.invoice_date:
+                    currency_date = record.invoice_date
+                elif record.delivery_date > fields.Date.today():
+                    currency_date = fields.Date.today()
+                else:
+                    currency_date = record.delivery_date
                 last_rate = self.env['res.currency.rate'].search([
                     ('company_id', '=', record.company_id.id),
                     ('currency_id', '=', record.currency_id.id),
@@ -1118,11 +1123,11 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Get last_accounting_rate
         ## Company ccy != invoice ccy
-        if self.date and self.currency_id != self.company_currency_id:
+        if self.delivery_date and self.currency_id != self.company_currency_id:
             last_accounting_rate = self.env['res.currency.rate'].search([
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', self.currency_id.id),
-                ('name', '<=', self.date)
+                ('name', '<=', self.delivery_date)
             ], limit=1)
             if last_accounting_rate:
                 debug_list.append("last_accounting_rate found")
@@ -1137,22 +1142,22 @@ class L10nHuPlusAccountMove(models.Model):
         if self.company_currency_id.name == 'HUF' and self.currency_id.name == 'HUF':
             last_huf_rate = None
         ## Company HUF and invoice NOT HUF
-        elif self.date and self.company_currency_id.name == 'HUF' and self.currency_id.name != 'HUF':
+        elif self.delivery_date and self.company_currency_id.name == 'HUF' and self.currency_id.name != 'HUF':
             last_huf_rate = self.env['res.currency.rate'].search([
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', self.currency_id.id),
-                ('name', '<=', self.date)
+                ('name', '<=', self.delivery_date)
             ], limit=1)
             if last_huf_rate:
                 debug_list.append("last_huf_rate found")
             else:
                 error_list.append("last_huf_rate not found for company HUF and invoice NOT HUF")
         ## Company NOT HUF
-        elif self.date and self.company_currency_id.name != 'HUF':
+        elif self.delivery_date and self.company_currency_id.name != 'HUF':
             last_huf_rate = self.env['res.currency.rate'].search([
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', currency_huf.id),
-                ('name', '<=', self.date)
+                ('name', '<=', self.delivery_date)
             ], limit=1)
             if last_huf_rate:
                 debug_list.append("last_huf_rate found for company NOT HUF")
