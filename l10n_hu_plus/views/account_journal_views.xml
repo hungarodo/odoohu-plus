@@ -9,27 +9,46 @@
         <field name="arch" type="xml">
             <!-- Add l10n_hu page and fields -->
             <xpath expr="//page[@name='advanced_settings']" position="after">
-                <page name="l10n_hu_plus" string="HU+">
-                    <group name="l10n_hu_plus_1">
-                        <group name="l10n_hu_plus_1_1">
+                <page name="l10n_hu_plus" groups="l10n_hu_plus.user_group" string="HU+">
+                    <group name="l10n_hu_plus">
+                        <group name="l10n_hu_plus_1">
                             <field name="l10n_hu_plus_enabled" widget="boolean_toggle"/>
+                            <field name="l10n_hu_priority" class="oe_inline" string="Priority"/>
+                        </group>
+                        <group name="l10n_hu_plus_2">
+                            <div name="l10n_hu_plus_actions" colspan="2">
+                                <button name="action_l10n_hu_plus_view_documentation" class="btn-secondary m-1" icon="fa-info-circle" string="Documentation" type="object"/>
+                                <button name="action_l10n_hu_set_proforma_sequence" class="btn-primary m-1" groups="l10n_hu_plus.user_group" icon="fa-bolt" invisible="type != 'sale' or l10n_hu_proforma_sequence_available" string="Set proforma sequence" type="object"/>
+                            </div>
+                            <field name="l10n_hu_banner_enabled" string="Banner" widget="boolean_toggle"/>
+                        </group>
+                        <group name="l10n_hu_plus_3" invisible="type not in ['purchase', 'sale']">
                             <field name="l10n_hu_delivery_date_default" string="Delivery Date"/>
                             <field name="l10n_hu_nav_payment_method" string="NAV Payment Method"/>
                             <field name="l10n_hu_proforma_sequence_available" invisible="1"/>
                             <field name="l10n_hu_proforma_sequence" domain="[('code', 'like', 'proforma'), ('company_id', '=', company_id)]" invisible="type != 'sale'" options="{'no_create': True}" string="Proforma Sequence"/>
                             <field name="l10n_hu_proforma_mail_template" invisible="type != 'sale'" options="{'no_create': True}" string="Proforma Mail Template"/>
                         </group>
-                        <group name="l10n_hu_plus_1_2">
-                            <div name="l10n_hu_plus_actions" colspan="2">
-                                <button name="action_l10n_hu_plus_view_documentation" class="btn-secondary btn-sm m-2" icon="fa-info-circle" string="Documentation" type="object"/>
-                                <button name="action_l10n_hu_set_proforma_sequence" class="btn-primary btn-sm m-2" groups="l10n_hu_plus.user_group" icon="fa-bolt" invisible="type != 'sale' or l10n_hu_proforma_sequence_available" string="Set proforma sequence" type="object"/>
-                            </div>
-                            <field name="l10n_hu_banner_enabled" string="Banner" widget="boolean_toggle"/>
-                            <field name="l10n_hu_priority" class="oe_inline" string="Priority"/>
-                            <field name="l10n_hu_edi_send_disabled" invisible="type != 'sale'" string="EDI Send Disabled" widget="boolean_toggle"/>
+                        <group name="l10n_hu_plus_4" invisible="type not in ['purchase', 'sale']">
+                            <field name="l10n_hu_cron_batch" class="oe_inline" min="0" max="1000" string="Cron Batch"/>
+                            <field name="l10n_hu_edi_sending" invisible="type != 'sale'" required="type == 'sale'" string="EDI Sending"/>
                         </group>
                     </group>
                 </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- Search view inherit -->
+    <record id="view_account_journal_search_inherit" model="ir.ui.view">
+        <field name="name">l10n.hu.plus.view.account.journal.search.inherit</field>
+        <field name="inherit_id" ref="account.view_account_journal_search"/>
+        <field name="model">account.journal</field>
+        <field name="priority">36</field>
+        <field name="arch" type="xml">
+            <!-- Filters -->
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter name="l10n_hu_plus_enabled_filter" domain="[('l10n_hu_plus_enabled', '=', True)]" string="HU+"/>
             </xpath>
         </field>
     </record>

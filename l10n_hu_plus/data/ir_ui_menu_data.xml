@@ -157,7 +157,7 @@
     </record>
     <!-- HU+ > Configuration > Accounting > Account Journals -->
     <record id="configuration_accounting_account_journal_menu" model="ir.ui.menu">
-        <field name="name">Account Journals</field>
+        <field name="name">Journals</field>
         <field name="action" ref="account_journal_action"/>
         <field name="parent_id" ref="configuration_accounting_menu"/>
         <field name="sequence">16</field>
@@ -218,10 +218,10 @@
         <field name="parent_id" ref="configuration_menu"/>
         <field name="sequence">128</field>
     </record>
-    <!-- HU+ > Configuration > Technical > Apps -->
-    <record id="configuration_technical_app_menu" model="ir.ui.menu">
-        <field name="name">Apps</field>
-        <field name="action" ref="app_action"/>
+    <!-- HU+ > Configuration > Technical > Applications -->
+    <record id="configuration_technical_application_menu" model="ir.ui.menu">
+        <field name="name">Applications</field>
+        <field name="action" ref="application_action"/>
         <field name="parent_id" ref="configuration_technical_menu"/>
         <field name="sequence">8</field>
     </record>

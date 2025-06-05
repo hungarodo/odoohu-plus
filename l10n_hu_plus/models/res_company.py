@@ -612,8 +612,6 @@ class L10nHuBaseResCompany(models.Model):
         """ Apply HU+ configuration
         @:return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_plus_apply_configuration BEGIN")
-
         # Initialize variables
         debug_list = []
         error_list = []
@@ -622,6 +620,7 @@ class L10nHuBaseResCompany(models.Model):
         result = {}
         success_list = []
         warning_list = []
+        # raise exceptions.UserError("l10n_hu_plus_apply_configuration BEGIN")
 
         # company
         if values.get('company'):
@@ -718,6 +717,14 @@ class L10nHuBaseResCompany(models.Model):
                 success_list.append(_("Audit trail configured"))
             else:
                 info_list.append(_("Audit trail configuration skipped"))
+            # 3) ENABLED JOURNALS
+            if values.get('enabled_journals'):
+                for journal in values['enabled_journals']:
+                    journal.write({'l10n_hu_plus_enabled': True})
+                    operations.append({'model_name': 'account.journal', 'record_id': journal.id, 'operation': 'write'})
+                success_list.append(_("Journals configured"))
+            else:
+                info_list.append(_("Journal configuration skipped"))
         else:
             debug_list.append("operations skipped due to previous errors")
 

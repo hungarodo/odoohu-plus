@@ -3,7 +3,7 @@
     <data noupdate="1">
         <record id="settings_config_parameter" forcecreate="1" model="ir.config_parameter">
             <field name="key">l10n_hu_plus.settings</field>
-            <field name="value">{"documentation_url": "https://hungarodo.hu/odoohu", "object_api_key": "", "object_api_pagination": 80, "object_api_url": ""}</field>
+            <field name="value">{"documentation_url": "https://mopsz.odoo.com", "object_api_key": "", "object_api_pagination": 80, "object_api_url": ""}</field>
         </record>
     </data>
 </odoo>

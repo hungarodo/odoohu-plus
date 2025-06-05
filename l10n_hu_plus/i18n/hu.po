@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 09:45+0000\n"
-"PO-Revision-Date: 2025-05-24 09:45+0000\n"
+"POT-Creation-Date: 2025-06-03 07:31+0000\n"
+"PO-Revision-Date: 2025-06-03 07:31+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -265,11 +265,6 @@ msgstr "API nincs bekapcsolva!"
 #: model:ir.actions.act_window,name:l10n_hu_plus.account_journal_action
 msgid "Account Journal"
 msgstr "Könyvelési napló"
-
-#. module: l10n_hu_plus
-#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_account_journal_menu
-msgid "Account Journals"
-msgstr "Könyvelési naplók"
 
 #. module: l10n_hu_plus
 #. odoo-python
@@ -601,15 +596,15 @@ msgid "App Name"
 msgstr "App név"
 
 #. module: l10n_hu_plus
+#: model:ir.actions.act_window,name:l10n_hu_plus.application_action
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_technical_application_menu
+msgid "Applications"
+msgstr "Alkalmazások"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Apply HU+ configuration"
 msgstr "HU+ konfiguráció alkalmazása"
-
-#. module: l10n_hu_plus
-#: model:ir.actions.act_window,name:l10n_hu_plus.app_action
-#: model:ir.ui.menu,name:l10n_hu_plus.configuration_technical_app_menu
-msgid "Apps"
-msgstr "App-ok"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_form
@@ -654,6 +649,16 @@ msgstr "Audit napló konfiguráció kihagyva"
 #: code:addons/l10n_hu_plus/models/res_company.py:0
 msgid "Audit trail configured"
 msgstr "Audit napló konfigurálva"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_journal__l10n_hu_edi_sending__auto_edi_email_
+msgid "Automated EDI & Email"
+msgstr "Automatizált EDI & Email"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_journal__l10n_hu_edi_sending__auto_edi_
+msgid "Automated EDI (no email)"
+msgstr "Automatizált EDI (nincs email)"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
@@ -747,6 +752,12 @@ msgid "Close"
 msgstr "Bezárás"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__closed
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__closed
+msgid "Closed"
+msgstr "Lezárt"
+
+#. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__code
@@ -806,7 +817,7 @@ msgstr "Vállalat pénznem"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__company_currency_code
-msgid "Company Currency C7ode"
+msgid "Company Currency Code"
 msgstr "Vállalat pénznem kód"
 
 #. module: l10n_hu_plus
@@ -857,17 +868,14 @@ msgid "Configuration Document Types"
 msgstr "Konfiguráció dokumentum típusok"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__configuration_enabled_journals
+msgid "Configuration Enabled Journals"
+msgstr "Konfiguráció bekapcsolt naplók"
+
+#. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_res_partner
 msgid "Contact"
 msgstr "Kapcsolat"
-
-#. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-msgid "Could not authenticate with NAV. Check your credentials and try again."
-msgstr ""
-"Nem sikerült a NAV hitelesítés. Kérjük, ellenőrizze az adatait és próbálja "
-"újra."
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_tag_view_form_inherit
@@ -914,13 +922,17 @@ msgid "Credit Note"
 msgstr "Jóváírás"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
+msgid "Cron Batch"
+msgstr "Cron köteg"
+
+#. module: l10n_hu_plus
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_general_currency_menu
 msgid "Currencies"
 msgstr "Pénznemek"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Currency"
 msgstr "Pénznem"
 
@@ -997,16 +1009,6 @@ msgid "Dashboard"
 msgstr "Kezelőpult"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
-msgid ""
-"Date when the proforma is sent out, automatically updated, also editable "
-"manually"
-msgstr ""
-"Proforma (díjbekérő) kiküldésének dátuma, automatikusan frissül, kézzel is  "
-"módosítható"
-
-#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_vat_status__declared
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__accounting_vat_status__declared
 msgid "Declared"
@@ -1014,7 +1016,7 @@ msgstr "Bevallott"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_proforma_mail_template
-msgid "Default template for sending proforma emails"
+msgid "Default template for proforma emails"
 msgstr "Alapértelmezett sablon proforma emailek küldéséhez"
 
 #. module: l10n_hu_plus
@@ -1112,13 +1114,9 @@ msgid "Direction"
 msgstr "Irány"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_edi_send_disabled
-msgid ""
-"Disable EDI sending when the journal is used for externally issued or OSS "
-"reported invoices"
-msgstr ""
-"NAV küldés kikapcsolása, a napló külsőleg kibocsátott vagy OSS számlákat "
-"tartalmaz"
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_journal__l10n_hu_edi_sending__disabled
+msgid "Disabled"
+msgstr "Kikapcsolva"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_log__display_name
@@ -1234,9 +1232,14 @@ msgid "Draft Invoice"
 msgstr "Piszkozat számla"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_edi_sending
+msgid "EDI (NAV Online Invoice) and email sending"
+msgstr "EDI (NAV Online Számla) és email küldés"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
-msgid "EDI Send Disabled"
-msgstr "NAV küldés kikapcsolva"
+msgid "EDI Sending"
+msgstr "EDI küldés"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
@@ -1262,6 +1265,11 @@ msgstr ""
 #: model:ir.model,name:l10n_hu_plus.model_mail_compose_message
 msgid "Email composition wizard"
 msgstr "E-mail összeállító varázsló"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Enabled Journals"
+msgstr "Bekapcsolt naplók"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -1458,6 +1466,11 @@ msgid "HU Country Code"
 msgstr "Országkód"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_cron_batch
+msgid "HU Cron Batch"
+msgstr "HU cron köteg"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_currency_date
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_currency_date
 msgid "HU Currency Date"
@@ -1517,9 +1530,9 @@ msgid "HU Document Type"
 msgstr "Dokumentum típus"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_edi_send_disabled
-msgid "HU EDI Send Disabled"
-msgstr "NAV küldés kikapcsolva"
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_edi_sending
+msgid "HU EDI Sending"
+msgstr "HU EDI küldés"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_financial_representative
@@ -1603,6 +1616,12 @@ msgstr "Ár jóváírás"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_priority
 msgid "HU Priority"
 msgstr "Prioritás"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
+msgid "HU Proforma Date"
+msgstr "Proforma dátum"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_mail_template
@@ -1705,6 +1724,7 @@ msgstr "HU varázsló"
 #: model:ir.ui.menu,name:l10n_hu_plus.hu_plus_menu
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_tag_view_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_search_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_position_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_company_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -1752,6 +1772,11 @@ msgstr "HU+ API időbélyeg"
 #: code:addons/l10n_hu_plus/models/res_company.py:0
 msgid "HU+ API is not enabled!"
 msgstr "HU+ API nincs bekapcsolva!"
+
+#. module: l10n_hu_plus
+#: model:ir.actions.server,name:l10n_hu_plus.account_move_cron_ir_actions_server
+msgid "HU+ Account Move"
+msgstr "HU+ Könyvelési tétel"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_tax__l10n_hu_plus_category
@@ -1826,6 +1851,9 @@ msgstr "HU+ Proforma küldés"
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_plus_status
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_plus_status
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "HU+ Status"
@@ -2015,8 +2043,6 @@ msgstr "Info szöveg"
 #. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__info
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__info
 msgid "Information"
 msgstr "Információ"
 
@@ -2067,28 +2093,6 @@ msgid "Invoice pdf detached"
 msgstr "Számlakép pdf leválasztva"
 
 #. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-msgid "Invoice submission failed."
-msgstr "Számlabeküldés sikertelen."
-
-#. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-msgid ""
-"Invoice submission timed out. Please wait at least 6 minutes, then update "
-"the status."
-msgstr ""
-"Számlabeküldés időtúllépés. Kérjük, várjon legalább 6 percet, aztán "
-"frissítse az állapotot."
-
-#. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-msgid "Invoice submitted, waiting for response."
-msgstr "Számla beküldve, válaszra vár."
-
-#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
 msgid "Invoices"
 msgstr "Számlák"
@@ -2121,6 +2125,23 @@ msgstr "Könyvelési tétel"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Journal Type"
 msgstr "Napló típus"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/res_company.py:0
+msgid "Journal configuration skipped"
+msgstr "Napló konfiguráció kihagyva"
+
+#. module: l10n_hu_plus
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_account_journal_menu
+msgid "Journals"
+msgstr "Könyvelési naplók"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/res_company.py:0
+msgid "Journals configured"
+msgstr "Naplók beállítva"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__key
@@ -2271,6 +2292,11 @@ msgid "Manager"
 msgstr "Menedzser"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_journal__l10n_hu_edi_sending__manual
+msgid "Manual"
+msgstr "Kézi"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_has_error
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_tag__message_has_error
 msgid "Message Delivery error"
@@ -2323,12 +2349,8 @@ msgstr "Név"
 #. module: l10n_hu_plus
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_name
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_name
-msgid ""
-"Name of the proforma, automatically generated when sending, also editable "
-"manually"
-msgstr ""
-"Proforma (díjbekérő) neve, automatikusan létrehozásra kerül, kézzel is "
-"módosítható"
+msgid "Name of the proforma document"
+msgstr "Proforma (díjbekérő) dokumentum neve"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_form
@@ -2422,6 +2444,11 @@ msgid "Number of errors"
 msgstr "Hibák száma"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_cron_batch
+msgid "Number of items managed by scheduled action"
+msgstr "Ütemezett akció által kezelt tételek száma"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_object__message_needaction_counter
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_tag__message_needaction_counter
 msgid "Number of messages requiring action"
@@ -2512,6 +2539,12 @@ msgid "Original Invoice Number"
 msgstr "Eredeti számla sorszám"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Original invoice not found!"
+msgstr "Eredeti számla nem található!"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_trade_position__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_vat_status__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__other
@@ -2549,6 +2582,7 @@ msgstr "DÍJBEKÉRŐ"
 #. odoo-python
 #: code:addons/l10n_hu_plus/wizard/wizard.py:0
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__partner
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__action_type__partner
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Partner"
@@ -2689,7 +2723,6 @@ msgstr "Feldolgozás"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.product_product_action
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__action_type__product
 msgid "Product"
 msgstr "Termék"
 
@@ -2712,8 +2745,6 @@ msgid "Proforma"
 msgstr ""
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
 msgid "Proforma Date"
@@ -2751,8 +2782,8 @@ msgstr "Proforma sorszám"
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_sequence
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_sequence
-msgid "Proforma numbering sequence"
-msgstr "Proforma sorszám szekvencia"
+msgid "Proforma document naming sequence"
+msgstr "Proforma dokumentum név szekvencia"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
@@ -2841,6 +2872,12 @@ msgstr "Önszámlázás"
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__res_partner__l10n_hu_incorporation__self_employed
 msgid "Self Employed"
 msgstr "Egyéni vállalkozó"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
+msgid "Sending date of the proforma document"
+msgstr "Proforma (díjbekérő) kiküldésének dátuma"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list

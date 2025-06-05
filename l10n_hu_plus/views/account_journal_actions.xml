@@ -3,6 +3,7 @@
     <!-- Window action -->
     <record id="account_journal_action" model="ir.actions.act_window">
         <field name="name">Account Journal</field>
+        <field name="context">{'search_default_l10n_hu_plus_enabled_filter': True,}</field>
         <field name="res_model">account.journal</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">list,form</field>

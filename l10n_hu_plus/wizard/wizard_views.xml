@@ -24,9 +24,13 @@
                         <field name="account_move_action_editable" invisible="1"/>
                         <field name="account_move_action_visible" invisible="1"/>
                         <field name="account_move_action" force_save="1" invisible="action_type != 'account_move' or not account_move_action_visible" readonly="not account_move_action_editable" string="Action"/>
-                        <field name="account_move_plus_status" invisible="account_move_action != 'check_status'" string="HU+ Status"/>
                         <field name="accounting_journal" invisible="1" options="{'no_create': True}" string="Journal"/>
                         <field name="accounting_move_type" invisible="1"/>
+                        <!-- ACCOUNT MOVE - CHECK STATUS -->
+                        <field name="account_move_plus_status" invisible="account_move_action != 'check_status'" string="HU+ Status"/>
+                        <field name="accounting_hu_plus_tag" colspan="2" context="{'default_tag_type': 'account_move'}" domain="[]" invisible="account_move_action != 'check_status'" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
+                        <field name="accounting_hu_plus_notes" colspan="2" invisible="account_move_action != 'check_status'" placeholder="Notes..."/>
+                        <!-- ACCOUNT MOVE - DELIVERY PERIOD -->
                         <field name="accounting_delivery_date" force_save="1" invisible="account_move_action != 'update_fields'" readonly="accounting_delivery_period_enabled and accounting_move_type in ['out_invoice', 'out_refund']" string="Delivery Date"/>
                         <label for="accounting_delivery_period_enabled" invisible="account_move_action != 'update_fields'" string="Delivery Period"/>
                         <div name="accounting_delivery_period_enabled" invisible="account_move_action != 'update_fields'">
@@ -44,6 +48,7 @@
                         <!-- CONFIGURATION -->
                         <field name="configuration_audit_trail" invisible="action_type != 'configuration'" string="Audit Trail"/>
                         <field name="configuration_document_types" invisible="action_type != 'configuration'" string="Document Types"/>
+                        <field name="configuration_enabled_journals" invisible="action_type != 'configuration'" options="{'no_create': True}" string="Enabled Journals" widget="many2many_tags"/>
                         <!-- CURRENCY EXCHANGE -->
                         <field name="exchange_action_editable" invisible="1"/>
                         <field name="exchange_visible" invisible="1"/>
