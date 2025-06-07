@@ -373,6 +373,33 @@ class L10nHuPlusAccountMove(models.Model):
         plus_status = self.l10n_hu_get_plus_status()
         return self.write({'l10n_hu_plus_status': plus_status})
 
+    def action_l10n_hu_view_analytic_lines(self):
+        """ View account move related analytic line """
+        self.ensure_one()
+        analytic_line_ids = self.env['account.analytic.line'].search([('move_line_id', 'in', self.line_ids.ids)]).ids
+        form_view = self.env.ref('analytic.view_account_analytic_line_form')
+        list_view = self.env.ref('analytic.view_account_analytic_line_tree')
+        if analytic_line_ids and len(analytic_line_ids) == 1:
+            return {
+                'name': _("Analytic Line"),
+                'res_id': analytic_line_ids[0],
+                'res_model': 'account.analytic.line',
+                'target': 'current',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form,list',
+                'views': [(form_view.id, 'form'), (list_view.id, 'list')],
+            }
+        else:
+            return {
+                'name': _("Analytic Lines"),
+                'domain': [('id', 'in', analytic_line_ids)],
+                'res_model': 'account.analytic.line',
+                'target': 'current',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'list,form',
+                'views': [(list_view.id, 'list'), (form_view.id, 'form')],
+            }
+
     def action_l10n_hu_view_original_invoice(self):
         """ View original invoice """
         self.ensure_one()
@@ -404,7 +431,7 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             raise exceptions.UserError(_("Original invoice not found!"))
 
-    def action_l10n_hu_view_currency_rate(self):
+    def action_l10n_hu_view_currency_rates(self):
         """ View currency rates """
         self.ensure_one()
         if self.currency_id and self.currency_id == self.company_id.currency_id:

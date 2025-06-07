@@ -64,10 +64,14 @@
                                 <li name="l10n_hu_wizard_currency_exchange" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
                                     <button name="action_l10n_hu_wizard_currency_exchange" class="dropdown-item" icon="fa-calculator" string="Currency Exchange" type="object"/>
                                 </li>
-                                <li name="l10n_hu_view_currency_rate" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
-                                    <button name="action_l10n_hu_view_currency_rate" class="dropdown-item" icon="fa-area-chart" string="Currency Rates" type="object"/>
+                                <li name="l10n_hu_view_currency_rates" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
+                                    <button name="action_l10n_hu_view_currency_rates" class="dropdown-item" icon="fa-area-chart" string="Currency Rates" type="object"/>
                                 </li>
                                 <li name="l10n_hu_currency_divider" class="dropdown-divider" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id"/>
+                                <li name="l10n_hu_view_analytic_lines" groups="analytic.group_analytic_accounting">
+                                    <button name="action_l10n_hu_view_analytic_lines" class="dropdown-item" icon="fa-list" string="Analytic Line" type="object"/>
+                                </li>
+                                <li name="l10n_hu_analytic_divider" class="dropdown-divider" groups="analytic.group_analytic_accounting"/>
                                 <li name="l10n_hu_plus_documentation">
                                     <button name="action_l10n_hu_plus_view_documentation" class="dropdown-item" icon="fa-info-circle" string="Documentation" type="object"/>
                                 </li>
@@ -109,7 +113,7 @@
                             <field name="l10n_hu_huf_rate" invisible="l10n_hu_company_currency_name == 'HUF'" string="HUF Rate"/>
                             <div name="l10n_hu_currency_actions" colspan="2" invisible="l10n_hu_banner_enabled or (l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF')">
                                 <button name="action_l10n_hu_wizard_currency_exchange" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-calculator" invisible="state != 'draft' and checked" string="Currency Exchange" type="object"/>
-                                <button name="action_l10n_hu_view_currency_rate" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
+                                <button name="action_l10n_hu_view_currency_rates" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
                             </div>
                             <!-- Proforma -->
                             <field name="l10n_hu_proforma_name" invisible="l10n_hu_journal_type not in ['purchase', 'sale'] or (l10n_hu_journal_type == 'sale' and not l10n_hu_proforma_sequence)" readonly="state != 'draft' and checked" string="Proforma Name"/>
@@ -123,6 +127,10 @@
                             <field name="l10n_hu_plus_notes" groups="l10n_hu_plus.user_group" invisible="l10n_hu_banner_enabled" string="Notes"/>
                             <!-- HU+ Status -->
                             <field name="l10n_hu_plus_status" invisible="l10n_hu_banner_enabled" readonly="state != 'draft' and checked" string="HU+ Status"/>
+                            <!-- Analytic -->
+                            <div name="l10n_hu_analytic_actions" colspan="2" groups="analytic.group_analytic_accounting" invisible="l10n_hu_banner_enabled">
+                                <button name="action_l10n_hu_view_analytic_lines" class="btn-secondary m-1" icon="fa-list" string="Analytic Line" type="object"/>
+                            </div>
                         </group>
                         <group name="l10n_hu_plus_2" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
                             <!-- VAT -->
