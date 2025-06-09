@@ -242,9 +242,9 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     accounting_vat_status = fields.Selection(
         selection=[
-            ('declared', "Declared"),
             ('to_declare', "To Declare"),
             ('postponed', "Postponed"),
+            ('declared', "Declared"),
             ('excluded', "Excluded"),
             ('out_of_scope', "Out of Scope"),
             ('legacy', "Legacy"),

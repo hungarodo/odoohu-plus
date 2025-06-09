@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-07 09:32+0000\n"
-"PO-Revision-Date: 2025-06-07 09:32+0000\n"
+"POT-Creation-Date: 2025-06-09 07:28+0000\n"
+"PO-Revision-Date: 2025-06-09 07:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -310,9 +310,17 @@ msgid "Account Move HU+ Status"
 msgstr "Könyvelési tétel HU+ állapot"
 
 #. module: l10n_hu_plus
-#: model:ir.actions.act_window,name:l10n_hu_plus.account_move_line_vat_action
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Account Move Line"
+msgstr "Könyvelési tételsor"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+#: model:ir.actions.act_window,name:l10n_hu_plus.account_move_line_action
+#: model:ir.ui.menu,name:l10n_hu_plus.reporting_accounting_account_move_line_menu
 msgid "Account Move Lines"
-msgstr "Könyvelési tétel sorok"
+msgstr "Könyvelési tételsorok"
 
 #. module: l10n_hu_plus
 #: model:ir.model,name:l10n_hu_plus.model_account_move_reversal
@@ -1543,6 +1551,18 @@ msgid "HU Document Type"
 msgstr "Dokumentum típus"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_document_type_code
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_document_type_code
+msgid "HU Document Type Code"
+msgstr "Dokumentum típus kód"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_document_type_technical_name
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_document_type_technical_name
+msgid "HU Document Type Technical Name"
+msgstr "Dokumentum típus technikai név"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_edi_sending
 msgid "HU EDI Sending"
 msgstr "HU EDI küldés"
@@ -2360,12 +2380,6 @@ msgid "Name"
 msgstr "Név"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_name
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_name
-msgid "Name of the proforma document"
-msgstr "Proforma (díjbekérő) dokumentum neve"
-
-#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_form
 msgid "Name..."
@@ -2796,7 +2810,7 @@ msgstr "Proforma sorszám"
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_sequence
 msgid "Proforma document naming sequence"
-msgstr "Proforma dokumentum név szekvencia"
+msgstr "Proforma sorszám szekvencia"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
@@ -2885,12 +2899,6 @@ msgstr "Önszámlázás"
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__res_partner__l10n_hu_incorporation__self_employed
 msgid "Self Employed"
 msgstr "Egyéni vállalkozó"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
-#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
-msgid "Sending date of the proforma document"
-msgstr "Proforma (díjbekérő) kiküldésének dátuma"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
@@ -3150,9 +3158,21 @@ msgstr ""
 "főkönyvi számlákat."
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_name
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_name
+msgid "The name of the proforma document"
+msgstr "A proforma (díjbekérő) dokumentum neve"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_wizard__company_currency_rate_inverse_amount
 msgid "The rate of the currency to the currency of rate 1 "
 msgstr "1 egységnyi pénznemre átváltás árfolyama (inverz). "
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_proforma_date
+#: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_date
+msgid "The sending date of the proforma document"
+msgstr "A proforma (díjbekérő) dokumentum küldésének dátuma"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -3276,11 +3296,6 @@ msgstr "Felhasználó"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.log_view_search
 msgid "User ID"
 msgstr "Felhasználó ID"
-
-#. module: l10n_hu_plus
-#: model:ir.ui.menu,name:l10n_hu_plus.reporting_accounting_account_move_line_menu
-msgid "VAT Account Move Lines"
-msgstr "ÁFA könyvelési tételsorok"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.account_move_line_view_list

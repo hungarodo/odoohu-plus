@@ -95,6 +95,14 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Document Type",
         tracking=True,
     )
+    l10n_hu_document_type_code = fields.Char(
+        related='l10n_hu_document_type.code',
+        string="HU Document Type Code",
+    )
+    l10n_hu_document_type_technical_name = fields.Char(
+        related='l10n_hu_document_type.technical_name',
+        string="HU Document Type Technical Name",
+    )
     ## HU+
     l10n_hu_plus_notes = fields.Char(
         copy=False,
@@ -171,13 +179,13 @@ class L10nHuPlusAccountMove(models.Model):
     ## PROFORMA
     l10n_hu_proforma_date = fields.Date(
         copy=False,
-        help="Sending date of the proforma document",
+        help="The sending date of the proforma document",
         string="HU Proforma Date",
         tracking=True,
     )
     l10n_hu_proforma_name = fields.Char(
         copy=False,
-        help="Name of the proforma document",
+        help="The name of the proforma document",
         string="HU Proforma Name",
         tracking=True,
     )
@@ -196,9 +204,9 @@ class L10nHuPlusAccountMove(models.Model):
         copy=False,
         index=True,
         selection=[
-            ('declared', "Declared"),
             ('to_declare', "To Declare"),
             ('postponed', "Postponed"),
+            ('declared', "Declared"),
             ('excluded', "Excluded"),
             ('out_of_scope', "Out of Scope"),
             ('legacy', "Legacy"),
@@ -372,6 +380,23 @@ class L10nHuPlusAccountMove(models.Model):
         self.ensure_one()
         plus_status = self.l10n_hu_get_plus_status()
         return self.write({'l10n_hu_plus_status': plus_status})
+
+    def action_l10n_hu_view_account_move_lines(self):
+        """ View account move lines """
+        self.ensure_one()
+        form_id = self.env.ref('account.view_move_line_form').id
+        kanban_id = self.env.ref('account.account_move_line_view_kanban').id
+        list_id = self.env.ref('account.view_move_line_tree').id
+        pivot_id = self.env.ref('account.view_move_line_pivot').id
+        return {
+            'name': _("Account Move Lines"),
+            'domain': [('id', 'in', self.line_ids.ids), ('display_type', 'not in', ['line_section', 'line_note'])],
+            'res_model': 'account.move.line',
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'list,pivot,kanban,form',
+            'views': [(list_id, 'list'), (pivot_id, 'pivot'), (kanban_id, 'kanban'), (form_id, 'form')],
+        }
 
     def action_l10n_hu_view_analytic_lines(self):
         """ View account move related analytic line """
@@ -569,12 +594,8 @@ class L10nHuPlusAccountMove(models.Model):
         # Customer tax number
         ## NOTES: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
         customer = result.get('customer', None)
-        if customer \
-                and customer.is_company \
-                and customer.vat \
-                and customer.country_code != 'HU' \
-                and self.fiscal_position_id \
-                and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
+        if customer and customer.is_company and customer.vat and customer.country_code != 'HU' \
+                and self.fiscal_position_id and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
             result.update({
                 'customer_vat_data': {
                     'tax_number': customer.l10n_hu_group_vat or customer.vat,

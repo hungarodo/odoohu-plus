@@ -67,10 +67,10 @@
         <field name="parent_id" ref="reporting_accounting_menu"/>
         <field name="sequence">16</field>
     </record>
-    <!-- HU+ > Reporting > Accounting > VAT -->
+    <!-- HU+ > Reporting > Accounting > Account Move Lines -->
     <record id="reporting_accounting_account_move_line_menu" model="ir.ui.menu">
-        <field name="name">VAT Account Move Lines</field>
-        <field name="action" ref="account_move_line_vat_action"/>
+        <field name="name">Account Move Lines</field>
+        <field name="action" ref="account_move_line_action"/>
         <field name="parent_id" ref="reporting_accounting_menu"/>
         <field name="sequence">32</field>
     </record>
