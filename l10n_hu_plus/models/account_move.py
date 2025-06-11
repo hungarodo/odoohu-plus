@@ -1065,6 +1065,26 @@ class L10nHuPlusAccountMove(models.Model):
             last_huf_rate = None
             debug_list.append("last_huf_rate else scenario, probably date not set")
 
+        # Check storno by amount residual
+        ## NOTES: https://github.com/odoo/odoo/commit/5214296e8be76663ffdb6647c91645c66501121d
+        base_invoice = self._l10n_hu_get_chain_base()
+        if self.move_type == 'out_refund' and self != base_invoice and base_invoice.amount_residual == 0:
+            is_storno = True
+        else:
+            is_storno = False
+
+        # Special document types
+        modification_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_modification'),
+        ], limit=1)
+        storno_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_storno'),
+        ], limit=1)
+
         # Process field values
         if len(error_list) == 0:
             # date
@@ -1136,10 +1156,17 @@ class L10nHuPlusAccountMove(models.Model):
             # l10n_hu_document_type
             if values.get('l10n_hu_document_type'):
                 field_values.update({'l10n_hu_document_type': values['l10n_hu_document_type'].id})
-            elif not self.l10n_hu_document_type:
+            elif not self.l10n_hu_document_type and self.move_type == 'out_invoice':
                 l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
                 if l10n_hu_document_type:
                     field_values.update({'l10n_hu_document_type': l10n_hu_document_type.id})
+                else:
+                    pass
+            elif not self.l10n_hu_document_type and self.move_type == 'out_refund':
+                if is_storno and storno_document_type:
+                    field_values.update({'l10n_hu_document_type': storno_document_type.id})
+                elif modification_document_type:
+                    field_values.update({'l10n_hu_document_type': modification_document_type.id})
                 else:
                     pass
             else:
@@ -1626,14 +1653,8 @@ class L10nHuPlusAccountMove(models.Model):
         if self.move_type == 'out_invoice' and self.state == 'posted':
             points += 1
 
-        # 4) Account move: amount residual
-        ## NOTES: https://github.com/odoo/odoo/commit/5214296e8be76663ffdb6647c91645c66501121d
-        base_invoice = self._l10n_hu_get_chain_base()
-        if self != base_invoice and base_invoice.amount_residual == 0:
-            points += 1
-
         # Return result
-        if points == 4:
+        if points == 3:
             return True
         else:
             return False

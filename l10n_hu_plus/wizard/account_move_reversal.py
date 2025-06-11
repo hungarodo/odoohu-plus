@@ -19,6 +19,7 @@ class L10nHuPlusAccountMoveReversal(models.TransientModel):
     # Field declarations
     l10n_hu_storno_enabled = fields.Boolean(
         default=False,
+        help="Storno document type for refund without new invoice",
         string="HU Storno Enabled",
     )
     l10n_hu_storno_visible = fields.Boolean(
@@ -56,6 +57,11 @@ class L10nHuPlusAccountMoveReversal(models.TransientModel):
     ## SUPER
     def reverse_moves(self, is_modify=False):
         action = super().reverse_moves(is_modify=is_modify)
+        modification_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_modification'),
+        ], limit=1)
         storno_document_type = self.env['l10n.hu.plus.tag'].search([
             ('company', '=', self.company_id.id),
             ('tag_type', '=', 'document_type'),
@@ -77,6 +83,13 @@ class L10nHuPlusAccountMoveReversal(models.TransientModel):
                     new_move.action_post()
                 except:
                     pass
+        elif not self.l10n_hu_storno_enabled and modification_document_type:
+            new_modification_moves = self.env['account.move'].search([
+                ('move_type', '=', 'out_refund'),
+                ('reversed_entry_id', 'in', self.move_ids.ids),
+            ])
+            for new_move in new_modification_moves:
+                new_move.write({'l10n_hu_document_type': modification_document_type.id})
         else:
             pass
         return action
