@@ -196,7 +196,7 @@
                 <field name="l10n_hu_vat_date" optional="hide" string="VAT Date"/>
                 <field name="l10n_hu_vat_status" optional="hide" string="VAT Status"/>
             </field>
-            <!-- Tag and notes -->
+            <!-- HU+ workflow -->
             <xpath expr="//field[@name='checked']" position="before">
                 <field name="l10n_hu_plus_tag" optional="hide" options="{'color_field': 'color'}" string="HU+ Tag" widget="many2many_tags"/>
                 <field name="l10n_hu_plus_notes" optional="hide" string="HU+ Notes"/>
@@ -233,17 +233,17 @@
                 <field name="l10n_hu_vat_status" decoration-info="l10n_hu_vat_status == 'to_declare'" decoration-muted="l10n_hu_vat_status in ('excluded', 'legacy', 'out_of_scope')" decoration-success="l10n_hu_vat_status == 'declared'" decoration-warning="l10n_hu_vat_status == 'postponed'" optional="show" string="VAT Status"/>
                 <!-- Amounts -->
                 <field name="currency_id" optional="hide" readonly="state in ['cancel', 'posted']" string="Currency"/>
-                <field name="amount_untaxed" optional="show" string="Net" sum="Total"/>
-                <field name="amount_tax" optional="show" string="Tax" sum="Total"/>
+                <field name="amount_untaxed" optional="show" string="Net" sum="Net Total"/>
+                <field name="amount_tax" optional="show" string="Tax" sum="Tax Total"/>
                 <field name="amount_total" decoration-bf="1" optional="show" string="Total" sum="Total"/>
-                <field name="amount_total_in_currency_signed" decoration-bf="1" decoration-warning="abnormal_amount_warning" groups="base.group_multi_currency" optional="hide" string="Total" sum="Signed Total"/>
-                <field name="amount_untaxed_signed" optional="hide" string="Accounting Net" sum="Total"/>
-                <field name="amount_tax_signed" optional="show" string="Accounting Tax" sum="Total"/>
-                <field name="amount_total_signed" optional="hide" string="Accounting Total" sum="Total"/>
+                <field name="amount_total_in_currency_signed" decoration-bf="1" decoration-warning="abnormal_amount_warning" groups="base.group_multi_currency" optional="hide" string="Signed Total" sum="Signed Total"/>
+                <field name="amount_untaxed_signed" optional="hide" string="Accounting Net" sum="Accounting Net Total"/>
+                <field name="amount_tax_signed" optional="show" string="Accounting Tax" sum="Accounting Tax Total"/>
+                <field name="amount_total_signed" optional="hide" string="Accounting Total" sum="Accounting Total"/>
                 <!-- Payment -->
                 <field name="status_in_payment" decoration-info="state == 'draft'" decoration-danger="payment_state == 'not_paid' and invoice_date_due &lt; context_today().strftime('%Y-%m-%d')" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" invisible="payment_state == 'invoicing_legacy' or move_type == 'entry'" optional="show" string="Payment Status" widget="badge"/>
                 <field name="invoice_date_due" invisible="payment_state in ('paid', 'in_payment', 'reversed') or state == 'cancel'" optional="hide" widget="remaining_days" />
-                <field name="amount_residual_signed" optional="hide" string="Amount Due" sum="Amount Due" />
+                <field name="amount_residual_signed" optional="hide" string="Amount Due" sum="Amount Due Total"/>
                 <!-- Workflow -->
                 <field name="checked" optional="show" widget="boolean_toggle"/>
                 <field name="state" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-success="state == 'posted'" optional="hide" string="Accounting Status"  widget="badge"/>

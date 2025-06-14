@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-11 23:18+0000\n"
-"PO-Revision-Date: 2025-06-11 23:18+0000\n"
+"POT-Creation-Date: 2025-06-14 14:24+0000\n"
+"PO-Revision-Date: 2025-06-14 14:24+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -434,6 +434,11 @@ msgid "Accounting Net"
 msgstr "Könyvelés nettó"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
+msgid "Accounting Net Total"
+msgstr "Könyvelés nettó összesen"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_origin
 msgid "Accounting Origin"
 msgstr "Könyvelési eredet"
@@ -452,6 +457,11 @@ msgstr "Könyvelési állapot"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
 msgid "Accounting Tax"
 msgstr "Könyvelés adó"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
+msgid "Accounting Tax Total"
+msgstr "Könyvelés adó összesen"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
@@ -580,6 +590,11 @@ msgstr "HU+ funkciók engedélyezése a naplón"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
 msgid "Amount Due"
 msgstr "Esedékes összeg"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
+msgid "Amount Due Total"
+msgstr ""
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
@@ -2391,6 +2406,11 @@ msgid "Net"
 msgstr "Nettó"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
+msgid "Net Total"
+msgstr "Nettó összesen"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__status__new
 msgid "New"
 msgstr "Új"
@@ -2810,7 +2830,7 @@ msgstr "Proforma sorszám"
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence
 #: model:ir.model.fields,help:l10n_hu_plus.field_account_move__l10n_hu_proforma_sequence
 msgid "Proforma document naming sequence"
-msgstr "Proforma sorszám szekvencia"
+msgstr "Proforma dokumentum név szekvencia"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
@@ -3055,6 +3075,11 @@ msgstr "Adórendszer"
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_tax_repartition_line_menu
 msgid "Tax Repartition Lines"
 msgstr "Adó újraosztási sorok"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
+msgid "Tax Total"
+msgstr "Adó összesen"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_incorporation__taxable_person
