@@ -157,17 +157,6 @@ class L10nHuPlusWizard(models.TransientModel):
         readonly=True,
         string="Account Move HU+ Overview",
     )
-    account_move_plus_status = fields.Selection(
-        copy=False,
-        selection=[
-            ('ok', "Ok"),
-            ('closed', "Closed"),
-            ('warning', "Warning"),
-            ('error', "Error"),
-            ('other', "Other"),
-        ],
-        string="Account Move HU+ Status",
-    )
     account_move_visible = fields.Boolean(
         default=False,
         string="Account Move Visible",
@@ -217,6 +206,17 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     accounting_hu_plus_notes = fields.Char(
         string="HU+ Notes",
+    )
+    accounting_hu_plus_status = fields.Selection(
+        copy=False,
+        selection=[
+            ('ok', "Ok"),
+            ('closed', "Closed"),
+            ('warning', "Warning"),
+            ('error', "Error"),
+            ('other', "Other"),
+        ],
+        string="HU+ Status",
     )
     accounting_hu_plus_tag = fields.Many2many(
         comodel_name='l10n.hu.plus.tag',
@@ -501,6 +501,10 @@ class L10nHuPlusWizard(models.TransientModel):
             if account_move.l10n_hu_plus_notes:
                 self.accounting_hu_plus_notes = account_move.l10n_hu_plus_notes
 
+            # HU+ status
+            if account_move.l10n_hu_plus_status:
+                self.accounting_hu_plus_status = account_move.l10n_hu_plus_status
+
             # HU+ tag
             if account_move.l10n_hu_plus_tag:
                 self.accounting_hu_plus_tag = account_move.l10n_hu_plus_tag
@@ -776,7 +780,7 @@ class L10nHuPlusWizard(models.TransientModel):
                 for account_move in self.account_move:
                     account_move.write({
                         'l10n_hu_plus_notes': self.accounting_hu_plus_notes,
-                        'l10n_hu_plus_status': self.account_move_plus_status,
+                        'l10n_hu_plus_status': self.accounting_hu_plus_status,
                         'l10n_hu_plus_tag': [(6, None, self.accounting_hu_plus_tag.ids)]
                     })
                     account_move_ids.append(account_move.id)
@@ -814,6 +818,7 @@ class L10nHuPlusWizard(models.TransientModel):
                         write_values = values_result['field_values']
                         write_values.update({
                             'l10n_hu_plus_notes': self.accounting_hu_plus_notes,
+                            'l10n_hu_plus_status': self.accounting_hu_plus_status,
                             'l10n_hu_plus_tag': [(6, None, self.accounting_hu_plus_tag.ids)]
                         })
                         account_move.write(write_values)

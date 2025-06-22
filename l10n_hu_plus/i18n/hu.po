@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-14 14:24+0000\n"
-"PO-Revision-Date: 2025-06-14 14:24+0000\n"
+"POT-Creation-Date: 2025-06-21 10:10+0000\n"
+"PO-Revision-Date: 2025-06-21 10:10+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -303,11 +303,6 @@ msgstr "Könyvelési tételek száma"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move_plus_overview
 msgid "Account Move HU+ Overview"
 msgstr "Könyvelés tétel HU+ áttekintés"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__account_move_plus_status
-msgid "Account Move HU+ Status"
-msgstr "Könyvelési tétel HU+ állapot"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
@@ -789,7 +784,7 @@ msgstr "Bezárás"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__closed
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__closed
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__accounting_hu_plus_status__closed
 msgid "Closed"
 msgstr "Lezárt"
 
@@ -1317,7 +1312,7 @@ msgstr "Záró dátum..."
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__error
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__status__error
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__error
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__accounting_hu_plus_status__error
 msgid "Error"
 msgstr "Hiba"
 
@@ -1899,6 +1894,7 @@ msgstr "HU+ Proforma küldés"
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_plus_status
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_plus_status
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_hu_plus_status
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
@@ -2548,7 +2544,7 @@ msgstr "Objektumok"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__ok
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__ok
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__accounting_hu_plus_status__ok
 msgid "Ok"
 msgstr ""
 
@@ -2595,7 +2591,7 @@ msgstr "Eredeti számla nem található!"
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_trade_position__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_vat_status__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__other
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__other
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__accounting_hu_plus_status__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__res_partner__l10n_hu_trade_position__other
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__res_partner__l10n_hu_vat_status__other
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_invoice_filter_inherit
@@ -2997,6 +2993,11 @@ msgstr ""
 "Lejárt: a határidő már elmúlt\n"
 "Ma: határidő a mai nap\n"
 "Tervezett: jövőbeli tevékenységek."
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
+msgid "Status..."
+msgstr "Állapot..."
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_move_reversal_inherit
@@ -3437,7 +3438,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_move__l10n_hu_plus_status__warning
-#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__account_move_plus_status__warning
+#: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_wizard__accounting_hu_plus_status__warning
 msgid "Warning"
 msgstr "Figyelmeztetés"
 

@@ -27,9 +27,16 @@
                         <field name="accounting_journal" invisible="1" options="{'no_create': True}" string="Journal"/>
                         <field name="accounting_move_type" invisible="1"/>
                         <!-- ACCOUNT MOVE - CHECK STATUS -->
-                        <field name="account_move_plus_status" invisible="account_move_action != 'check_status'" string="HU+ Status"/>
-                        <field name="accounting_hu_plus_tag" colspan="2" context="{'default_tag_type': 'account_move'}" domain="[]" invisible="account_move_action != 'check_status'" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
-                        <field name="accounting_hu_plus_notes" colspan="2" invisible="account_move_action != 'check_status'" placeholder="Notes..."/>
+                        <label name="account_move_check_status"
+                               for="accounting_hu_plus_status"
+                               invisible="account_move_action != 'check_status'"
+                               string="HU+ Status"
+                        />
+                        <div name="account_move_check_status" invisible="account_move_action != 'check_status'">
+                            <field name="accounting_hu_plus_status" placeholder="Status..."/>
+                            <field name="accounting_hu_plus_tag" colspan="2" context="{'default_tag_type': 'account_move'}" domain="[]" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
+                            <field name="accounting_hu_plus_notes" colspan="2" placeholder="Notes..."/>
+                        </div>
                         <!-- ACCOUNT MOVE - DELIVERY PERIOD -->
                         <field name="accounting_delivery_date" force_save="1" invisible="account_move_action != 'update_fields'" readonly="accounting_delivery_period_enabled and accounting_move_type in ['out_invoice', 'out_refund']" string="Delivery Date"/>
                         <label for="accounting_delivery_period_enabled" invisible="account_move_action != 'update_fields'" string="Delivery Period"/>
@@ -180,9 +187,17 @@
                         <field name="accounting_date" invisible="account_move_action != 'update_fields'"/>
                     </group>
                 </group>
-                <group name="accounting_hu_plus" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'update_fields'">
-                    <field name="accounting_hu_plus_tag" colspan="2" context="{'default_tag_type': 'account_move'}" domain="[]" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
-                    <field name="accounting_hu_plus_notes" colspan="2" placeholder="Notes..."/>
+                <group name="accounting_hu_plus" class="border-top" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'update_fields'">
+                    <label name="accounting_hu_plus_workflow"
+                           class="mt-2"
+                           for="accounting_hu_plus_status"
+                           string="HU+"
+                    />
+                    <div name="accounting_hu_plus_workflow" class="mt-2">
+                        <field name="accounting_hu_plus_status" class="oe_inline" placeholder="Status..."/>
+                        <field name="accounting_hu_plus_tag" class="oe_inline ms-2" context="{'default_tag_type': 'account_move'}" domain="[]" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
+                        <field name="accounting_hu_plus_notes" placeholder="Notes..."/>
+                    </div>
                 </group>
                 <group name="account_move_plus_overview" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'check_status'">
                     <field name="account_move_plus_overview" colspan="2" nolabel="1"/>
@@ -216,8 +231,8 @@
                 <!-- FOOTER -->
                 <footer>
                     <field name="action_execute_visible" invisible="1"/>
-                    <button name="action_execute" class="btn-primary" default_focus="1" invisible="not action_execute_visible" string="Execute" type="object"/>
-                    <button special="cancel" class="btn-default" string="Close"/>
+                    <button name="action_execute" class="btn-primary" data-hotkey="s" default_focus="1" invisible="not action_execute_visible" string="Execute" type="object"/>
+                    <button special="cancel" class="btn-default" data-hotkey="x" string="Close"/>
                 </footer>
             </form>
         </field>
