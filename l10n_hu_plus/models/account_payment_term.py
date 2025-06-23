@@ -57,7 +57,7 @@ class L10nHuPlusPaymentTerm(models.Model):
     def l10n_hu_get_nav_methods(self):
         """ Get list of NAV methods
 
-        NOTE:
+        NOTES:
         - we call selection and assemble list
 
         :return: list

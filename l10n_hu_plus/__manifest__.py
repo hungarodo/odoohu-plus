@@ -63,6 +63,7 @@
     ],
     'demo': [],
     'depends': [  # Include only direct dependencies
+        'account_audit_trail',
         'l10n_hu_edi',
     ],
     'description': "Hungarian localization improvements",
@@ -74,6 +75,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "1.20.0",
-    'website': "https://hungarodo.hu/odoohu",
+    'version': "17.0.1.22.0",
+    'website': "https://mopsz.odoo.com",
 }

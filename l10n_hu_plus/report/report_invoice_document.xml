@@ -44,12 +44,6 @@
                 </div>
             </div>
         </xpath>
-        <!-- Bordered table -->
-        <xpath expr="//table[@name='invoice_line_table']"
-               position="attributes"
-        >
-            <attribute name="class">table table-sm o_main_table table-bordered</attribute>
-        </xpath>
         <!-- HU+ comments -->
         <xpath expr="//div[@name='comment']"
                position="before"

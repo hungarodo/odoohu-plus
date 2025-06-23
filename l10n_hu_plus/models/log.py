@@ -270,7 +270,7 @@ class L10nHuPlusLog(models.Model):
     def api_request_response(self, values):
         """ Make a request to API and process the response
 
-        NOTE:
+        NOTES:
         - simple python request implementation to manage API
 
         :param values: dictionary

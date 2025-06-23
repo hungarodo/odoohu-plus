@@ -299,7 +299,7 @@ class L10nHuBaseObject(models.Model):
     def api_object_request(self, values):
         """ Make a request to API and process the response
 
-        NOTE:
+        NOTES:
         - simple python request implementation to manage API
         - currency we only support GET
 
@@ -718,7 +718,7 @@ class L10nHuBaseObject(models.Model):
     def get_tags_by_technical_name(self):
         """ Get tags by technical name
 
-        NOTE:
+        NOTES:
         - helper method to get available tag ids and objects organized by technical name
 
         :return dictionary
