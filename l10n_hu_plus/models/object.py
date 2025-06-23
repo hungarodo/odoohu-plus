@@ -236,9 +236,7 @@ class L10nHuBaseObject(models.Model):
         self.ensure_one()
 
         # Get
-        if self.type_tag \
-                and self.type_tag.key_enabled \
-                and self.type_tag.key_method == 'uuid4':
+        if self.type_tag and self.type_tag.key_enabled and self.type_tag.key_method == 'uuid4':
             self.key = self.get_uuid4()
         else:
             return
@@ -267,7 +265,6 @@ class L10nHuBaseObject(models.Model):
         else:
             raise exceptions.UserError(_("API data is empty!"))
 
-
     def action_view_linked_record(self):
         # Ensure one
         self.ensure_one()
@@ -276,9 +273,7 @@ class L10nHuBaseObject(models.Model):
         if not self.linked_model_name or not self.linked_record_id:
             raise exceptions.UserError(_("Linked model name and record ID are both required!"))
 
-        model = self.env['ir.model'].search([
-            ('model', '=', self.linked_model_name)
-        ])
+        model = self.env['ir.model'].search([('model', '=', self.linked_model_name)])
 
         # Result
         result = {
@@ -292,6 +287,30 @@ class L10nHuBaseObject(models.Model):
 
         # Return result
         return result
+
+    def action_view_technical_data(self):
+        # Ensure one
+        self.ensure_one()
+
+        # Return
+        if self.technical_data:
+            data_display = json.dumps(self.api_data, default=str, indent=4)
+            context = {
+                'default_action_type': 'technical',
+                'default_techical_action': 'view_data',
+                'default_technical_data_display': data_display,
+            }
+            result = {
+                'name': _("HU+ Wizard"),
+                'context': context,
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
+            return result
+        else:
+            raise exceptions.UserError(_("Technical data is empty!"))
 
     # Business methods
     ## API

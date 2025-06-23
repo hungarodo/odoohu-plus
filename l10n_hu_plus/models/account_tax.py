@@ -31,11 +31,6 @@ class L10nHuAccountTax(models.Model):
         copy=False,
         string="HU+ Technical Name",
     )
-    l10n_hu_vat_declaration = fields.Boolean(
-        default=False,
-        help="Can be included in VAT declarations",
-        string="HU VAT Declaration",
-    )
 
     # Compute and search fields, in the same order of field declarations
 

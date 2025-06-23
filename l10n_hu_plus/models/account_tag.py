@@ -24,18 +24,6 @@ class L10nHuPlusAccountTag(models.Model):
         store=True,
         string="HU Country Code",
     )
-    l10n_hu_evat_description = fields.Text(
-        index=True,
-        string="HU eVAT Description",
-    )
-    l10n_hu_evat_readable_code = fields.Char(
-        index=True,
-        string="HU eVAT Readable Code",
-    )
-    l10n_hu_evat_standard_code = fields.Char(
-        index=True,
-        string="HU eVAT Standard Code",
-    )
     l10n_hu_plus_api_enabled = fields.Boolean(
         default=False,
         string="HU+ API Enabled",

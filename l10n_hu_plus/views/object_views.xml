@@ -9,42 +9,22 @@
         <field name="arch" type="xml">
             <form create="1" delete="1" edit="1">
                 <header>
-                    <button name="action_generate_key"
-                            class="btn btn-link"
-                            icon="fa-bolt"
-                            invisible="not type_key_enabled or not type_key_method or key"
-                            string="Generate key"
-                            type="object"
-                    />
-                    <button name="action_view_linked_record"
-                            class="btn btn-link"
-                            icon="fa-folder-open"
-                            invisible="not linked_model_name or not linked_record_id"
-                            string="View linked record"
-                            type="object"
-                    />
+                    <button name="action_generate_key" class="btn btn-link" icon="fa-bolt" invisible="not type_key_enabled or not type_key_method or key" string="Generate key" type="object"/>
+                    <button name="action_view_linked_record" class="btn btn-link" icon="fa-folder-open" invisible="not linked_model_name or not linked_record_id" string="View linked record" type="object"/>
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
+                        <button name="action_view_api_data" class="oe_stat_button" icon="fa-arrows-h" string="API" type="object"/>
+                        <button name="action_view_technical_data" class="oe_stat_button" icon="fa-code" string="Technical" type="object"/>
                     </div>
                     <widget name="web_ribbon" bg_color="bg-danger" invisible="active" title="Archived"/>
-                    <field name="image_1920"
-                           class="oe_avatar"
-                           options="{&quot;preview_image&quot;: &quot;image_128&quot;}"
-                           widget="image"
-                    />
+                    <field name="image_1920" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;image_128&quot;}" widget="image"/>
                     <div class="oe_title">
                         <h4 name="object_name">
                             <field name="name" placeholder="Name..." readonly="locked"/>
                         </h4>
                         <div>
-                            <field name="tag"
-                                   context="{'default_type': 'object'}"
-                                   options="{'color_field': 'color'}"
-                                   placeholder="Tags..."
-                                   readonly="locked"
-                                   widget="many2many_tags"
-                            />
+                            <field name="tag" context="{'default_type': 'object'}" options="{'color_field': 'color'}" placeholder="Tags..." readonly="locked" widget="many2many_tags"/>
                         </div>
                     </div>
                     <group name="base">
@@ -78,15 +58,6 @@
                                 <group name="api_1">
                                     <field name="api_enabled" readonly="locked" widget="boolean_toggle"/>
                                     <field name="api_timestamp"/>
-                                    <label name="view_api_data" for="action_view_api_data" string="API Data"/>
-                                    <div name="view_api_data">
-                                        <button name="action_view_api_data"
-                                                class="btn-link btn-sm"
-                                                icon="fa-code"
-                                                string="View"
-                                                type="object"
-                                        />
-                                    </div>
                                 </group>
                                 <group name="api_2">
                                     <field name="linked_model_name" readonly="locked"/>
@@ -130,9 +101,6 @@
                                 <group name="technical_2">
                                     <field name="technical_timestamp"/>
                                 </group>
-                                <group name="technical_data" colspan="2">
-                                    <field name="technical_data" readonly="locked" style="word-break: break-word;" type="object"/>
-                                </group>
                             </group>
                         </page>
                     </notebook>
@@ -147,63 +115,23 @@
         <field name="model">l10n.hu.plus.object</field>
         <field name="priority">16</field>
         <field name="arch" type="xml">
-            <kanban class="oe_background_grey o_kanban_dashboard o_emphasize_colors"
-                    create="0"
-                    group_create="false"
-            >
+            <kanban create="0" group_create="false">
                 <field name="color"/>
                 <field name="display_name"/>
                 <field name="id"/>
                 <field name="name"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div name="object_details"
-                             class="oe_kanban_global_click o_kanban_record_has_image_fill o_res_partner_kanban"
-                        >
-                            <div class="row">
-                                <strong class="o_kanban_record_title oe_partner_heading">
+                    <t t-name="card">
+                        <div class="flex-row">
+                            <div class="col-12">
+                                <strong>
                                     <field name="display_name"/>
                                 </strong>
                             </div>
-                            <div class="row" style="display:none;">
-                                <div class="col-6">
-                                    <t t-if="record">
-                                        <t t-set="background_image"
-                                           t-value="kanban_image('l10n.hu.object', 'image_128', record.raw_value)"
-                                        />
-                                        <div class="d-none d-md-block"
-                                        >
-                                            <img class="o_kanban_image_inner_pic"
-                                                 t-if="record and record.raw_value"
-                                                 t-att-alt="record.value"
-                                                 t-att-src="kanban_image('l10n.hu.object', 'image_128', record.raw_value)"
-                                            />
-                                        </div>
-                                        <div class="o_kanban_image d-md-none"
-                                        >
-                                            <img class="o_kanban_image_inner_pic"
-                                                 t-if="record and record.raw_value"
-                                                 t-att-alt="record.value"
-                                                 t-att-src="kanban_image('res.partner', 'avatar_128', record.raw_value)"/>
-                                        </div>
-                                    </t>
-                                    <t t-else="">
-                                        <div class="o_kanban_image_fill_left o_kanban_image_full"
-                                             t-attf-style="background-image: url(#{kanban_image('l10n.hu.object', 'image_128', record.raw_value)})"
-                                             role="img"
-                                        />
-                                    </t>
-                                </div>
-                                <div class="col-6">
-                                    <div class="col-12 p-0 m-0 d-grid gap-2">
-                                        <field name="code"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="oe_kanban_details d-flex flex-column">
-                                <strong class="o_kanban_record_title oe_partner_heading">
-                                    <field name="description"/>
-                                </strong>
+                        </div>
+                        <div class="flex-row">
+                            <div class="col-12">
+                                <field name="description"/>
                             </div>
                         </div>
                     </t>

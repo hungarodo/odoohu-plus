@@ -10,11 +10,7 @@
             <!-- Add fields -->
             <xpath expr="//field[@name='date']" position="after">
                 <field name="l10n_hu_storno_visible" invisible="1"/>
-                <field name="l10n_hu_storno_enabled"
-                       invisible="not l10n_hu_storno_visible"
-                       string="Storno"
-                       widget="boolean_toggle"
-                />
+                <field name="l10n_hu_storno_enabled" invisible="not l10n_hu_storno_visible" string="Storno" widget="boolean_toggle"/>
             </xpath>
         </field>
     </record>

@@ -32,9 +32,7 @@ class L10nHuPlusWizard(models.TransientModel):
         model_id = False
         if self._context.get('active_model'):
             model_name = self._context.get('active_model')
-            model = self.env['ir.model'].sudo().search([
-                ('model', '=', model_name)
-            ], limit=1)
+            model = self.env['ir.model'].sudo().search([('model', '=', model_name)], limit=1)
             if model:
                 model_id = model.id
         return model_id
@@ -65,10 +63,14 @@ class L10nHuPlusWizard(models.TransientModel):
             ('api', "API"),
             ('configuration', "Configuration"),
             ('currency_exchange', "Currency Exchange"),
-            ('product', "Product"),
+            ('partner', "Partner"),
             ('technical', "Technical"),
         ],
         string="Action Type",
+    )
+    action_type_editable = fields.Boolean(
+        default=False,
+        string="Action Type Editable",
     )
     action_type_visible = fields.Boolean(
         default=False,
@@ -102,6 +104,26 @@ class L10nHuPlusWizard(models.TransientModel):
         related='company.currency_id.name',
         string="Company Currency Code",
     )
+    error_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Error Text",
+    )
+    info_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Info Text",
+    )
+    success_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Success Text",
+    )
+    warning_text = fields.Text(
+        copy=False,
+        readonly=True,
+        string="Warning Text",
+    )
     ## ACCOUNT MOVE
     account_move = fields.Many2many(
         comodel_name='account.move',
@@ -134,17 +156,6 @@ class L10nHuPlusWizard(models.TransientModel):
         copy=False,
         readonly=True,
         string="Account Move HU+ Overview",
-    )
-    account_move_plus_status = fields.Selection(
-        copy=False,
-        selection=[
-            ('error', "Error"),
-            ('info', "Information"),
-            ('ok', "Ok"),
-            ('other', "Other"),
-            ('warning', "Warning"),
-        ],
-        string="Account Move HU+ Status",
     )
     account_move_visible = fields.Boolean(
         default=False,
@@ -196,6 +207,17 @@ class L10nHuPlusWizard(models.TransientModel):
     accounting_hu_plus_notes = fields.Char(
         string="HU+ Notes",
     )
+    accounting_hu_plus_status = fields.Selection(
+        copy=False,
+        selection=[
+            ('ok', "Ok"),
+            ('closed', "Closed"),
+            ('warning', "Warning"),
+            ('error', "Error"),
+            ('other', "Other"),
+        ],
+        string="HU+ Status",
+    )
     accounting_hu_plus_tag = fields.Many2many(
         comodel_name='l10n.hu.plus.tag',
         column1='wizard',
@@ -217,6 +239,17 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     accounting_vat_date = fields.Date(
         string="Accounting VAT Date",
+    )
+    accounting_vat_status = fields.Selection(
+        selection=[
+            ('to_declare', "To Declare"),
+            ('postponed', "Postponed"),
+            ('declared', "Declared"),
+            ('excluded', "Excluded"),
+            ('out_of_scope', "Out of Scope"),
+            ('legacy', "Legacy"),
+        ],
+        string="Accounting VAT Status",
     )
     ## API
     api_action = fields.Selection(
@@ -249,6 +282,22 @@ class L10nHuPlusWizard(models.TransientModel):
     )
     api_url = fields.Char(
         string="API URL",
+    )
+    ## CONFIGURATION
+    configuration_audit_trail = fields.Boolean(
+        default=True,
+        string="Configuration Audit Trail",
+    )
+    configuration_document_types = fields.Boolean(
+        default=True,
+        string="Configuration Document Types",
+    )
+    configuration_enabled_journals = fields.Many2many(
+        comodel_name='account.journal',
+        column1='wizard',
+        column2='journal',
+        relation='l10n_hu_plus_wizard_configuration_journal_rel',
+        string="Configuration Enabled Journals",
     )
     ## CURRENCY EXCHANGE
     company_currency_rate = fields.Many2one(
@@ -407,15 +456,14 @@ class L10nHuPlusWizard(models.TransientModel):
     @api.onchange('account_move')
     def onchange_account_move(self):
         # When only one record in account_move m2m and action is reasonable
-        if self.account_move \
-                and len(self.account_move) == 1 \
-                and self.action_type == 'account_move' \
+        if self.account_move and len(self.account_move) == 1 and self.action_type == 'account_move' \
                 and self.account_move_action in ['check_status', 'update_fields']:
             account_move = self.account_move[0]
             self.accounting_date = account_move.date
             self.accounting_move_type = account_move.move_type
             self.accounting_origin = account_move.invoice_origin
             self.accounting_vat_date = account_move.l10n_hu_vat_date
+            self.accounting_vat_status = account_move.l10n_hu_vat_status
 
             # cash accounting
             if account_move.move_type in ['in_invoice', 'in_refund']:
@@ -452,6 +500,10 @@ class L10nHuPlusWizard(models.TransientModel):
             # HU+ notes
             if account_move.l10n_hu_plus_notes:
                 self.accounting_hu_plus_notes = account_move.l10n_hu_plus_notes
+
+            # HU+ status
+            if account_move.l10n_hu_plus_status:
+                self.accounting_hu_plus_status = account_move.l10n_hu_plus_status
 
             # HU+ tag
             if account_move.l10n_hu_plus_tag:
@@ -502,11 +554,10 @@ class L10nHuPlusWizard(models.TransientModel):
                 if self.account_move[0].state != 'draft':
                     raise exceptions.UserError(_("Action only allowed for draft invoices!"))
 
-            # Manage result
+            # Manage
             manage_result = self.manage_account_move()
-
             if manage_result.get('account_move_ids') and len(manage_result['account_move_ids']) == 1:
-                result = {
+                return {
                     'name': _("Account Move"),
                     'res_id': manage_result['account_move_ids'][0],
                     'res_model': 'account.move',
@@ -514,9 +565,8 @@ class L10nHuPlusWizard(models.TransientModel):
                     'type': 'ir.actions.act_window',
                     'view_mode': 'form,list',
                 }
-                return result
             elif manage_result.get('account_move_ids'):
-                result = {
+                return {
                     'name': _("Account Moves"),
                     'domain': [('id', 'in', manage_result['account_move_ids'])],
                     'res_model': 'account.move',
@@ -524,7 +574,6 @@ class L10nHuPlusWizard(models.TransientModel):
                     'type': 'ir.actions.act_window',
                     'view_mode': 'list,form',
                 }
-                return result
             else:
                 raise exceptions.UserError("account move action error!")
         ## API
@@ -601,31 +650,43 @@ class L10nHuPlusWizard(models.TransientModel):
                 return result
             else:
                 raise exceptions.UserError("api action error!")
+        ## CONFIGURATION
+        elif self.action_type == 'configuration':
+            manage_result = self.manage_configuration()
+            return {
+                'name': _("HU+ Wizard"),
+                'context': {
+                    'default_action_execute_visible': False,
+                    'default_error_text': manage_result.get('error_text', None),
+                    'default_info_text': manage_result.get('info_text', None),
+                    'default_success_text': manage_result.get('success_text', None),
+                    'default_warning_text': manage_result.get('warning_text', None),
+                },
+                'res_model': 'l10n.hu.plus.wizard',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+            }
         ## CURRENCY EXCHANGE
         elif self.action_type == 'currency_exchange' and self.account_move:
             # Write
             for account_move in self.account_move:
                 account_move.write({'l10n_hu_document_rate': self.exchange_rate})
 
-            # Assemble result
-            result = {'type': 'ir.actions.act_window_close'}
-
-            # Return result
-            return result
+            # Return
+            return {'type': 'ir.actions.act_window_close'}
         ## PARTNER
         elif self.action_type == 'partner':
             ### list
-            if self.action_partner == 'list':
+            if self.partner_action == 'list':
                 # Check input
                 if not self.partner:
                     raise exceptions.UserError(_("No partner selected!"))
 
-                # Manage result
+                # Manage
                 manage_result = self.manage_partner()
-
-                # Wizard result
                 if manage_result.get('partner_ids'):
-                    result = {
+                    return {
                         'name': _("Partner"),
                         'domain': [('id', 'in', manage_result['partner_ids'])],
                         'res_model': 'res.partner',
@@ -633,7 +694,6 @@ class L10nHuPlusWizard(models.TransientModel):
                         'type': 'ir.actions.act_window',
                         'view_mode': 'list,form',
                     }
-                    return result
                 else:
                     raise exceptions.UserError("partner_delete error!")
             ### else
@@ -641,12 +701,10 @@ class L10nHuPlusWizard(models.TransientModel):
                 raise exceptions.UserError("invalid partner action!")
         ## TECHNICAL
         elif self.action_type == 'technical':
-            # Manage result
+            # Manage
             manage_result = self.manage_technical()
-
-            # Wizard result
             if manage_result.get('record_ids') and len(manage_result['record_ids']) == 1 and manage_result.get('model_name'):
-                result = {
+                return {
                     'name': _("HU+ Technical"),
                     'res_id': manage_result['record_ids'][0],
                     'res_model': manage_result['model_name'],
@@ -654,9 +712,8 @@ class L10nHuPlusWizard(models.TransientModel):
                     'type': 'ir.actions.act_window',
                     'view_mode': 'form,list',
                 }
-                return result
             elif manage_result.get('record_ids'):
-                result = {
+                return {
                     'name': _("HU+ Technical"),
                     'domain': [('id', 'in', manage_result['record_ids'])],
                     'res_model': manage_result['model_name'],
@@ -664,11 +721,9 @@ class L10nHuPlusWizard(models.TransientModel):
                     'type': 'ir.actions.act_window',
                     'view_mode': 'list,form',
                 }
-                return result
             else:
-                result = {'type': 'ir.actions.act_window_close'}
-                return result
-        ## else
+                return {'type': 'ir.actions.act_window_close'}
+        ## Else
         else:
             pass
 
@@ -687,19 +742,15 @@ class L10nHuPlusWizard(models.TransientModel):
         result = ""
 
         # Process scenarios
-        if self.action_type == 'partner' \
-                and self.partner:
+        if self.action_type == 'partner' and self.partner:
             # Partner count
             partner_count = len(self.partner)
             result += _("Selected") + ": " + str(partner_count)
-
             # Partner details
             no_company_partners = []
-
             for partner in self.partner:
                 if not partner.company_id:
                     no_company_partners.append(partner)
-
             # Summary
             result += "\n" + _("No Company") + ": " + str(len(no_company_partners))
         else:
@@ -727,7 +778,11 @@ class L10nHuPlusWizard(models.TransientModel):
         if self.action_type == 'account_move':
             if self.account_move_action == 'check_status':
                 for account_move in self.account_move:
-                    account_move.write({'l10n_hu_plus_status': self.account_move_plus_status})
+                    account_move.write({
+                        'l10n_hu_plus_notes': self.accounting_hu_plus_notes,
+                        'l10n_hu_plus_status': self.accounting_hu_plus_status,
+                        'l10n_hu_plus_tag': [(6, None, self.accounting_hu_plus_tag.ids)]
+                    })
                     account_move_ids.append(account_move.id)
             elif self.account_move_action == 'update_fields':
                 for account_move in self.account_move:
@@ -740,6 +795,7 @@ class L10nHuPlusWizard(models.TransientModel):
                         'invoice_origin': self.accounting_origin,
                         'l10n_hu_document_type': self.accounting_document_type,
                         'l10n_hu_vat_date': self.accounting_vat_date,
+                        'l10n_hu_vat_status': self.accounting_vat_status,
                     }
                     if self.accounting_cash_visible:
                         values_parameters.update({'l10n_hu_cash_accounting': self.accounting_cash_enabled})
@@ -762,6 +818,7 @@ class L10nHuPlusWizard(models.TransientModel):
                         write_values = values_result['field_values']
                         write_values.update({
                             'l10n_hu_plus_notes': self.accounting_hu_plus_notes,
+                            'l10n_hu_plus_status': self.accounting_hu_plus_status,
                             'l10n_hu_plus_tag': [(6, None, self.accounting_hu_plus_tag.ids)]
                         })
                         account_move.write(write_values)
@@ -776,10 +833,7 @@ class L10nHuPlusWizard(models.TransientModel):
             pass
 
         # Update result
-        result.update({
-            'account_move_ids': account_move_ids,
-            'error_list': error_list,
-        })
+        result.update({'account_move_ids': account_move_ids, 'error_list': error_list})
 
         # Return result
         # raise exceptions.UserError(str(result))
@@ -851,6 +905,71 @@ class L10nHuPlusWizard(models.TransientModel):
         return result
 
     @api.model
+    def manage_configuration(self):
+        """ Manage configuration actions
+
+        :return: dictionary
+        """
+        # Initialize variables
+        configuration_result = {}
+        debug_list = []
+        error_list = []
+        error_text = ""
+        info_list = []
+        info_text = ""
+        result = {}
+        success_list = []
+        success_text = ""
+        warning_list = []
+        warning_text = ""
+
+        # Process scenarios
+        if self.action_type == 'configuration':
+            debug_list.append("processing configuration action_type")
+            configuration_values = {
+                'audit_trail': self.configuration_audit_trail,
+                'document_types': self.configuration_document_types,
+                'enabled_journals': self.configuration_enabled_journals,
+            }
+            configuration_result = self.company.l10n_hu_plus_apply_configuration(configuration_values)
+            error_list += configuration_result.get('error_list', [])
+            if configuration_result.get('error_list'):
+                for error_item in configuration_result['error_list']:
+                    error_text += str(error_item) + "\n"
+            info_list += configuration_result.get('info_list', [])
+            if configuration_result.get('info_list'):
+                for info_item in configuration_result['info_list']:
+                    info_text += str(info_item) + "\n"
+            success_list += configuration_result.get('success_list', [])
+            if configuration_result.get('success_list'):
+                for success_item in configuration_result['success_list']:
+                    success_text += str(success_item) + "\n"
+            warning_list += configuration_result.get('warning_list', [])
+            if configuration_result.get('warning_list'):
+                for warning_item in configuration_result['warning_list']:
+                    warning_text += str(warning_item) + "\n"
+        else:
+            error_list.append("invalid action_type")
+
+        # Update result
+        result.update({
+            'configuration_result': configuration_result,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'error_text': error_text,
+            'info_list': info_list,
+            'info_text': info_text,
+            'success_list': success_list,
+            'success_text': success_text,
+            'warning_list': warning_list,
+            'warning_text': warning_text,
+        })
+
+        # Return result
+        # raise exceptions.UserError(str(result))
+        return result
+
+    @api.model
     def manage_partner(self):
         """ Manage partner actions
 
@@ -859,60 +978,23 @@ class L10nHuPlusWizard(models.TransientModel):
         :return: dictionary
         """
         # Initialize variables
-        messages = []
-        message_ids = []
-        message_results = []
         partners = []
         partner_ids = []
-        partner_ids_ignored = []
-        partner_ids_managed = []
         result = {}
 
         # Iterate partners
         for partner in self.partner:
             # Process scenarios
-            ## DELETE
-            if self.action_type == 'partner' \
-                    and self.action_partner == 'delete':
-                operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'delete'})
-            ## DOWNLOAD
-            elif self.action_type == 'partner' \
-                    and self.action_partner == 'download':
-                operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'download'})
-            ## UPLOAD
-            elif self.action_type == 'partner' \
-                    and self.action_partner == 'upload':
-                operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'upload'})
-            ## PULL DATA
-            elif self.action_type == 'partner' \
-                    and self.action_partner == 'pull':
-                operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'pull'})
-            ## PUSH DATA
-            elif self.action_type == 'partner' \
-                    and self.action_partner == 'push':
-                operation_result = partner.l10n_hu_plus_manage_partner({'operation': 'push'})
+            ## LIST
+            if self.action_type == 'partner' and self.partner_action == 'list':
+                partner_ids.append(partner.id)
             else:
-                operation_result = {}
-
-            # Append to lists
-            partners.append(partner)
-            partner_ids.append(partner.id)
-            message_results += operation_result.get('message_results', [])
-            messages += operation_result.get('message_results',[])
-            message_ids += operation_result.get('message_ids', [])
-            partner_ids += operation_result.get('partner_ids', [])
-            partner_ids_ignored += operation_result.get('partner_ids_ignored', [])
-            partner_ids_managed += operation_result.get('partner_ids_managed', [])
+                pass
 
         # Update result
         result.update({
-            'messages': messages,
-            'message_ids': message_ids,
-            'message_results': message_results,
             'partners': partners,
             'partner_ids': partner_ids,
-            'partner_ids_ignored': partner_ids_ignored,
-            'partner_ids_managed': partner_ids_managed,
         })
 
         # Return result

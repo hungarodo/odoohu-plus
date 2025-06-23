@@ -2,6 +2,7 @@
 # 1 : imports of python lib
 import base64
 import datetime
+import json
 
 # 2 : imports of odoo
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
@@ -21,6 +22,10 @@ class L10nHuPlusAccountMove(models.Model):
     # Default methods
     
     # Field declarations
+    ## ODOO
+    invoice_pdf_report_id = fields.Many2one(
+        tracking=True,
+    )
     ## CASH ACCOUNTING
     l10n_hu_cash_accounting = fields.Boolean(
         compute='_compute_l10n_hu_cash_accounting',
@@ -90,6 +95,14 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Document Type",
         tracking=True,
     )
+    l10n_hu_document_type_code = fields.Char(
+        related='l10n_hu_document_type.code',
+        string="HU Document Type Code",
+    )
+    l10n_hu_document_type_technical_name = fields.Char(
+        related='l10n_hu_document_type.technical_name',
+        string="HU Document Type Technical Name",
+    )
     ## HU+
     l10n_hu_plus_notes = fields.Char(
         copy=False,
@@ -99,11 +112,11 @@ class L10nHuPlusAccountMove(models.Model):
     l10n_hu_plus_status = fields.Selection(
         copy=False,
         selection=[
-            ('error', "Error"),
-            ('info', "Information"),
             ('ok', "Ok"),
-            ('other', "Other"),
+            ('closed', "Closed"),
             ('warning', "Warning"),
+            ('error', "Error"),
+            ('other', "Other"),
         ],
         string="HU+ Status",
     )
@@ -166,13 +179,13 @@ class L10nHuPlusAccountMove(models.Model):
     ## PROFORMA
     l10n_hu_proforma_date = fields.Date(
         copy=False,
-        help="Date when the proforma is sent out, automatically updated, also editable manually",
-        string="Proforma Date",
+        help="The sending date of the proforma document",
+        string="HU Proforma Date",
         tracking=True,
     )
     l10n_hu_proforma_name = fields.Char(
         copy=False,
-        help="Name of the proforma, automatically generated when sending, also editable manually",
+        help="The name of the proforma document",
         string="HU Proforma Name",
         tracking=True,
     )
@@ -185,6 +198,20 @@ class L10nHuPlusAccountMove(models.Model):
         copy=False,
         index=True,
         string="HU VAT Date",
+        tracking=True,
+    )
+    l10n_hu_vat_status = fields.Selection(
+        copy=False,
+        index=True,
+        selection=[
+            ('to_declare', "To Declare"),
+            ('postponed', "Postponed"),
+            ('declared', "Declared"),
+            ('excluded', "Excluded"),
+            ('out_of_scope', "Out of Scope"),
+            ('legacy', "Legacy"),
+        ],
+        string="HU VAT Status",
         tracking=True,
     )
 
@@ -224,8 +251,7 @@ class L10nHuPlusAccountMove(models.Model):
             period_legal = ""
             period_summary = ""
             if record.move_type in ['out_invoice', 'out_refund'] \
-                    and record.l10n_hu_delivery_period_start \
-                    and record.l10n_hu_delivery_period_end:
+                    and record.l10n_hu_delivery_period_start and record.l10n_hu_delivery_period_end:
                 # Get period info
                 delivery_period_result = record.l10n_hu_get_delivery_period_data({})
                 if delivery_period_result.get('period_legal'):
@@ -254,13 +280,10 @@ class L10nHuPlusAccountMove(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_plus_documentation(self):
-        """ HU+ documentation """
-        # Make sure there is one record in self
+    def action_l10n_hu_plus_view_documentation(self):
+        """ View HU+ documentation """
         self.ensure_one()
-
-        # Return
-        return self.company_id.action_l10n_hu_plus_documentation()
+        return self.company_id.action_l10n_hu_plus_view_documentation()
 
     def action_l10n_hu_send_proforma(self):
         """Open a window to compose an email using mail template loaded by default"""
@@ -334,16 +357,16 @@ class L10nHuPlusAccountMove(models.Model):
             'view_mode': 'form',
         }
 
+    def action_l10n_hu_send_edi(self):
+        """ Send invoice to HU EDI (NAV Online Szamla """
+        self.ensure_one()
+        return self.l10n_hu_do_send_edi()
+
     def action_l10n_hu_update_fields(self):
         """ Update HU+ relevant fields """
-        # Ensure one record in self
         self.ensure_one()
-
-        # Check
         if self.state != 'draft':
             raise exceptions.UserError(_("Action only allowed for draft invoices!"))
-
-        # Get values
         values_result = self.l10n_hu_get_field_values({})
         if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
             return self.write(values_result['field_values'])
@@ -352,12 +375,60 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             raise exceptions.UserError(str(values_result['error_list']))
 
+    def action_l10n_hu_update_plus_status(self):
+        """ Update HU+ status """
+        self.ensure_one()
+        plus_status = self.l10n_hu_get_plus_status()
+        return self.write({'l10n_hu_plus_status': plus_status})
+
+    def action_l10n_hu_view_account_move_lines(self):
+        """ View account move lines """
+        self.ensure_one()
+        form_id = self.env.ref('account.view_move_line_form').id
+        kanban_id = self.env.ref('account.account_move_line_view_kanban').id
+        list_id = self.env.ref('account.view_move_line_tree').id
+        pivot_id = self.env.ref('account.view_move_line_pivot').id
+        return {
+            'name': _("Account Move Lines"),
+            'domain': [('id', 'in', self.line_ids.ids), ('display_type', 'not in', ['line_section', 'line_note'])],
+            'res_model': 'account.move.line',
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'list,pivot,kanban,form',
+            'views': [(list_id, 'list'), (pivot_id, 'pivot'), (kanban_id, 'kanban'), (form_id, 'form')],
+        }
+
+    def action_l10n_hu_view_analytic_lines(self):
+        """ View account move related analytic line """
+        self.ensure_one()
+        analytic_line_ids = self.env['account.analytic.line'].search([('move_line_id', 'in', self.line_ids.ids)]).ids
+        form_view = self.env.ref('analytic.view_account_analytic_line_form')
+        list_view = self.env.ref('analytic.view_account_analytic_line_tree')
+        if analytic_line_ids and len(analytic_line_ids) == 1:
+            return {
+                'name': _("Analytic Line"),
+                'res_id': analytic_line_ids[0],
+                'res_model': 'account.analytic.line',
+                'target': 'current',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form,list',
+                'views': [(form_view.id, 'form'), (list_view.id, 'list')],
+            }
+        else:
+            return {
+                'name': _("Analytic Lines"),
+                'domain': [('id', 'in', analytic_line_ids)],
+                'res_model': 'account.analytic.line',
+                'target': 'current',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'list,form',
+                'views': [(list_view.id, 'list'), (form_view.id, 'form')],
+            }
+
     def action_l10n_hu_view_original_invoice(self):
         """ View original invoice """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Search
+        original_invoice = None
         if self.l10n_hu_original_invoice_number:
             if self.move_type in ['in_invoice', 'in_refund']:
                 original_invoice = self.env['account.move'].search([
@@ -372,11 +443,9 @@ class L10nHuPlusAccountMove(models.Model):
                     ('name', 'ilike', self.l10n_hu_original_invoice_number)
                 ], limit=1)
             else:
-                original_invoice = None
-
-        # Return
+                pass
         if original_invoice:
-            result = {
+            return {
                 'name': _("HU+ Wizard"),
                 'res_id': original_invoice.id,
                 'res_model': 'account.move',
@@ -384,103 +453,72 @@ class L10nHuPlusAccountMove(models.Model):
                 'type': 'ir.actions.act_window',
                 'view_mode': 'form,list',
             }
-            return result
         else:
-            return
+            raise exceptions.UserError(_("Original invoice not found!"))
 
-    def action_l10n_hu_view_currency_rate(self):
+    def action_l10n_hu_view_currency_rates(self):
         """ View currency rates """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Check
         if self.currency_id and self.currency_id == self.company_id.currency_id:
             raise exceptions.UserError(_("Invoice currency is same as company currency!"))
-
-        # currency_ids
         currency_ids = [self.currency_id.id]
         if self.company_id.currency_id.name != 'HUF':
             currency_ids.append(self.env.ref('base.HUF').id)
-
-        # Return
-        result = {
+        return {
             'name': _("Currency Rates"),
-            'context': {'search_default_name': self.delivery_date, 'search_default_currency_id_filter_group_by': 1, 'default_currency_id': self.currency_id.id},
+            'context': {
+                'search_default_name': self.delivery_date,
+                'search_default_currency_id_filter_group_by': 1,
+                'default_currency_id': self.currency_id.id
+            },
             'domain': [('currency_id', 'in', currency_ids)],
             'res_model': 'res.currency.rate',
             'target': 'current',
             'type': 'ir.actions.act_window',
             'view_mode': 'list,form',
         }
-        return result
 
     def action_l10n_hu_wizard_accounting(self):
         """ Open the HU+ wizard to update accounting fields """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Check
         if self.state != 'draft':
             raise exceptions.UserError(_("Action only allowed for draft invoices!"))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'account_move',
-            'default_action_type_visible': False,
-            'default_account_move_action': 'update_fields',
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'account_move',
+                'default_action_type_visible': False,
+                'default_account_move_action': 'update_fields',
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-
-        # Return result
-        return result
 
     def action_l10n_hu_wizard_check_status(self):
         """ Open the HU+ wizard to check status for HU+ """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Get overview
         status_overview = self.l10n_hu_get_plus_status_overview()
-
-        # Assemble context
-        context = {
-            'default_action_execute_visible': False,
-            'default_action_type': 'account_move',
-            'default_action_type_visible': False,
-            'default_account_move_action': 'check_status',
-            'default_account_move_action_visible': False,
-            'default_account_move_plus_overview': status_overview,
-            'default_account_move_plus_status': self.l10n_hu_plus_status,
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'account_move',
+                'default_action_type_visible': False,
+                'default_account_move_action': 'check_status',
+                'default_account_move_action_visible': False,
+                'default_account_move_plus_overview': status_overview,
+                'default_account_move_plus_status': self.l10n_hu_plus_status,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_wizard_currency_exchange(self):
         """ Open the HU+ wizard to calculate the document rate """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Prepare variables
         exchange_amount_from = self.amount_total
         if self.l10n_hu_document_rate != 0.0:
             exchange_rate = self.l10n_hu_document_rate
@@ -490,163 +528,25 @@ class L10nHuPlusAccountMove(models.Model):
             exchange_amount_to = exchange_amount_from * exchange_rate
         else:
             exchange_amount_to = 0.0
-
-        # Assemble context
-        context = {
-            'default_action_type': 'currency_exchange',
-            'default_action_type_visible': False,
-            'default_exchange_action': 'custom_currency',
-            'default_exchange_amount_from': exchange_amount_from,
-            'default_exchange_amount_to': exchange_amount_to,
-            'default_exchange_currency_from': self.currency_id.id,
-            'default_exchange_currency_to': self.company_id.currency_id.id,
-            'default_exchange_rate': exchange_rate,
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'currency_exchange',
+                'default_action_type_visible': False,
+                'default_exchange_action': 'custom_currency',
+                'default_exchange_amount_from': exchange_amount_from,
+                'default_exchange_amount_to': exchange_amount_to,
+                'default_exchange_currency_from': self.currency_id.id,
+                'default_exchange_currency_to': self.company_id.currency_id.id,
+                'default_exchange_rate': exchange_rate,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
 
-        # Return result
-        return result
-
     # Business methods
-    ## REPLACE
-    ## NOTES: unfortunately SUPER is not viable, so this complete method replace is necessary
-    ##       the issue was in invert_dict(), currency_obj should be the invoice currency, not the company currency
-    ##       there is a fix for 18.0 https://github.com/odoo/odoo/commit/62620e705d8c0a5da1e863733b8baa4f5a489b52
-    ##       this fix does not work on 17.0
-    def _l10n_hu_get_invoice_totals_for_report(self):
-        """ In Hungary, tax amounts should appear negative on credit notes.
-            We therefore apply a post-processing to the tax totals to make them negative. """
-
-        def invert_dict(dictionary, keys_to_invert):
-            """ Replace the values of keys_to_invert by their negative. """
-            dictionary.update({
-                key: -value
-                for key, value in dictionary.items() if key in keys_to_invert
-            })
-            keys_to_reformat = {f'formatted_{x}': x for x in keys_to_invert}
-            dictionary.update({
-                key: formatLang(self.env, dictionary[keys_to_reformat[key]], currency_obj=self.currency_id)
-                for key, value in dictionary.items() if key in keys_to_reformat
-            })
-
-        self.ensure_one()
-
-        tax_totals = self.tax_totals
-        if not isinstance(tax_totals, dict):
-            return tax_totals
-
-        tax_totals['display_tax_base'] = True
-
-        if 'refund' in self.move_type:
-            invert_dict(tax_totals, ['amount_total', 'amount_untaxed', 'rounding_amount', 'amount_total_rounded'])
-
-            for subtotal in tax_totals['subtotals']:
-                invert_dict(subtotal, ['amount'])
-
-            for tax_list in tax_totals['groups_by_subtotal'].values():
-                for tax in tax_list:
-                    keys_to_invert = ['tax_group_amount', 'tax_group_base_amount',
-                                      'tax_group_amount_company_currency', 'tax_group_base_amount_company_currency']
-                    invert_dict(tax, keys_to_invert)
-
-        currency_huf = self.env.ref('base.HUF')
-        currency_rate = self._l10n_hu_get_currency_rate()
-
-        tax_totals['total_vat_amount_in_huf'] = sum(
-            -line.balance if self.company_id.currency_id == currency_huf else currency_huf.round(
-                -line.amount_currency * currency_rate)
-            for line in self.line_ids.filtered(lambda l: l.tax_line_id.l10n_hu_tax_type)
-        )
-
-        tax_totals['formatted_total_vat_amount_in_huf'] = formatLang(
-            self.env, tax_totals['total_vat_amount_in_huf'], currency_obj=currency_huf
-        )
-
-        return tax_totals
-
-    ## REPLACE
-    ## NOTES: unfortunately SUPER is not viable, so this complete method replace is necessary to support STORNO
-    def _l10n_hu_edi_upload_single_batch(self, connection):
-        try:
-            token_result = connection.do_token_exchange(self.company_id.sudo()._l10n_hu_edi_get_credentials_dict())
-        except L10nHuEdiConnectionError as e:
-            return self.write({
-                'l10n_hu_edi_state': 'rejected',
-                'l10n_hu_edi_transaction_code': False,
-                'l10n_hu_edi_messages': {
-                    'error_title': _('Could not authenticate with NAV. Check your credentials and try again.'),
-                    'errors': e.errors,
-                    'blocking_level': 'error',
-                },
-            })
-
-        for i, invoice in enumerate(self, start=1):
-            invoice.l10n_hu_edi_batch_upload_index = i
-
-        ## L10NHU_PLUS BEGIN
-        operation = 'CREATE' if invoice._l10n_hu_get_chain_base() == invoice else 'MODIFY'
-        if invoice.l10n_hu_document_type and invoice.l10n_hu_document_type.technical_name == 'invoice_storno':
-            operation = 'STORNO'
-        ## L10NHU_PLUS END
-
-        invoice_operations = [
-            {
-                'index': invoice.l10n_hu_edi_batch_upload_index,
-                'operation': operation,  # NOTES: moved to variable
-                'invoice_data': base64.b64decode(invoice.l10n_hu_edi_attachment),
-            }
-            for invoice in self
-        ]
-
-        self.write({'l10n_hu_edi_send_time': fields.Datetime.now()})
-
-        try:
-            transaction_code = connection.do_manage_invoice(
-                self.company_id.sudo()._l10n_hu_edi_get_credentials_dict(),
-                token_result['token'],
-                invoice_operations,
-            )
-        except L10nHuEdiConnectionError as e:
-            if e.code == 'timeout':
-                return self.write({
-                    'l10n_hu_edi_state': 'send_timeout',
-                    'l10n_hu_edi_transaction_code': False,
-                    'l10n_hu_edi_messages': {
-                        'error_title': _(
-                            'Invoice submission timed out. Please wait at least 6 minutes, then update the status.'),
-                        'errors': e.errors,
-                        'blocking_level': 'warning',
-                    },
-                })
-            return self.write({
-                'l10n_hu_edi_state': 'rejected',
-                'l10n_hu_edi_transaction_code': False,
-                'l10n_hu_invoice_chain_index': 0,
-                'l10n_hu_edi_messages': {
-                    'error_title': _('Invoice submission failed.'),
-                    'errors': e.errors,
-                    'blocking_level': 'error',
-                },
-            })
-
-        self.write({
-            'l10n_hu_edi_state': 'sent',
-            'l10n_hu_edi_transaction_code': transaction_code,
-            'l10n_hu_edi_messages': {
-                'error_title': _('Invoice submitted, waiting for response.'),
-                'errors': [],
-            }
-        })
-
     ## SUPER
     def _get_report_base_filename(self) -> str:
         """ Get the filename for proforma"""
@@ -694,12 +594,8 @@ class L10nHuPlusAccountMove(models.Model):
         # Customer tax number
         ## NOTES: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
         customer = result.get('customer', None)
-        if customer \
-                and customer.is_company \
-                and customer.vat \
-                and customer.country_code != 'HU' \
-                and self.fiscal_position_id \
-                and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
+        if customer and customer.is_company and customer.vat and customer.country_code != 'HU' \
+                and self.fiscal_position_id and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
             result.update({
                 'customer_vat_data': {
                     'tax_number': customer.l10n_hu_group_vat or customer.vat,
@@ -721,13 +617,29 @@ class L10nHuPlusAccountMove(models.Model):
         # Execute super
         result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_valid_actions()
 
-        # No action when EDI is disabled on the journal (eg: externally issued invoices, OSS)
+        # No action when EDI sending is disabled on the journal (eg: externally issued invoices, OSS)
         if self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted' \
-                and self.journal_id and self.journal_id.l10n_hu_edi_send_disabled:
+                and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled':
             result = []
         return result
 
     ## HU+
+    @api.model
+    def l10n_hu_do_send_edi(self):
+        """ Shorthand method to send invoice to EDI (NAV Online Szamla) without user interaction
+
+        :return: boolean
+        """
+        if self.l10n_hu_get_send_edi_allowed():
+            if self.journal_id.l10n_hu_edi_sending == 'auto_edi_email':
+                mail_template = self.l10n_hu_get_invoice_mail_template()
+                self.env['account.move.send']._generate_and_send_invoices(self, sending_methods=['email'], mail_template=mail_template)
+            else:
+                self.env['account.move.send']._generate_and_send_invoices(self, sending_methods=[])
+            return True
+        else:
+            return False
+
     @api.model
     def l10n_hu_get_cash_accounting(self):
         """ Use cash accounting for this invoice or not
@@ -1153,6 +1065,26 @@ class L10nHuPlusAccountMove(models.Model):
             last_huf_rate = None
             debug_list.append("last_huf_rate else scenario, probably date not set")
 
+        # Check storno by amount residual
+        ## NOTES: https://github.com/odoo/odoo/commit/5214296e8be76663ffdb6647c91645c66501121d
+        base_invoice = self._l10n_hu_get_chain_base()
+        if self.move_type == 'out_refund' and self != base_invoice and base_invoice.amount_residual == 0:
+            is_storno = True
+        else:
+            is_storno = False
+
+        # Special document types
+        modification_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_modification'),
+        ], limit=1)
+        storno_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_storno'),
+        ], limit=1)
+
         # Process field values
         if len(error_list) == 0:
             # date
@@ -1224,10 +1156,17 @@ class L10nHuPlusAccountMove(models.Model):
             # l10n_hu_document_type
             if values.get('l10n_hu_document_type'):
                 field_values.update({'l10n_hu_document_type': values['l10n_hu_document_type'].id})
-            elif not self.l10n_hu_document_type:
+            elif not self.l10n_hu_document_type and self.move_type == 'out_invoice':
                 l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
                 if l10n_hu_document_type:
                     field_values.update({'l10n_hu_document_type': l10n_hu_document_type.id})
+                else:
+                    pass
+            elif not self.l10n_hu_document_type and self.move_type == 'out_refund':
+                if is_storno and storno_document_type:
+                    field_values.update({'l10n_hu_document_type': storno_document_type.id})
+                elif modification_document_type:
+                    field_values.update({'l10n_hu_document_type': modification_document_type.id})
                 else:
                     pass
             else:
@@ -1248,8 +1187,7 @@ class L10nHuPlusAccountMove(models.Model):
             if values.get('l10n_hu_payment_mode'):
                 field_values.update({'l10n_hu_payment_mode': values['l10n_hu_payment_mode']})
                 debug_list.append("l10n_hu_payment_mode set from values: " + str(values['l10n_hu_payment_mode']))
-            elif not self.l10n_hu_payment_mode \
-                    and self.invoice_payment_term_id \
+            elif not self.l10n_hu_payment_mode and self.invoice_payment_term_id \
                     and self.invoice_payment_term_id.l10n_hu_nav_method:
                 l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method
                 field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_2})
@@ -1267,6 +1205,12 @@ class L10nHuPlusAccountMove(models.Model):
                 debug_list.append("l10n_hu_vat_date set from values: " + str(values['l10n_hu_vat_date']))
             else:
                 pass
+            # l10n_hu_vat_status
+            if values.get('l10n_hu_vat_status') is not None:
+                field_values.update({'l10n_hu_vat_status': values['l10n_hu_vat_status']})
+                debug_list.append("l10n_hu_vat_status set from values: " + str(values['l10n_hu_vat_status']))
+            else:
+                pass
         else:
             debug_list.append("processing skipped due to previous errors")
 
@@ -1282,6 +1226,40 @@ class L10nHuPlusAccountMove(models.Model):
         # Return result
         # raise exceptions.UserError("l10n_hu_get_field_values END" + str(result))
         return result
+
+    @api.model
+    def l10n_hu_get_invoice_mail_template(self):
+        """ Get mail template to send out invoice email"""
+        return self.env.ref('account.email_template_edi_invoice')
+
+    @api.model
+    def l10n_hu_get_plus_status(self):
+        """ Get HU+ status
+
+        NOTES:
+        - meant to be used by automations
+        - meant to be overridden by super for customizations
+
+        :return: dictionary
+        """
+        # Do not modify closed and other
+        if self.l10n_hu_plus_status in ['closed', 'other']:
+            return self.l10n_hu_plus_status
+        else:
+            # Run checklist and determine status
+            checklist_result = self.l10n_hu_get_plus_status_checklist()
+            error_list = checklist_result.get('error_list', [])
+            # info_list = checklist_result.get('info_list', [])
+            success_list = checklist_result.get('success_list', [])
+            warning_list = checklist_result.get('warning_list', [])
+            if len(error_list) > 0:
+                return 'error'
+            elif len(warning_list) > 0:
+                return 'warning'
+            elif len(success_list) > 0:
+                return 'success'
+            else:
+                return None
 
     @api.model
     def l10n_hu_get_plus_status_checklist(self):
@@ -1447,6 +1425,7 @@ class L10nHuPlusAccountMove(models.Model):
         - we return status check results
         - we also return an overview html table assembled by a different method
 
+        @return: string (HTML syntax)
         """
         # Initialize variables
         result = ""
@@ -1593,6 +1572,58 @@ class L10nHuPlusAccountMove(models.Model):
         return result
 
     @api.model
+    def l10n_hu_get_send_edi_allowed(self):
+        """ Determine if EDI send is allowed for an account move
+
+        NOTES:
+        - we have a method because it is too complex to be handled by a domain
+        - you can override with super if you want to check more conditions
+        - we collect points, if all collected, it is allowed
+
+        :return: boolean
+        """
+        # Initialize variables
+        points = 0
+
+        # 1) Company NAV connection configured
+        if self.company_id.l10n_hu_edi_server_mode and self.company_id.l10n_hu_edi_server_mode in ['production', 'test']:
+            points += 1
+
+        # 2) Journal EDI automation is enabled
+        if self.journal_id.l10n_hu_edi_sending in ['auto_edi', 'auto_edi_email']:
+            points += 1
+
+        # 3) Journal type
+        if self.journal_id.type == 'sale':
+            points += 1
+
+        # 4) Move EDI state
+        if not self.l10n_hu_edi_state:
+            points += 1
+
+        # 5) Move HU+ status
+        if self.l10n_hu_plus_status != 'closed':
+            points += 1
+
+        # 6) Move type
+        if self.move_type in ['out_invoice', 'out_refund']:
+            points += 1
+
+        # 7) Move state
+        if self.state == 'posted':
+            points += 1
+
+        # 8) Move invoice date today
+        if self.invoice_date == fields.Date.today():
+            points += 1
+
+        # Return
+        if points == 8:
+            return True
+        else:
+            return False
+
+    @api.model
     def l10n_hu_get_storno_allowed(self):
         """ Determine if storno is allowed for an account move
 
@@ -1605,7 +1636,11 @@ class L10nHuPlusAccountMove(models.Model):
         # Initialize variables
         points = 0
 
-        # document type available
+        # 1) Company: NAV connection configured
+        if self.company_id.l10n_hu_edi_server_mode and self.company_id.l10n_hu_edi_server_mode in ['production', 'test']:
+            points += 1
+
+        # 2) Company: Storno document type
         storno_document_type = self.env['l10n.hu.plus.tag'].search([
             ('company', '=', self.company_id.id),
             ('tag_type', '=', 'document_type'),
@@ -1614,16 +1649,139 @@ class L10nHuPlusAccountMove(models.Model):
         if storno_document_type:
             points += 1
 
-        # posted out_invoice
+        # 3) Account move: posted out_invoice
         if self.move_type == 'out_invoice' and self.state == 'posted':
             points += 1
 
-        # nav configured for the company
-        if self.company_id.l10n_hu_edi_server_mode:
-            points += 1
-
-        # Determine points
+        # Return result
         if points == 3:
             return True
         else:
             return False
+
+    @api.model
+    def l10n_hu_run_account_move_cron(self):
+        """ Meant to be called by cron
+
+        NOTES:
+        - cron jobs are not company aware
+        - we use batch limit per journal
+
+        :return: dictionary, also an info entry into l10n_hu.log
+        """
+        # Initialize variables
+        company_ids = []
+        company_results = []
+        date_today = fields.Date.today()
+        debug_list = []
+        error_list = []
+        log_ids = []
+        result = {}
+
+        # Get companies
+        companies = self.env['res.company'].sudo().search([('account_fiscal_country_id.code', '=', 'HU')])
+
+        # Process companies
+        for company in companies:
+            # Initialize variables
+            journal_ids = []
+            journal_results = []
+
+            # Get journals
+            journals = self.env['account.journal'].sudo().search([
+                ('company_id', '=', company.id),
+                ('l10n_hu_cron_batch', '>', 0),
+                ('l10n_hu_plus_enabled', '=', True),
+                ('type', 'in', ['purchase', 'sale']),
+            ])
+            debug_list.append("processing company: " + str(company.id))
+            debug_list.append("eligible journal count: " + str(len(journals)))
+
+            # Process journals
+            for journal in journals:
+                # Initialize variables
+                journal_debug_list = []
+                journal_error_list = []
+
+                # Set batch
+                batch = journal.l10n_hu_cron_batch
+                journal_debug_list.append("batch: " + str(batch))
+
+                # 1: Update HU+ status
+                status_invoices = self.env['account.move'].sudo().search([
+                    ('journal_id', '=', journal.id),
+                    ('l10n_hu_plus_status', 'not in', ['closed', 'other']),
+                ], limit=batch, order='write_date asc')
+                journal_debug_list.append("status_invoices count: " + str(len(status_invoices)))
+                for status_invoice in status_invoices:
+                    status_invoice.action_l10n_hu_update_plus_status()
+
+                # 2: Send EDI (NAV Online Szamla)
+                if journal.type == 'sale' and journal.l10n_hu_edi_sending in ['auto_edi', 'auto_edi_email']:
+                    auto_edi_invoices = self.env['account.move'].sudo().search([
+                        ('journal_id', '=', journal.id),
+                        ('invoice_date', '=', date_today),
+                        ('l10n_hu_edi_state', '=', None),
+                        ('l10n_hu_plus_status', 'not in', ['closed']),
+                        ('move_type', 'in', ['out_invoice', 'out_refund']),
+                        ('state', '=', 'posted')
+                    ], limit=batch, order='write_date asc')
+                    journal_debug_list.append("auto_edi_invoices count: " + str(len(auto_edi_invoices)))
+                    for auto_edi_invoice in auto_edi_invoices:
+                        auto_edi_invoice.action_l10n_hu_send_edi()
+
+                # Assemble journal_result
+                journal_result = {
+                    'journal_id': journal.id,
+                    'journal_type': journal.type,
+                    'journal_debug_list': journal_debug_list,
+                    'journal_error_list': journal_error_list,
+                }
+
+                # Append to lists
+                journal_ids.append(journal.id)
+                journal_results.append(journal_result)
+
+            # Assemble company_result
+            company_result = {
+                'company_id': company.id,
+                'journal_ids': journal_ids,
+                'journal_results': journal_results,
+            }
+
+            # Append to lists
+            company_ids.append(company.id)
+            company_results.append(company_result)
+
+            # Create log
+            ## NOTES: we want to log everything, even failed attempts
+            log_description = {'company_result': company_result}
+            log_values = {
+                'app_name': 'l10n_hu_plus',
+                'company': company.id,
+                'description': json.dumps(log_description, default=str),
+                'direction': 'internal',
+                'level': 'info',
+                'log_type': 'l10n_hu_run_account_move_cron',
+                'name': 'l10n_hu_run_account_move_cron company_id:' + str(company.id),
+                'source_model_name': 'res.company',
+                'source_record_id': company.id,
+                'technical_data': json.loads(json.dumps(company_result, default=str)),
+                'technical_name': 'l10n_hu_plus.l10n_hu_run_account_move_cron',
+                'timestamp': fields.Datetime.now(),
+                'user_id': self.env.uid,
+            }
+            log_record = self.env['l10n.hu.plus.log'].create(log_values)
+            log_ids.append(log_record.id)
+
+        # Update result
+        result.update({
+            'company_ids': company_ids,
+            'company_results': company_results,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'log_ids': log_ids,
+        })
+
+        # Return result
+        return result

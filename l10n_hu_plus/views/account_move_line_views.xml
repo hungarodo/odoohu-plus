@@ -29,7 +29,7 @@
     </record>
     <!-- List view readonly -->
     <record id="account_move_line_view_list_readonly" model="ir.ui.view">
-        <field name="name">l10n.hu.account.move.line.view.list.readonly</field>
+        <field name="name">l10n.hu.plus.move.line.view.list.readonly</field>
         <field name="model">account.move.line</field>
         <field name="priority">40</field>
         <field name="arch" type="xml">
@@ -56,7 +56,7 @@
     </record>
     <!-- Search view inherit -->
     <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
-        <field name="name">l10n.hu.account.view.account.move.line.filter.inherit</field>
+        <field name="name">l10n.hu.plus.view.account.move.line.filter.inherit</field>
         <field name="inherit_id" ref="account.view_account_move_line_filter"/>
         <field name="model">account.move.line</field>
         <field name="priority">36</field>
@@ -64,42 +64,18 @@
             <!-- Filter -->
             <xpath expr="//filter[@name='date']" position="after">
                 <separator/>
-                <filter name="l10n_hu_move_vat_date_filter"
-                        date="l10n_hu_move_vat_date"
-                        help="Account move VAT date"
-                        string="VAT Date"
-                />
+                <filter name="l10n_hu_move_vat_date_filter" date="l10n_hu_move_vat_date" help="Account move VAT date" string="VAT Date"/>
                 <separator/>
-                <filter name="l10n_hu_move_trade_position_domestic_filter"
-                        domain="[('l10n_hu_move_trade_position', '=', 'domestic')]"
-                        string="Domestic"
-                />
-                <filter name="l10n_hu_move_trade_position_eu_filter"
-                        domain="[('l10n_hu_move_trade_position', '=', 'eu')]"
-                        string="EU"
-                />
-                <filter name="l10n_hu_move_trade_position_other_filter"
-                        domain="[('l10n_hu_move_trade_position', '=', 'other')]"
-                        string="Other"
-                />
-                <filter name="l10n_hu_move_trade_position_none_filter"
-                        domain="[('l10n_hu_move_trade_position', '=', False)]"
-                        string="No Trade Position"
-                />
+                <filter name="l10n_hu_move_trade_position_domestic_filter" domain="[('l10n_hu_move_trade_position', '=', 'domestic')]" string="Domestic"/>
+                <filter name="l10n_hu_move_trade_position_eu_filter" domain="[('l10n_hu_move_trade_position', '=', 'eu')]" string="EU"/>
+                <filter name="l10n_hu_move_trade_position_other_filter" domain="[('l10n_hu_move_trade_position', '=', 'other')]" string="Other"/>
+                <filter name="l10n_hu_move_trade_position_none_filter" domain="[('l10n_hu_move_trade_position', '=', False)]" string="No Trade Position"/>
             </xpath>
             <!-- Filter group by -->
             <xpath expr="//filter[@name='group_by_matching']" position="after">
                 <separator/>
-                <filter name="l10n_hu_move_vat_date_filter_group_by"
-                        domain="[]"
-                        context="{'group_by': 'l10n_hu_move_vat_date'}"
-                        string="VAT Date"
-                />
-                <filter name="l10n_hu_move_trade_position_filter_group_by"
-                        domain="[]"
-                        context="{'group_by': 'l10n_hu_move_trade_position'}"
-                        string="Trade Position"
-                />
+                <filter name="l10n_hu_move_vat_date_filter_group_by" domain="[]" context="{'group_by': 'l10n_hu_move_vat_date'}" string="VAT Date"/>
+                <filter name="l10n_hu_move_trade_position_filter_group_by" domain="[]" context="{'group_by': 'l10n_hu_move_trade_position'}" string="Trade Position"/>
             </xpath>
         </field>
     </record>

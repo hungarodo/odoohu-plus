@@ -11,22 +11,13 @@
                 <header></header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-                        <button name="action_list_account_moves"
-                                class="oe_stat_button"
-                                icon="fa-list"
-                                invisible="tag_type not in ['account_move', 'document_type']"
-                                type="object"
-                        >
+                        <button name="action_list_account_moves" class="oe_stat_button" icon="fa-list" invisible="tag_type not in ['account_move', 'document_type']" type="object">
                             <field name="account_move_count" string="Account Move" widget="statinfo"/>
                         </button>
-                        <button name="action_list_objects"
-                                class="oe_stat_button"
-                                icon="fa-list"
-                                invisible="tag_type != 'object_type'"
-                                type="object"
-                        >
+                        <button name="action_list_objects" class="oe_stat_button" icon="fa-list" invisible="tag_type != 'object_type'" type="object">
                             <field name="object_count" string="Object" widget="statinfo"/>
                         </button>
+                        <button name="action_view_technical_data" class="oe_stat_button" groups="base.group_no_one" icon="fa-code" string="Technical" type="object"/>
                     </div>
                     <widget name="web_ribbon" bg_color="bg-danger" invisible="active" title="Archived"/>
                     <div class="oe_title">
@@ -79,21 +70,6 @@
                                 </group>
                                 <group name="technical_2">
                                     <field name="technical_timestamp"/>
-                                </group>
-                                <group name="technical_data" colspan="2">
-                                    <label name="view_technical_data"
-                                           for="action_view_technical_data"
-                                           string="Technical Data"
-                                    />
-                                    <div name="view_technical_data">
-                                        <button name="action_view_technical_data"
-                                                class="btn-link btn-sm"
-                                                icon="fa-code"
-                                                string="View"
-                                                type="object"
-                                        />
-                                        <field name="technical_data" invisible="1"/>
-                                    </div>
                                 </group>
                             </group>
                         </page>

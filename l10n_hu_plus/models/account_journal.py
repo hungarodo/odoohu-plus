@@ -31,32 +31,44 @@ class L10nHuPlusAccountJournal(models.Model):
         index=True,
         string="HU Banner Enabled",
     )
+    l10n_hu_cron_batch = fields.Integer(
+        copy=False,
+        default=36,
+        help="Number of items managed by scheduled action",
+        string="HU Cron Batch",
+    )
     l10n_hu_delivery_date_default = fields.Selection(
         copy=False,
         default='none',
-        help="Used as default value when necessary",
+        help="Used as default value (when necessary)",
         selection=[
             ('none', "None"),
             ('today', "Today"),
         ],
         string="HU Delivery Date Default",
     )
-    l10n_hu_edi_send_disabled = fields.Boolean(
+    l10n_hu_edi_sending = fields.Selection(
         copy=False,
-        default=False,
-        help="Disable EDI sending when the journal is used for externally issued or OSS reported invoices",
-        index=True,
-        string="HU EDI Send Disabled",
+        default='disabled',
+        help="EDI (NAV Online Invoice) and email sending",
+        selection=[
+            ('disabled', "Disabled"),
+            ('manual', "Manual"),
+            ('auto_edi', "Automated EDI (no email)"),
+            ('auto_edi_email', "Automated EDI & Email"),
+        ],
+        string="HU EDI Sending",
+        tracking=True,
     )
     l10n_hu_nav_payment_method = fields.Selection(
         copy=False,
-        help="Used as default value when necessary",
+        help="Used as default value (when necessary)",
         selection=_get_selection_l10n_hu_nav_payment_method,
         string="HU NAV Payment Method",
     )
     l10n_hu_plus_enabled = fields.Boolean(
         copy=False,
-        default=True,
+        default=False,
         help="Allow HU+ features for this journal",
         index=True,
         string="HU+ Enabled",
@@ -72,7 +84,7 @@ class L10nHuPlusAccountJournal(models.Model):
         comodel_name='mail.template',
         copy=False,
         domain=_get_default_l10n_hu_proforma_mail_template_domain,
-        help="Default template for sending proforma emails",
+        help="Default template for proforma emails",
         index=True,
         string="HU Proforma Mail Template",
     )
@@ -80,7 +92,7 @@ class L10nHuPlusAccountJournal(models.Model):
         comodel_name='ir.sequence',
         copy=False,
         domain=[('code', 'like', 'proforma')],
-        help="Proforma numbering sequence",
+        help="Proforma document naming sequence",
         index=True,
         string="HU Proforma Sequence",
     )
@@ -106,13 +118,13 @@ class L10nHuPlusAccountJournal(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_plus_documentation(self):
-        """ HU+ documentation """
+    def action_l10n_hu_plus_view_documentation(self):
+        """ View HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
 
         # Return
-        return self.company_id.action_l10n_hu_plus_documentation()
+        return self.company_id.action_l10n_hu_plus_view_documentation()
 
     def action_l10n_hu_set_proforma_sequence(self):
         """ Set a proforma sequence"""

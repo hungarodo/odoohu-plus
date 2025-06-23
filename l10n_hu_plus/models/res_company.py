@@ -283,8 +283,24 @@ class L10nHuBaseResCompany(models.Model):
         # Return
         return
 
-    def action_l10n_hu_plus_documentation(self):
-        """ HU+ documentation """
+    def action_l10n_hu_plus_apply_configuration(self):
+        self.ensure_one()
+        context = {
+            'default_action_type': 'configuration',
+            'default_action_type_visible': True,
+        }
+        result = {
+            'name': _("HU+ Wizard"),
+            'context': context,
+            'res_model': 'l10n.hu.plus.wizard',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
+        return result
+
+    def action_l10n_hu_plus_view_documentation(self):
+        """ View HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
 
@@ -591,6 +607,172 @@ class L10nHuBaseResCompany(models.Model):
 
         # Return result
         # raise exceptions.UserError("l10n_hu_plus_api_registration_response END" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_plus_apply_configuration(self, values):
+        """ Apply HU+ configuration
+        @:return: dictionary
+        """
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        operations = []
+        result = {}
+        success_list = []
+        warning_list = []
+        # raise exceptions.UserError("l10n_hu_plus_apply_configuration BEGIN")
+
+        # company
+        if values.get('company'):
+            company = values['company']
+            company_id = company.id
+            info_list.append(_("Company") + ": " + str(company.display_name))
+        elif len(self) == 1 and self.id:
+            company = self
+            company_id = company.id
+            info_list.append(_("Company") + ": " + str(company.display_name))
+        else:
+            company = None
+            company_id = None
+            error_list.append("could not set company")
+
+        if len(error_list) == 0:
+            # 1) DOCUMENT TYPES
+            if values.get('document_types'):
+                documents_types = []
+                ## NORMAL INVOICE
+                invoice_normal = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_normal'),
+                ])
+                if not invoice_normal:
+                    invoice_normal_values = {
+                        'code': "INVOICE-NORMAL",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_normal",
+                        'priority': 1,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_normal',
+                    }
+                    invoice_normal = self.env['l10n.hu.plus.tag'].sudo().create(invoice_normal_values)
+                    invoice_normal.with_context(lang="en_US").name = "Invoice"
+                    invoice_normal.with_context(lang="hu_HU").name = "Számla"
+                    operations.append({
+                        'model_name': 'l10n.hu.plus.tag',
+                        'record_id': invoice_normal.id,
+                        'operation': 'create'
+                    })
+                documents_types.append(invoice_normal)
+                ## INVOICE STORNO
+                invoice_storno = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_storno'),
+                ])
+                if not invoice_storno:
+                    invoice_storno_values = {
+                        'code': "INVOICE-STORNO",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_storno",
+                        'priority': 4,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_storno',
+                    }
+                    invoice_storno = self.env['l10n.hu.plus.tag'].sudo().create(invoice_storno_values)
+                    invoice_storno.with_context(lang="en_US").name = "Storno Invoice"
+                    invoice_storno.with_context(lang="hu_HU").name = "Storno számla"
+                    operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_storno.id, 'operation': 'create'})
+                documents_types.append(invoice_normal)
+                ## MODIFICATION INVOICE
+                invoice_modification = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_modification'),
+                ])
+                if not invoice_modification:
+                    invoice_modification_values = {
+                        'code': "INVOICE-MODIFICATION",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_modification",
+                        'priority': 3,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_modification',
+                    }
+                    invoice_modification = self.env['l10n.hu.plus.tag'].sudo().create(invoice_modification_values)
+                    invoice_modification.with_context(lang="en_US").name = "Modification Invoice"
+                    invoice_modification.with_context(lang="hu_HU").name = "Módosító számla"
+                    operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_modification.id, 'operation': 'create'})
+                documents_types.append(invoice_normal)
+                success_list.append(_("Document types configured"))
+            else:
+                info_list.append(_("Document type configuration skipped"))
+            # 2) AUDIT TRAIL
+            if values.get('audit_trail'):
+                company.write({'check_account_audit_trail': True})
+                operations.append({'model_name': 'res.company', 'record_id': company.id, 'operation': 'write'})
+                success_list.append(_("Audit trail configured"))
+            else:
+                info_list.append(_("Audit trail configuration skipped"))
+            # 3) ENABLED JOURNALS
+            if values.get('enabled_journals'):
+                for journal in values['enabled_journals']:
+                    journal.write({'l10n_hu_plus_enabled': True})
+                    operations.append({'model_name': 'account.journal', 'record_id': journal.id, 'operation': 'write'})
+                success_list.append(_("Journals configured"))
+            else:
+                info_list.append(_("Journal configuration skipped"))
+        else:
+            debug_list.append("operations skipped due to previous errors")
+
+        # Create log
+        log_description = {
+            'error_list': error_list,
+            'operations': operations,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        }
+        log_technical_data = {
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'operations': operations,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        }
+        log_values = {
+            'app_name': 'l10n_hu_plus',
+            'company': company.id,
+            'description': str(log_description),
+            'direction': 'internal',
+            'level': 'info',
+            'log_type': 'hu_plus_configuration',
+            'name': " HU+ configuration company_id: " + str(company_id),
+            'source_model_name': 'res.company',
+            'source_record_id': company_id,
+            'technical_data': json.loads(json.dumps(log_technical_data, default=str)),
+            'technical_name': 'l10n_hu_plus.l10n_hu_plus_run_configuration',
+        }
+        log_record = self.env['l10n.hu.plus.log'].create(log_values)
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'log_record': log_record,
+            'operations': operations,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_run_configuration END")
         return result
 
     @api.model
