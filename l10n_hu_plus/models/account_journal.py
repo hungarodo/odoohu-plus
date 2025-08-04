@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
+import datetime
 
 # 2 :  imports of odoo
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
@@ -161,3 +162,34 @@ class L10nHuPlusAccountJournal(models.Model):
             ('company', '=', self.company_id.id),
             ('tag_type', '=', 'document_type'),
         ], limit=1, order='priority asc, id desc')
+
+    @api.model
+    def l10n_hu_get_default_delivery_date(self):
+        # date_today = fields.Date.today()
+        date_today = datetime.date.today()
+        if self.l10n_hu_delivery_date_default == 'none':
+            return None
+        elif self.l10n_hu_delivery_date_default == 'today':
+            return  fields.Date.today()
+        elif self.l10n_hu_delivery_date_default == 'first_day_of_this_month':
+            # Replace day to first day of this month
+            return date_today.replace(day=1)
+        elif self.l10n_hu_delivery_date_default == 'last_day_of_this_month':
+            # Get close to the end of this month and add 4 days to 'roll it over'
+            next_month = date_today.replace(day=28) + datetime.timedelta(days=4)
+            # Set the day to 1 gives us the start of next month
+            first_day_of_next_month = next_month.replace(day=1)
+            # Remove one day to get last day of this month
+            return first_day_of_next_month - datetime.timedelta(days=1)
+        elif self.l10n_hu_delivery_date_default == 'last_day_of_last_month':
+            # Replace day to first day of this month
+            first_day_of_this_month = date_today.replace(day=1)
+            # Remove one day to get last day of last month
+            return first_day_of_this_month - datetime.timedelta(days=1)
+        elif self.l10n_hu_delivery_date_default == 'first_day_of_next_month':
+            # Get close to the end of this month and add 4 days to 'roll it over'
+            next_month = date_today.replace(day=28) + datetime.timedelta(days=4)
+            # Set the day to 1 gives us the first day of next month
+            return next_month.replace(day=1)
+        else:
+            return None

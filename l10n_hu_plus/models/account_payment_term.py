@@ -41,36 +41,22 @@ class L10nHuPlusPaymentTerm(models.Model):
 
         :return: list
         """
-        # Assemble result
-        result = [
-            ('TRANSFER', "Transfer"),
-            ('CASH', "Cash"),
-            ('CARD', "Card"),
-            ('VOUCHER', "Voucher"),
-            ('OTHER', "Other"),
+        return [
+            ('TRANSFER', _("Transfer")),
+            ('CASH', _("Cash")),
+            ('CARD', _("Card")),
+            ('VOUCHER', _("Voucher")),
+            ('OTHER', _("Other")),
         ]
-
-        # Return result
-        return result
 
     @api.model
     def l10n_hu_get_nav_methods(self):
         """ Get list of NAV methods
 
-        NOTE:
-        - we call selection and assemble list
-
         :return: list
         """
-        # Initialize variables
         result = []
-
-        # Get selection
         selection_list = self.l10n_hu_get_nav_method_selection()
-
-        # Assemble result
         for selection in selection_list:
             result.append(selection[0])
-
-        # Return result
         return result

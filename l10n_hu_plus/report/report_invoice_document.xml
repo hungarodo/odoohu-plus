@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template name="l10n.hu.plus.report.invoice.document.inherit"
-              id="report_invoice_document_inherit"
-              inherit_id="account.report_invoice_document"
-    >
+    <template name="l10n.hu.plus.report.invoice.document.inherit" id="report_invoice_document_inherit" inherit_id="account.report_invoice_document">
         <!-- Document type -->
         <xpath expr="//t[@t-set='layout_document_title']" position="replace">
             <t t-set="layout_document_title">
@@ -58,10 +55,10 @@
                 <span t-field="o.l10n_hu_proforma_name" class="ms-2"/>
             </div>
             <!-- Document rate -->
-            <div name="l10n_hu_document_rate" class="mb-3" t-if="o.currency_id != o.company_currency_id and o.l10n_hu_currency_rate">
+            <div name="l10n_hu_document_rate" class="mb-3" t-if="o.currency_id != o.company_currency_id and o.l10n_hu_invoice_currency_rate_inverse">
                 Exchange Rate:
-                <span t-field="o.l10n_hu_currency_rate" class="ms-1" t-if="o.company_currency_id.name == 'HUF'" t-options="{'widget': 'float', 'precision': 2}"/>
-                <span t-field="o.l10n_hu_currency_rate" class="ms-1" t-if="o.company_currency_id.name != 'HUF'" t-options="{'widget': 'float', 'precision': 4}"/>
+                <span t-field="o.l10n_hu_invoice_currency_rate_inverse" class="ms-1" t-if="o.company_currency_id.name == 'HUF'" t-options="{'widget': 'float', 'precision': 2}"/>
+                <span t-field="o.l10n_hu_invoice_currency_rate" class="ms-1" t-if="o.company_currency_id.name != 'HUF'" t-options="{'widget': 'float', 'precision': 4}"/>
                 <span t-field="o.company_currency_id.name"/>/<span t-field="o.currency_id.name"/>
                 <span t-field="o.l10n_hu_currency_date" class="ms-1"/>
             </div>
