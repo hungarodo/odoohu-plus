@@ -12,7 +12,7 @@ from odoo.service import common as odoo_service_common
 
 
 # Class
-class L10nHuBaseResCompany(models.Model):
+class L10nHuPlusResCompany(models.Model):
     # Private attributes
     _inherit = 'res.company'
 

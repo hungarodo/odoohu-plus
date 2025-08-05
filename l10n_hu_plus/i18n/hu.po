@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 21:13+0000\n"
-"PO-Revision-Date: 2025-07-28 21:13+0000\n"
+"POT-Creation-Date: 2025-08-05 12:40+0000\n"
+"PO-Revision-Date: 2025-08-05 12:40+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -308,6 +308,11 @@ msgstr "API adat nem áll rendelkezésre!"
 #: code:addons/l10n_hu_plus/models/res_company.py:0
 msgid "API is not enabled!"
 msgstr "API nincs bekapcsolva!"
+
+#. module: l10n_hu_plus
+#: model:ir.model,name:l10n_hu_plus.model_account_cash_rounding
+msgid "Account Cash Rounding"
+msgstr "Számla Készpénz Kerekítés"
 
 #. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.account_journal_action
@@ -1578,6 +1583,12 @@ msgid "HU Delivery Period Start"
 msgstr "Teljesítési időszak kezdete"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_delivery_period_summary
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_delivery_period_summary
+msgid "HU Delivery Period Summary"
+msgstr "HU Teljesítési időszak összefoglaló"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_document_gross_huf
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_document_gross_huf
 msgid "HU Document Gross HUF"
@@ -1698,6 +1709,11 @@ msgid "HU Partner Country"
 msgstr "Partner ország"
 
 #. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_cash_rounding__l10n_hu_payment_term
+msgid "HU Payment Term"
+msgstr "HU fizetési feltétel"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move_line__l10n_hu_price_refund
 msgid "HU Price Refund"
 msgstr "Ár jóváírás"
@@ -1735,6 +1751,11 @@ msgstr "Proforma sorszám"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_proforma_sequence_available
 msgid "HU Proforma Sequence Available"
 msgstr "Proforma sorszám elérhető"
+
+#. module: l10n_hu_plus
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_payment_term__l10n_hu_rounding_method
+msgid "HU Rounding Method"
+msgstr "HU Kerekítési módszer"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_res_partner__l10n_hu_self_billing
@@ -2232,9 +2253,9 @@ msgid "Journal configuration skipped"
 msgstr "Napló konfiguráció kihagyva"
 
 #. module: l10n_hu_plus
-#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_account_journal_menu
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_journal_menu
 msgid "Journals"
-msgstr "Könyvelési naplók"
+msgstr "Naplók"
 
 #. module: l10n_hu_plus
 #. odoo-python
@@ -2756,6 +2777,12 @@ msgid "Payment Status"
 msgstr "Fizetési állapot"
 
 #. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.rounding_form_view_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.rounding_tree_view_inherit
+msgid "Payment Term"
+msgstr "Fizetési feltétel"
+
+#. module: l10n_hu_plus
 #: model:ir.actions.act_window,name:l10n_hu_plus.account_payment_term_action
 #: model:ir.model,name:l10n_hu_plus.model_account_payment_term
 #: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_payment_term_menu
@@ -2940,6 +2967,17 @@ msgstr "Felelős felhasználó"
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 msgid "Result"
 msgstr "Eredmény"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_payment_term_form_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_payment_term_tree_inherit
+msgid "Rounding Method"
+msgstr "Kerekítési módszer"
+
+#. module: l10n_hu_plus
+#: model:ir.ui.menu,name:l10n_hu_plus.configuration_accounting_rounding_method_menu
+msgid "Rounding Methods"
+msgstr "Kerekítési módszerek"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__message_has_sms_error

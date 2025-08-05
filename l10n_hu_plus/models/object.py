@@ -16,7 +16,7 @@ from odoo.tools.translate import html_translate
 
 
 # Class
-class L10nHuBaseObject(models.Model):
+class L10nHuPlusObject(models.Model):
     # Private attributes
     _name = 'l10n.hu.plus.object'
     _description = "HU+ Object"

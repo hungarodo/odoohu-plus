@@ -12,12 +12,13 @@
                 <group name="l10n_hu_plus" string="HU+">
                     <group name="l10n_hu_plus_1">
                         <field name="l10n_hu_nav_method" string="NAV Method"/>
+                        <field name="l10n_hu_rounding_method" options="{'no_quick_create': True}" string="Rounding Method"/>
                     </group>
                 </group>
             </xpath>
         </field>
     </record>
-    <!-- Form view inherit -->
+    <!-- List view inherit -->
     <record id="view_payment_term_tree_inherit" model="ir.ui.view">
         <field name="name">l10n.hu.plus.view.payment.term.tree.inherit</field>
         <field name="inherit_id" ref="account.view_payment_term_tree"/>
@@ -26,6 +27,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="l10n_hu_nav_method" string="NAV Method"/>
+                <field name="l10n_hu_rounding_method" string="Rounding Method"/>
             </xpath>
         </field>
     </record>

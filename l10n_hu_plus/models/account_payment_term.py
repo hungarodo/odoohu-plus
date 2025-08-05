@@ -10,7 +10,7 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 
 # Class
-class L10nHuPlusPaymentTerm(models.Model):
+class L10nHuPlusAccountPaymentTerm(models.Model):
     # Private attributes
     _inherit = 'account.payment.term'
 
@@ -24,6 +24,11 @@ class L10nHuPlusPaymentTerm(models.Model):
         selection=_get_l10n_hu_nav_method_selection,
         copy=False,
         string="HU NAV Method",
+    )
+    l10n_hu_rounding_method = fields.Many2one(
+        comodel_name='account.cash.rounding',
+        copy=False,
+        string="HU Rounding Method",
     )
 
     # Compute and search fields, in the same order of field declarations

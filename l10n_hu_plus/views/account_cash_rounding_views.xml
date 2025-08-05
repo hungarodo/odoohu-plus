@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="rounding_form_view_inherit" model="ir.ui.view">
+        <field name="name">l10n.hu.plus.view.rounding.form.view.inherit</field>
+        <field name="inherit_id" ref="account.rounding_form_view"/>
+        <field name="model">account.cash.rounding</field>
+        <field name="priority">36</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rounding_method']" position="after">
+                <field name="l10n_hu_payment_term" string="Payment Term" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- List view inherit -->
+    <record id="rounding_tree_view_inherit" model="ir.ui.view">
+        <field name="name">l10n.hu.plus.rounding.tree.view.inherit</field>
+        <field name="inherit_id" ref="account.rounding_tree_view"/>
+        <field name="model">account.cash.rounding</field>
+        <field name="priority">36</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rounding_method']" position="after">
+                <field name="l10n_hu_payment_term" string="Payment Term" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

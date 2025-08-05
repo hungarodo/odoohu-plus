@@ -294,6 +294,14 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             pass
 
+    @api.onchange('invoice_payment_term_id')
+    def onchange_l10n_hu_payment_term_id(self):
+        if self.invoice_payment_term_id and self.journal_id and self.journal_id.l10n_hu_plus_enabled:
+            self.invoice_cash_rounding_id = self.invoice_payment_term_id.l10n_hu_rounding_method
+            self.l10n_hu_payment_mode = self.invoice_payment_term_id.l10n_hu_nav_method
+        else:
+            pass
+
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
