@@ -38,17 +38,9 @@ class L10nHuPlusAccountMove(models.Model):
         related='company_currency_id.name',
         string="HU Company Currency Name",
     )
-    l10n_hu_currency_date = fields.Date(
-        compute='_compute_l10n_hu_currency',
-        string="HU Currency Date",
-    )
     l10n_hu_currency_name = fields.Char(
         related='currency_id.name',
         string="HU Currency Name",
-    )
-    l10n_hu_currency_summary = fields.Text(
-        compute='_compute_l10n_hu_currency',
-        string="HU Currency Summary",
     )
     l10n_hu_huf_currency = fields.Many2one(
         comodel_name='res.currency',
@@ -58,6 +50,10 @@ class L10nHuPlusAccountMove(models.Model):
     l10n_hu_huf_rate = fields.Float(
         compute='_compute_l10n_hu_currency',
         string="HU HUF Rate",
+    )
+    l10n_hu_invoice_currency_rate_date = fields.Date(
+        compute='_compute_l10n_hu_currency',
+        string="HU Currency Date",
     )
     l10n_hu_invoice_currency_rate_inverse = fields.Float(
         compute='_compute_l10n_hu_currency',
@@ -92,8 +88,7 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Document Net HUF",
     )
     l10n_hu_document_rate = fields.Float(
-        copy=False,
-        default=0,
+        compute='_compute_l10n_hu_document',
         help="Currency rate of the invoice document",
         string="HU Document Rate",
     )
@@ -243,27 +238,28 @@ class L10nHuPlusAccountMove(models.Model):
     @api.depends('currency_id', 'invoice_date', 'delivery_date')
     def _compute_l10n_hu_currency(self):
         for record in self:
-            data_result = record.l10n_hu_get_data_currency_rate({})
-            record.l10n_hu_currency_date = data_result.get('l10n_hu_currency_date', None)
-            record.l10n_hu_huf_currency = data_result.get('l10n_hu_huf_currency', None)
-            record.l10n_hu_huf_rate = data_result.get('l10n_hu_huf_rate', 0.0)
-            record.l10n_hu_invoice_currency_rate_inverse = data_result.get('l10n_hu_invoice_currency_rate_inverse', None)
+            rate_data = record.l10n_hu_plus_get_rate_data({})
+            record.l10n_hu_invoice_currency_rate_date = rate_data.get('l10n_hu_invoice_currency_rate_date', None)
+            record.l10n_hu_huf_currency = rate_data.get('l10n_hu_huf_currency', None)
+            record.l10n_hu_huf_rate = rate_data.get('l10n_hu_huf_rate', 0.0)
+            record.l10n_hu_invoice_currency_rate_inverse = rate_data.get('l10n_hu_invoice_currency_rate_inverse', None)
 
     def _compute_l10n_hu_delivery_period_text(self):
         for record in self:
             period_summary = ""
             if record.move_type in ['out_invoice', 'out_refund'] and record.l10n_hu_delivery_period_start and record.l10n_hu_delivery_period_end:
-                delivery_period_result = record.l10n_hu_get_data_delivery_date({})
-                if delivery_period_result.get('period_summary'):
-                    period_summary = delivery_period_result['period_summary']
+                delivery_result = record.l10n_hu_plus_get_delivery_data({})
+                if delivery_result.get('period_summary'):
+                    period_summary = delivery_result['period_summary']
             record.l10n_hu_delivery_period_summary = period_summary
 
     @api.depends('amount_untaxed', 'amount_tax', 'currency_id', 'l10n_hu_document_rate', 'l10n_hu_document_vat_huf')
     def _compute_l10n_hu_document(self):
         for record in self:
-            data_result = record.l10n_hu_get_data_document({})
+            data_result = record.l10n_hu_plus_get_document_data({})
             record.l10n_hu_document_gross_huf = data_result.get('l10n_hu_document_gross_huf', 0)
             record.l10n_hu_document_net_huf = data_result.get('l10n_hu_document_net_huf', 0)
+            record.l10n_hu_document_rate = data_result.get('l10n_hu_document_rate', 0)
 
     # Constraints and onchanges
     @api.onchange('l10n_hu_delivery_period_end', 'l10n_hu_delivery_period_start')
@@ -392,7 +388,7 @@ class L10nHuPlusAccountMove(models.Model):
         self.ensure_one()
         if self.state != 'draft':
             raise exceptions.UserError(_("Action only allowed for draft invoices!"))
-        values_result = self.l10n_hu_get_data({})
+        values_result = self.l10n_hu_plus_get_data({})
         if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
             return self.write(values_result['field_values'])
         elif len(values_result.get('field_values')) == 0:
@@ -748,18 +744,20 @@ class L10nHuPlusAccountMove(models.Model):
 
     ## HU+ DATA
     @api.model
-    def l10n_hu_get_data(self, values):
-        """ Get field values for HU
+    def l10n_hu_plus_get_data(self, values):
+        """ Get relevant HU+ related data
 
         NOTES:
-        - This method prepares write operation compatible values for special hungarian fields
-        - Some fields are computed by calling other methods
-
+        - central method to collect and compute hungarian localization data
+        - some fields are computed by calling other methods
+        - this method also prepares write operation compatible values for special hungarian fields
+        - there should be no CRUD operation here, keep it in mind when using super()
+        
         :param values: dictionary
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_data BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_plus_get_data BEGIN" + str(values))
 
         # Initialize variables
         debug_list = []
@@ -781,61 +779,37 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             error_list.append("invalid account move type")
 
-        # Check state
-        if self.state == 'draft':
-            debug_list.append("state check passed")
-        else:
-            error_list.append("invalid state, only draft is allowed")
-
         # Collect data using dedicated methods
-        ## CASH ACCOUNTING
-        cash_accounting_data = self.l10n_hu_get_data_cash_accounting(values)
-        error_list += cash_accounting_data.get('error_list', [])
-        warning_list += cash_accounting_data.get('warning_list', [])
-
-        ## DELIVERY DATE
-        delivery_date_data = self.l10n_hu_get_data_delivery_date(values)
-        error_list += delivery_date_data.get('error_list', [])
-        warning_list += delivery_date_data.get('warning_list', [])
+        ## DELIVERY
+        delivery_data = self.l10n_hu_plus_get_delivery_data(values)
+        error_list += delivery_data.get('error_list', [])
+        warning_list += delivery_data.get('warning_list', [])
 
         ## DOCUMENT
-        document_data = self.l10n_hu_get_data_document(values)
+        document_data = self.l10n_hu_plus_get_document_data(values)
         error_list += document_data.get('error_list', [])
         warning_list += document_data.get('warning_list', [])
 
-        ## CURRENCY - NOTES: do this after delivery date
-        currency_values = values
-        currency_values.update({'delivery_date': delivery_date_data.get('delivery_date', None)})
-        currency_data = self.l10n_hu_get_data_currency_rate(currency_values)
-        error_list += currency_data.get('error_list', [])
-        warning_list += currency_data.get('warning_list', [])
+        ## RATE - NOTES: do this after date
+        rate_values = values
+        rate_values.update({'delivery_date': delivery_data.get('delivery_date', None)})
+        rate_data = self.l10n_hu_plus_get_rate_data(rate_values)
+        error_list += rate_data.get('error_list', [])
+        warning_list += rate_data.get('warning_list', [])
 
         ## VAT - NOTES: do this at last, we need to prepare values before this
         vat_values = values
-        vat_values.update({'delivery_date': delivery_date_data.get('delivery_date', None)})
-        vat_data = self.l10n_hu_get_data_vat(vat_values)
+        vat_values.update({'delivery_date': delivery_data.get('delivery_date', None)})
+        vat_data = self.l10n_hu_plus_get_vat_data(vat_values)
         error_list += vat_data.get('error_list', [])
         warning_list += vat_data.get('warning_list', [])
 
         # Process field values
         if len(error_list) == 0:
-            # CASH ACCOUNTING
-            is_cash_accounting = cash_accounting_data.get('is_cash_accounting', False)
-            field_values.update({'l10n_hu_cash_accounting': is_cash_accounting})
-
-            # CURRENCY
-            field_values.update({
-                'l10n_hu_currency_date': currency_data.get('l10n_hu_currency_date', None),
-                'l10n_hu_huf_currency': currency_data.get('l10n_hu_huf_currency', None),
-                'l10n_hu_document_rate': currency_data.get('l10n_hu_document_rate', 0.0),
-                'l10n_hu_huf_rate': currency_data.get('l10n_hu_huf_rate', 0.0),
-                'l10n_hu_invoice_currency_rate_inverse': currency_data.get('l10n_hu_invoice_currency_rate_inverse', 0.0),
-            })
-
-            # DELIVERY DATE
-            delivery_date = delivery_date_data.get('delivery_date', None)
-            l10n_hu_delivery_period_end = delivery_date_data.get('l10n_hu_delivery_period_end', None)
-            l10n_hu_delivery_period_start = delivery_date_data.get('l10n_hu_delivery_period_start', None)
+            # DELIVERY
+            delivery_date = delivery_data.get('delivery_date', None)
+            l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end', None)
+            l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start', None)
             if self.state == 'draft' and delivery_date:
                 field_values.update({'delivery_date': delivery_date})
             if self.state == 'draft' and l10n_hu_delivery_period_end:
@@ -853,8 +827,18 @@ class L10nHuPlusAccountMove(models.Model):
                 'l10n_hu_document_vat_huf': l10n_hu_document_vat_huf,
             })
 
+            # RATE
+            field_values.update({
+                'l10n_hu_huf_currency': rate_data.get('l10n_hu_huf_currency', None),
+                'l10n_hu_document_rate': rate_data.get('l10n_hu_document_rate', 0.0),
+                'l10n_hu_huf_rate': rate_data.get('l10n_hu_huf_rate', 0.0),
+                'l10n_hu_invoice_currency_rate_date': rate_data.get('l10n_hu_invoice_currency_rate_date', None),
+                'l10n_hu_invoice_currency_rate_inverse': rate_data.get('l10n_hu_invoice_currency_rate_inverse', 0.0),
+            })
+
             # VAT
             field_values.update({
+                'l10n_hu_cash_accounting': vat_data.get('l10n_hu_cash_accounting', False),
                 'l10n_hu_vat_date': vat_data.get('l10n_hu_vat_date', self.l10n_hu_vat_date),
                 'l10n_hu_vat_status': vat_data.get('l10n_hu_vat_status', self.l10n_hu_vat_status),
             })
@@ -882,307 +866,24 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Update result
         result.update({
-            'cash_accounting_data': cash_accounting_data,
-            'currency_data': currency_data,
             'debug_list': debug_list,
-            'delivery_date_data': delivery_date_data,
+            'delivery_data': delivery_data,
             'document_data': document_data,
             'error_list': error_list,
             'field_values': field_values,
             'info_list': info_list,
+            'rate_data': rate_data,
             'vat_data': vat_data,
             'warning_list': warning_list,
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_get_data END" + str(result))
-        return result
-    
-    @api.model
-    def l10n_hu_get_data_cash_accounting(self, values):
-        """ Collect cash accounting related data
-
-        NOTES:
-        - This method get values care of special hungarian fields
-
-        :param values: dictionary
-
-        :return: dictionary
-        """
-        # raise exceptions.UserError("l10n_hu_get_data_cash_accounting BEGIN" + str(values))
-
-        # Initialize variables
-        debug_list = []
-        error_list = []
-        info_list = []
-        result = {}
-        warning_list = []
-
-        # is_cash_accounting
-        is_cash_accounting = False
-        if self.is_invoice(True) and self.state == 'draft':
-            if self.move_type in ['in_invoice', 'in_refund'] \
-                    and self.partner_id \
-                    and self.partner_id.property_account_position_id \
-                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
-                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca':
-                is_cash_accounting = True
-            elif self.move_type in ['out_invoice', 'out_refund'] \
-                    and self.partner_id \
-                    and self.partner_id.property_account_position_id \
-                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
-                    and self.company_id.l10n_hu_tax_regime == 'ca':
-                is_cash_accounting = True
-            else:
-                pass
-        else:
-            pass
-
-        # cash_account_summary
-        if is_cash_accounting:
-            cash_accounting_summary = _("The issuer of the invoice applies cash accounting")
-        else:
-            cash_accounting_summary = _("The issuer of the invoice does not apply cash accounting")
-
-        # Update result
-        result.update({
-            'cash_accounting_summary': cash_accounting_summary,
-            'debug_list': debug_list,
-            'error_list': error_list,
-            'info_list': info_list,
-            'is_cash_accounting': is_cash_accounting,
-            'warning_list': warning_list,
-        })
-
-        # Return result
-        # raise exceptions.UserError("l10n_hu_get_data_cash_accounting END" + str(result))
+        # raise exceptions.UserError("l10n_hu_plus_get_data END" + str(result))
         return result
 
     @api.model
-    def l10n_hu_get_data_currency_rate(self, values):
-        """ Get currency related data considering special hungarian rules
-
-        NOTES:
-        - This method only collects data, can be called by various other methods
-        - we collect all HU relevant information (currencies, rates, etc..)
-        - TODO write documentation:
-            - expected_rate (accounting_rate) vs invoice_currency_rate (document rate)
-            - issue_date vs delivery_date vs currency_rate_date
-
-        :param values: dictionary
-
-        :return: dictionary
-        """
-        # raise exceptions.UserError("l10n_hu_get_data_currency_rate BEGIN" + str(values))
-
-        # Initialize variables
-        debug_list = []
-        error_list = []
-        info_list = []
-        result = {}
-        warning_list = []
-
-        # CURRENCIES
-        company_currency = self.company_id.currency_id
-        huf_currency = self.env.ref('base.HUF')
-        invoice_currency = self.currency_id
-
-        # DATES
-        ## delivery_date
-        delivery_date = values.get('delivery_date', self.delivery_date)
-
-        ## invoice date
-        if values.get('invoice_date'):
-            invoice_date = values['invoice_date']
-            if isinstance(invoice_date, datetime.date):
-                pass
-            elif isinstance(invoice_date, str):
-                try:
-                    date_string = invoice_date
-                    date_format = "%Y-%m-%d"
-                    invoice_date = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    invoice_date = None
-            else:
-                invoice_date = None
-        elif self.invoice_date:
-            invoice_date = self.invoice_date
-        elif self.state == 'draft':
-            invoice_date = fields.Date.today()
-        else:
-            invoice_date = None
-
-        ## currency_rate_date
-        ## NOTES: if the invoice was issued before the delivery date then
-        ##        that means that the rate for the delivery date did nto exist yet
-        ##        so we use the rate for the issue date
-        if delivery_date and invoice_date and delivery_date > invoice_date:
-            currency_rate_date = invoice_date
-        elif delivery_date:
-            currency_rate_date = delivery_date
-        else:
-            currency_rate_date = fields.Date.today()
-
-        # Rates
-        ## ODOO (FLOAT)
-        expected_currency_rate = self.expected_currency_rate
-        invoice_currency_rate = values.get('invoice_currency_rate', self.invoice_currency_rate)
-
-        ## HU+ delivery_date_rcr
-        if delivery_date:
-            delivery_date_rcr = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', invoice_currency.id),
-                ('name', '<=', delivery_date)
-            ], limit=1)
-        else:
-            delivery_date_rcr = None
-
-        ## HU+ invoice_date_rcr
-        if invoice_date:
-            invoice_date_rcr = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', invoice_currency.id),
-                ('name', '<=', invoice_date)
-            ], limit=1)
-        else:
-            invoice_date_rcr = None
-
-        ## HU+ accounting_rate
-        accounting_date = currency_rate_date
-        accounting_rate = 1.0
-        accounting_rcr = None
-        if currency_rate_date and company_currency != invoice_currency:
-            accounting_rcr = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', invoice_currency.id),
-                ('name', '<=', accounting_date)
-            ], limit=1)
-            debug_list.append("accounting_rcr set for foreign currency")
-            if accounting_rcr:
-                accounting_rate = accounting_rcr.company_rate
-                debug_list.append("accounting_rate set: " + str(accounting_rate))
-        else:
-            debug_list.append("accounting_rcr not set, invoice and company has same currency")
-
-        ## HU+ document_rate
-        ### NOTES: NOT THE same as Odoo's invoice_currency_rate!
-        ###        Odoo's invoice_currency_rate is used for accounting!!
-        ###        Document rate is needed for VAT and may not be the same as the accounting rate!
-        ###        For example: vendor bill issuer might use different rate than our company for the same date
-        if values.get('l10n_hu_document_rate') and isinstance(values['l10n_hu_document_rate'], float):
-            document_rate = values['l10n_hu_document_rate']
-            debug_list.append("l10n_hu_document_rate set from values: " + str(values['l10n_hu_document_rate']))
-        elif invoice_currency == company_currency and self.l10n_hu_document_rate != 1.0:
-            document_rate = 1.0
-            debug_list.append("l10n_hu_document_rate set to 1.0")
-        elif self.l10n_hu_document_rate in [0, 1] and accounting_rcr:
-            document_rate = accounting_rcr.inverse_company_rate
-            debug_list.append("l10n_hu_document_rate set from last accounting rate: " + str(document_rate))
-        elif self.l10n_hu_document_rate:
-            document_rate = self.l10n_hu_document_rate
-            debug_list.append("l10n_hu_document_rate set from self: " + str(document_rate))
-        else:
-            document_rate = 0.0
-            debug_list.append("l10n_hu_document_rate passed")
-
-        ## HU+ huf_rate
-        huf_rate = 0.0
-        ### Company HUF
-        if company_currency.name == 'HUF':
-            huf_rate = 1.0
-            debug_list.append("huf_rate is 1.0 for company HUF")
-        ## Company NOT HUF
-        elif company_currency.name != 'HUF' and currency_rate_date:
-            huf_rate_rcr = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', huf_currency.id),
-                ('name', '<=', currency_rate_date)
-            ], limit=1)
-            if huf_rate_rcr:
-                huf_rate = huf_rate_rcr.company_rate
-                debug_list.append("huf_rate found for company NOT HUF")
-            else:
-                error_list.append("huf_rate not found")
-        else:
-            debug_list.append("huf_rate else scenario, probably delivery_date is not set")
-
-        ## SPECIAL CASE: invoice_date < delivery_date (periodic delivery)
-        ## - customer invoice issued externally and downloaded
-        ## - vendor bill
-        ## NOTES: we need to do accounting for the invoice_date
-        if self.move_type in ['in_invoice', 'in_refund'] and invoice_date and delivery_date \
-                and invoice_date < delivery_date:
-            invoice_currency_rate = delivery_date_rcr.company_rate
-
-        # l10n_hu_currency_date
-        l10n_hu_currency_date = self._get_invoice_currency_rate_date()
-        if l10n_hu_currency_date > currency_rate_date:
-            l10n_hu_currency_date = currency_rate_date
-
-        # l10n_hu_invoice_currency_rate_inverse
-        if invoice_currency_rate != 0:
-            l10n_hu_invoice_currency_rate_inverse = 1 / invoice_currency_rate
-        else:
-            l10n_hu_invoice_currency_rate_inverse = 0.0
-
-        # expected_currency_rate_inverse
-        if expected_currency_rate != 0:
-            expected_currency_rate_inverse = 1 / expected_currency_rate
-        else:
-            expected_currency_rate_inverse = 0.0
-
-        # currency_summary
-        if company_currency == invoice_currency:
-            currency_summary = _("This document uses the company currency")
-        else:
-            currency_summary = _("Currency rate") + ": " + str(l10n_hu_currency_date) + " "
-            currency_summary += str(l10n_hu_invoice_currency_rate_inverse)
-            currency_summary += " " + invoice_currency.name + "/" + company_currency.name
-            currency_summary += " (" + _("Accounting") + ") "
-            if l10n_hu_invoice_currency_rate_inverse != expected_currency_rate_inverse:
-                currency_summary += str(expected_currency_rate_inverse)
-                currency_summary += " " + invoice_currency.name + "/" + company_currency.name
-                currency_summary += " (" + _("Expected") + ") "
-            if self.move_type in ['in_invoice', 'in_refund']:
-                currency_summary += str(document_rate)
-                currency_summary += " " + invoice_currency.name + "/" + company_currency.name
-                currency_summary += " (" + _("Document") + ") "
-            if company_currency.name != 'HUF':
-                currency_summary +=  str(huf_rate)
-                currency_summary += " " + company_currency.name + "/" + huf_currency.name
-                currency_summary += " (" + _("HUF rate") + ")"
-
-        # Update result
-        result.update({
-            'accounting_rate': accounting_rate,
-            'currency_summary': currency_summary,
-            'debug_list': debug_list,
-            'delivery_date': delivery_date,
-            'error_list': error_list,
-            'expected_currency_rate': expected_currency_rate,
-            'expected_currency_rate_inverse': expected_currency_rate_inverse,
-            'info_list': info_list,
-            'invoice_currency_rate': invoice_currency_rate,
-            'invoice_date': invoice_date,
-            'l10n_hu_currency_date': l10n_hu_currency_date,
-            'l10n_hu_huf_currency': huf_currency,
-            'l10n_hu_document_rate': document_rate,
-            'l10n_hu_huf_rate': huf_rate,
-            'l10n_hu_invoice_currency_rate_inverse': l10n_hu_invoice_currency_rate_inverse,
-            'res_currency_rate_accounting': accounting_rcr,
-            'res_currency_rate_invoice_date': invoice_date_rcr,
-            'res_currency_rate_delivery_date': delivery_date_rcr,
-            'warning_list': warning_list,
-        })
-
-        # Return result
-        # raise exceptions.UserError("l10n_hu_get_data_currency_rate" + "\n" + str(result))
-        return result
-
-    @api.model
-    def l10n_hu_get_data_delivery_date(self, values):
-        """ Get delivery date data considering special hungarian rules
+    def l10n_hu_plus_get_delivery_data(self, values):
+        """ Get date data considering special hungarian rules
 
         NOTES:
         - This method only collects data, can be called by various other methods
@@ -1193,7 +894,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_data_delivery_date BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_plus_get_delivery_data BEGIN" + str(values))
 
         # Initialize variables
         debug_list = []
@@ -1204,60 +905,18 @@ class L10nHuPlusAccountMove(models.Model):
         result = {}
         warning_list = []
 
-        # journal
-        if values.get('journal_id') and isinstance(values['journal_id'], int):
-            journal = self.env['account.journal'].sudo().browse(values['journal_id'])
-        elif values.get('journal'):
-            journal = values['journal']
-        elif self.journal_id:
-            journal = self.journal_id
+        # delivery_date_default
+        if self.journal_id:
+            delivery_date_default = self.journal_id.l10n_hu_get_default_delivery_date()
         else:
-            journal = None
+            delivery_date_default = None
             error_list.append("journal not set")
 
-        # is_hu_company
-        if journal and journal.company_id.account_fiscal_country_id.code == 'HU':
-            is_hu_company = True
-        else:
-            is_hu_company = False
-
-        # period_start
-        if values.get('l10n_hu_delivery_period_start'):
-            period_start = values['l10n_hu_delivery_period_start']
-            if isinstance(period_start, datetime.date):
-                pass
-            elif isinstance(period_start, str):
-                try:
-                    date_string = period_start
-                    date_format = "%Y-%m-%d"
-                    period_start = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    period_start = None
-            else:
-                period_start = None
-        elif self.l10n_hu_delivery_period_start:
-            period_start = self.l10n_hu_delivery_period_start
-        else:
-            period_start = None
-
-        # period_end
-        if values.get('l10n_hu_delivery_period_end'):
-            period_end = values['l10n_hu_delivery_period_end']
-            if isinstance(period_end, datetime.date):
-                pass
-            elif isinstance(period_end, str):
-                try:
-                    date_string = period_end
-                    date_format = "%Y-%m-%d"
-                    period_end = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    period_end = None
-            else:
-                period_end = None
-        elif self.l10n_hu_delivery_period_end:
-            period_end = self.l10n_hu_delivery_period_end
-        else:
-            period_end = None
+        # dates
+        accounting_date = values.get('date', self.date)
+        invoice_date = values.get('invoice_date', self.invoice_date)
+        period_end = values.get('l10n_hu_delivery_period_end', self.l10n_hu_delivery_period_end)
+        period_start = values.get('l10n_hu_delivery_period_start', self.l10n_hu_delivery_period_start)
 
         # period_enabled
         if period_start and period_end:
@@ -1265,47 +924,9 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             period_enabled = False
 
-        # delivery_date_default
-        if journal:
-            delivery_date_default = journal.l10n_hu_get_default_delivery_date()
-        else:
-            delivery_date_default = None
-
-        # invoice date
-        if values.get('invoice_date'):
-            invoice_date = values['invoice_date']
-            if isinstance(invoice_date, datetime.date):
-                pass
-            elif isinstance(invoice_date, str):
-                try:
-                    date_string = invoice_date
-                    date_format = "%Y-%m-%d"
-                    invoice_date = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    invoice_date = None
-            else:
-                invoice_date = None
-        elif self.invoice_date:
-            invoice_date = self.invoice_date
-        elif self.state == 'draft':
-            invoice_date = fields.Date.today()
-        else:
-            invoice_date = None
-
         # invoice_date_due
         if values.get('invoice_date_due'):
             invoice_date_due = values['invoice_date_due']
-            if isinstance(invoice_date_due, datetime.date):
-                pass
-            elif isinstance(invoice_date_due, str):
-                try:
-                    date_string = invoice_date_due
-                    date_format = "%Y-%m-%d"
-                    invoice_date_due = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    invoice_date_due = None
-            else:
-                invoice_date_due = None
         elif self.invoice_payment_term_id:
             # NOTES: using a payment term needs a recompute, see _compute_invoice_date_due()
             context_today = fields.Date.context_today(self)
@@ -1313,19 +934,15 @@ class L10nHuPlusAccountMove(models.Model):
                 (k['date_maturity'] for k in self.needed_terms.keys() if k),
                 default=False,
             ) or self.invoice_date_due or context_today
-        elif self.invoice_date_due:
-            invoice_date_due = self.invoice_date_due
         else:
-            invoice_date_due = None
+            invoice_date_due = self.invoice_date_due
 
         # Set last day of delivery period month
         if period_end:
             # Get close to the end of the month and add 4 days to 'roll it over'
             period_next_month = period_end.replace(day=28) + datetime.timedelta(days=4)
-
             # Set the day to 1 gives us the start of next month
             period_first_day_of_next_month = period_next_month.replace(day=1)
-
             # Remove one day to get last day of this month
             period_month_last_day = period_first_day_of_next_month - datetime.timedelta(days=1)
         else:
@@ -1373,12 +990,9 @@ class L10nHuPlusAccountMove(models.Model):
                 delivery_date = period_end_plus_60
 
         # Period text
-        if is_hu_company and period_enabled:
-            # period_summary
+        if period_enabled:
             period_summary += _("Delivery period") + ": "
             period_summary += str(period_start) + " - " + str(period_end)
-
-            # period_legal
             period_legal = "2007. CXXVII. 58.§"
             if scenario == '1a_invoice_date':
                 period_legal += " (1) a)"
@@ -1391,6 +1005,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Update result
         result.update({
+            'accounting_date': accounting_date,
             'debug_list': debug_list,
             'delivery_date': delivery_date,
             'delivery_date_default': delivery_date_default,
@@ -1410,12 +1025,12 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_get_data_delivery_date" + "\n" + str(result))
+        # raise exceptions.UserError("l10n_hu_plus_get_delivery_data" + "\n" + str(result))
         return result
 
     @api.model
-    def l10n_hu_get_data_document(self, values):
-        """ Get document type related data considering special hungarian rules
+    def l10n_hu_plus_get_document_data(self, values):
+        """ Get document related data considering special hungarian rules
 
         NOTES:
         - This method only collects data, can be called by various other methods
@@ -1430,7 +1045,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_data_document BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_plus_get_document_data BEGIN" + str(values))
 
         # Initialize variables
         debug_list = []
@@ -1439,17 +1054,18 @@ class L10nHuPlusAccountMove(models.Model):
         result = {}
         warning_list = []
 
-        # HUF Amounts
-        if self.l10n_hu_document_rate > 0:
-            l10n_hu_document_rate = self.l10n_hu_document_rate
-        elif self.l10n_hu_document_vat_huf > 0 and self.amount_tax > 0 \
-                and self.currency_id and self.currency_id.name != 'HUF':
-            l10n_hu_document_rate = self.l10n_hu_document_vat_huf / self.amount_tax
+        ## HUF VAT, document rate and amounts
+        ### NOTES: document rate is NOT THE same as Odoo's invoice_currency_rate!
+        ###        Odoo's invoice_currency_rate is used for accounting
+        ###        Document rate is needed for VAT and can be a different rate
+        ###        For example: vendor bill issuer might use different rate than our company for the same date
+        l10n_hu_document_vat_huf = values.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
+        if self.amount_tax != 0:
+            l10n_hu_document_rate = l10n_hu_document_vat_huf / self.amount_tax
         else:
             l10n_hu_document_rate = 1.0
         l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
-        l10n_hu_document_gross_huf = self.l10n_hu_document_vat_huf + l10n_hu_document_net_huf
-        l10n_hu_document_vat_huf = self.l10n_hu_document_vat_huf
+        l10n_hu_document_gross_huf = l10n_hu_document_vat_huf + l10n_hu_document_net_huf
 
         # MODIFICATION
         modification_document_type = self.env['l10n.hu.plus.tag'].search([
@@ -1459,55 +1075,37 @@ class L10nHuPlusAccountMove(models.Model):
         ], limit=1)
 
         # STORNO
-        # is_storno_invoice
+        ## Storno document type
+        storno_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_storno'),
+        ], limit=1)
+
+        ## is_storno_invoice
         base_invoice = self._l10n_hu_get_chain_base()
         if self.move_type == 'out_refund' and self != base_invoice and base_invoice.amount_residual == 0:
             is_storno_invoice = True
         else:
             is_storno_invoice = False
 
-        # is_storno_allowed
-        is_storno_allowed_points = 0
-
-        ## 1) Company: NAV connection configured
-        if self.company_id.l10n_hu_edi_server_mode in ['production', 'test']:
-            is_storno_allowed_points += 1
-
-        ## 2) Company: Storno document type
-        storno_document_type = self.env['l10n.hu.plus.tag'].search([
-            ('company', '=', self.company_id.id),
-            ('tag_type', '=', 'document_type'),
-            ('technical_name', '=', 'invoice_storno'),
-        ], limit=1)
-        if storno_document_type:
-            is_storno_allowed_points += 1
-
-        ## 3) Account move: posted out_invoice
-        if self.move_type == 'out_invoice' and self.state == 'posted':
-            is_storno_allowed_points += 1
-
-        ## Evaluate
-        if is_storno_allowed_points == 3:
+        ## is_storno_allowed
+        if storno_document_type and self.move_type == 'out_invoice' and self.state == 'posted' \
+                and not self.reversed_entry_id and not self.l10n_hu_original_invoice_number:
             is_storno_allowed = True
         else:
             is_storno_allowed = False
 
         # DOCUMENT TYPE
-        if values.get('l10n_hu_document_type'):
-            l10n_hu_document_type = values['l10n_hu_document_type']
-        elif self.l10n_hu_document_type:
-            l10n_hu_document_type = self.l10n_hu_document_type
-        elif not self.l10n_hu_document_type and self.move_type == 'out_invoice':
+        l10n_hu_document_type = values.get('l10n_hu_document_type', self.l10n_hu_document_type)
+        if not l10n_hu_document_type and self.move_type == 'out_invoice':
             l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
-        elif not self.l10n_hu_document_type and self.move_type == 'out_refund':
-            if is_storno_invoice and storno_document_type:
-                l10n_hu_document_type = storno_document_type
-            elif modification_document_type:
-                l10n_hu_document_type = modification_document_type
-            else:
-                l10n_hu_document_type = None
+        elif not l10n_hu_document_type and self.move_type == 'out_refund' and is_storno_invoice and storno_document_type:
+            l10n_hu_document_type = storno_document_type
+        elif not l10n_hu_document_type and self.move_type == 'out_refund' and modification_document_type:
+            l10n_hu_document_type = modification_document_type
         else:
-            l10n_hu_document_type = None
+            pass
 
         # Update result
         result.update({
@@ -1515,7 +1113,6 @@ class L10nHuPlusAccountMove(models.Model):
             'error_list': error_list,
             'info_list': info_list,
             'is_storno_allowed': is_storno_allowed,
-            'is_storno_allowed_points': is_storno_allowed_points,
             'is_storno_invoice': is_storno_invoice,
             'l10n_hu_document_gross_huf': l10n_hu_document_gross_huf,
             'l10n_hu_document_net_huf': l10n_hu_document_net_huf,
@@ -1528,14 +1125,197 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_get_data_document" + "\n" + str(result))
+        # raise exceptions.UserError("l10n_hu_plus_get_document_data" + "\n" + str(result))
         return result
 
     @api.model
-    def l10n_hu_get_data_vat(self, values):
+    def l10n_hu_plus_get_rate_data(self, values):
+        """ Get currency related data considering special hungarian rules
+
+        NOTES:
+        - This method only collects data, can be called by various other methods
+        - we collect all HU relevant information (currencies, rates, etc..)
+        - TODO write documentation:
+            - expected_rate (accounting_rate) vs invoice_currency_rate (document rate)
+            - issue_date vs delivery_date vs currency_rate_date
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_plus_get_rate_data BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        warning_list = []
+
+        # CURRENCIES
+        company_currency = self.company_id.currency_id
+        huf_currency = self.env.ref('base.HUF')
+        invoice_currency = self.currency_id
+
+        # DATES
+        delivery_date = values.get('delivery_date', self.delivery_date)
+        invoice_date = values.get('invoice_date', self.invoice_date)
+
+        ## currency_rate_date
+        ## NOTES: if the invoice was issued before the delivery date then
+        ##        that means that the rate for the delivery date did nto exist yet
+        ##        so we use the rate for the issue date
+        if delivery_date and invoice_date and delivery_date > invoice_date:
+            currency_rate_date = invoice_date
+        elif delivery_date:
+            currency_rate_date = delivery_date
+        else:
+            currency_rate_date = fields.Date.today()
+
+        # Float rates
+        ## Odoo rates
+        expected_currency_rate = self.expected_currency_rate
+        invoice_currency_rate = values.get('invoice_currency_rate', self.invoice_currency_rate)
+
+        ## Inverse rates
+        if invoice_currency_rate != 0:
+            l10n_hu_invoice_currency_rate_inverse = 1 / invoice_currency_rate
+        else:
+            l10n_hu_invoice_currency_rate_inverse = 0.0
+        if expected_currency_rate != 0:
+            expected_currency_rate_inverse = 1 / expected_currency_rate
+        else:
+            expected_currency_rate_inverse = 0.0
+
+        ## HU+ document rate
+        document_rate = values.get('l10n_hu_document_rate', self.l10n_hu_document_rate)
+
+        # Rate objects (res.currency.rate)
+        ## HU+ delivery_date_rcr
+        if delivery_date:
+            delivery_date_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', invoice_currency.id),
+                ('name', '<=', delivery_date)
+            ], limit=1)
+        else:
+            delivery_date_rcr = None
+
+        ## HU+ invoice_date_rcr
+        if invoice_date:
+            invoice_date_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', invoice_currency.id),
+                ('name', '<=', invoice_date)
+            ], limit=1)
+        else:
+            invoice_date_rcr = None
+
+        ## HU+ accounting_rate
+        accounting_date = currency_rate_date
+        accounting_rate = 1.0
+        accounting_rcr = None
+        if currency_rate_date and company_currency != invoice_currency:
+            accounting_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', invoice_currency.id),
+                ('name', '<=', accounting_date)
+            ], limit=1)
+            debug_list.append("accounting_rcr set for foreign currency")
+            if accounting_rcr:
+                accounting_rate = accounting_rcr.company_rate
+                debug_list.append("accounting_rate set: " + str(accounting_rate))
+        else:
+            debug_list.append("accounting_rcr not set, invoice and company has same currency")
+
+        ## HU+ huf_rate
+        huf_rate = 0.0
+        ### Company HUF
+        if company_currency.name == 'HUF':
+            huf_rate = 1.0
+            debug_list.append("huf_rate is 1.0 for company HUF")
+        ## Company NOT HUF
+        elif company_currency.name != 'HUF' and currency_rate_date:
+            huf_rate_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', huf_currency.id),
+                ('name', '<=', currency_rate_date)
+            ], limit=1)
+            if huf_rate_rcr:
+                huf_rate = huf_rate_rcr.company_rate
+                debug_list.append("huf_rate found for company NOT HUF")
+            else:
+                error_list.append("huf_rate not found")
+        else:
+            debug_list.append("huf_rate else scenario, probably delivery_date is not set")
+
+        ## SPECIAL CASE: invoice_date < delivery_date (periodic delivery)
+        ## - customer invoice issued externally and downloaded
+        ## - vendor bill
+        ## NOTES: we need to do accounting for the invoice_date
+        if self.move_type in ['in_invoice', 'in_refund'] and invoice_date and delivery_date \
+                and invoice_date < delivery_date:
+            invoice_currency_rate = delivery_date_rcr.company_rate
+
+        # l10n_hu_invoice_currency_rate_date
+        l10n_hu_invoice_currency_rate_date = self._get_invoice_currency_rate_date()
+        if l10n_hu_invoice_currency_rate_date > currency_rate_date:
+            l10n_hu_invoice_currency_rate_date = currency_rate_date
+
+        # currency_summary
+        if company_currency == invoice_currency:
+            currency_summary = _("This document uses the company currency")
+        else:
+            currency_summary = _("Currency rate") + ": " + str(l10n_hu_invoice_currency_rate_date) + " "
+            currency_summary += str(l10n_hu_invoice_currency_rate_inverse)
+            currency_summary += " " + invoice_currency.name + "/" + company_currency.name
+            currency_summary += " (" + _("Accounting") + ") "
+            if l10n_hu_invoice_currency_rate_inverse != expected_currency_rate_inverse:
+                currency_summary += str(expected_currency_rate_inverse)
+                currency_summary += " " + invoice_currency.name + "/" + company_currency.name
+                currency_summary += " (" + _("Expected") + ") "
+            if self.move_type in ['in_invoice', 'in_refund']:
+                currency_summary += str(document_rate)
+                currency_summary += " " + invoice_currency.name + "/" + company_currency.name
+                currency_summary += " (" + _("Document") + ") "
+            if company_currency.name != 'HUF':
+                currency_summary += str(huf_rate)
+                currency_summary += " " + company_currency.name + "/" + huf_currency.name
+                currency_summary += " (" + _("HUF rate") + ")"
+
+        # Update result
+        result.update({
+            'accounting_rate': accounting_rate,
+            'currency_summary': currency_summary,
+            'debug_list': debug_list,
+            'delivery_date': delivery_date,
+            'error_list': error_list,
+            'expected_currency_rate': expected_currency_rate,
+            'expected_currency_rate_inverse': expected_currency_rate_inverse,
+            'info_list': info_list,
+            'invoice_currency_rate': invoice_currency_rate,
+            'invoice_date': invoice_date,
+            'l10n_hu_document_rate': document_rate,
+            'l10n_hu_huf_currency': huf_currency,
+            'l10n_hu_huf_rate': huf_rate,
+            'l10n_hu_invoice_currency_rate_date': l10n_hu_invoice_currency_rate_date,
+            'l10n_hu_invoice_currency_rate_inverse': l10n_hu_invoice_currency_rate_inverse,
+            'res_currency_rate_accounting': accounting_rcr,
+            'res_currency_rate_invoice_date': invoice_date_rcr,
+            'res_currency_rate_delivery_date': delivery_date_rcr,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_get_rate_data" + "\n" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_plus_get_vat_data(self, values):
         """ Collect vat related data
 
         NOTES:
+        - is_cash_accounting: cash accounting is relevant or not
         - l10n_hu_vat_date: date of next VAT declaration
         - l10n_hu_vat_status: VAT status of the document
 
@@ -1543,7 +1323,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_get_data_vat BEGIN" + str(values))
+        # raise exceptions.UserError("l10n_hu_plus_get_vat_data BEGIN" + str(values))
 
         # Initialize variables
         debug_list = []
@@ -1558,18 +1338,46 @@ class L10nHuPlusAccountMove(models.Model):
         # l10n_hu_vat_status
         l10n_hu_vat_status = values.get('l10n_hu_vat_status', self.l10n_hu_vat_status)
 
+        # is_cash_accounting
+        is_cash_accounting = False
+        if self.is_invoice(True) and self.state == 'draft':
+            if self.move_type in ['in_invoice', 'in_refund'] \
+                    and self.partner_id \
+                    and self.partner_id.property_account_position_id \
+                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
+                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca':
+                is_cash_accounting = True
+            elif self.move_type in ['out_invoice', 'out_refund'] \
+                    and self.partner_id \
+                    and self.partner_id.property_account_position_id \
+                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
+                    and self.company_id.l10n_hu_tax_regime == 'ca':
+                is_cash_accounting = True
+            else:
+                pass
+        else:
+            pass
+
+        # cash_account_summary
+        if is_cash_accounting:
+            cash_accounting_summary = _("The issuer of the invoice applies cash accounting")
+        else:
+            cash_accounting_summary = _("The issuer of the invoice does not apply cash accounting")
+
         # Update result
         result.update({
+            'cash_accounting_summary': cash_accounting_summary,
             'debug_list': debug_list,
             'error_list': error_list,
             'info_list': info_list,
+            'is_cash_accounting': is_cash_accounting,
             'l10n_hu_vat_date': l10n_hu_vat_date,
             'l10n_hu_vat_status': l10n_hu_vat_status,
             'warning_list': warning_list,
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_get_data_vat END" + str(result))
+        # raise exceptions.UserError("l10n_hu_plus_get_vat_data END" + str(result))
         return result
 
     ## HU+ EDI
@@ -1709,10 +1517,10 @@ class L10nHuPlusAccountMove(models.Model):
         """
         
         # HU+0: collect data using dedicated methods
-        cash_accounting_data = self.l10n_hu_get_data_cash_accounting({})
-        currency_data = self.l10n_hu_get_data_currency_rate({})
-        delivery_date_data = self.l10n_hu_get_data_delivery_date({})
-        document_data = self.l10n_hu_get_data_document({})
+        delivery_data = self.l10n_hu_plus_get_delivery_data({})
+        document_data = self.l10n_hu_plus_get_document_data({})
+        rate_data = self.l10n_hu_plus_get_rate_data({})
+        vat_data = self.l10n_hu_plus_get_vat_data({})
 
         # HU+1: document type
         if self.l10n_hu_document_type:
@@ -1787,9 +1595,9 @@ class L10nHuPlusAccountMove(models.Model):
             })
 
         # HU+5: delivery period
-        l10n_hu_delivery_period_end = delivery_date_data.get('l10n_hu_delivery_period_end', None)
-        l10n_hu_delivery_period_legal = delivery_date_data.get('l10n_hu_delivery_period_legal', None)
-        l10n_hu_delivery_period_start = delivery_date_data.get('l10n_hu_delivery_period_start', None)
+        l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end', None)
+        l10n_hu_delivery_period_legal = delivery_data.get('l10n_hu_delivery_period_legal', None)
+        l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start', None)
         hu_5_description = str(l10n_hu_delivery_period_start)
         hu_5_description += " - "
         hu_5_description += str(l10n_hu_delivery_period_end)
@@ -1833,7 +1641,7 @@ class L10nHuPlusAccountMove(models.Model):
         info_list.append({
             'action_text': None,
             'code': 'HU+6',
-            'description': str(cash_accounting_data.get('cash_accounting_summary', "")),
+            'description': str(vat_data.get('cash_accounting_summary', "")),
             'records': self,
             'result': 'info',
         })
@@ -1842,7 +1650,7 @@ class L10nHuPlusAccountMove(models.Model):
         info_list.append({
             'action_text': None,
             'code': 'HU+7',
-            'description': str(currency_data.get('currency_summary', "")),
+            'description': str(rate_data.get('currency_summary', "")),
             'records': self,
             'result': 'info',
         })

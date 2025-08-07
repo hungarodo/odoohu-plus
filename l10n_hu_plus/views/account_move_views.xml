@@ -101,20 +101,20 @@
                             <field name="l10n_hu_document_type_technical_name" invisible="1"/>
                             <!-- Document HUF -->
                             <label name="l10n_hu_document_huf_label" for="l10n_hu_document_type" invisible="move_type not in ['in_invoice', 'in_refund']" string="Document HUF"/>
-                            <div name="l10n_hu_document_huf_div" class="d-flex d-row gap-1 justify-content-start" invisible="move_type not in ['in_invoice', 'in_refund']">
-                                <field name="l10n_hu_document_net_huf" class="text-muted w-auto"/>
-                                <span class="text-muted w-auto">+</span>
-                                <field name="l10n_hu_document_vat_huf" class="w-auto" readonly="state != 'draft' and checked"/>
-                                <span class="text-muted w-auto">=</span>
-                                <field name="l10n_hu_document_gross_huf" class="text-muted w-auto"/>
-                            </div>
-                            <!-- Document Rate -->
-                            <label name="l10n_hu_document_rate_label" for="l10n_hu_document_rate" invisible="currency_id == company_currency_id or move_type not in ['in_invoice', 'in_refund']" string="Document Rate"/>
-                            <div name="l10n_hu_document_rate_div" class="d-flex gap-1" invisible="currency_id == company_currency_id or move_type not in ['in_invoice', 'in_refund']">
-                                <field name="l10n_hu_document_rate" class="text-end w-25" digits="[12,2]" readonly="(state != 'draft' and checked) or currency_id == company_currency_id"/>
-                                <field name="company_currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
-                                <span class="text-muted w-auto">/</span>
-                                <field name="currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
+                            <div name="l10n_hu_document_huf_div"  invisible="move_type not in ['in_invoice', 'in_refund']">
+                                <div name="l10n_hu_document_huf_div_1" class="d-flex gap-1 justify-content-start">
+                                    <field name="l10n_hu_document_net_huf" class="text-muted w-auto"/>
+                                    <span class="text-muted w-auto">+</span>
+                                    <field name="l10n_hu_document_vat_huf" class="w-auto" readonly="state != 'draft' and checked"/>
+                                    <span class="text-muted w-auto">=</span>
+                                    <field name="l10n_hu_document_gross_huf" class="text-muted w-auto"/>
+                                </div>
+                                <div name="l10n_hu_document_huf_div_2" class="d-flex gap-1 justify-content-start" invisible="currency_id == company_currency_id or move_type not in ['in_invoice', 'in_refund']">
+                                    <field name="l10n_hu_document_rate" class="text-muted w-auto" digits="[12,2]"/>
+                                    <field name="company_currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
+                                    <span class="text-muted w-auto">/</span>
+                                    <field name="currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
+                                </div>
                             </div>
                             <!-- Original invoice -->
                             <label name="l10n_hu_original_invoice" for="l10n_hu_original_invoice_number" invisible="l10n_hu_document_type_technical_name in ['invoice_normal']" string="Original Invoice Number"/>

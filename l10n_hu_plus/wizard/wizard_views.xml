@@ -140,16 +140,17 @@
                     <group name="accounting_fields_1">
                         <!-- Document type-->
                         <field name="accounting_document_type" options="{'no_create': True, 'no_open': True}" string="Document Type"/>
-                        <!-- Document VAT HUF -->
-                        <field name="accounting_document_vat_huf" invisible="account_move_action != 'update_fields' or accounting_move_type not in ['in_invoice', 'in_refund']" string="Document VAT"/>
-                        <!-- Document currency rate -->
-                        <label name="accounting_document_currency_rate_label" class="fw-bold" for="accounting_document_rate_visible" invisible="not accounting_document_rate_visible" string="Document Rate"/>
-                        <div name="accounting_document_currency_rate_div" class="d-flex d-flex-row gap-1" invisible="not accounting_document_rate_visible">
-                            <field name="accounting_document_rate_visible" invisible="1"/>
-                            <field name="accounting_document_rate_amount" class="w-25"/>
-                            <field name="company_currency_name" class="text-muted w-auto"/>
-                            <span class="text-muted w-auto">/</span>
-                            <field name="accounting_move_currency_name" class="text-muted w-auto"/>
+                        <!-- Document VAT HUF and rate -->
+                        <label name="accounting_document_vat_label" class="fw-bold" for="accounting_document_vat_huf" string="Document VAT"/>
+                        <div name="accounting_document_vat_div">
+                            <field name="accounting_document_vat_huf" invisible="account_move_action != 'update_fields' or accounting_move_type not in ['in_invoice', 'in_refund']"/>
+                            <div class="d-flex d-flex-row gap-1" invisible="not accounting_document_rate_visible">
+                                <field name="accounting_document_rate_visible" invisible="1"/>
+                                <field name="accounting_document_rate_amount" class="w-auto"/>
+                                <field name="company_currency_name" class="text-muted w-auto"/>
+                                <span class="text-muted w-auto">/</span>
+                                <field name="accounting_move_currency_name" class="text-muted w-auto"/>
+                            </div>
                         </div>
                     </group>
                     <group name="accounting_fields_2">

@@ -198,6 +198,7 @@ class L10nHuPlusWizard(models.TransientModel):
         string="Accounting Delivery Period Start",
     )
     accounting_document_rate_amount = fields.Float(
+        readonly=True,
         string="Accounting Document Rate Amount",
     )
     accounting_document_rate_visible = fields.Boolean(
@@ -442,17 +443,23 @@ class L10nHuPlusWizard(models.TransientModel):
                 and self.accounting_delivery_period_end \
                 and self.accounting_delivery_period_start \
                 and self.account_move_action == 'update_fields':
-            # Get delivery period data
-            delivery_date_result = self.account_move[0].l10n_hu_get_data_delivery_date({
+            # Get delivery data
+            delivery_data = self.account_move[0].l10n_hu_plus_get_delivery_data({
                 'l10n_hu_delivery_period_end': self.accounting_delivery_period_end,
                 'l10n_hu_delivery_period_start': self.accounting_delivery_period_start,
             })
-            # raise exceptions.ValidationError(str(delivery_date_result))
-            self.accounting_date = delivery_date_result.get('delivery_date', None)
-            self.accounting_delivery_date = delivery_date_result.get('delivery_date', None)
-            self.accounting_delivery_period_legal = delivery_date_result.get('period_legal', None)
+            # raise exceptions.ValidationError(str(delivery_data))
+            self.accounting_date = delivery_data.get('delivery_date', None)
+            self.accounting_delivery_date = delivery_data.get('delivery_date', None)
+            self.accounting_delivery_period_legal = delivery_data.get('period_legal', None)
         else:
             pass
+
+    @api.onchange('accounting_document_vat_huf')
+    def onchange_accounting_document_vat_huf(self):
+        document_data = self.account_move[0].l10n_hu_plus_get_document_data({
+            'l10n_hu_document_vat_huf': self.accounting_document_vat_huf})
+        self.accounting_document_rate_amount = document_data.get('l10n_hu_document_rate', 0.0)
 
     @api.onchange('account_move')
     def onchange_account_move(self):
@@ -472,7 +479,7 @@ class L10nHuPlusWizard(models.TransientModel):
             self.accounting_hu_plus_tag = account_move.l10n_hu_plus_tag
 
             # Set fields from HU+ data
-            data_result = account_move.l10n_hu_get_data({})
+            data_result = account_move.l10n_hu_plus_get_data({})
             # raise exceptions.UserError(str(data_result))
             field_values = data_result.get('field_values', {})
             # raise exceptions.UserError(str(field_values))
@@ -492,7 +499,7 @@ class L10nHuPlusWizard(models.TransientModel):
                 self.accounting_cash_visible = True
 
             # accounting_delivery_period_enabled
-            if data_result.get('delivery_date_data', {}) and data_result['delivery_date_data'].get('period_enabled'):
+            if self.accounting_delivery_period_start and self.accounting_delivery_period_end:
                 self.accounting_delivery_period_enabled = True
 
             # accounting_document_rate_visible
@@ -532,7 +539,9 @@ class L10nHuPlusWizard(models.TransientModel):
 
             # Manage
             manage_result = self.manage_account_move()
-            if manage_result.get('account_move_ids') and len(manage_result['account_move_ids']) == 1:
+            if self.account_move_action in ['check_status', 'update_fields']:
+                return {'type': 'ir.actions.act_window_close'}
+            elif manage_result.get('account_move_ids') and len(manage_result['account_move_ids']) == 1:
                 return {
                     'name': _("Account Move"),
                     'res_id': manage_result['account_move_ids'][0],
@@ -763,6 +772,7 @@ class L10nHuPlusWizard(models.TransientModel):
                         'l10n_hu_delivery_period_end': self.accounting_delivery_period_end,
                         'l10n_hu_delivery_period_start': self.accounting_delivery_period_start,
                         'l10n_hu_document_type': self.accounting_document_type,
+                        'l10n_hu_document_vat_huf': self.accounting_document_vat_huf,
                         'l10n_hu_vat_date': self.accounting_vat_date,
                         'l10n_hu_vat_status': self.accounting_vat_status,
                     }
@@ -770,7 +780,7 @@ class L10nHuPlusWizard(models.TransientModel):
                         data_parameters.update({'l10n_hu_cash_accounting': self.accounting_cash_enabled})
                     if self.accounting_document_rate_visible:
                         data_parameters.update({'l10n_hu_document_rate': self.accounting_document_rate_amount})
-                    data_result = account_move.l10n_hu_get_data(data_parameters)
+                    data_result = account_move.l10n_hu_plus_get_data(data_parameters)
                     # raise exceptions.ValidationError(str(values_result))
 
                     # Write when necessary
