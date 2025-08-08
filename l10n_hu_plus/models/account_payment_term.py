@@ -23,7 +23,7 @@ class L10nHuPlusPaymentTerm(models.Model):
     l10n_hu_nav_method = fields.Selection(
         selection=_get_l10n_hu_nav_method_selection,
         copy=False,
-        string="HU NAV Method",
+        string="NAV Payment Method",
     )
 
     # Compute and search fields, in the same order of field declarations
