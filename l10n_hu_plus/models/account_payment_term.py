@@ -25,6 +25,12 @@ class L10nHuPlusPaymentTerm(models.Model):
         copy=False,
         string="NAV Payment Method",
     )
+    l10n_hu_cash_rounding_id = fields.Many2one(
+        comodel_name="account.cash.rounding",
+        copy=False,
+        string="Cash Rounding",
+        help="Cash rounding to be used for this payment term.",
+    )
 
     # Compute and search fields, in the same order of field declarations
 
