@@ -19,7 +19,7 @@ class L10nHuPlusAccountMove(models.Model):
     _inherit = 'account.move'
 
     # Default methods
-    
+
     # Field declarations
     ## CASH ACCOUNTING
     l10n_hu_cash_accounting = fields.Boolean(
