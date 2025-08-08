@@ -457,9 +457,12 @@ class L10nHuPlusWizard(models.TransientModel):
 
     @api.onchange('accounting_document_vat_huf')
     def onchange_accounting_document_vat_huf(self):
-        document_data = self.account_move[0].l10n_hu_plus_get_document_data({
-            'l10n_hu_document_vat_huf': self.accounting_document_vat_huf})
-        self.accounting_document_rate_amount = document_data.get('l10n_hu_document_rate', 0.0)
+        document_rate = self.accounting_document_rate_amount
+        if self.account_move and len(self.account_move) == 1:
+            document_values = {'l10n_hu_document_vat_huf': self.accounting_document_vat_huf}
+            document_data = self.account_move[0].l10n_hu_plus_get_document_data(document_values)
+            document_rate = document_data.get('l10n_hu_document_rate', 0.0)
+        self.accounting_document_rate_amount = document_rate
 
     @api.onchange('account_move')
     def onchange_account_move(self):
