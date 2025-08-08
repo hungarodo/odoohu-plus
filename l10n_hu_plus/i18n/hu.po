@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 12:40+0000\n"
-"PO-Revision-Date: 2025-08-05 12:40+0000\n"
+"POT-Creation-Date: 2025-08-08 07:03+0000\n"
+"PO-Revision-Date: 2025-08-08 07:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1231,10 +1231,10 @@ msgid "Document HUF"
 msgstr "Dokumentum HUF"
 
 #. module: l10n_hu_plus
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
-#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
-msgid "Document Rate"
-msgstr "Dokumentum árfolyam"
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Document HUF amounts"
+msgstr "Dokumentum HUF összegek"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_tag__tag_type__document_type
@@ -1498,6 +1498,12 @@ msgid "Gross amount in HUF of the invoice document"
 msgstr "Számla dokumentumon szereplő bruttó összeg forintban"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Gross difference"
+msgstr "Bruttó eltérés"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__html_content
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.object_view_form
 msgid "HTML Content"
@@ -1548,22 +1554,16 @@ msgid "HU Cron Batch"
 msgstr "HU cron köteg"
 
 #. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_currency_date
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_currency_date
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_invoice_currency_rate_date
+#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_invoice_currency_rate_date
 msgid "HU Currency Date"
-msgstr "Árfolyam dátum"
+msgstr "HU Árfolyam dátum"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_currency_name
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_currency_name
 msgid "HU Currency Name"
 msgstr "Pénznem"
-
-#. module: l10n_hu_plus
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_bank_statement_line__l10n_hu_currency_summary
-#: model:ir.model.fields,field_description:l10n_hu_plus.field_account_move__l10n_hu_currency_summary
-msgid "HU Currency Summary"
-msgstr "HU pénznem összefoglalás"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_account_journal__l10n_hu_delivery_date_default
@@ -2489,6 +2489,12 @@ msgid "Net amount in HUF of the invoice document"
 msgstr "Számla dokumentumon szereplő nettó össze forintban"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Net difference"
+msgstr "Nettó eltérés"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__status__new
 msgid "New"
 msgstr "Új"
@@ -2913,6 +2919,12 @@ msgstr "Proforma név..."
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
 msgid "Proforma reference:"
 msgstr "Proforma hivatkozás:"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Rate difference"
+msgstr "Árfolyam eltérés"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__rating_ids
@@ -3464,6 +3476,12 @@ msgstr "ÁFA státusz"
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_document_vat_huf
 msgid "VAT amount in HUF as indicated on the invoice document"
 msgstr "A bizonylaton feltüntetett ÁFA összege forintban"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "VAT difference"
+msgstr "ÁFA eltérés"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_partner_form_inherit

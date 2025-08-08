@@ -390,7 +390,9 @@ class L10nHuPlusAccountMove(models.Model):
             raise exceptions.UserError(_("Action only allowed for draft invoices!"))
         values_result = self.l10n_hu_plus_get_data({})
         if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
-            return self.write(values_result['field_values'])
+            self.write(values_result['field_values'])
+            self.action_l10n_hu_update_plus_status()
+            return
         elif len(values_result.get('field_values')) == 0:
             return
         else:
@@ -1067,6 +1069,30 @@ class L10nHuPlusAccountMove(models.Model):
         l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
         l10n_hu_document_gross_huf = l10n_hu_document_vat_huf + l10n_hu_document_net_huf
 
+        # HUF AMOUNT DIFF AND SUMMARY
+        if self.company_id.currency_id.name == 'HUF':
+            huf_amount_net_diff = round(abs(self.amount_untaxed_signed) - l10n_hu_document_net_huf, 2)
+            huf_amount_vat_diff = round(abs(self.amount_tax_signed) - l10n_hu_document_vat_huf, 2)
+            huf_amount_gross_diff = round(abs(self.amount_total_signed) - l10n_hu_document_gross_huf, 2)
+        else:
+            huf_amount_net_diff = 0.0
+            huf_amount_vat_diff = 0.0
+            huf_amount_gross_diff = 0.0
+        if huf_amount_net_diff != 0 or huf_amount_vat_diff != 0 or huf_amount_gross_diff != 0:
+            huf_amount_diff = True
+        else:
+            huf_amount_diff = False
+        huf_amount_summary = _("Document HUF amounts") + ": "
+        huf_amount_summary += _("Net difference") + " " + str(huf_amount_net_diff)
+        huf_amount_summary += " (" + str(abs(self.amount_untaxed_signed))
+        huf_amount_summary += "-" + str(self.l10n_hu_document_net_huf) + "); "
+        huf_amount_summary += _("VAT difference") + " " + str(huf_amount_vat_diff)
+        huf_amount_summary += " (" + str(abs(self.amount_tax_signed))
+        huf_amount_summary += "-" + str(self.l10n_hu_document_vat_huf) + "); "
+        huf_amount_summary += _("Gross difference") + " " + str(huf_amount_gross_diff)
+        huf_amount_summary += " (" + str(abs(self.amount_total_signed))
+        huf_amount_summary += "-" + str(self.l10n_hu_document_gross_huf) + ")"
+
         # MODIFICATION
         modification_document_type = self.env['l10n.hu.plus.tag'].search([
             ('company', '=', self.company_id.id),
@@ -1111,6 +1137,11 @@ class L10nHuPlusAccountMove(models.Model):
         result.update({
             'debug_list': debug_list,
             'error_list': error_list,
+            'huf_amount_diff': huf_amount_diff,
+            'huf_amount_gross_diff': huf_amount_gross_diff,
+            'huf_amount_net_diff': huf_amount_net_diff,
+            'huf_amount_vat_diff': huf_amount_vat_diff,
+            'huf_amount_summary': huf_amount_summary,
             'info_list': info_list,
             'is_storno_allowed': is_storno_allowed,
             'is_storno_invoice': is_storno_invoice,
@@ -1262,6 +1293,9 @@ class L10nHuPlusAccountMove(models.Model):
         if l10n_hu_invoice_currency_rate_date > currency_rate_date:
             l10n_hu_invoice_currency_rate_date = currency_rate_date
 
+        # document_rate_diff
+        document_rate_diff = l10n_hu_invoice_currency_rate_inverse - document_rate
+
         # currency_summary
         if company_currency == invoice_currency:
             currency_summary = _("This document uses the company currency")
@@ -1275,11 +1309,13 @@ class L10nHuPlusAccountMove(models.Model):
                 currency_summary += " " + invoice_currency.name + "/" + company_currency.name
                 currency_summary += " (" + _("Expected") + ") "
             if self.move_type in ['in_invoice', 'in_refund']:
-                currency_summary += str(document_rate)
+                currency_summary += str(round(document_rate, 2))
                 currency_summary += " " + invoice_currency.name + "/" + company_currency.name
                 currency_summary += " (" + _("Document") + ") "
+            if document_rate_diff != 0:
+                currency_summary += " " + _("Rate difference") + ": " + str(round(document_rate_diff, 2))
             if company_currency.name != 'HUF':
-                currency_summary += str(huf_rate)
+                currency_summary += str(round(huf_rate, 2))
                 currency_summary += " " + company_currency.name + "/" + huf_currency.name
                 currency_summary += " (" + _("HUF rate") + ")"
 
@@ -1289,6 +1325,7 @@ class L10nHuPlusAccountMove(models.Model):
             'currency_summary': currency_summary,
             'debug_list': debug_list,
             'delivery_date': delivery_date,
+            'document_rate_diff': document_rate_diff,
             'error_list': error_list,
             'expected_currency_rate': expected_currency_rate,
             'expected_currency_rate_inverse': expected_currency_rate_inverse,
@@ -1637,7 +1674,7 @@ class L10nHuPlusAccountMove(models.Model):
                 'result': 'info',
             })
 
-        # HU+6: currency
+        # HU+6: cash accounting
         info_list.append({
             'action_text': None,
             'code': 'HU+6',
@@ -1646,14 +1683,41 @@ class L10nHuPlusAccountMove(models.Model):
             'result': 'info',
         })
 
-        # HU+7: currency
-        info_list.append({
-            'action_text': None,
-            'code': 'HU+7',
-            'description': str(rate_data.get('currency_summary', "")),
-            'records': self,
-            'result': 'info',
-        })
+        # HU+7: Document rate amounts
+        if rate_data.get('document_rate_diff') and rate_data['document_rate_diff'] != 0:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+7',
+                'description': str(rate_data.get('currency_summary', "")),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+7',
+                'description': str(rate_data.get('currency_summary', "")),
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+8: Document HUF amounts
+        if document_data.get('huf_amount_diff'):
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+8',
+                'description': str(document_data.get('huf_amount_summary', "")),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+8',
+                'description': str(document_data.get('huf_amount_summary', "")),
+                'records': self,
+                'result': 'success',
+            })
 
         # Update result
         result.update({
