@@ -12,7 +12,7 @@
             <xpath expr="//group[last()]" position="after">
                 <group name="l10n_hu_plus" string="HU+">
                     <group name="l10n_hu_plus_1">
-                        <field name="l10n_hu_nav_method" string="NAV Method"/>
+                        <field name="l10n_hu_nav_method"/>
                     </group>
                 </group>
             </xpath>
@@ -27,7 +27,7 @@
         <field name="priority">36</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
-                <field name="l10n_hu_nav_method" string="NAV Method"/>
+                <field name="l10n_hu_nav_method" optional="show"/>
             </xpath>
         </field>
     </record>
