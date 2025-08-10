@@ -34,22 +34,25 @@
                     </div>
                     <div name="l10n_hu_banner_end" class="d-inline float-end">
                         <span name="l10n_hu_update_fields" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'draft'">
-                            <button name="action_l10n_hu_update_fields" class="btn-primary" data-hotkey="shift+w" icon="fa-bolt" title="Update fields" type="object"/>
+                            <button name="action_l10n_hu_update_fields" class="btn-primary" data-hotkey="d" icon="fa-bolt" title="Update fields" type="object"/>
+                        </span>
+                        <span name="l10n_hu_uncheck" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'posted' or not checked">
+                            <button name="action_l10n_hu_uncheck" class="btn-secondary text-success" data-hotkey="d" icon="fa-check-square-o" title="Set to not checked" type="object"/>
                         </span>
                         <span name="l10n_hu_hu_wizard_accounting" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'draft'">
-                            <button name="action_l10n_hu_wizard_accounting" class="btn-secondary" data-hotkey="a" icon="fa-book" title="Accounting" type="object"/>
+                            <button name="action_l10n_hu_wizard_accounting" class="btn-secondary" data-hotkey="f" icon="fa-book" title="Accounting" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_error" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'error'">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-danger" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-danger" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_info" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status not in [False, 'other']">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-info" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-info" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_success" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status not in ['closed', 'ok']">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-success" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-success" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_warning" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'warning'">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-warning text-white" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-warning text-white" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <div name="l10n_hu_banner_dropdown" class="btn-group ms-2">
                             <a id="l10nHuDropdownMenuLink" name="l10n_hu_banner_dropdown_button" class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

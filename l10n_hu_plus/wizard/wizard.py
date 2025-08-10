@@ -800,10 +800,12 @@ class L10nHuPlusWizard(models.TransientModel):
                         write_values = data_result['field_values']
                         write_values.update({
                             'l10n_hu_plus_notes': self.accounting_hu_plus_notes,
-                            'l10n_hu_plus_status': self.accounting_hu_plus_status,
                             'l10n_hu_plus_tag': [(6, None, self.accounting_hu_plus_tag.ids)]
                         })
                         account_move.write(write_values)
+
+                        # Update HU+ status
+                        account_move.action_l10n_hu_update_plus_status()
                     else:
                         error_list += data_result.get('error_list', [])
 
