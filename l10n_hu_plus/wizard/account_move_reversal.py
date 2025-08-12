@@ -38,7 +38,7 @@ class L10nHuPlusAccountMoveReversal(models.TransientModel):
             # Iterate account moves
             for account_move in record.move_ids:
                 checked_account_move_count += 1
-                document_data = account_move.l10n_hu_plus_get_data_document({})
+                document_data = account_move.l10n_hu_plus_get_document_data({})
                 if document_data.get('is_storno_allowed', False):
                     compatible_account_moves.append(account_move)
 
