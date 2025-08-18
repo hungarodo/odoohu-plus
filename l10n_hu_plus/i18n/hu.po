@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-18 06:40+0000\n"
-"PO-Revision-Date: 2025-08-18 06:40+0000\n"
+"POT-Creation-Date: 2025-08-18 22:52+0000\n"
+"PO-Revision-Date: 2025-08-18 22:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -753,6 +753,12 @@ msgid "Bill Date"
 msgstr "Számla kelte"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Can not post invoice with HU+ error!"
+msgstr "Nem könyvelhető HU+ hibás számla!"
+
+#. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.report_invoice_document_inherit
 msgid "Cancelled Credit Note"
 msgstr "Visszavont jóváírás"
@@ -791,6 +797,38 @@ msgstr "Pénzforgalmi bekapcsolva"
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_wizard__accounting_cash_visible
 msgid "Cash Accounting Visible"
 msgstr "Pénzforgalmi látható"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Cash accounting is not applicable for the invoice"
+msgstr "Pénzforgalmi elszámolás nem alkalmazható a számlára"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Cash accounting is not set, on payment tax check skipped"
+msgstr "Nincs beállítva pénzforgalmi elszámolás, adó fizetés beállítás ellenőrzés kihagyva"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Cash accounting is set and all applied VAT taxes are set to on payment"
+msgstr "Pénzforgalmi elszámolás beállítva és minden alkalmazott ÁFA adó fizetésre beállított"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid ""
+"Cash accounting is set, but not all applied VAT taxes are set to on payment"
+msgstr "Pénzforgalmi elszámolás beállítva, de nem minden alkalmazott ÁFA adó fizetésre beállított"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid ""
+"Cash accounting setting for document is inconsistent with partner settings"
+msgstr "Dokumentum pénzforgalmi beállítása nem egyezik a partner beállítással"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,field_description:l10n_hu_plus.field_l10n_hu_plus_object__category_tag
@@ -1262,6 +1300,12 @@ msgstr "Dokumentum ÁFA HUF"
 
 #. module: l10n_hu_plus
 #. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Document cash accounting setting"
+msgstr "Dokumentum pénzforgalmi elszámolás beállítás"
+
+#. module: l10n_hu_plus
+#. odoo-python
 #: code:addons/l10n_hu_plus/models/res_company.py:0
 msgid "Document type configuration skipped"
 msgstr "Dokumentum típus konfiguráció kihagyva"
@@ -1314,6 +1358,18 @@ msgstr "Dokumentáció hivatkozás nincs beállítva!"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_move_line_filter_inherit
 msgid "Domestic"
 msgstr "Belföldi"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Domestic invoice issuer applies cash accounting"
+msgstr "A számla kibocsátója belföldi és pénzforgalmi elszámolást alkalmaz"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Domestic partner and company applies cash accounting"
+msgstr "Belföldi a partner és a vállalat pénzforgalmi elszámolást alkalmaz"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__l10n_hu_plus_log__status__done
@@ -2525,6 +2581,12 @@ msgstr "Következő tevékenység típus"
 
 #. module: l10n_hu_plus
 #. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "No"
+msgstr "Nem"
+
+#. module: l10n_hu_plus
+#. odoo-python
 #: code:addons/l10n_hu_plus/wizard/wizard.py:0
 msgid "No Company"
 msgstr "Nincs vállalat"
@@ -3193,6 +3255,18 @@ msgid "Tax Total"
 msgstr "Adó összesen"
 
 #. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Tax is set on all invoice lines"
+msgstr "Adó beállítva minden számlasoron"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Tax must be set on all invoice lines"
+msgstr "Minden számlasoron be kell állítani az adót"
+
+#. module: l10n_hu_plus
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__account_fiscal_position__l10n_hu_incorporation__taxable_person
 #: model:ir.model.fields.selection,name:l10n_hu_plus.selection__res_partner__l10n_hu_incorporation__taxable_person
 msgid "Taxable Person"
@@ -3297,18 +3371,6 @@ msgid ""
 msgstr ""
 "A pénzügyi pozíció határozza meg a kapcsolathoz alkalmazandó adókat és "
 "főkönyvi számlákat."
-
-#. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-msgid "The issuer of the invoice applies cash accounting"
-msgstr "A számla kibocsátója pénzforgalmi elszámolást alkalmaz"
-
-#. module: l10n_hu_plus
-#. odoo-python
-#: code:addons/l10n_hu_plus/models/account_move.py:0
-msgid "The issuer of the invoice does not apply cash accounting"
-msgstr "A számla kibocsátója nem alkalmaz pénzforgalmi elszámolást"
 
 #. module: l10n_hu_plus
 #: model:ir.model.fields,help:l10n_hu_plus.field_l10n_hu_plus_wizard__company_currency_rate_inverse_amount
@@ -3605,6 +3667,12 @@ msgstr "Varázsló"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.tag_view_search
 msgid "Write Date"
 msgstr "Írás dátuma"
+
+#. module: l10n_hu_plus
+#. odoo-python
+#: code:addons/l10n_hu_plus/models/account_move.py:0
+msgid "Yes"
+msgstr "Igen"
 
 #. module: l10n_hu_plus
 #. odoo-python

@@ -301,6 +301,16 @@ class L10nHuPlusAccountMove(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
+    ## SUPER
+    def action_post(self):
+        """ Do not allow posting invoice when HU+ status is error """
+        for record in self:
+            if record.state == 'draft' and record.journal_id and record.journal_id.l10n_hu_plus_enabled \
+                    and record.is_invoice(include_receipts=True) and record.l10n_hu_plus_status == 'error':
+                raise exceptions.UserError(_("Can not post invoice with HU+ error!") + " " + str(record.display_name))
+        return super().action_post()
+
+    ## HU+
     def action_l10n_hu_plus_view_documentation(self):
         """ View HU+ documentation """
         self.ensure_one()
@@ -852,18 +862,18 @@ class L10nHuPlusAccountMove(models.Model):
 
             # l10n_hu_payment_mode
             if values.get('l10n_hu_payment_mode'):
-                field_values.update({'l10n_hu_payment_mode': values['l10n_hu_payment_mode']})
+                field_values.update({'l10n_hu_payment_mode': values['l10n_hu_payment_mode'].upper()})
                 debug_list.append("l10n_hu_payment_mode set from values: " + str(values['l10n_hu_payment_mode']))
             elif self.l10n_hu_payment_mode:
                 field_values.update({'l10n_hu_payment_mode': self.l10n_hu_payment_mode})
                 debug_list.append("l10n_hu_payment_mode set from self: " + str(self.l10n_hu_payment_mode))
             elif not self.l10n_hu_payment_mode and self.invoice_payment_term_id \
                     and self.invoice_payment_term_id.l10n_hu_nav_method:
-                l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method
+                l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method.upper()
                 field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_2})
                 debug_list.append("l10n_hu_payment_mode set from payment term: " + str(l10n_hu_payment_mode_2))
             elif not self.l10n_hu_payment_mode and self.journal_id.l10n_hu_nav_payment_method:
-                l10n_hu_payment_mode_3 = self.journal_id.l10n_hu_nav_payment_method
+                l10n_hu_payment_mode_3 = self.journal_id.l10n_hu_nav_payment_method.upper()
                 field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_3})
                 debug_list.append("l10n_hu_payment_mode set from journal: " + str(l10n_hu_payment_mode_3))
             else:
@@ -1072,12 +1082,18 @@ class L10nHuPlusAccountMove(models.Model):
 
         ### CUSTOMER INVOICE - we issued it (Odoo or externally), so we reported the data, so we must use accounting
         if self.move_type in ['out_invoice', 'out_refund'] and self.invoice_currency_rate != 0 \
-                and self.company_id.currency_id .name == 'HUF':
+                and self.company_id.currency_id.name == 'HUF':
             l10n_hu_document_rate = 1 / self.invoice_currency_rate
             l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
-        elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf and self.amount_tax != 0:
-            l10n_hu_document_rate = l10n_hu_document_vat_huf / self.amount_tax
+        elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
+            l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
+        elif self.move_type in ['in_invoice', 'in_refund'] and self.amount_total != 0 \
+                and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
+            l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
+        elif self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0 \
+                and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
+            l10n_hu_document_rate = round(self.l10n_hu_invoice_currency_rate_inverse, huf_rounding)
         else:
             l10n_hu_document_rate = 1.0
         l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
@@ -1138,7 +1154,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         # DOCUMENT TYPE
         l10n_hu_document_type = values.get('l10n_hu_document_type', self.l10n_hu_document_type)
-        if not l10n_hu_document_type and self.move_type == 'out_invoice':
+        if not l10n_hu_document_type and self.move_type in ['in_invoice', 'out_invoice']:
             l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
         elif not l10n_hu_document_type and self.move_type == 'out_refund' and is_storno_invoice and storno_document_type:
             l10n_hu_document_type = storno_document_type
@@ -1309,7 +1325,7 @@ class L10nHuPlusAccountMove(models.Model):
             l10n_hu_invoice_currency_rate_date = currency_rate_date
 
         # document_rate_diff
-        document_rate_diff = l10n_hu_invoice_currency_rate_inverse - document_rate
+        document_rate_diff = round(l10n_hu_invoice_currency_rate_inverse, huf_rounding) - round(document_rate, huf_rounding)
 
         # currency_summary
         if company_currency == invoice_currency:
@@ -1367,7 +1383,9 @@ class L10nHuPlusAccountMove(models.Model):
         """ Collect vat related data
 
         NOTES:
+        - cash_accounting_summary: text summary for cash accounting
         - is_cash_accounting: cash accounting is relevant or not
+        - l10n_hu_cash_accounting: value for the account move field
         - l10n_hu_vat_date: date of next VAT declaration
         - l10n_hu_vat_status: VAT status of the document
 
@@ -1392,6 +1410,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         # is_cash_accounting
         is_cash_accounting = False
+        cash_accounting_summary = _("Cash accounting is not applicable for the invoice")
         if self.is_invoice(True) and self.state == 'draft':
             if self.move_type in ['in_invoice', 'in_refund'] \
                     and self.partner_id \
@@ -1399,32 +1418,54 @@ class L10nHuPlusAccountMove(models.Model):
                     and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
                     and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca':
                 is_cash_accounting = True
-            elif self.move_type in ['out_invoice', 'out_refund'] \
-                    and self.partner_id \
+                cash_accounting_summary = _("Domestic invoice issuer applies cash accounting")
+            elif self.partner_id \
                     and self.partner_id.property_account_position_id \
                     and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
                     and self.company_id.l10n_hu_tax_regime == 'ca':
                 is_cash_accounting = True
+                cash_accounting_summary = _("Domestic partner and company applies cash accounting")
             else:
                 pass
         else:
             pass
 
-        # cash_account_summary
-        if is_cash_accounting:
-            cash_accounting_summary = _("The issuer of the invoice applies cash accounting")
+        # l10n_hu_cash_accounting
+        if self.state == 'draft' and is_cash_accounting:
+            l10n_hu_cash_accounting = is_cash_accounting
         else:
-            cash_accounting_summary = _("The issuer of the invoice does not apply cash accounting")
+            l10n_hu_cash_accounting = self.l10n_hu_cash_accounting
+
+        # Taxes
+        ## In case of cash accounting we check if the applied taxes are set to use cash accounting
+        cash_accounting_taxes = []
+        taxes = []
+        vat_taxes = []
+        if l10n_hu_cash_accounting:
+            for invoice_line in self.invoice_line_ids:
+                if invoice_line.product_id:
+                    for tax in invoice_line.tax_ids:
+                        if tax not in taxes:
+                            taxes.append(tax)
+                        if tax.l10n_hu_tax_type == 'VAT':
+                            if tax not in vat_taxes:
+                                vat_taxes.append(tax)
+                            if tax.tax_exigibility == 'on_payment' and tax not in cash_accounting_taxes:
+                                cash_accounting_taxes.append(tax)
 
         # Update result
         result.update({
             'cash_accounting_summary': cash_accounting_summary,
+            'cash_accounting_taxes': cash_accounting_taxes,
             'debug_list': debug_list,
             'error_list': error_list,
             'info_list': info_list,
             'is_cash_accounting': is_cash_accounting,
+            'l10n_hu_cash_accounting': l10n_hu_cash_accounting,
             'l10n_hu_vat_date': l10n_hu_vat_date,
             'l10n_hu_vat_status': l10n_hu_vat_status,
+            'taxes': taxes,
+            'vat_taxes': vat_taxes,
             'warning_list': warning_list,
         })
 
@@ -1689,14 +1730,27 @@ class L10nHuPlusAccountMove(models.Model):
                 'result': 'info',
             })
 
-        # HU+6: cash accounting
-        info_list.append({
-            'action_text': None,
-            'code': 'HU+6',
-            'description': str(vat_data.get('cash_accounting_summary', "")),
-            'records': self,
-            'result': 'info',
-        })
+        # HU+6: taxes
+        no_tax_lines = []
+        for line in self.invoice_line_ids:
+            if line.product_id and not line.tax_ids:
+                no_tax_lines.append(line)
+        if len(no_tax_lines) == 0:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+6',
+                'description': _("Tax is set on all invoice lines"),
+                'records': self,
+                'result': 'success',
+            })
+        else:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+6',
+                'description': _("Tax must be set on all invoice lines"),
+                'records': self,
+                'result': 'error',
+            })
 
         # HU+7: Document rate amounts
         if rate_data.get('document_rate_diff') and rate_data['document_rate_diff'] != 0:
@@ -1706,6 +1760,14 @@ class L10nHuPlusAccountMove(models.Model):
                 'description': str(rate_data.get('currency_summary', "")),
                 'records': self,
                 'result': 'warning',
+            })
+        elif rate_data.get('document_rate_diff') and rate_data['document_rate_diff'] == 0:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+7',
+                'description': str(rate_data.get('currency_summary', "")),
+                'records': self,
+                'result': 'success',
             })
         else:
             info_list.append({
@@ -1731,8 +1793,68 @@ class L10nHuPlusAccountMove(models.Model):
                 'code': 'HU+8',
                 'description': str(document_data.get('huf_amount_summary', "")),
                 'records': self,
-                'result': 'success',
+                'result': 'info',
             })
+
+        # HU+9: Cash accounting setting
+        if vat_data.get('l10n_hu_cash_accounting') != self.l10n_hu_cash_accounting:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+9',
+                'description': _("Cash accounting setting for document is inconsistent with partner settings"),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            hu_9_info_text = _("Document cash accounting setting") + ": "
+            if self.l10n_hu_cash_accounting:
+                hu_9_info_text += _("Yes")
+            else:
+                hu_9_info_text += _("No")
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+9',
+                'description': hu_9_info_text,
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+10: Cash accounting taxes
+        cash_accounting_taxes = vat_data.get('cash_accounting_taxes', [])
+        vat_taxes = vat_data.get('vat_taxes', [])
+        if vat_data.get('l10n_hu_cash_accounting') and len(cash_accounting_taxes) == len(vat_taxes):
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+10',
+                'description': _("Cash accounting is set and all applied VAT taxes are set to on payment"),
+                'records': self,
+                'result': 'warning',
+            })
+        elif vat_data.get('l10n_hu_cash_accounting') and len(cash_accounting_taxes) != len(vat_taxes):
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+10',
+                'description': _("Cash accounting is set, but not all applied VAT taxes are set to on payment"),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+10',
+                'description': _("Cash accounting is not set, on payment tax check skipped"),
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+11: cash accounting summary
+        info_list.append({
+            'action_text': None,
+            'code': 'HU+11',
+            'description': str(vat_data.get('cash_accounting_summary', "")),
+            'records': self,
+            'result': 'info',
+        })
 
         # Update result
         result.update({
