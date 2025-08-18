@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 07:03+0000\n"
-"PO-Revision-Date: 2025-08-08 07:03+0000\n"
+"POT-Creation-Date: 2025-08-18 06:40+0000\n"
+"PO-Revision-Date: 2025-08-18 06:40+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -3034,6 +3034,11 @@ msgstr "Elküldött"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_account_journal_form_inherit
 msgid "Set proforma sequence"
 msgstr "Proforma sorszám beállítása"
+
+#. module: l10n_hu_plus
+#: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_move_form_inherit
+msgid "Set to not checked"
+msgstr "Nem ellenőrzöttre állítás"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list

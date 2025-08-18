@@ -527,6 +527,7 @@ class L10nHuPlusAccountMove(models.Model):
     def action_l10n_hu_wizard_check_status(self):
         """ Open the HU+ wizard to check status for HU+ """
         self.ensure_one()
+        self.action_l10n_hu_update_plus_status()
         status_overview = self.l10n_hu_get_plus_status_overview()
         return {
             'name': _("HU+ Wizard"),
@@ -1315,22 +1316,22 @@ class L10nHuPlusAccountMove(models.Model):
             currency_summary = _("This document uses the company currency")
         else:
             currency_summary = _("Currency rate") + ": " + str(l10n_hu_invoice_currency_rate_date) + " "
-            currency_summary += str(l10n_hu_invoice_currency_rate_inverse)
-            currency_summary += " " + invoice_currency.name + "/" + company_currency.name
-            if l10n_hu_invoice_currency_rate_inverse != expected_currency_rate_inverse:
-                currency_summary += " (" + _("Accounting") + ") "
-                currency_summary += str(expected_currency_rate_inverse)
-                currency_summary += " " + invoice_currency.name + "/" + company_currency.name
+            currency_summary += str(round(l10n_hu_invoice_currency_rate_inverse, huf_rounding))
+            currency_summary += " " + company_currency.name + "/" + invoice_currency.name
+            currency_summary += " (" + _("Accounting") + ") "
+            if round(l10n_hu_invoice_currency_rate_inverse, huf_rounding) != round(expected_currency_rate_inverse, huf_rounding):
+                currency_summary += str(round(expected_currency_rate_inverse, huf_rounding))
+                currency_summary += " " + company_currency.name + "/" + invoice_currency.name
                 currency_summary += " (" + _("Expected") + ") "
             if self.move_type in ['in_invoice', 'in_refund']:
                 currency_summary += str(round(document_rate, huf_rounding))
-                currency_summary += " " + invoice_currency.name + "/" + company_currency.name
+                currency_summary += " " + company_currency.name + "/" + invoice_currency.name
                 currency_summary += " (" + _("Document") + ") "
             if document_rate_diff != 0:
                 currency_summary += " " + _("Rate difference") + ": " + str(round(document_rate_diff, huf_rounding))
             if company_currency.name != 'HUF':
                 currency_summary += str(round(huf_rate, huf_rounding))
-                currency_summary += " " + company_currency.name + "/" + huf_currency.name
+                currency_summary += " " + huf_currency.name + "/" + company_currency.name
                 currency_summary += " (" + _("HUF rate") + ")"
 
         # Update result
