@@ -28,7 +28,7 @@
                             <div name="l10n_hu_plus_actions"
                                  colspan="2"
                             >
-                                <button name="action_l10n_hu_plus_documentation"
+                                <button name="action_l10n_hu_plus_apply_configuration"
                                         class="btn-secondary btn-sm m-2"
                                         icon="fa-info-circle"
                                         string="Documentation"
@@ -116,4 +116,3 @@
         </field>
     </record>
 </odoo>
-        

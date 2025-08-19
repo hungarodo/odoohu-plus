@@ -61,11 +61,11 @@
                                    widget="boolean_toggle"
                             />
                             <label name="l10n_hu_actions"
-                                   for="action_l10n_hu_plus_documentation"
+                                   for="action_l10n_hu_plus_apply_configuration"
                                    string="Actions"
                             />
                             <div name="l10n_hu_actions">
-                                <button name="action_l10n_hu_plus_documentation"
+                                <button name="action_l10n_hu_plus_apply_configuration"
                                         class="btn-secondary m-2"
                                         icon="fa-info-circle"
                                         string="Documentation"

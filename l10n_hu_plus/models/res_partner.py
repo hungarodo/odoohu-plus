@@ -91,7 +91,7 @@ class L10nHuPlusResPartner(models.Model):
     # CRUD methods (and name_get, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_plus_documentation(self):
+    def action_l10n_hu_plus_apply_configuration(self):
         """ HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
