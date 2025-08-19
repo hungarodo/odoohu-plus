@@ -165,7 +165,7 @@ class L10nHuBaseResCompany(models.Model):
 
         # API details
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
-        api_details += "\n" +_("License Type") + ": " + str(api_data.get('license_type'))
+        api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
         api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
         api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
@@ -177,9 +177,9 @@ class L10nHuBaseResCompany(models.Model):
             'default_api_action': 'delete_registration',
             'default_api_action_editable': False,
             'default_api_details': api_details,
-            'default_api_key':  api_data.get('api_key', "free"),
-            'default_api_license_code':  api_data.get('license_code', "free"),
-            'default_api_url':  api_data.get('api_url', "free"),
+            'default_api_key': api_data.get('api_key', "free"),
+            'default_api_license_code': api_data.get('license_code', "free"),
+            'default_api_url': api_data.get('api_url', "free"),
         }
 
         # Assemble result
