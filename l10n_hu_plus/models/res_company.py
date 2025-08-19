@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
 import json
+import logging
 
 # 2 : imports of odoo
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
@@ -9,6 +10,8 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 from odoo.service import common as odoo_service_common
 
 # 4 : variable declarations
+
+_logger = logging.getLogger(__name__)
 
 
 # Class
@@ -608,7 +611,7 @@ class L10nHuBaseResCompany(models.Model):
         return result
 
     @api.model
-    def l10n_hu_plus_apply_configuration(self, values):
+    def l10n_hu_plus_apply_configuration(self, values: dict = {}, from_server_action: bool = False) -> dict:
         """ Apply HU+ configuration
         @:return: dictionary
         """
@@ -637,7 +640,7 @@ class L10nHuBaseResCompany(models.Model):
             company_id = None
             error_list.append("could not set company")
 
-        if len(error_list) == 0:
+        if not error_list:
             # 1) DOCUMENT TYPES
             if values.get('document_types'):
                 documents_types = []
@@ -674,11 +677,44 @@ class L10nHuBaseResCompany(models.Model):
                     priority=3,
                     labels={"en_US": "Modification Invoice", "hu_HU": "Módosító számla"}
                 )
+                ## ADVANCE INVOICE
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_advance",
+                    code="INVOICE-ADVANCE",
+                    name="invoice_advance",
+                    priority=5,
+                    labels={"en_US": "Advance Invoice", "hu_HU": "Előleg számla"}
+                )
+                ## FINAL INVOICE
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_final",
+                    code="INVOICE-FINAL",
+                    name="invoice_final",
+                    priority=6,
+                    labels={"en_US": "Final Invoice", "hu_HU": "Végszámla"}
+                )
                 success_list.append(_("Document types configured"))
             else:
                 info_list.append(_("Document type configuration skipped"))
         else:
             debug_list.append("operations skipped due to previous errors")
+            if from_server_action:
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": ("HU+ base tag creation"),
+                        "message": "\n".join(error_list),
+                        "type": "danger",  # types: success, warning, danger, info
+                        "sticky": True,  # True/False; will display for few seconds if false
+                    },
+                }
 
         # Create log
         log_description = {
@@ -710,6 +746,18 @@ class L10nHuBaseResCompany(models.Model):
         }
         log_record = self.env['l10n.hu.plus.log'].create(log_values)
 
+        if from_server_action:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": ("HU+ base tag creation"),
+                    "message": "HU+ base tag creation successful",
+                    "type": "success",  # types: success, warning, danger, info
+                    "sticky": False,  # True/False; will display for few seconds if false
+                },
+            }
+
         # Update result
         result.update({
             'debug_list': debug_list,
@@ -730,6 +778,9 @@ class L10nHuBaseResCompany(models.Model):
         self, operations: list, document_types: list, company_id: int, technical_name: str, code: str, name: str, priority: int,
         labels: dict
     ) -> None:
+        _logger.debug(
+            "l10n_hu_plus_get_document_type_tag: technical_name: %s, code: %s, name: %s, priority: %s", technical_name, code, name, priority
+        )
         tag = self.env["l10n.hu.plus.tag"].search([
             ("company", "=", company_id),
             ("tag_type", "=", "document_type"),
