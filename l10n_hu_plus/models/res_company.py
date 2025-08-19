@@ -642,72 +642,38 @@ class L10nHuBaseResCompany(models.Model):
             if values.get('document_types'):
                 documents_types = []
                 ## NORMAL INVOICE
-                invoice_normal = self.env['l10n.hu.plus.tag'].search([
-                    ('company', '=', company_id),
-                    ('tag_type', '=', 'document_type'),
-                    ('technical_name', '=', 'invoice_normal'),
-                ])
-                if not invoice_normal:
-                    invoice_normal_values = {
-                        'code': "INVOICE-NORMAL",
-                        'company': company.id,
-                        'locked': True,
-                        'name': "invoice_normal",
-                        'priority': 1,
-                        'tag_type': 'document_type',
-                        'technical_name': 'invoice_normal',
-                    }
-                    invoice_normal = self.env['l10n.hu.plus.tag'].sudo().create(invoice_normal_values)
-                    invoice_normal.with_context(lang="en_US").name = "Invoice"
-                    invoice_normal.with_context(lang="hu_HU").name = "Számla"
-                    operations.append({
-                        'model_name': 'l10n.hu.plus.tag',
-                        'record_id': invoice_normal.id,
-                        'operation': 'create'
-                    })
-                documents_types.append(invoice_normal)
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_normal",
+                    code="INVOICE-NORMAL",
+                    name="invoice_normal",
+                    priority=1,
+                    labels={"en_US": "Invoice", "hu_HU": "Számla"}
+                )
                 ## INVOICE STORNO
-                invoice_storno = self.env['l10n.hu.plus.tag'].search([
-                    ('company', '=', company_id),
-                    ('tag_type', '=', 'document_type'),
-                    ('technical_name', '=', 'invoice_storno'),
-                ])
-                if not invoice_storno:
-                    invoice_storno_values = {
-                        'code': "INVOICE-STORNO",
-                        'company': company.id,
-                        'locked': True,
-                        'name': "invoice_storno",
-                        'priority': 4,
-                        'tag_type': 'document_type',
-                        'technical_name': 'invoice_storno',
-                    }
-                    invoice_storno = self.env['l10n.hu.plus.tag'].sudo().create(invoice_storno_values)
-                    invoice_storno.with_context(lang="en_US").name = "Storno Invoice"
-                    invoice_storno.with_context(lang="hu_HU").name = "Storno számla"
-                    operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_storno.id, 'operation': 'create'})
-                documents_types.append(invoice_normal)
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_storno",
+                    code="INVOICE-STORNO",
+                    name="invoice_storno",
+                    priority=4,
+                    labels={"en_US": "Storno Invoice", "hu_HU": "Storno számla"}
+                )
                 ## MODIFICATION INVOICE
-                invoice_modification = self.env['l10n.hu.plus.tag'].search([
-                    ('company', '=', company_id),
-                    ('tag_type', '=', 'document_type'),
-                    ('technical_name', '=', 'invoice_modification'),
-                ])
-                if not invoice_modification:
-                    invoice_modification_values = {
-                        'code': "INVOICE-MODIFICATION",
-                        'company': company.id,
-                        'locked': True,
-                        'name': "invoice_modification",
-                        'priority': 3,
-                        'tag_type': 'document_type',
-                        'technical_name': 'invoice_modification',
-                    }
-                    invoice_modification = self.env['l10n.hu.plus.tag'].sudo().create(invoice_modification_values)
-                    invoice_modification.with_context(lang="en_US").name = "Modification Invoice"
-                    invoice_modification.with_context(lang="hu_HU").name = "Módosító számla"
-                    operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_modification.id, 'operation': 'create'})
-                documents_types.append(invoice_normal)
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_modification",
+                    code="INVOICE-MODIFICATION",
+                    name="invoice_modification",
+                    priority=3,
+                    labels={"en_US": "Modification Invoice", "hu_HU": "Módosító számla"}
+                )
                 success_list.append(_("Document types configured"))
             else:
                 info_list.append(_("Document type configuration skipped"))
@@ -758,6 +724,31 @@ class L10nHuBaseResCompany(models.Model):
         # Return result
         # raise exceptions.UserError("l10n_hu_plus_run_configuration END")
         return result
+
+    @api.model
+    def l10n_hu_plus_get_document_type_tag(
+        self, operations: list, document_types: list, company_id: int, technical_name: str, code: str, name: str, priority: int,
+        labels: dict
+    ) -> None:
+        tag = self.env["l10n.hu.plus.tag"].search([
+            ("company", "=", company_id),
+            ("tag_type", "=", "document_type"),
+            ("technical_name", "=", technical_name),
+        ])
+        if not tag:
+            tag = self.env["l10n.hu.plus.tag"].sudo().create({
+                "code": code,
+                "company": company_id,
+                "locked": True,
+                "name": name,
+                "priority": priority,
+                "tag_type": "document_type",
+                "technical_name": technical_name,
+            })
+            for lang, value in labels.items():
+                tag.with_context(lang=lang).name = value
+            operations.append({"model_name": "l10n.hu.plus.tag", "record_id": tag.id, "operation": "create"})
+        document_types.append(tag)
 
     @api.model
     def l10n_hu_plus_get_api_environment(self):
