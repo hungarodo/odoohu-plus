@@ -25,7 +25,7 @@ class L10nHuPlusPaymentTerm(models.Model):
         copy=False,
         string="NAV Payment Method",
     )
-    l10n_hu_cash_rounding_id = fields.Many2one(
+    l10n_hu_rounding_method = fields.Many2one(
         comodel_name="account.cash.rounding",
         copy=False,
         string="Cash Rounding",

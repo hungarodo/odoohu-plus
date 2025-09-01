@@ -13,7 +13,7 @@
                 <group name="l10n_hu_plus" string="HU+">
                     <group name="l10n_hu_plus_1">
                         <field name="l10n_hu_nav_method"/>
-                        <field name="l10n_hu_cash_rounding_id"/>
+                        <field name="l10n_hu_rounding_method"/>
                     </group>
                 </group>
             </xpath>
@@ -29,7 +29,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="l10n_hu_nav_method" optional="show"/>
-                <field name="l10n_hu_cash_rounding_id" optional="show"/>
+                <field name="l10n_hu_rounding_method" optional="show"/>
             </xpath>
         </field>
     </record>
