@@ -19,6 +19,7 @@
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
         'report/report_invoice_document.xml',
+        'views/account_cash_rounding_views.xml',
         'views/account_fiscal_position_views.xml',
         'views/account_journal_views.xml',
         'views/account_journal_actions.xml',
@@ -75,6 +76,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "17.0.1.22.0",
+    'version': "17.0.1.24.0",
     'website': "https://mopsz.odoo.com",
 }

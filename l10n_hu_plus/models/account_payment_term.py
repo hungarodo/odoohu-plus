@@ -23,7 +23,13 @@ class L10nHuPlusPaymentTerm(models.Model):
     l10n_hu_nav_method = fields.Selection(
         selection=_get_l10n_hu_nav_method_selection,
         copy=False,
-        string="HU NAV Method",
+        string="NAV Payment Method",
+    )
+    l10n_hu_rounding_method = fields.Many2one(
+        comodel_name="account.cash.rounding",
+        copy=False,
+        string="Cash Rounding",
+        help="Cash rounding to be used for this payment term.",
     )
 
     # Compute and search fields, in the same order of field declarations
