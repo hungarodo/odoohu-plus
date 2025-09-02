@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
 import json
+import logging
 
 # 2 : imports of odoo
 from odoo import _, api, exceptions, fields, models  # alphabetically ordered
@@ -9,6 +10,8 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 from odoo.service import common as odoo_service_common
 
 # 4 : variable declarations
+
+_logger = logging.getLogger(__name__)
 
 
 # Class
@@ -165,7 +168,7 @@ class L10nHuBaseResCompany(models.Model):
 
         # API details
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
-        api_details += "\n" +_("License Type") + ": " + str(api_data.get('license_type'))
+        api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
         api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
         api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
@@ -177,9 +180,9 @@ class L10nHuBaseResCompany(models.Model):
             'default_api_action': 'delete_registration',
             'default_api_action_editable': False,
             'default_api_details': api_details,
-            'default_api_key':  api_data.get('api_key', "free"),
-            'default_api_license_code':  api_data.get('license_code', "free"),
-            'default_api_url':  api_data.get('api_url', "free"),
+            'default_api_key': api_data.get('api_key', "free"),
+            'default_api_license_code': api_data.get('license_code', "free"),
+            'default_api_url': api_data.get('api_url', "free"),
         }
 
         # Assemble result
@@ -282,7 +285,23 @@ class L10nHuBaseResCompany(models.Model):
         return
 
     def action_l10n_hu_plus_documentation(self):
-        """ HU+ documentation """
+        self.ensure_one()
+        context = {
+            'default_action_type': 'configuration',
+            'default_action_type_visible': True,
+        }
+        result = {
+            'name': _("HU+ Wizard"),
+            'context': context,
+            'res_model': 'l10n.hu.plus.wizard',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
+        return result
+
+    def action_l10n_hu_plus_view_documentation(self):
+        """ View HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
 
@@ -590,6 +609,197 @@ class L10nHuBaseResCompany(models.Model):
         # Return result
         # raise exceptions.UserError("l10n_hu_plus_api_registration_response END" + str(result))
         return result
+
+    @api.model
+    def l10n_hu_plus_apply_configuration(self, values: dict = {}, from_server_action: bool = False) -> dict:
+        """ Apply HU+ configuration
+        @:return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_plus_apply_configuration BEGIN")
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        operations = []
+        result = {}
+        success_list = []
+        warning_list = []
+
+        # company
+        if values.get('company'):
+            company = values['company']
+            company_id = company.id
+            info_list.append(_("Company") + ": " + str(company.display_name))
+        elif len(self) == 1 and self.id:
+            company = self
+            company_id = company.id
+            info_list.append(_("Company") + ": " + str(company.display_name))
+        else:
+            company = None
+            company_id = None
+            error_list.append("could not set company")
+
+        if not error_list:
+            # 1) DOCUMENT TYPES
+            if values.get('document_types'):
+                documents_types = []
+                ## NORMAL INVOICE
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_normal",
+                    code="INVOICE-NORMAL",
+                    name="invoice_normal",
+                    priority=1,
+                    labels={"en_US": "Invoice", "hu_HU": "Számla"}
+                )
+                ## INVOICE STORNO
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_storno",
+                    code="INVOICE-STORNO",
+                    name="invoice_storno",
+                    priority=4,
+                    labels={"en_US": "Storno Invoice", "hu_HU": "Storno számla"}
+                )
+                ## MODIFICATION INVOICE
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_modification",
+                    code="INVOICE-MODIFICATION",
+                    name="invoice_modification",
+                    priority=3,
+                    labels={"en_US": "Modification Invoice", "hu_HU": "Módosító számla"}
+                )
+                ## ADVANCE INVOICE
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_advance",
+                    code="INVOICE-ADVANCE",
+                    name="invoice_advance",
+                    priority=5,
+                    labels={"en_US": "Advance Invoice", "hu_HU": "Előleg számla"}
+                )
+                ## FINAL INVOICE
+                self.l10n_hu_plus_get_document_type_tag(
+                    operations,
+                    documents_types,
+                    company_id,
+                    technical_name="invoice_final",
+                    code="INVOICE-FINAL",
+                    name="invoice_final",
+                    priority=6,
+                    labels={"en_US": "Final Invoice", "hu_HU": "Végszámla"}
+                )
+                success_list.append(_("Document types configured"))
+            else:
+                info_list.append(_("Document type configuration skipped"))
+        else:
+            debug_list.append("operations skipped due to previous errors")
+            if from_server_action:
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": ("HU+ base tag creation"),
+                        "message": "\n".join(error_list),
+                        "type": "danger",  # types: success, warning, danger, info
+                        "sticky": True,  # True/False; will display for few seconds if false
+                    },
+                }
+
+        # Create log
+        log_description = {
+            'error_list': error_list,
+            'operations': operations,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        }
+        log_technical_data = {
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'operations': operations,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        }
+        log_values = {
+            'app_name': 'l10n_hu_plus',
+            'company': company.id,
+            'description': str(log_description),
+            'direction': 'internal',
+            'level': 'info',
+            'log_type': 'hu_plus_configuration',
+            'name': " HU+ configuration company_id: " + str(company_id),
+            'source_model_name': 'res.company',
+            'source_record_id': company_id,
+            'technical_data': json.loads(json.dumps(log_technical_data, default=str)),
+            'technical_name': 'l10n_hu_plus.l10n_hu_plus_run_configuration',
+        }
+        log_record = self.env['l10n.hu.plus.log'].create(log_values)
+
+        if from_server_action:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": ("HU+ base tag creation"),
+                    "message": "HU+ base tag creation successful",
+                    "type": "success",  # types: success, warning, danger, info
+                    "sticky": False,  # True/False; will display for few seconds if false
+                },
+            }
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'log_record': log_record,
+            'operations': operations,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_run_configuration END")
+        return result
+
+    @api.model
+    def l10n_hu_plus_get_document_type_tag(
+        self, operations: list, document_types: list, company_id: int, technical_name: str, code: str, name: str, priority: int,
+        labels: dict
+    ) -> None:
+        _logger.debug(
+            "l10n_hu_plus_get_document_type_tag: technical_name: %s, code: %s, name: %s, priority: %s", technical_name, code, name, priority
+        )
+        tag = self.env["l10n.hu.plus.tag"].search([
+            ("company", "=", company_id),
+            ("tag_type", "=", "document_type"),
+            ("technical_name", "=", technical_name),
+        ])
+        if not tag:
+            tag = self.env["l10n.hu.plus.tag"].sudo().create({
+                "code": code,
+                "company": company_id,
+                "locked": True,
+                "name": name,
+                "priority": priority,
+                "tag_type": "document_type",
+                "technical_name": technical_name,
+            })
+            for lang, value in labels.items():
+                tag.with_context(lang=lang).name = value
+            operations.append({"model_name": "l10n.hu.plus.tag", "record_id": tag.id, "operation": "create"})
+        document_types.append(tag)
 
     @api.model
     def l10n_hu_plus_get_api_environment(self):
