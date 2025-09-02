@@ -284,7 +284,7 @@ class L10nHuBaseResCompany(models.Model):
         # Return
         return
 
-    def action_l10n_hu_plus_apply_configuration(self):
+    def action_l10n_hu_plus_documentation(self):
         self.ensure_one()
         context = {
             'default_action_type': 'configuration',

@@ -86,7 +86,7 @@
                             <div name="l10n_hu_plus_actions"
                                  class="d-grid gap-2"
                             >
-                                <button name="action_l10n_hu_plus_apply_configuration"
+                                <button name="action_l10n_hu_plus_documentation"
                                         class="btn-link btn-sm text-start"
                                         icon="fa-info-circle"
                                         string="Documentation"

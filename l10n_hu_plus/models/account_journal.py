@@ -106,13 +106,13 @@ class L10nHuPlusAccountJournal(models.Model):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
-    def action_l10n_hu_plus_apply_configuration(self):
+    def action_l10n_hu_plus_documentation(self):
         """ HU+ documentation """
         # Make sure there is one record in self
         self.ensure_one()
 
         # Return
-        return self.company_id.action_l10n_hu_plus_apply_configuration()
+        return self.company_id.action_l10n_hu_plus_documentation()
 
     def action_l10n_hu_set_proforma_sequence(self):
         """ Set a proforma sequence"""

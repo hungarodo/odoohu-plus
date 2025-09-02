@@ -15,7 +15,7 @@
                         <group name="l10n_hu_plus_1"></group>
                         <group name="l10n_hu_plus_2">
                             <div name="l10n_hu_plus_actions" colspan="2">
-                                <button name="action_l10n_hu_plus_apply_configuration" class="btn-secondary btn-sm m-2"
+                                <button name="action_l10n_hu_plus_documentation" class="btn-secondary btn-sm m-2"
                                         icon="fa-info-circle" string="Documentation" type="object"/>
                                 <button name="action_l10n_hu_plus_view_technical_data" class="btn-link btn-sm m-2"
                                         groups="base.group_no_one" icon="fa-code" string="View technical data" type="object"/>

@@ -31,8 +31,8 @@
                                  width="36px"
                             />
                         </span>
-                        <span name="action_l10n_hu_plus_apply_configuration">
-                            <button name="action_l10n_hu_plus_apply_configuration"
+                        <span name="action_l10n_hu_plus_documentation">
+                            <button name="action_l10n_hu_plus_documentation"
                                     class="btn-link"
                                     string="HU+"
                                     type="object"
@@ -223,7 +223,7 @@
                                     invisible="currency_id == company_currency_id"
                                 />
                                 <li name="l10n_hu_plus_documentation">
-                                    <button name="action_l10n_hu_plus_apply_configuration"
+                                    <button name="action_l10n_hu_plus_documentation"
                                             class="dropdown-item"
                                             icon="fa-info-circle"
                                             string="Documentation"
