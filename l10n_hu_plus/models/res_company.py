@@ -165,7 +165,7 @@ class L10nHuPlusResCompany(models.Model):
 
         # API details
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
-        api_details += "\n" +_("License Type") + ": " + str(api_data.get('license_type'))
+        api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
         api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
         api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
@@ -685,7 +685,7 @@ class L10nHuPlusResCompany(models.Model):
                     invoice_storno.with_context(lang="en_US").name = "Storno Invoice"
                     invoice_storno.with_context(lang="hu_HU").name = "Storno számla"
                     operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_storno.id, 'operation': 'create'})
-                documents_types.append(invoice_normal)
+                documents_types.append(invoice_storno)
                 ## MODIFICATION INVOICE
                 invoice_modification = self.env['l10n.hu.plus.tag'].search([
                     ('company', '=', company_id),
@@ -706,7 +706,51 @@ class L10nHuPlusResCompany(models.Model):
                     invoice_modification.with_context(lang="en_US").name = "Modification Invoice"
                     invoice_modification.with_context(lang="hu_HU").name = "Módosító számla"
                     operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_modification.id, 'operation': 'create'})
-                documents_types.append(invoice_normal)
+                documents_types.append(invoice_modification)
+                ## ADVANCE INVOICE
+                invoice_advance = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_advance'),
+                ])
+                if not invoice_advance:
+                    invoice_advance_values = {
+                        'code': "INVOICE-ADVANCE",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_advance",
+                        'priority': 5,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_advance',
+                    }
+                    invoice_advance = self.env['l10n.hu.plus.tag'].sudo().create(invoice_advance_values)
+                    invoice_advance.with_context(lang="en_US").name = "Invoice Advance"
+                    invoice_advance.with_context(lang="hu_HU").name = "Előleg számla"
+                    operations.append(
+                        {'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_advance.id, 'operation': 'create'})
+                documents_types.append(invoice_advance)
+                ## FINAL INVOICE
+                invoice_final = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_final'),
+                ])
+                if not invoice_final:
+                    invoice_final_values = {
+                        'code': "INVOICE-FINAL",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_final",
+                        'priority': 6,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_final',
+                    }
+                    invoice_final = self.env['l10n.hu.plus.tag'].sudo().create(invoice_final_values)
+                    invoice_final.with_context(lang="en_US").name = "Invoice Final"
+                    invoice_final.with_context(lang="hu_HU").name = "Végszámla"
+                    operations.append(
+                        {'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_final.id, 'operation': 'create'})
+                documents_types.append(invoice_final)
                 success_list.append(_("Document types configured"))
             else:
                 info_list.append(_("Document type configuration skipped"))
