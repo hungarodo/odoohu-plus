@@ -58,10 +58,7 @@ class L10nHuPlusResCompany(models.Model):
     # Action methods
     def action_l10n_hu_plus_api_check_registration(self):
         """ Open the wizard for check API registration """
-        # Ensure one
         self.ensure_one()
-
-        # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
         if not self.l10n_hu_plus_technical_data:
@@ -70,173 +67,117 @@ class L10nHuPlusResCompany(models.Model):
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
         except:
             raise exceptions.UserError(_("API data not available!"))
-
-        # API details
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
         api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
         api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
         api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
         api_details += "\n" + _("Valid To") + ": " + str(api_data.get('license_valid_to'))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'check_registration',
-            'default_api_action_editable': False,
-            'default_api_details': api_details,
-            'default_api_key': api_data.get('api_key', "free"),
-            'default_api_license_code': api_data.get('license_code', "free"),
-            'default_api_url': api_data.get('api_url', None),
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'check_registration',
+                'default_api_action_editable': False,
+                'default_api_details': api_details,
+                'default_api_key': api_data.get('api_key', "free"),
+                'default_api_license_code': api_data.get('license_code', "free"),
+                'default_api_url': api_data.get('api_url', None),
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-
-        # Return result
-        return result
 
     def action_l10n_hu_plus_api_create_registration(self):
         """ Open the wizard for create API registration """
-        # Ensure one
         self.ensure_one()
-
-        # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
-
-        # Data
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
-        except:
-            api_data = {}
-
-        if api_data:
             api_key = api_data.get('api_key', "free")
             api_url = api_data.get('api_url', None)
             license_code = api_data.get('license_code', "free")
-        else:
+        except:
             api_key = "free"
             api_url = "https://odoohu17e.hungarodo.hu/v1/l10n_hu_api/registration"
             license_code = "free"
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'create_registration',
-            'default_api_action_editable': False,
-            'default_api_key': api_key,
-            'default_api_license_code': license_code,
-            'default_api_url': api_url,
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'create_registration',
+                'default_api_action_editable': False,
+                'default_api_key': api_key,
+                'default_api_license_code': license_code,
+                'default_api_url': api_url,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_plus_api_delete_registration(self):
         """ Open the wizard for delete API registration """
-        # Ensure one
         self.ensure_one()
-
-        # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
         except:
             raise exceptions.UserError(_("API data not available!"))
-
-        # API details
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
         api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
         api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
         api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
         api_details += "\n" + _("Valid To") + ": " + str(api_data.get('license_valid_to'))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'delete_registration',
-            'default_api_action_editable': False,
-            'default_api_details': api_details,
-            'default_api_key':  api_data.get('api_key', "free"),
-            'default_api_license_code':  api_data.get('license_code', "free"),
-            'default_api_url':  api_data.get('api_url', "free"),
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'delete_registration',
+                'default_api_action_editable': False,
+                'default_api_details': api_details,
+                'default_api_key':  api_data.get('api_key', "free"),
+                'default_api_license_code':  api_data.get('license_code', "free"),
+                'default_api_url':  api_data.get('api_url', "free"),
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-
-        # Return result
-        return result
 
     def action_l10n_hu_plus_api_get_objects(self):
         """ Open the wizard for GET API objects """
-        # Ensure one
         self.ensure_one()
-
-        # Check
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("HU+ API is not enabled!"))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'get_objects',
-            'default_api_action_editable': False,
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'get_objects',
+                'default_api_action_editable': False,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_plus_api_list_logs(self):
         """ List logs """
-        # Ensure one
         self.ensure_one()
-
-        # Set l10n_hu_log_ids
         l10n_hu_log_ids = []
         logs = self.env['l10n.hu.plus.log'].sudo().search([('company', '=', self.id)])
         for log in logs:
             l10n_hu_log_ids.append(log.id)
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Logs"),
             'domain': [('id', 'in', l10n_hu_log_ids)],
             'res_model': 'l10n.hu.plus.log',
@@ -245,22 +186,14 @@ class L10nHuPlusResCompany(models.Model):
             'view_mode': 'list,form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_plus_api_reset_registration(self):
         """ Reset registration to default """
-        # Ensure one
         self.ensure_one()
-
-        # api_url
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
             api_url = api_data.get('api_url', None)
         except:
             api_url = None
-
-        # Reset
         api_data = {
             'api_key': 'free',
             'api_url': api_url,
@@ -277,39 +210,31 @@ class L10nHuPlusResCompany(models.Model):
             'l10n_hu_plus_api_registered': False,
         }
         self.write(company_values)
-
-        # Return
         return
 
     def action_l10n_hu_plus_apply_configuration(self):
         self.ensure_one()
-        context = {
-            'default_action_type': 'configuration',
-            'default_action_type_visible': True,
-        }
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'configuration',
+                'default_action_type_visible': True,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-        return result
 
     def action_l10n_hu_plus_view_documentation(self):
         """ View HU+ documentation """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Get config_parameters
         try:
             config_param_obj = self.env['ir.config_parameter'].sudo()
             config_parameters_string = config_param_obj.get_param('l10n_hu_plus.settings')
             config_parameters = json.loads(config_parameters_string)
         except:
             config_parameters = {}
-
         if config_parameters.get('documentation_url'):
             return {
                 'target': 'new',
@@ -320,27 +245,21 @@ class L10nHuPlusResCompany(models.Model):
             raise exceptions.UserError(_("Documentation URL is not configured!"))
 
     def action_l10n_hu_plus_view_technical_data(self):
-        # Ensure one record in self
         self.ensure_one()
-
-        # Return
         if self.l10n_hu_plus_technical_data:
-            data_display = json.dumps(self.l10n_hu_plus_technical_data, default=str, indent=4)
-            context = {
-                'default_action_type': 'technical',
-                'default_action_execute_visible': False,
-                'default_technical_action': 'view_data',
-                'default_technical_data_display': data_display,
-            }
-            result = {
+            return {
                 'name': _("HU+ Wizard"),
-                'context': context,
+                'context': {
+                    'default_action_type': 'technical',
+                    'default_action_execute_visible': False,
+                    'default_technical_action': 'view_data',
+                    'default_technical_data_display': json.dumps(self.l10n_hu_plus_technical_data, default=str, indent=4),
+                },
                 'res_model': 'l10n.hu.plus.wizard',
                 'target': 'new',
                 'type': 'ir.actions.act_window',
                 'view_mode': 'form',
             }
-            return result
         else:
             raise exceptions.UserError(_("Technical data is empty!"))
 
