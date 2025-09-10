@@ -1,24 +1,24 @@
-# Mit találsz itt?
+# What can you find here?
 
-Ebben a repository-ban a **MOPSZ** ( [mopsz.odoo.com](https://mopsz.odoo.com) ) által fejlesztett és karbantartott lokalizációs modulok találhatóak, amelyek mindenki számára **ingyenesen elérhetők**.  
+In this repository you will find localization modules developed and maintained by **MOPSZ** ( [mopsz.odoo.com](https://mopsz.odoo.com) ), which are **freely available** to everyone.  
 
-A Magyar Odoo Partnerek Szövetsége (MOPSZ) azért jött létre, hogy összefogja a hazai Odoo partnereket, és együttműködésükkel biztosítsa a rendszer hatékony és folyamatosan frissülő lokalizációját Magyarországon. Közös alapokra építkezünk, közösen fejlesztünk, és közösen határozzuk meg azokat az irányokat, amelyek valóban a magyar vállalkozások igényeire reagálnak.
+The Hungarian Odoo Partners Association (MOPSZ) was created to bring together local Odoo partners and, through their collaboration, ensure efficient and continuously updated localization of the system in Hungary. We build on shared foundations, develop together, and jointly define directions that truly address the needs of Hungarian businesses.
 
 ---
 
-# Modulok
+# Modules
 
 ## Odoo HU+ (l10n_hu_plus)
 
-A modul célja, hogy az Odoo számlázási és könyvelési folyamatait teljes mértékben a magyar jogszabályokhoz igazítsa.
+The purpose of this module is to fully adapt Odoo's invoicing and accounting processes to Hungarian regulations.
 
-### Funkciók
-- Számla dokumentum típusok kezelése  
-- Pro-forma számlázás folyamat  
-- Stornó számla kiállítás  
-- Folyamatos teljesítésű számla kiállítás  
-- Áfa dátum kezelés  
-- Deviza számla árfolyam kezelés  
-- Deviza számla árfolyam kezelés a jóváíró és sztornó számláknál  
-- Készpénzforgalmi számlák kezelése  
-- Bejövő számla kiállítás dátumának kezelése  
+### Features
+- Management of invoice document types  
+- Pro-forma invoicing process  
+- Issuing of cancellation (storno) invoices  
+- Issuing of continuous service invoices  
+- VAT date management  
+- Foreign currency invoice exchange rate handling  
+- Foreign currency invoice exchange rate handling for credit and cancellation invoices  
+- Handling of cash-flow invoices  
+- Management of incoming invoice issue dates  
