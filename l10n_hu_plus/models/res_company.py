@@ -65,8 +65,8 @@ class L10nHuPlusResCompany(models.Model):
             raise exceptions.UserError(_("Technical data not available!"))
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
-        except:
-            raise exceptions.UserError(_("API data not available!"))
+        except Exception as ex:
+            raise exceptions.UserError(_("API data not available!") + "\n" + str(ex))
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
         api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
@@ -100,7 +100,7 @@ class L10nHuPlusResCompany(models.Model):
             api_key = api_data.get('api_key', "free")
             api_url = api_data.get('api_url', None)
             license_code = api_data.get('license_code', "free")
-        except:
+        except Exception as ex:
             api_key = "free"
             api_url = "https://odoohu17e.hungarodo.hu/v1/l10n_hu_api/registration"
             license_code = "free"
@@ -127,8 +127,8 @@ class L10nHuPlusResCompany(models.Model):
             raise exceptions.UserError(_("API is not enabled!"))
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
-        except:
-            raise exceptions.UserError(_("API data not available!"))
+        except Exception as ex:
+            raise exceptions.UserError(_("API data not available!") + "\n" + str(ex))
         api_details = _("Registered") + ": " + str(api_data.get('registered'))
         api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
         api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
@@ -192,7 +192,7 @@ class L10nHuPlusResCompany(models.Model):
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
             api_url = api_data.get('api_url', None)
-        except:
+        except Exception as ex:
             api_url = None
         api_data = {
             'api_key': 'free',
@@ -201,7 +201,7 @@ class L10nHuPlusResCompany(models.Model):
         }
         try:
             technical_data = json.loads(self.l10n_hu_plus_technical_data)
-        except:
+        except Exception as ex:
             technical_data = {}
         technical_data.update({'hu_plus_api': api_data})
         company_values = {
@@ -233,7 +233,7 @@ class L10nHuPlusResCompany(models.Model):
             config_param_obj = self.env['ir.config_parameter'].sudo()
             config_parameters_string = config_param_obj.get_param('l10n_hu_plus.settings')
             config_parameters = json.loads(config_parameters_string)
-        except:
+        except Exception:
             config_parameters = {}
         if config_parameters.get('documentation_url'):
             return {
@@ -306,7 +306,7 @@ class L10nHuPlusResCompany(models.Model):
         try:
             technical_data = json.loads(company.l10n_hu_plus_technical_data)
             api_data = technical_data.get('hu_plus_api')
-        except:
+        except Exception as ex:
             api_data = {}
         api_environment_result = company.l10n_hu_plus_get_api_environment()
 
@@ -459,15 +459,15 @@ class L10nHuPlusResCompany(models.Model):
             log_technical_data.update({'response_payload': payload})
             log.sudo().write({'technical_data': log_technical_data})
             debug_list.append("log technical_data update success")
-        except:
-            error_list.append("log technical_data update exception")
+        except Exception as ex:
+            error_list.append("log technical_data update exception" + ": " + str(ex))
 
         # Process
         if len(error_list) == 0:
             if request_type in ['get_registration', 'post_registration']:
                 try:
                     technical_data = json.loads(log.company.l10n_hu_plus_technical_data)
-                except:
+                except Exception as ex:
                     technical_data = {}
                 technical_data.update({'hu_plus_api': registration_data})
                 if registration_data.get('api_key'):
@@ -484,7 +484,7 @@ class L10nHuPlusResCompany(models.Model):
                 try:
                     technical_data = json.loads(log.company.l10n_hu_plus_technical_data)
                     current_api_data = technical_data.get('hu_plus_api')
-                except:
+                except Exception as ex:
                     technical_data = {}
                     current_api_data = {}
                 api_data = {
@@ -789,16 +789,16 @@ class L10nHuPlusResCompany(models.Model):
             else:
                 app_version = False
                 error_list.append("app_module not found, could not set app_version")
-        except:
+        except Exception as ex:
             app_version = False
-            error_list.append('could not set app_version')
+            error_list.append("could not set app_version" + ": " + str(ex))
 
         ## database_uuid
         try:
             database_uuid = config_class.get_param('database.uuid')
-        except:
+        except Exception as ex:
             database_uuid = False
-            error_list.append("could not set database_uuid")
+            error_list.append("could not set database_uuid" + ": " + str(ex))
 
         ## odoo_edition
         try:
@@ -807,17 +807,17 @@ class L10nHuPlusResCompany(models.Model):
                 odoo_edition = 'enterprise'
             else:
                 odoo_edition = 'community'
-        except:
+        except Exception as ex:
             odoo_edition = False
-            error_list.append('could not set odoo_edition')
+            error_list.append("could not set odoo_edition" + ": " + str(ex))
 
         ## odoo_release
         try:
             exp_version = odoo_service_common.exp_version()
             odoo_release = exp_version['server_serie']
-        except:
+        except Exception as ex:
             odoo_release = False
-            error_list.append('could not set odoo_release')
+            error_list.append("could not set odoo_release" + ": " + str(ex))
 
         # Update application_data
         if len(error_list) == 0:
