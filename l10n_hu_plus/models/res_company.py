@@ -58,185 +58,126 @@ class L10nHuPlusResCompany(models.Model):
     # Action methods
     def action_l10n_hu_plus_api_check_registration(self):
         """ Open the wizard for check API registration """
-        # Ensure one
         self.ensure_one()
-
-        # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
         if not self.l10n_hu_plus_technical_data:
             raise exceptions.UserError(_("Technical data not available!"))
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
-        except:
-            raise exceptions.UserError(_("API data not available!"))
-
-        # API details
-        api_details = _("Registered") + ": " + str(api_data.get('registered'))
-        api_details += "\n" + _("License Type") + ": " + str(api_data.get('license_type'))
-        api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
-        api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
-        api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
-        api_details += "\n" + _("Valid To") + ": " + str(api_data.get('license_valid_to'))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'check_registration',
-            'default_api_action_editable': False,
-            'default_api_details': api_details,
-            'default_api_key': api_data.get('api_key', "free"),
-            'default_api_license_code': api_data.get('license_code', "free"),
-            'default_api_url': api_data.get('api_url', None),
-        }
-
-        # Assemble result
-        result = {
+        except Exception as ex:
+            raise exceptions.UserError(f"_('API data not available!')\n{ex}")
+        api_details = (f"{_('Registered')} : + {api_data.get('registered')}"
+        f"\n{_('License Type')}: {api_data.get('license_type')}"
+        f"\n{_('License Owner')}: {api_data.get('license_owner')}"
+        f"\n{_('License Status')}: {api_data.get('license_status')}"
+        f"\n{_('License Valid')}: {api_data.get('license_valid')}"
+        f"\n{_('Valid To')}: {api_data.get('license_valid_to')}")
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'check_registration',
+                'default_api_action_editable': False,
+                'default_api_details': api_details,
+                'default_api_key': api_data.get('api_key', "free"),
+                'default_api_license_code': api_data.get('license_code', "free"),
+                'default_api_url': api_data.get('api_url', None),
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-
-        # Return result
-        return result
 
     def action_l10n_hu_plus_api_create_registration(self):
         """ Open the wizard for create API registration """
-        # Ensure one
         self.ensure_one()
-
-        # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
-
-        # Data
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
-        except:
-            api_data = {}
-
-        if api_data:
             api_key = api_data.get('api_key', "free")
             api_url = api_data.get('api_url', None)
             license_code = api_data.get('license_code', "free")
-        else:
+        except Exception:
             api_key = "free"
             api_url = "https://odoohu17e.hungarodo.hu/v1/l10n_hu_api/registration"
             license_code = "free"
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'create_registration',
-            'default_api_action_editable': False,
-            'default_api_key': api_key,
-            'default_api_license_code': license_code,
-            'default_api_url': api_url,
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'create_registration',
+                'default_api_action_editable': False,
+                'default_api_key': api_key,
+                'default_api_license_code': license_code,
+                'default_api_url': api_url,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_plus_api_delete_registration(self):
         """ Open the wizard for delete API registration """
-        # Ensure one
         self.ensure_one()
-
-        # Checks
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("API is not enabled!"))
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
-        except:
-            raise exceptions.UserError(_("API data not available!"))
-
-        # API details
-        api_details = _("Registered") + ": " + str(api_data.get('registered'))
-        api_details += "\n" +_("License Type") + ": " + str(api_data.get('license_type'))
-        api_details += "\n" + _("License Owner") + ": " + str(api_data.get('license_owner'))
-        api_details += "\n" + _("License Status") + ": " + str(api_data.get('license_status'))
-        api_details += "\n" + _("License Valid") + ": " + str(api_data.get('license_valid'))
-        api_details += "\n" + _("Valid To") + ": " + str(api_data.get('license_valid_to'))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'delete_registration',
-            'default_api_action_editable': False,
-            'default_api_details': api_details,
-            'default_api_key':  api_data.get('api_key', "free"),
-            'default_api_license_code':  api_data.get('license_code', "free"),
-            'default_api_url':  api_data.get('api_url', "free"),
-        }
-
-        # Assemble result
-        result = {
+        except Exception as ex:
+            raise exceptions.UserError(f"_('API data not available!')\n{ex}")
+        api_details = (f"{_('Registered')} : + {api_data.get('registered')}"
+        f"\n{_('License Type')}: {api_data.get('license_type')}"
+        f"\n{_('License Owner')}: {api_data.get('license_owner')}"
+        f"\n{_('License Status')}: {api_data.get('license_status')}"
+        f"\n{_('License Valid')}: {api_data.get('license_valid')}"
+        f"\n{_('Valid To')}: {api_data.get('license_valid_to')}")
+        return {
             'name': _("HU Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'delete_registration',
+                'default_api_action_editable': False,
+                'default_api_details': api_details,
+                'default_api_key':  api_data.get('api_key', "free"),
+                'default_api_license_code':  api_data.get('license_code', "free"),
+                'default_api_url':  api_data.get('api_url', "free"),
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-
-        # Return result
-        return result
 
     def action_l10n_hu_plus_api_get_objects(self):
         """ Open the wizard for GET API objects """
-        # Ensure one
         self.ensure_one()
-
-        # Check
         if not self.l10n_hu_plus_api_enabled:
             raise exceptions.UserError(_("HU+ API is not enabled!"))
-
-        # Assemble context
-        context = {
-            'default_action_type': 'api',
-            'default_api_action': 'get_objects',
-            'default_api_action_editable': False,
-        }
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'api',
+                'default_api_action': 'get_objects',
+                'default_api_action_editable': False,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_plus_api_list_logs(self):
         """ List logs """
-        # Ensure one
         self.ensure_one()
-
-        # Set l10n_hu_log_ids
         l10n_hu_log_ids = []
         logs = self.env['l10n.hu.plus.log'].sudo().search([('company', '=', self.id)])
         for log in logs:
             l10n_hu_log_ids.append(log.id)
-
-        # Assemble result
-        result = {
+        return {
             'name': _("HU+ Logs"),
             'domain': [('id', 'in', l10n_hu_log_ids)],
             'res_model': 'l10n.hu.plus.log',
@@ -245,30 +186,18 @@ class L10nHuPlusResCompany(models.Model):
             'view_mode': 'list,form',
         }
 
-        # Return result
-        return result
-
     def action_l10n_hu_plus_api_reset_registration(self):
         """ Reset registration to default """
-        # Ensure one
         self.ensure_one()
-
-        # api_url
         try:
             api_data = self.l10n_hu_plus_technical_data.get("hu_plus_api")
             api_url = api_data.get('api_url', None)
-        except:
+        except Exception:
             api_url = None
-
-        # Reset
-        api_data = {
-            'api_key': 'free',
-            'api_url': api_url,
-            'license_code': 'free',
-        }
+        api_data = {'api_key': 'free', 'api_url': api_url, 'license_code': 'free'}
         try:
             technical_data = json.loads(self.l10n_hu_plus_technical_data)
-        except:
+        except Exception:
             technical_data = {}
         technical_data.update({'hu_plus_api': api_data})
         company_values = {
@@ -277,70 +206,52 @@ class L10nHuPlusResCompany(models.Model):
             'l10n_hu_plus_api_registered': False,
         }
         self.write(company_values)
-
-        # Return
         return
 
     def action_l10n_hu_plus_apply_configuration(self):
         self.ensure_one()
-        context = {
-            'default_action_type': 'configuration',
-            'default_action_type_visible': True,
-        }
-        result = {
+        return {
             'name': _("HU+ Wizard"),
-            'context': context,
+            'context': {
+                'default_action_type': 'configuration',
+                'default_action_type_visible': True,
+            },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
         }
-        return result
 
     def action_l10n_hu_plus_view_documentation(self):
         """ View HU+ documentation """
-        # Make sure there is one record in self
         self.ensure_one()
-
-        # Get config_parameters
         try:
             config_param_obj = self.env['ir.config_parameter'].sudo()
             config_parameters_string = config_param_obj.get_param('l10n_hu_plus.settings')
             config_parameters = json.loads(config_parameters_string)
-        except:
+        except Exception:
             config_parameters = {}
-
         if config_parameters.get('documentation_url'):
-            return {
-                'target': 'new',
-                'type': 'ir.actions.act_url',
-                'url': config_parameters['documentation_url'],
-            }
+            return {'target': 'new', 'type': 'ir.actions.act_url', 'url': config_parameters['documentation_url']}
         else:
             raise exceptions.UserError(_("Documentation URL is not configured!"))
 
     def action_l10n_hu_plus_view_technical_data(self):
-        # Ensure one record in self
         self.ensure_one()
-
-        # Return
         if self.l10n_hu_plus_technical_data:
-            data_display = json.dumps(self.l10n_hu_plus_technical_data, default=str, indent=4)
-            context = {
-                'default_action_type': 'technical',
-                'default_action_execute_visible': False,
-                'default_technical_action': 'view_data',
-                'default_technical_data_display': data_display,
-            }
-            result = {
+            return {
                 'name': _("HU+ Wizard"),
-                'context': context,
+                'context': {
+                    'default_action_type': 'technical',
+                    'default_action_execute_visible': False,
+                    'default_technical_action': 'view_data',
+                    'default_technical_data_display': json.dumps(self.l10n_hu_plus_technical_data, default=str, indent=4),
+                },
                 'res_model': 'l10n.hu.plus.wizard',
                 'target': 'new',
                 'type': 'ir.actions.act_window',
                 'view_mode': 'form',
             }
-            return result
         else:
             raise exceptions.UserError(_("Technical data is empty!"))
 
@@ -387,7 +298,7 @@ class L10nHuPlusResCompany(models.Model):
         try:
             technical_data = json.loads(company.l10n_hu_plus_technical_data)
             api_data = technical_data.get('hu_plus_api')
-        except:
+        except Exception:
             api_data = {}
         api_environment_result = company.l10n_hu_plus_get_api_environment()
 
@@ -452,11 +363,7 @@ class L10nHuPlusResCompany(models.Model):
             debug_list.append("api_result skipped due to previous errors")
 
         # Log description
-        description_json = {
-            'error_list': error_list,
-            'info_list': info_list,
-            'warning_list': warning_list,
-        }
+        description_json = {'error_list': error_list, 'info_list': info_list, 'warning_list': warning_list}
         log_record.write({'description': json.dumps(description_json, default=str)})
 
         # Update result
@@ -540,15 +447,14 @@ class L10nHuPlusResCompany(models.Model):
             log_technical_data.update({'response_payload': payload})
             log.sudo().write({'technical_data': log_technical_data})
             debug_list.append("log technical_data update success")
-        except:
-            error_list.append("log technical_data update exception")
-
+        except Exception as ex:
+            error_list.append(f"log technical_data update exception: {ex}")
         # Process
         if len(error_list) == 0:
             if request_type in ['get_registration', 'post_registration']:
                 try:
                     technical_data = json.loads(log.company.l10n_hu_plus_technical_data)
-                except:
+                except Exception:
                     technical_data = {}
                 technical_data.update({'hu_plus_api': registration_data})
                 if registration_data.get('api_key'):
@@ -565,7 +471,7 @@ class L10nHuPlusResCompany(models.Model):
                 try:
                     technical_data = json.loads(log.company.l10n_hu_plus_technical_data)
                     current_api_data = technical_data.get('hu_plus_api')
-                except:
+                except Exception:
                     technical_data = {}
                     current_api_data = {}
                 api_data = {
@@ -685,7 +591,7 @@ class L10nHuPlusResCompany(models.Model):
                     invoice_storno.with_context(lang="en_US").name = "Storno Invoice"
                     invoice_storno.with_context(lang="hu_HU").name = "Storno számla"
                     operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_storno.id, 'operation': 'create'})
-                documents_types.append(invoice_normal)
+                documents_types.append(invoice_storno)
                 ## MODIFICATION INVOICE
                 invoice_modification = self.env['l10n.hu.plus.tag'].search([
                     ('company', '=', company_id),
@@ -706,7 +612,51 @@ class L10nHuPlusResCompany(models.Model):
                     invoice_modification.with_context(lang="en_US").name = "Modification Invoice"
                     invoice_modification.with_context(lang="hu_HU").name = "Módosító számla"
                     operations.append({'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_modification.id, 'operation': 'create'})
-                documents_types.append(invoice_normal)
+                documents_types.append(invoice_modification)
+                ## ADVANCE INVOICE
+                invoice_advance = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_advance'),
+                ])
+                if not invoice_advance:
+                    invoice_advance_values = {
+                        'code': "INVOICE-ADVANCE",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_advance",
+                        'priority': 5,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_advance',
+                    }
+                    invoice_advance = self.env['l10n.hu.plus.tag'].sudo().create(invoice_advance_values)
+                    invoice_advance.with_context(lang="en_US").name = "Invoice Advance"
+                    invoice_advance.with_context(lang="hu_HU").name = "Előleg számla"
+                    operations.append(
+                        {'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_advance.id, 'operation': 'create'})
+                documents_types.append(invoice_advance)
+                ## FINAL INVOICE
+                invoice_final = self.env['l10n.hu.plus.tag'].search([
+                    ('company', '=', company_id),
+                    ('tag_type', '=', 'document_type'),
+                    ('technical_name', '=', 'invoice_final'),
+                ])
+                if not invoice_final:
+                    invoice_final_values = {
+                        'code': "INVOICE-FINAL",
+                        'company': company.id,
+                        'locked': True,
+                        'name': "invoice_final",
+                        'priority': 6,
+                        'tag_type': 'document_type',
+                        'technical_name': 'invoice_final',
+                    }
+                    invoice_final = self.env['l10n.hu.plus.tag'].sudo().create(invoice_final_values)
+                    invoice_final.with_context(lang="en_US").name = "Invoice Final"
+                    invoice_final.with_context(lang="hu_HU").name = "Végszámla"
+                    operations.append(
+                        {'model_name': 'l10n.hu.plus.tag', 'record_id': invoice_final.id, 'operation': 'create'})
+                documents_types.append(invoice_final)
                 success_list.append(_("Document types configured"))
             else:
                 info_list.append(_("Document type configuration skipped"))
@@ -826,16 +776,16 @@ class L10nHuPlusResCompany(models.Model):
             else:
                 app_version = False
                 error_list.append("app_module not found, could not set app_version")
-        except:
+        except Exception as ex:
             app_version = False
-            error_list.append('could not set app_version')
+            error_list.append(f"could not set app_version: {ex}")
 
         ## database_uuid
         try:
             database_uuid = config_class.get_param('database.uuid')
-        except:
+        except Exception as ex:
             database_uuid = False
-            error_list.append("could not set database_uuid")
+            error_list.append(f"could not set database_uuid: {ex}")
 
         ## odoo_edition
         try:
@@ -844,17 +794,17 @@ class L10nHuPlusResCompany(models.Model):
                 odoo_edition = 'enterprise'
             else:
                 odoo_edition = 'community'
-        except:
+        except Exception as ex:
             odoo_edition = False
-            error_list.append('could not set odoo_edition')
+            error_list.append(f"could not set odoo_edition: {ex}")
 
         ## odoo_release
         try:
             exp_version = odoo_service_common.exp_version()
             odoo_release = exp_version['server_serie']
-        except:
+        except Exception as ex:
             odoo_release = False
-            error_list.append('could not set odoo_release')
+            error_list.append(f"could not set odoo_release: {ex}")
 
         # Update application_data
         if len(error_list) == 0:
