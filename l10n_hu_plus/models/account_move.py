@@ -1371,24 +1371,20 @@ class L10nHuPlusAccountMove(models.Model):
         if company_currency == invoice_currency:
             currency_summary = _("This document uses the company currency")
         else:
-            currency_summary = _("Currency rate") + ": " + str(l10n_hu_invoice_currency_rate_date) + " "
-            currency_summary += str(round(l10n_hu_invoice_currency_rate_inverse, rate_rounding))
-            currency_summary += " " + company_currency.name + "/" + invoice_currency.name
-            currency_summary += " (" + _("Accounting") + ") "
+            currency_summary = (f"{_('Currency rate')}: {l10n_hu_invoice_currency_rate_date}"
+            f"{round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
+            f"{company_currency.name}/{invoice_currency.name} ({_('Accounting')})")
             if round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) != round(expected_currency_rate_inverse, rate_rounding):
-                currency_summary += str(round(expected_currency_rate_inverse, rate_rounding))
-                currency_summary += " " + company_currency.name + "/" + invoice_currency.name
-                currency_summary += " (" + _("Expected") + ") "
+                currency_summary += (f"{round(expected_currency_rate_inverse, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name} ({_('Expected')}) ")
             if self.move_type in ['in_invoice', 'in_refund']:
-                currency_summary += str(round(document_rate, rate_rounding))
-                currency_summary += " " + company_currency.name + "/" + invoice_currency.name
-                currency_summary += " (" + _("Document") + ") "
+                currency_summary += (f"{round(document_rate, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name} ({_('Document')})")
             if document_rate_diff != 0:
-                currency_summary += " " + _("Rate difference") + ": " + str(round(document_rate_diff, rate_rounding))
+                currency_summary += f"{_('Rate difference')}: {round(document_rate_diff, rate_rounding)}"
             if company_currency.name != 'HUF':
-                currency_summary += str(round(huf_rate, rate_rounding))
-                currency_summary += " " + huf_currency.name + "/" + company_currency.name
-                currency_summary += " (" + _("HUF rate") + ")"
+                currency_summary += (f"{round(huf_rate, rate_rounding)} "
+                                     f"{huf_currency.name}/{company_currency.name} ({_('HUF rate')})")
 
         # Update result
         result.update({
