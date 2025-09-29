@@ -5,8 +5,7 @@ import datetime
 import json
 
 # 2 : imports of odoo
-from odoo import _, api, exceptions, fields, models  # alphabetically ordered
-from odoo.tools import formatLang
+from odoo import _, api, exceptions, fields, models, tools  # alphabetically ordered
 
 # 3 : imports from odoo modules
 from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L10nHuEdiConnection, L10nHuEdiConnectionError
@@ -253,7 +252,7 @@ class L10nHuPlusAccountMove(models.Model):
                     period_summary = delivery_result['period_summary']
             record.l10n_hu_delivery_period_summary = period_summary
 
-    @api.depends('amount_untaxed', 'amount_tax', 'currency_id', 'l10n_hu_document_rate', 'l10n_hu_document_vat_huf')
+    @api.depends('amount_untaxed', 'amount_tax', 'currency_id', 'l10n_hu_document_vat_huf')
     def _compute_l10n_hu_document(self):
         for record in self:
             data_result = record.l10n_hu_plus_get_document_data({})
@@ -295,6 +294,13 @@ class L10nHuPlusAccountMove(models.Model):
         if self.invoice_payment_term_id and self.journal_id and self.journal_id.l10n_hu_plus_enabled:
             self.invoice_cash_rounding_id = self.invoice_payment_term_id.l10n_hu_rounding_method
             self.l10n_hu_payment_mode = self.invoice_payment_term_id.l10n_hu_nav_method
+        else:
+            pass
+
+    @api.onchange('l10n_hu_vat_status')
+    def onchange_l10n_hu_vat_status(self):
+        if not self.l10n_hu_vat_status:
+            self.l10n_hu_vat_date = None
         else:
             pass
 
@@ -556,6 +562,14 @@ class L10nHuPlusAccountMove(models.Model):
 
     # Business methods
     ## SUPER
+    def _get_invoice_currency_rate_date(self):
+        self.ensure_one()
+        result = super()._get_invoice_currency_rate_date()
+        if (self.country_code == 'HU' and self.delivery_date and self.invoice_date
+                and self.delivery_date > self.invoice_date):
+            return self.invoice_date
+        return result
+
     def _get_report_base_filename(self) -> str:
         """ Get the filename for proforma"""
         if self.state == 'draft' and self.l10n_hu_proforma_name:
@@ -799,6 +813,9 @@ class L10nHuPlusAccountMove(models.Model):
         # Collect data using dedicated methods
         ## DELIVERY
         delivery_data = self.l10n_hu_plus_get_delivery_data(values)
+        delivery_date = delivery_data.get('delivery_date')
+        l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end')
+        l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start')
         error_list += delivery_data.get('error_list', [])
         warning_list += delivery_data.get('warning_list', [])
 
@@ -809,14 +826,14 @@ class L10nHuPlusAccountMove(models.Model):
 
         ## RATE - NOTES: do this after date
         rate_values = values
-        rate_values.update({'delivery_date': delivery_data.get('delivery_date', None)})
+        rate_values.update({'delivery_date': delivery_date})
         rate_data = self.l10n_hu_plus_get_rate_data(rate_values)
         error_list += rate_data.get('error_list', [])
         warning_list += rate_data.get('warning_list', [])
 
         ## VAT - NOTES: do this at last, we need to prepare values before this
         vat_values = values
-        vat_values.update({'delivery_date': delivery_data.get('delivery_date', None)})
+        vat_values.update({'delivery_date': delivery_date})
         vat_data = self.l10n_hu_plus_get_vat_data(vat_values)
         error_list += vat_data.get('error_list', [])
         warning_list += vat_data.get('warning_list', [])
@@ -824,10 +841,13 @@ class L10nHuPlusAccountMove(models.Model):
         # Process field values
         if len(error_list) == 0:
             # DELIVERY
-            delivery_date = delivery_data.get('delivery_date', None)
-            l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end', None)
-            l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start', None)
-            if self.state == 'draft' and delivery_date:
+            ## NOTES: write on delivery date triggers recompute of currency rate date! Update it only when necessary!
+            if delivery_date and delivery_date != self.delivery_date:
+                delivery_date_update = True
+            else:
+                delivery_date_update = False
+            if self.state == 'draft' and delivery_date_update:
+                debug_list.append(f"delivery date updated: {self.delivery_date}->{delivery_date}")
                 field_values.update({'delivery_date': delivery_date})
             if self.state == 'draft' and l10n_hu_delivery_period_end:
                 field_values.update({'l10n_hu_delivery_period_end': l10n_hu_delivery_period_end})
@@ -846,12 +866,25 @@ class L10nHuPlusAccountMove(models.Model):
 
             # RATE
             field_values.update({
-                'l10n_hu_huf_currency': rate_data.get('l10n_hu_huf_currency', None),
+                'l10n_hu_huf_currency': rate_data.get('l10n_hu_huf_currency'),
                 'l10n_hu_document_rate': rate_data.get('l10n_hu_document_rate', 0.0),
                 'l10n_hu_huf_rate': rate_data.get('l10n_hu_huf_rate', 0.0),
-                'l10n_hu_invoice_currency_rate_date': rate_data.get('l10n_hu_invoice_currency_rate_date', None),
+                'l10n_hu_invoice_currency_rate_date': rate_data.get('l10n_hu_invoice_currency_rate_date'),
                 'l10n_hu_invoice_currency_rate_inverse': rate_data.get('l10n_hu_invoice_currency_rate_inverse', 0.0),
             })
+            # Only update invoice currency rate if delivery date has changed
+            if delivery_date_update:
+                if rate_data.get('invoice_currency_rate') != self.invoice_currency_rate:
+                    field_values.update({'invoice_currency_rate': rate_data['invoice_currency_rate']})
+                    debug_list.append(f"invoice_currency_rate update: {rate_data['invoice_currency_rate']}")
+                if rate_data.get('l10n_hu_invoice_currency_rate_date') != self.l10n_hu_invoice_currency_rate_date:
+                    field_values.update({'l10n_hu_invoice_currency_rate_date': rate_data['l10n_hu_invoice_currency_rate_date']})
+                    debug_list.append(f"l10n_hu_invoice_currency_rate_date update: {rate_data['l10n_hu_invoice_currency_rate_date']}")
+                if rate_data.get('l10n_hu_invoice_currency_rate_inverse') != self.l10n_hu_invoice_currency_rate_inverse:
+                    field_values.update({'l10n_hu_invoice_currency_rate_inverse': rate_data['l10n_hu_invoice_currency_rate_inverse']})
+                    debug_list.append(f"l10n_hu_invoice_currency_rate_inverse update: {rate_data['l10n_hu_invoice_currency_rate_inverse']}")
+            else:
+                pass
 
             # VAT
             field_values.update({
@@ -867,8 +900,8 @@ class L10nHuPlusAccountMove(models.Model):
             elif self.l10n_hu_payment_mode:
                 field_values.update({'l10n_hu_payment_mode': self.l10n_hu_payment_mode})
                 debug_list.append("l10n_hu_payment_mode set from self: " + str(self.l10n_hu_payment_mode))
-            elif not self.l10n_hu_payment_mode and self.invoice_payment_term_id \
-                    and self.invoice_payment_term_id.l10n_hu_nav_method:
+            elif (not self.l10n_hu_payment_mode and self.invoice_payment_term_id
+                  and self.invoice_payment_term_id.l10n_hu_nav_method):
                 l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method.upper()
                 field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_2})
                 debug_list.append("l10n_hu_payment_mode set from payment term: " + str(l10n_hu_payment_mode_2))
@@ -911,8 +944,6 @@ class L10nHuPlusAccountMove(models.Model):
 
         :return: dictionary
         """
-        # raise exceptions.UserError("l10n_hu_plus_get_delivery_data BEGIN" + str(values))
-
         # Initialize variables
         debug_list = []
         error_list = []
@@ -922,21 +953,24 @@ class L10nHuPlusAccountMove(models.Model):
         result = {}
         warning_list = []
 
-        # delivery_date_default
-        if self.journal_id:
-            delivery_date_default = self.journal_id.l10n_hu_get_default_delivery_date()
-        else:
-            delivery_date_default = None
-            error_list.append("journal not set")
-
         # dates
         accounting_date = values.get('date', self.date)
+        delivery_date = values.get('delivery_date', self.delivery_date)
         invoice_date = values.get('invoice_date', self.invoice_date)
         period_end = values.get('l10n_hu_delivery_period_end', self.l10n_hu_delivery_period_end)
         period_start = values.get('l10n_hu_delivery_period_start', self.l10n_hu_delivery_period_start)
 
+        # delivery_date_default
+        if not delivery_date and self.move_type in ['in_invoice', 'in_refund'] and invoice_date:
+            delivery_date_default = invoice_date
+        elif not delivery_date and self.journal_id:
+            delivery_date_default = self.journal_id.l10n_hu_get_default_delivery_date()
+        else:
+            delivery_date_default = None
+            debug_list.append("delivery_date_default not set, this is a valid scenario")
+
         # period_enabled
-        if period_start and period_end:
+        if period_start and period_end and self.state == 'draft' and self.move_type in ['out_invoice', 'out_refund']:
             period_enabled = True
         else:
             period_enabled = False
@@ -955,7 +989,7 @@ class L10nHuPlusAccountMove(models.Model):
             invoice_date_due = self.invoice_date_due
 
         # Set last day of delivery period month
-        if period_end:
+        if period_enabled and period_end:
             # Get close to the end of the month and add 4 days to 'roll it over'
             period_next_month = period_end.replace(day=28) + datetime.timedelta(days=4)
             # Set the day to 1 gives us the start of next month
@@ -966,39 +1000,40 @@ class L10nHuPlusAccountMove(models.Model):
             period_month_last_day = None
 
         # Set 60 days from period_end
-        if period_end:
+        if period_enabled and period_end:
             period_end_plus_60 = period_end + datetime.timedelta(days=60)
         else:
             period_end_plus_60 = None
 
         # NAV SCENARIOS
         # 0) DEFAULT
-        if delivery_date_default:
-            scenario = '0_default'
+        if delivery_date:
+            scenario = '0_already_set'
+        elif not delivery_date and delivery_date_default:
+            scenario = '0_use_default'
             delivery_date = delivery_date_default
         else:
             scenario = '0_no_default'
-            delivery_date = None
 
         # 1) PERIOD END
         # Rule: period_end is set
         # Value: delivery_period_end
-        if period_end:
+        if period_enabled and period_end:
             scenario = '1_period_end'
             delivery_date = period_end
 
         # 2) INVOICE DATE
         # Rule: BOTH invoice_date_due AND invoice_date are BEFORE period_end
         # Value: invoice_date
-        if invoice_date and invoice_date_due and period_end \
-                and invoice_date_due < period_end and invoice_date < period_end:
+        if (period_enabled and invoice_date and invoice_date_due and period_end
+                and invoice_date_due < period_end and invoice_date < period_end):
             scenario = '1a_invoice_date'
             delivery_date = invoice_date
 
         # 3) INVOICE DATE DUE (MAX 60)
         # Rule: invoice_date_due is AFTER period_end
         # Value: invoice_date_due (BUT max 60 days from period_end)
-        if invoice_date_due and period_end and invoice_date_due > period_end:
+        if period_enabled and invoice_date_due and period_end and invoice_date_due > period_end:
             if invoice_date_due <= period_end_plus_60:
                 scenario = '1b_invoice_date_due'
                 delivery_date = invoice_date_due
@@ -1008,8 +1043,7 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Period text
         if period_enabled:
-            period_summary += _("Delivery period") + ": "
-            period_summary += str(period_start) + " - " + str(period_end)
+            period_summary = f"{_('Delivery period')}: {period_start} - {period_end}"
             period_legal = "2007. CXXVII. 58.§"
             if scenario == '1a_invoice_date':
                 period_legal += " (1) a)"
@@ -1079,21 +1113,22 @@ class L10nHuPlusAccountMove(models.Model):
         huf_currency = self.env.ref('base.HUF')
         huf_rounding = huf_currency.decimal_places
         l10n_hu_document_vat_huf = values.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
+        rate_rounding = 2
 
         ### CUSTOMER INVOICE - we issued it (Odoo or externally), so we reported the data, so we must use accounting
-        if self.move_type in ['out_invoice', 'out_refund'] and self.invoice_currency_rate != 0 \
-                and self.company_id.currency_id.name == 'HUF':
+        if (self.move_type in ['out_invoice', 'out_refund'] and self.invoice_currency_rate != 0
+                and self.company_id.currency_id.name == 'HUF'):
             l10n_hu_document_rate = 1 / self.invoice_currency_rate
             l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
         elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
             l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
-        elif self.move_type in ['in_invoice', 'in_refund'] and self.amount_total != 0 \
-                and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
+        elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total != 0
+              and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
             l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
-        elif self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0 \
-                and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
-            l10n_hu_document_rate = round(self.l10n_hu_invoice_currency_rate_inverse, huf_rounding)
+        elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0
+              and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
+            l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
         else:
             l10n_hu_document_rate = 1.0
         l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
@@ -1103,25 +1138,22 @@ class L10nHuPlusAccountMove(models.Model):
         accounting_amount_untaxed = abs(self.amount_untaxed_signed)
         accounting_amount_tax = abs(self.amount_tax_signed)
         accounting_amount_total = abs(self.amount_total_signed)
-        huf_amount_diff = False
+        huf_amount_diff = 0
+        huf_amount_gross_diff = 0
+        huf_amount_net_diff = 0
+        huf_amount_vat_diff = 0
         huf_amount_summary = None
         if self.company_id.currency_id.name == 'HUF':
-            huf_amount_net_diff = round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
-            huf_amount_vat_diff = round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
-            huf_amount_gross_diff = round(accounting_amount_total - l10n_hu_document_gross_huf, huf_rounding)
+            huf_amount_net_diff = tools.float_round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
+            huf_amount_vat_diff = tools.float_round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
+            huf_amount_gross_diff = tools.float_round(accounting_amount_total - l10n_hu_document_gross_huf, huf_rounding)
             if huf_amount_net_diff != 0 or huf_amount_vat_diff != 0 or huf_amount_gross_diff != 0:
                 huf_amount_diff = True
             if self.company_id.currency_id.name == 'HUF':
-                huf_amount_summary = _("Document HUF amounts") + ": "
-                huf_amount_summary += _("Net difference") + " " + str(huf_amount_net_diff)
-                huf_amount_summary += " (" + str(accounting_amount_untaxed)
-                huf_amount_summary += "-" + str(self.l10n_hu_document_net_huf) + "); "
-                huf_amount_summary += _("VAT difference") + " " + str(huf_amount_vat_diff)
-                huf_amount_summary += " (" + str(accounting_amount_tax)
-                huf_amount_summary += "-" + str(self.l10n_hu_document_vat_huf) + "); "
-                huf_amount_summary += _("Gross difference") + " " + str(huf_amount_gross_diff)
-                huf_amount_summary += " (" + str(accounting_amount_total)
-                huf_amount_summary += "-" + str(self.l10n_hu_document_gross_huf) + ")"
+                huf_amount_summary = (f"{_('Document HUF amounts')}: "
+                f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed}-{self.l10n_hu_document_net_huf});"
+                f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax}-{self.l10n_hu_document_vat_huf});"
+                f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total}-{self.l10n_hu_document_gross_huf})")
 
         # MODIFICATION
         modification_document_type = self.env['l10n.hu.plus.tag'].search([
@@ -1146,8 +1178,8 @@ class L10nHuPlusAccountMove(models.Model):
             is_storno_invoice = False
 
         ## is_storno_allowed
-        if storno_document_type and self.move_type == 'out_invoice' and self.state == 'posted' \
-                and not self.reversed_entry_id and not self.l10n_hu_original_invoice_number:
+        if (storno_document_type and self.move_type == 'out_invoice' and self.state == 'posted'
+                and not self.reversed_entry_id and not self.l10n_hu_original_invoice_number):
             is_storno_allowed = True
         else:
             is_storno_allowed = False
@@ -1216,8 +1248,8 @@ class L10nHuPlusAccountMove(models.Model):
         # CURRENCIES
         company_currency = self.company_id.currency_id
         huf_currency = self.env.ref('base.HUF')
-        huf_rounding = huf_currency.decimal_places
         invoice_currency = self.currency_id
+        rate_rounding = 2
 
         # DATES
         delivery_date = values.get('delivery_date', self.delivery_date)
@@ -1315,9 +1347,10 @@ class L10nHuPlusAccountMove(models.Model):
         ## - customer invoice issued externally and downloaded
         ## - vendor bill
         ## NOTES: we need to do accounting for the invoice_date
-        if self.move_type in ['in_invoice', 'in_refund'] and invoice_date and delivery_date \
-                and invoice_date < delivery_date:
-            invoice_currency_rate = delivery_date_rcr.company_rate
+        if (self.move_type in ['in_invoice', 'in_refund'] and invoice_date and delivery_date
+                and invoice_date < delivery_date):
+            invoice_currency_rate = invoice_date_rcr.company_rate
+            debug_list.append(f"inbound invoice special: {invoice_date}<{delivery_date} = {invoice_currency_rate}")
 
         # l10n_hu_invoice_currency_rate_date
         l10n_hu_invoice_currency_rate_date = self._get_invoice_currency_rate_date()
@@ -1325,30 +1358,26 @@ class L10nHuPlusAccountMove(models.Model):
             l10n_hu_invoice_currency_rate_date = currency_rate_date
 
         # document_rate_diff
-        document_rate_diff = round(l10n_hu_invoice_currency_rate_inverse, huf_rounding) - round(document_rate, huf_rounding)
+        document_rate_diff = tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) - tools.float_round(document_rate, rate_rounding)
 
         # currency_summary
         if company_currency == invoice_currency:
             currency_summary = _("This document uses the company currency")
         else:
-            currency_summary = _("Currency rate") + ": " + str(l10n_hu_invoice_currency_rate_date) + " "
-            currency_summary += str(round(l10n_hu_invoice_currency_rate_inverse, huf_rounding))
-            currency_summary += " " + company_currency.name + "/" + invoice_currency.name
-            currency_summary += " (" + _("Accounting") + ") "
-            if round(l10n_hu_invoice_currency_rate_inverse, huf_rounding) != round(expected_currency_rate_inverse, huf_rounding):
-                currency_summary += str(round(expected_currency_rate_inverse, huf_rounding))
-                currency_summary += " " + company_currency.name + "/" + invoice_currency.name
-                currency_summary += " (" + _("Expected") + ") "
+            currency_summary = (f"{_('Currency rate')}: {l10n_hu_invoice_currency_rate_date}"
+            f" {tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
+            f" {company_currency.name}/{invoice_currency.name} ({_('Accounting')})")
+            if tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) != tools.float_round(expected_currency_rate_inverse, rate_rounding):
+                currency_summary += (f" {tools.float_round(expected_currency_rate_inverse, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name} ({_('Expected')}) ")
             if self.move_type in ['in_invoice', 'in_refund']:
-                currency_summary += str(round(document_rate, huf_rounding))
-                currency_summary += " " + company_currency.name + "/" + invoice_currency.name
-                currency_summary += " (" + _("Document") + ") "
+                currency_summary += (f" {tools.float_round(document_rate, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name} ({_('Document')})")
             if document_rate_diff != 0:
-                currency_summary += " " + _("Rate difference") + ": " + str(round(document_rate_diff, huf_rounding))
+                currency_summary += f"{_('Rate difference')}: {tools.float_round(document_rate_diff, rate_rounding)}"
             if company_currency.name != 'HUF':
-                currency_summary += str(round(huf_rate, huf_rounding))
-                currency_summary += " " + huf_currency.name + "/" + company_currency.name
-                currency_summary += " (" + _("HUF rate") + ")"
+                currency_summary += (f" {tools.float_round(huf_rate, rate_rounding)} "
+                                     f" {huf_currency.name}/{company_currency.name} ({_('HUF rate')})")
 
         # Update result
         result.update({
@@ -1402,27 +1431,22 @@ class L10nHuPlusAccountMove(models.Model):
         result = {}
         warning_list = []
 
-        # l10n_hu_vat_date
-        l10n_hu_vat_date = values.get('l10n_hu_vat_date', self.l10n_hu_vat_date)
-
-        # l10n_hu_vat_status
-        l10n_hu_vat_status = values.get('l10n_hu_vat_status', self.l10n_hu_vat_status)
+        # delivery_date
+        delivery_date = values.get('delivery_date', self.delivery_date)
 
         # is_cash_accounting
         is_cash_accounting = False
         cash_accounting_summary = _("Cash accounting is not applicable for the invoice")
         if self.is_invoice(True) and self.state == 'draft':
-            if self.move_type in ['in_invoice', 'in_refund'] \
-                    and self.partner_id \
-                    and self.partner_id.property_account_position_id \
-                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
-                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca':
+            if (self.move_type in ['in_invoice', 'in_refund'] and self.partner_id
+                    and self.partner_id.property_account_position_id
+                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic'
+                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca'):
                 is_cash_accounting = True
                 cash_accounting_summary = _("Domestic invoice issuer applies cash accounting")
-            elif self.partner_id \
-                    and self.partner_id.property_account_position_id \
-                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
-                    and self.company_id.l10n_hu_tax_regime == 'ca':
+            elif (self.partner_id and self.partner_id.property_account_position_id
+                  and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic'
+                  and self.company_id.l10n_hu_tax_regime == 'ca'):
                 is_cash_accounting = True
                 cash_accounting_summary = _("Domestic partner and company applies cash accounting")
             else:
@@ -1452,6 +1476,16 @@ class L10nHuPlusAccountMove(models.Model):
                                 vat_taxes.append(tax)
                             if tax.tax_exigibility == 'on_payment' and tax not in cash_accounting_taxes:
                                 cash_accounting_taxes.append(tax)
+
+        # l10n_hu_vat_status
+        l10n_hu_vat_status = values.get('l10n_hu_vat_status', self.l10n_hu_vat_status)
+        if not l10n_hu_vat_status and not is_cash_accounting:
+            l10n_hu_vat_status = 'to_declare'
+
+        # l10n_hu_vat_date
+        l10n_hu_vat_date = values.get('l10n_hu_vat_date', self.l10n_hu_vat_date)
+        if not l10n_hu_vat_date and not is_cash_accounting and l10n_hu_vat_status == 'to_declare':
+            l10n_hu_vat_date = delivery_date
 
         # Update result
         result.update({
@@ -1900,7 +1934,7 @@ class L10nHuPlusAccountMove(models.Model):
             success_rate = success_count / total_count
             warning_rate = warning_count / total_count
             bad_count = error_count + (warning_count * 0.5)
-            health_rate = int(round(((total_count - bad_count) / total_count * 100), 0))
+            health_rate = int(tools.float_round(((total_count - bad_count) / total_count * 100), 0))
         else:
             error_rate = 0
             info_rate = 0
