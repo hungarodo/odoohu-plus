@@ -5,8 +5,7 @@ import datetime
 import json
 
 # 2 : imports of odoo
-from odoo import _, api, exceptions, fields, models  # alphabetically ordered
-from odoo.tools import formatLang
+from odoo import _, api, exceptions, fields, models, tools  # alphabetically ordered
 
 # 3 : imports from odoo modules
 from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L10nHuEdiConnection, L10nHuEdiConnectionError
@@ -1129,7 +1128,7 @@ class L10nHuPlusAccountMove(models.Model):
             l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
         elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0
               and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
-            l10n_hu_document_rate = round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
+            l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
         else:
             l10n_hu_document_rate = 1.0
         l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
@@ -1145,22 +1144,16 @@ class L10nHuPlusAccountMove(models.Model):
         huf_amount_vat_diff = 0
         huf_amount_summary = None
         if self.company_id.currency_id.name == 'HUF':
-            huf_amount_net_diff = round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
-            huf_amount_vat_diff = round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
-            huf_amount_gross_diff = round(accounting_amount_total - l10n_hu_document_gross_huf, huf_rounding)
+            huf_amount_net_diff = tools.float_round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
+            huf_amount_vat_diff = tools.float_round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
+            huf_amount_gross_diff = tools.float_round(accounting_amount_total - l10n_hu_document_gross_huf, huf_rounding)
             if huf_amount_net_diff != 0 or huf_amount_vat_diff != 0 or huf_amount_gross_diff != 0:
                 huf_amount_diff = True
             if self.company_id.currency_id.name == 'HUF':
-                huf_amount_summary = _("Document HUF amounts") + ": "
-                huf_amount_summary += _("Net difference") + " " + str(huf_amount_net_diff)
-                huf_amount_summary += " (" + str(accounting_amount_untaxed)
-                huf_amount_summary += "-" + str(self.l10n_hu_document_net_huf) + "); "
-                huf_amount_summary += _("VAT difference") + " " + str(huf_amount_vat_diff)
-                huf_amount_summary += " (" + str(accounting_amount_tax)
-                huf_amount_summary += "-" + str(self.l10n_hu_document_vat_huf) + "); "
-                huf_amount_summary += _("Gross difference") + " " + str(huf_amount_gross_diff)
-                huf_amount_summary += " (" + str(accounting_amount_total)
-                huf_amount_summary += "-" + str(self.l10n_hu_document_gross_huf) + ")"
+                huf_amount_summary = (f"{_('Document HUF amounts')}: "
+                f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed}-{self.l10n_hu_document_net_huf});"
+                f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax}-{self.l10n_hu_document_vat_huf});"
+                f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total}-{self.l10n_hu_document_gross_huf})")
 
         # MODIFICATION
         modification_document_type = self.env['l10n.hu.plus.tag'].search([
@@ -1365,26 +1358,26 @@ class L10nHuPlusAccountMove(models.Model):
             l10n_hu_invoice_currency_rate_date = currency_rate_date
 
         # document_rate_diff
-        document_rate_diff = round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) - round(document_rate, rate_rounding)
+        document_rate_diff = tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) - tools.float_round(document_rate, rate_rounding)
 
         # currency_summary
         if company_currency == invoice_currency:
             currency_summary = _("This document uses the company currency")
         else:
             currency_summary = (f"{_('Currency rate')}: {l10n_hu_invoice_currency_rate_date}"
-            f"{round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
-            f"{company_currency.name}/{invoice_currency.name} ({_('Accounting')})")
-            if round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) != round(expected_currency_rate_inverse, rate_rounding):
-                currency_summary += (f"{round(expected_currency_rate_inverse, rate_rounding)}"
+            f" {tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
+            f" {company_currency.name}/{invoice_currency.name} ({_('Accounting')})")
+            if tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) != tools.float_round(expected_currency_rate_inverse, rate_rounding):
+                currency_summary += (f" {tools.float_round(expected_currency_rate_inverse, rate_rounding)}"
                                      f" {company_currency.name}/{invoice_currency.name} ({_('Expected')}) ")
             if self.move_type in ['in_invoice', 'in_refund']:
-                currency_summary += (f"{round(document_rate, rate_rounding)}"
+                currency_summary += (f" {tools.float_round(document_rate, rate_rounding)}"
                                      f" {company_currency.name}/{invoice_currency.name} ({_('Document')})")
             if document_rate_diff != 0:
-                currency_summary += f"{_('Rate difference')}: {round(document_rate_diff, rate_rounding)}"
+                currency_summary += f"{_('Rate difference')}: {tools.float_round(document_rate_diff, rate_rounding)}"
             if company_currency.name != 'HUF':
-                currency_summary += (f"{round(huf_rate, rate_rounding)} "
-                                     f"{huf_currency.name}/{company_currency.name} ({_('HUF rate')})")
+                currency_summary += (f" {tools.float_round(huf_rate, rate_rounding)} "
+                                     f" {huf_currency.name}/{company_currency.name} ({_('HUF rate')})")
 
         # Update result
         result.update({
@@ -1941,7 +1934,7 @@ class L10nHuPlusAccountMove(models.Model):
             success_rate = success_count / total_count
             warning_rate = warning_count / total_count
             bad_count = error_count + (warning_count * 0.5)
-            health_rate = int(round(((total_count - bad_count) / total_count * 100), 0))
+            health_rate = int(tools.float_round(((total_count - bad_count) / total_count * 100), 0))
         else:
             error_rate = 0
             info_rate = 0
