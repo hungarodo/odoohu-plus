@@ -1160,7 +1160,7 @@ msgstr "Regisztráció törlése"
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.view_invoice_tree_inherit
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.wizard_view_form
 msgid "Delivery Date"
-msgstr "Teljesítés dátuma"
+msgstr "Teljesítési dátum"
 
 #. module: l10n_hu_plus
 #: model_terms:ir.ui.view,arch_db:l10n_hu_plus.invoice_view_list
@@ -1182,13 +1182,13 @@ msgstr "Teljesítés kezdete"
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 msgid "Delivery date not set"
-msgstr "Teljesítés dátuma nincs beállítva"
+msgstr "Teljesítési dátum nincs beállítva"
 
 #. module: l10n_hu_plus
 #. odoo-python
 #: code:addons/l10n_hu_plus/models/account_move.py:0
 msgid "Delivery date set"
-msgstr "Teljesítés dátuma beállítva"
+msgstr "Teljesítési dátum beállítva"
 
 #. module: l10n_hu_plus
 #. odoo-python
