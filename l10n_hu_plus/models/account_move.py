@@ -246,7 +246,8 @@ class L10nHuPlusAccountMove(models.Model):
     def _compute_l10n_hu_delivery_period_text(self):
         for record in self:
             period_summary = ""
-            if record.move_type in ['out_invoice', 'out_refund'] and record.l10n_hu_delivery_period_start and record.l10n_hu_delivery_period_end:
+            if (record.move_type in ['out_invoice', 'out_refund']
+                    and record.l10n_hu_delivery_period_start and record.l10n_hu_delivery_period_end):
                 delivery_result = record.l10n_hu_plus_get_delivery_data({})
                 if delivery_result.get('period_summary'):
                     period_summary = delivery_result['period_summary']
@@ -311,8 +312,8 @@ class L10nHuPlusAccountMove(models.Model):
     def action_post(self):
         """ Do not allow posting invoice when HU+ status is error """
         for record in self:
-            if record.state == 'draft' and record.journal_id and record.journal_id.l10n_hu_plus_enabled \
-                    and record.is_invoice(include_receipts=True) and record.l10n_hu_plus_status == 'error':
+            if (record.state == 'draft' and record.journal_id and record.journal_id.l10n_hu_plus_enabled
+                    and record.is_invoice(include_receipts=True) and record.l10n_hu_plus_status == 'error'):
                 raise exceptions.UserError(_("Can not post invoice with HU+ error!") + " " + str(record.display_name))
         return super().action_post()
 
@@ -616,8 +617,8 @@ class L10nHuPlusAccountMove(models.Model):
         # Customer tax number
         ## NOTES: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
         customer = result.get('customer', None)
-        if customer and customer.is_company and customer.vat and customer.country_code != 'HU' \
-                and self.fiscal_position_id and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
+        if (customer and customer.is_company and customer.vat and customer.country_code != 'HU'
+                and self.fiscal_position_id and self.fiscal_position_id.l10n_hu_vat_status == 'domestic'):
             result.update({
                 'customer_vat_data': {
                     'tax_number': customer.l10n_hu_group_vat or customer.vat,
@@ -640,8 +641,8 @@ class L10nHuPlusAccountMove(models.Model):
         result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_valid_actions()
 
         # No action when EDI sending is disabled on the journal (eg: externally issued invoices, OSS)
-        if self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted' \
-                and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled':
+        if (self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted'
+                and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled'):
             result = []
         return result
 
@@ -814,6 +815,7 @@ class L10nHuPlusAccountMove(models.Model):
         ## DELIVERY
         delivery_data = self.l10n_hu_plus_get_delivery_data(values)
         delivery_date = delivery_data.get('delivery_date')
+        invoice_date_due = delivery_data.get('invoice_date_due')
         l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end')
         l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start')
         error_list += delivery_data.get('error_list', [])
@@ -840,6 +842,12 @@ class L10nHuPlusAccountMove(models.Model):
 
         # Process field values
         if len(error_list) == 0:
+            # DUE DATE
+            ## NOTES: we need this because payment term may change the due date
+            if invoice_date_due and invoice_date_due != self.invoice_date_due:
+                debug_list.append(f"invoice_date_due updated: {self.invoice_date_due}->{invoice_date_due}")
+                field_values.update({'invoice_date_due': invoice_date_due})
+
             # DELIVERY
             ## NOTES: write on delivery date triggers recompute of currency rate date! Update it only when necessary!
             if delivery_date and delivery_date != self.delivery_date:
@@ -948,8 +956,6 @@ class L10nHuPlusAccountMove(models.Model):
         debug_list = []
         error_list = []
         info_list = []
-        period_legal = ""
-        period_summary = ""
         result = {}
         warning_list = []
 
@@ -978,15 +984,20 @@ class L10nHuPlusAccountMove(models.Model):
         # invoice_date_due
         if values.get('invoice_date_due'):
             invoice_date_due = values['invoice_date_due']
+            debug_list.append(f"invoice_date_due set from values: {invoice_date_due}")
         elif self.invoice_payment_term_id:
             # NOTES: using a payment term needs a recompute, see _compute_invoice_date_due()
-            context_today = fields.Date.context_today(self)
+            if self.state == 'draft':
+                self._compute_needed_terms()
+            debug_list.append(f"needed_terms: {self.needed_terms}")
             invoice_date_due = self.needed_terms and max(
                 (k['date_maturity'] for k in self.needed_terms.keys() if k),
                 default=False,
-            ) or self.invoice_date_due or context_today
+            ) or self.invoice_date_due or fields.Date.context_today(self)
+            debug_list.append(f"invoice_date_due set from invoice_payment_term_id: {invoice_date_due}")
         else:
             invoice_date_due = self.invoice_date_due
+            debug_list.append(f"invoice_date_due set from self: {invoice_date_due}")
 
         # Set last day of delivery period month
         if period_enabled and period_end:
@@ -1014,6 +1025,7 @@ class L10nHuPlusAccountMove(models.Model):
             delivery_date = delivery_date_default
         else:
             scenario = '0_no_default'
+        debug_list.append(f"delivery_date scenario 0: {scenario} - {delivery_date}")
 
         # 1) PERIOD END
         # Rule: period_end is set
@@ -1021,6 +1033,7 @@ class L10nHuPlusAccountMove(models.Model):
         if period_enabled and period_end:
             scenario = '1_period_end'
             delivery_date = period_end
+        debug_list.append(f"delivery_date scenario 1: {scenario} - {delivery_date}")
 
         # 2) INVOICE DATE
         # Rule: BOTH invoice_date_due AND invoice_date are BEFORE period_end
@@ -1029,6 +1042,7 @@ class L10nHuPlusAccountMove(models.Model):
                 and invoice_date_due < period_end and invoice_date < period_end):
             scenario = '1a_invoice_date'
             delivery_date = invoice_date
+        debug_list.append(f"delivery_date scenario 2: {scenario} - {delivery_date}")
 
         # 3) INVOICE DATE DUE (MAX 60)
         # Rule: invoice_date_due is AFTER period_end
@@ -1040,19 +1054,21 @@ class L10nHuPlusAccountMove(models.Model):
             else:
                 scenario = '1b_invoice_date_due_max_60'
                 delivery_date = period_end_plus_60
+        debug_list.append(f"delivery_date scenario 3: {scenario} - {delivery_date}")
 
-        # Period text
-        if period_enabled:
-            period_summary = f"{_('Delivery period')}: {period_start} - {period_end}"
-            period_legal = "2007. CXXVII. 58.§"
-            if scenario == '1a_invoice_date':
-                period_legal += " (1) a)"
-            elif scenario == '1b_invoice_date_due':
-                period_legal += " (1) b)"
-            elif scenario == '1b_invoice_date_due_max_60':
-                period_legal += " (1) b) 60+ " + _("day")
-            else:
-                pass
+        # period_summary
+        period_summary = f"{_('Delivery period')}: {period_start} - {period_end}"
+
+        # period_legal
+        period_legal = "2007. CXXVII. 58.§"
+        if scenario == '1a_invoice_date':
+            period_legal += " (1) a)"
+        elif scenario == '1b_invoice_date_due':
+            period_legal += " (1) b)"
+        elif scenario == '1b_invoice_date_due_max_60':
+            period_legal += " (1) b) 60+ " + _("day")
+        else:
+            pass
 
         # Update result
         result.update({
@@ -1723,15 +1739,15 @@ class L10nHuPlusAccountMove(models.Model):
 
         # HU+5: delivery period
         l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end', None)
-        l10n_hu_delivery_period_legal = delivery_data.get('l10n_hu_delivery_period_legal', None)
         l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start', None)
+        period_legal = delivery_data.get('period_legal', None)
         hu_5_description = str(l10n_hu_delivery_period_start)
         hu_5_description += " - "
         hu_5_description += str(l10n_hu_delivery_period_end)
         if l10n_hu_delivery_period_start and l10n_hu_delivery_period_end:
             ## for outgoing invoices
-            if self.move_type in ['out_invoice', 'out_refund'] and l10n_hu_delivery_period_legal:
-                hu_5_description += " (" + str(l10n_hu_delivery_period_legal) + ")"
+            if self.move_type in ['out_invoice', 'out_refund'] and period_legal:
+                hu_5_description += f" ({period_legal})"
             success_list.append({
                 'action_text': None,
                 'code': 'HU+5',
