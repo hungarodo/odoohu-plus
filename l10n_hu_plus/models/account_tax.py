@@ -11,7 +11,7 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 
 # Class
-class L10nHuAccountTax(models.Model):
+class L10nHuPlusAccountTax(models.Model):
     # Private attributes
     _inherit = 'account.tax'
 

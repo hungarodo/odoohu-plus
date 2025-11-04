@@ -16,6 +16,8 @@
                         <field name="active_model_id" force_save="1" invisible="1"/>
                         <field name="active_model_name" invisible="1"/>
                         <field name="company" force_save="1" invisible="1"/>
+                        <field name="company_currency" force_save="1" invisible="1"/>
+                        <field name="huf_currency" force_save="1" invisible="1"/>
                         <!-- ACTION TYPES -->
                         <field name="action_type_editable" invisible="1"/>
                         <field name="action_type_visible" invisible="1"/>
@@ -25,26 +27,14 @@
                         <field name="account_move_action_visible" invisible="1"/>
                         <field name="account_move_action" force_save="1" invisible="action_type != 'account_move' or not account_move_action_visible" readonly="not account_move_action_editable" string="Action"/>
                         <field name="accounting_journal" invisible="1" options="{'no_create': True}" string="Journal"/>
+                        <field name="accounting_move_currency" invisible="1"/>
                         <field name="accounting_move_type" invisible="1"/>
-                        <!-- ACCOUNT MOVE - CHECK STATUS -->
-                        <label name="account_move_check_status"
-                               for="accounting_hu_plus_status"
-                               invisible="account_move_action != 'check_status'"
-                               string="HU+ Status"
-                        />
-                        <div name="account_move_check_status" invisible="account_move_action != 'check_status'">
-                            <field name="accounting_hu_plus_status" placeholder="Status..."/>
-                            <field name="accounting_hu_plus_tag" colspan="2" context="{'default_tag_type': 'account_move'}" domain="[]" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
+                        <!-- ACCOUNT MOVE HU+ STATUS -->
+                        <label name="account_move_hu_plus_status_label" for="accounting_hu_plus_status" invisible="account_move_action not in ['check_status', 'update_fields']" string="HU+ Status"/>
+                        <div name="account_move_hu_plus_status_div" invisible="account_move_action not in ['check_status', 'update_fields']">
+                            <field name="accounting_hu_plus_status" placeholder="Select..."/>
+                            <field name="accounting_hu_plus_tag" colspan="2" context="{'default_tag_type': 'account_move'}" domain="[('company', '=', company), ('tag_type', 'in', ['account_move', 'general'])]" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
                             <field name="accounting_hu_plus_notes" colspan="2" placeholder="Notes..."/>
-                        </div>
-                        <!-- ACCOUNT MOVE - DELIVERY PERIOD -->
-                        <field name="accounting_delivery_date" force_save="1" invisible="account_move_action != 'update_fields'" readonly="accounting_delivery_period_enabled and accounting_move_type in ['out_invoice', 'out_refund']" string="Delivery Date"/>
-                        <label for="accounting_delivery_period_enabled" invisible="account_move_action != 'update_fields'" string="Delivery Period"/>
-                        <div name="accounting_delivery_period_enabled" invisible="account_move_action != 'update_fields'">
-                            <field name="accounting_delivery_period_enabled" widget="boolean_toggle"/>
-                            <field name="accounting_delivery_period_start" class="oe_inline o_input_12ch" invisible="not accounting_delivery_period_enabled" placeholder="Period Start"/>
-                            <span class="ps-2 pe-2" invisible="not accounting_delivery_period_enabled">-</span>
-                            <field name="accounting_delivery_period_end" class="oe_inline o_input_12ch" invisible="not accounting_delivery_period_enabled" placeholder="Period End"/>
                         </div>
                         <!-- API -->
                         <field name="api_action_editable" invisible="1"/>
@@ -56,23 +46,6 @@
                         <field name="configuration_audit_trail" invisible="action_type != 'configuration'" string="Audit Trail"/>
                         <field name="configuration_document_types" invisible="action_type != 'configuration'" string="Document Types"/>
                         <field name="configuration_enabled_journals" invisible="action_type != 'configuration'" options="{'no_create': True}" string="Enabled Journals" widget="many2many_tags"/>
-                        <!-- CURRENCY EXCHANGE -->
-                        <field name="exchange_action_editable" invisible="1"/>
-                        <field name="exchange_visible" invisible="1"/>
-                        <field name="exchange_action" force_save="1" invisible="action_type != 'currency_exchange'" readonly="not exchange_action_editable" required="action_type == 'currency_exchange'" string="Action"/>
-                        <div name="exchange_currency_from" invisible="action_type != 'currency_exchange'">
-                            <field name="exchange_currency_from" options="{'no_create': True, 'no_open': True}" placeholder="Currency From"/>
-                        </div>
-                        <div name="exchange_amount_from" invisible="action_type != 'currency_exchange'">
-                            <field name="exchange_amount_from" placeholder="Amount From"/>
-                        </div>
-                        <div name="exchange_currency_to" invisible="action_type != 'currency_exchange'">
-                            <field name="exchange_currency_to" options="{'no_create': True, 'no_open': True}" placeholder="Currency To"/>
-                        </div>
-                        <div name="exchange_amount_to" invisible="action_type != 'currency_exchange'">
-                            <field name="exchange_amount_to" placeholder="Amount To"/>
-                        </div>
-                        <field name="exchange_rate" invisible="action_type != 'currency_exchange'" class="oe_inline" string="Exchange Rate"/>
                         <!-- PARTNER -->
                         <field name="partner_action_editable" invisible="1"/>
                         <field name="partner_action" force_save="1" invisible="action_type != 'partner'" readonly="not partner_action_editable" required="action_type == 'partner'" string="Action"/>
@@ -89,7 +62,6 @@
                                 <p class="card-text" invisible="account_move_action">Please select an action</p>
                                 <p class="card-text" invisible="account_move_action != 'check_status'">Check HU+ status of the account move</p>
                                 <p class="card-text" invisible="account_move_action != 'update_fields'">Update account move fields</p>
-                                <p class="card-text" invisible="account_move_action != 'update_fields' or not accounting_delivery_period_enabled or accounting_move_type in ['in_invoice', 'in_refund']">Period Legal:<field name="accounting_delivery_period_legal" class="oe_inline ms-1"/></p>
                             </div>
                         </div>
                         <!-- CARD - API -->
@@ -110,13 +82,6 @@
                             <div class="card-body">
                                 <p class="card-text">Apply HU+ configuration</p>
                                 <p class="card-text">Check the documentation for details</p>
-                            </div>
-                        </div>
-                        <!-- CARD - CURRENCY EXCHANGE -->
-                        <div name="currency_exchange_info" class="card border-info" colspan="2" invisible="action_type != 'currency_exchange'">
-                            <div class="card-header bg-info text-white"><i class="fa fa-info-circle me-1"/>Information</div>
-                            <div class="card-body">
-                                <p class="card-text">Currency exchange rate calculator</p>
                             </div>
                         </div>
                         <!-- CARD - PARTNER -->
@@ -173,32 +138,53 @@
                 <!-- ADDITIONAL FIELDS -->
                 <group name="accounting_fields" invisible="action_type != 'account_move' or account_move_action != 'update_fields'">
                     <group name="accounting_fields_1">
-                        <field name="accounting_document_type" invisible="account_move_action != 'update_fields'" options="{'no_create': True, 'no_open': True}" string="Document Type"/>
-                        <field name="accounting_document_rate_amount" invisible="account_move_action != 'update_fields' or not accounting_document_rate_visible" string="Document Rate"/>
-                        <field name="accounting_document_rate_visible" invisible="1"/>
-                        <field name="accounting_cash_enabled" invisible="account_move_action != 'update_fields' or not accounting_cash_visible" string="Cash Accounting" widget="boolean_toggle"/>
-                        <field name="accounting_cash_visible" invisible="1"/>
-                        <field name="accounting_vat_date" invisible="account_move_action != 'update_fields'" string="VAT Date"/>
-                        <field name="accounting_vat_status" invisible="account_move_action != 'update_fields'" string="VAT Status"/>
+                        <!-- Document type-->
+                        <field name="accounting_document_type" options="{'no_create': True, 'no_open': True}" string="Document Type"/>
+                        <!-- Document VAT HUF and rate -->
+                        <label name="accounting_document_vat_label" class="fw-bold" for="accounting_document_vat_huf" invisible="account_move_action != 'update_fields' or accounting_move_type not in ['in_invoice', 'in_refund']" string="Document VAT"/>
+                        <div name="accounting_document_vat_div" invisible="account_move_action != 'update_fields' or accounting_move_type not in ['in_invoice', 'in_refund']">
+                            <field name="accounting_document_vat_huf"/>
+                            <div class="d-flex d-flex-row gap-1" invisible="not accounting_document_rate_visible">
+                                <field name="accounting_document_rate_visible" invisible="1"/>
+                                <field name="accounting_document_rate_amount" class="w-auto"/>
+                                <field name="company_currency_name" class="text-muted w-auto"/>
+                                <span class="text-muted w-auto">/</span>
+                                <field name="accounting_move_currency_name" class="text-muted w-auto"/>
+                            </div>
+                        </div>
                     </group>
                     <group name="accounting_fields_2">
+                        <field name="accounting_date" invisible="account_move_action != 'update_fields' or accounting_move_type in ['out_invoice', 'out_refund']"/>
                         <field name="accounting_origin" invisible="account_move_action != 'update_fields'" string="Origin"/>
                         <field name="accounting_nav_payment_method" invisible="account_move_action != 'update_fields'" string="NAV Payment Method"/>
-                        <field name="accounting_date" invisible="account_move_action != 'update_fields'"/>
                     </group>
                 </group>
-                <group name="accounting_hu_plus" class="border-top" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'update_fields'">
-                    <label name="accounting_hu_plus_workflow"
-                           class="mt-2"
-                           for="accounting_hu_plus_status"
-                           string="HU+"
-                    />
-                    <div name="accounting_hu_plus_workflow" class="mt-2">
-                        <field name="accounting_hu_plus_status" class="oe_inline" placeholder="Status..."/>
-                        <field name="accounting_hu_plus_tag" class="oe_inline ms-2" context="{'default_tag_type': 'account_move'}" domain="[]" options="{'color_field': 'color'}" placeholder="Tags..." widget="many2many_tags"/>
-                        <field name="accounting_hu_plus_notes" placeholder="Notes..."/>
+                <!-- ACCOUNTING DELIVERY DATE -->
+                <group name="accounting_delivery_date" class="border-top" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'update_fields'">
+                    <label name="accounting_delivery_date_label" class="mt-2" for="accounting_delivery_date" string="Delivery Date"/>
+                    <div name="accounting_delivery_date_div" class="d-flex d-row gap-1 justify-content-start mt-2">
+                        <field name="accounting_delivery_date" class="w-25" force_save="1" invisible="account_move_action != 'update_fields'" placeholder="Select..." readonly="accounting_delivery_period_enabled and accounting_move_type in ['out_invoice', 'out_refund']"/>
+                        <span class="fw-bold w-auto">Period</span>
+                        <field name="accounting_delivery_period_enabled" class="w-auto" widget="boolean_toggle"/>
+                        <field name="accounting_delivery_period_start" class="text-end w-auto" invisible="not accounting_delivery_period_enabled" placeholder="Start date..."/>
+                        <span class="w-auto" invisible="not accounting_delivery_period_enabled">-</span>
+                        <field name="accounting_delivery_period_end" class="text-start w-auto" invisible="not accounting_delivery_period_enabled" placeholder="End date..."/>
+                        <field name="accounting_delivery_period_legal" class="fw-light fst-italic text-start w-auto" invisible="not accounting_delivery_period_enabled"/>
                     </div>
                 </group>
+                <!-- ACCOUNTING VAT -->
+                <group name="accounting_vat" class="border-top" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'update_fields'">
+                    <label name="accounting_vat_label" class="mt-2" for="accounting_vat_date" string="VAT Status"/>
+                    <div name="accounting_vat_div" class="d-flex d-row gap-1 justify-content-start mt-2">
+                        <field name="accounting_vat_status" class="w-25" invisible="account_move_action != 'update_fields'" placeholder="Select..."/>
+                        <span class="fw-bold w-auto">VAT Date</span>
+                        <field name="accounting_vat_date" class="w-25" invisible="account_move_action != 'update_fields'" placeholder="Select..."/>
+                        <field name="accounting_cash_visible" invisible="1"/>
+                        <span class="fw-bold w-auto" invisible="not accounting_cash_visible">Cash Accounting</span>
+                        <field name="accounting_cash_enabled" class="w-auto" invisible="not accounting_cash_visible" widget="boolean_toggle"/>
+                    </div>
+                </group>
+                <!-- HU+ OVERVIEW -->
                 <group name="account_move_plus_overview" colspan="2" invisible="action_type != 'account_move' or account_move_action != 'check_status'">
                     <field name="account_move_plus_overview" colspan="2" nolabel="1"/>
                 </group>

@@ -155,12 +155,19 @@
         <field name="parent_id" ref="configuration_accounting_menu"/>
         <field name="sequence">8</field>
     </record>
-    <!-- HU+ > Configuration > Accounting > Account Journals -->
-    <record id="configuration_accounting_account_journal_menu" model="ir.ui.menu">
+    <!-- HU+ > Configuration > Accounting > Journals -->
+    <record id="configuration_accounting_journal_menu" model="ir.ui.menu">
         <field name="name">Journals</field>
         <field name="action" ref="account_journal_action"/>
         <field name="parent_id" ref="configuration_accounting_menu"/>
         <field name="sequence">16</field>
+    </record>
+    <!-- HU+ > Configuration > Accounting > Rounding Methods -->
+    <record id="configuration_accounting_rounding_method_menu" model="ir.ui.menu">
+        <field name="name">Rounding Methods</field>
+        <field name="action" ref="account.rounding_list_action"/>
+        <field name="parent_id" ref="configuration_accounting_menu"/>
+        <field name="sequence">20</field>
     </record>
     <!-- HU+ > Configuration > Accounting > Fiscal Positions -->
     <record id="configuration_accounting_fiscal_position_menu" model="ir.ui.menu">

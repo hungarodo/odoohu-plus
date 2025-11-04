@@ -5,8 +5,7 @@ import datetime
 import json
 
 # 2 : imports of odoo
-from odoo import _, api, exceptions, fields, models  # alphabetically ordered
-from odoo.tools import formatLang
+from odoo import _, api, exceptions, fields, models, tools  # alphabetically ordered
 
 # 3 : imports from odoo modules
 from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L10nHuEdiConnection, L10nHuEdiConnectionError
@@ -28,55 +27,42 @@ class L10nHuPlusAccountMove(models.Model):
     )
     ## CASH ACCOUNTING
     l10n_hu_cash_accounting = fields.Boolean(
-        compute='_compute_l10n_hu_cash_accounting',
         copy=False,
         default=False,
         index=True,
-        readonly=False,
-        store=True,
         string="HU Cash Accounting",
-        tracking=True,
     )
     ## CURRENCY
     l10n_hu_company_currency_name = fields.Char(
         related='company_currency_id.name',
         string="HU Company Currency Name",
     )
-    l10n_hu_currency_date = fields.Date(
-        compute='_compute_l10n_hu_currency',
-        string="HU Currency Date",
-    )
     l10n_hu_currency_name = fields.Char(
         related='currency_id.name',
         string="HU Currency Name",
     )
-    l10n_hu_currency_rate = fields.Float(
+    l10n_hu_huf_currency = fields.Many2one(
+        comodel_name='res.currency',
         compute='_compute_l10n_hu_currency',
-        string="HU Currency Rate",
-    )
-    l10n_hu_document_rate = fields.Float(
-        copy=False,
-        default=0,
-        string="HU Document Rate",
-    )
-    l10n_hu_document_rate_difference = fields.Float(
-        compute='_compute_l10n_hu_document_rate_difference',
-        string="HU Document Rate Difference",
+        string="HUF Currency",
     )
     l10n_hu_huf_rate = fields.Float(
-        copy=False,
-        default=0,
+        compute='_compute_l10n_hu_currency',
         string="HU HUF Rate",
+    )
+    l10n_hu_invoice_currency_rate_date = fields.Date(
+        compute='_compute_l10n_hu_currency',
+        string="HU Currency Date",
+    )
+    l10n_hu_invoice_currency_rate_inverse = fields.Float(
+        compute='_compute_l10n_hu_currency',
+        string="HU Invoice Currency Rate Inverse",
     )
     ## DELIVERY PERIOD
     l10n_hu_delivery_period_end = fields.Date(
         copy=False,
         string="HU Delivery Period End",
         tracking=True,
-    )
-    l10n_hu_delivery_period_legal = fields.Text(
-        compute='_compute_l10n_hu_delivery_period_text',
-        string="HU Invoice Delivery Period Legal",
     )
     l10n_hu_delivery_period_start = fields.Date(
         copy=False,
@@ -87,7 +73,24 @@ class L10nHuPlusAccountMove(models.Model):
         compute='_compute_l10n_hu_delivery_period_text',
         string="HU Delivery Period Summary",
     )
-    ## DOCUMENT TYPE
+    ## DOCUMENT
+    l10n_hu_document_gross_huf = fields.Monetary(
+        compute='_compute_l10n_hu_document',
+        currency_field='l10n_hu_huf_currency',
+        help="Gross amount in HUF of the invoice document",
+        string="HU Document Gross HUF",
+    )
+    l10n_hu_document_net_huf = fields.Monetary(
+        compute='_compute_l10n_hu_document',
+        currency_field='l10n_hu_huf_currency',
+        help="Net amount in HUF of the invoice document",
+        string="HU Document Net HUF",
+    )
+    l10n_hu_document_rate = fields.Float(
+        compute='_compute_l10n_hu_document',
+        help="Currency rate of the invoice document",
+        string="HU Document Rate",
+    )
     l10n_hu_document_type = fields.Many2one(
         comodel_name='l10n.hu.plus.tag',
         domain=[('tag_type', '=', 'document_type')],
@@ -102,6 +105,12 @@ class L10nHuPlusAccountMove(models.Model):
     l10n_hu_document_type_technical_name = fields.Char(
         related='l10n_hu_document_type.technical_name',
         string="HU Document Type Technical Name",
+    )
+    l10n_hu_document_vat_huf = fields.Monetary(
+        copy=False,
+        currency_field='l10n_hu_huf_currency',
+        help="VAT amount in HUF as indicated on the invoice document",
+        string="HU Document VAT HUF",
     )
     ## HU+
     l10n_hu_plus_notes = fields.Char(
@@ -185,7 +194,6 @@ class L10nHuPlusAccountMove(models.Model):
     )
     l10n_hu_proforma_name = fields.Char(
         copy=False,
-        help="The name of the proforma document",
         string="HU Proforma Name",
         tracking=True,
     )
@@ -226,45 +234,32 @@ class L10nHuPlusAccountMove(models.Model):
                 move.show_delivery_date = True
 
     ## HU+
-    @api.depends('partner_id')
-    def _compute_l10n_hu_cash_accounting(self):
-        for record in self:
-            record.l10n_hu_cash_accounting = record.l10n_hu_get_cash_accounting()
-
+    @api.depends('currency_id', 'invoice_date', 'delivery_date')
     def _compute_l10n_hu_currency(self):
         for record in self:
-            last_rate = self.env['res.currency.rate'].search([
-                ('company_id', '=', record.company_id.id),
-                ('currency_id', '=', record.currency_id.id),
-                ('name', '<=', record.date)
-            ], limit=1)
-            if last_rate:
-                record.l10n_hu_currency_date = last_rate.name
-                record.l10n_hu_currency_rate = last_rate.inverse_company_rate
-            else:
-                record.l10n_hu_currency_date = record.date
-                record.l10n_hu_currency_rate = 1.0
-                record.l10n_hu_document_rate = 1.0
+            rate_data = record.l10n_hu_plus_get_rate_data({})
+            record.l10n_hu_invoice_currency_rate_date = rate_data.get('l10n_hu_invoice_currency_rate_date', None)
+            record.l10n_hu_huf_currency = rate_data.get('l10n_hu_huf_currency', None)
+            record.l10n_hu_huf_rate = rate_data.get('l10n_hu_huf_rate', 0.0)
+            record.l10n_hu_invoice_currency_rate_inverse = rate_data.get('l10n_hu_invoice_currency_rate_inverse', None)
 
     def _compute_l10n_hu_delivery_period_text(self):
         for record in self:
-            period_legal = ""
             period_summary = ""
-            if record.move_type in ['out_invoice', 'out_refund'] \
-                    and record.l10n_hu_delivery_period_start and record.l10n_hu_delivery_period_end:
-                # Get period info
-                delivery_period_result = record.l10n_hu_get_delivery_period_data({})
-                if delivery_period_result.get('period_legal'):
-                    period_legal = delivery_period_result['period_legal']
-                if delivery_period_result.get('period_summary'):
-                    period_summary = delivery_period_result['period_summary']
-            record.l10n_hu_delivery_period_legal = period_legal
+            if (record.move_type in ['out_invoice', 'out_refund']
+                    and record.l10n_hu_delivery_period_start and record.l10n_hu_delivery_period_end):
+                delivery_result = record.l10n_hu_plus_get_delivery_data({})
+                if delivery_result.get('period_summary'):
+                    period_summary = delivery_result['period_summary']
             record.l10n_hu_delivery_period_summary = period_summary
 
-    def _compute_l10n_hu_document_rate_difference(self):
+    @api.depends('amount_untaxed', 'amount_tax', 'currency_id', 'l10n_hu_document_vat_huf')
+    def _compute_l10n_hu_document(self):
         for record in self:
-            difference = record.l10n_hu_currency_rate - record.l10n_hu_document_rate
-            record.l10n_hu_document_rate_difference = difference
+            data_result = record.l10n_hu_plus_get_document_data({})
+            record.l10n_hu_document_gross_huf = data_result.get('l10n_hu_document_gross_huf', 0)
+            record.l10n_hu_document_net_huf = data_result.get('l10n_hu_document_net_huf', 0)
+            record.l10n_hu_document_rate = data_result.get('l10n_hu_document_rate', 0)
 
     # Constraints and onchanges
     @api.onchange('l10n_hu_delivery_period_end', 'l10n_hu_delivery_period_start')
@@ -277,9 +272,52 @@ class L10nHuPlusAccountMove(models.Model):
         else:
             pass
 
+    @api.onchange('l10n_hu_invoice_currency_rate_inverse')
+    def onchange_l10n_hu_invoice_currency_rate_inverse(self):
+        if self.l10n_hu_invoice_currency_rate_inverse < 0:
+            raise exceptions.ValidationError(_("Currency rate must be more than 0!"))
+        elif self.l10n_hu_invoice_currency_rate_inverse > 0:
+            self.invoice_currency_rate = 1 / self.l10n_hu_invoice_currency_rate_inverse
+        else:
+            pass
+
+    @api.onchange('invoice_currency_rate')
+    def onchange_l10n_hu_invoice_currency_rate(self):
+        if self.invoice_currency_rate < 0:
+            raise exceptions.ValidationError(_("Currency rate must be more than 0!"))
+        elif self.invoice_currency_rate > 0:
+            self.l10n_hu_invoice_currency_rate_inverse = 1 / self.invoice_currency_rate
+        else:
+            pass
+
+    @api.onchange('invoice_payment_term_id')
+    def onchange_l10n_hu_payment_term_id(self):
+        if self.invoice_payment_term_id and self.journal_id and self.journal_id.l10n_hu_plus_enabled:
+            self.invoice_cash_rounding_id = self.invoice_payment_term_id.l10n_hu_rounding_method
+            self.l10n_hu_payment_mode = self.invoice_payment_term_id.l10n_hu_nav_method
+        else:
+            pass
+
+    @api.onchange('l10n_hu_vat_status')
+    def onchange_l10n_hu_vat_status(self):
+        if not self.l10n_hu_vat_status:
+            self.l10n_hu_vat_date = None
+        else:
+            pass
+
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
+    ## SUPER
+    def action_post(self):
+        """ Do not allow posting invoice when HU+ status is error """
+        for record in self:
+            if (record.state == 'draft' and record.journal_id and record.journal_id.l10n_hu_plus_enabled
+                    and record.is_invoice(include_receipts=True) and record.l10n_hu_plus_status == 'error'):
+                raise exceptions.UserError(_("Can not post invoice with HU+ error!") + " " + str(record.display_name))
+        return super().action_post()
+
+    ## HU+
     def action_l10n_hu_plus_view_documentation(self):
         """ View HU+ documentation """
         self.ensure_one()
@@ -362,14 +400,21 @@ class L10nHuPlusAccountMove(models.Model):
         self.ensure_one()
         return self.l10n_hu_do_send_edi()
 
+    def action_l10n_hu_uncheck(self):
+        """ Set checked boolean to False """
+        self.ensure_one()
+        return self.write({'checked': False})
+
     def action_l10n_hu_update_fields(self):
         """ Update HU+ relevant fields """
         self.ensure_one()
         if self.state != 'draft':
             raise exceptions.UserError(_("Action only allowed for draft invoices!"))
-        values_result = self.l10n_hu_get_field_values({})
+        values_result = self.l10n_hu_plus_get_data({})
         if len(values_result.get('error_list')) == 0 and len(values_result.get('field_values')) > 0:
-            return self.write(values_result['field_values'])
+            self.write(values_result['field_values'])
+            self.action_l10n_hu_update_plus_status()
+            return
         elif len(values_result.get('field_values')) == 0:
             return
         else:
@@ -499,6 +544,7 @@ class L10nHuPlusAccountMove(models.Model):
     def action_l10n_hu_wizard_check_status(self):
         """ Open the HU+ wizard to check status for HU+ """
         self.ensure_one()
+        self.action_l10n_hu_update_plus_status()
         status_overview = self.l10n_hu_get_plus_status_overview()
         return {
             'name': _("HU+ Wizard"),
@@ -508,37 +554,6 @@ class L10nHuPlusAccountMove(models.Model):
                 'default_account_move_action': 'check_status',
                 'default_account_move_action_visible': False,
                 'default_account_move_plus_overview': status_overview,
-                'default_account_move_plus_status': self.l10n_hu_plus_status,
-            },
-            'res_model': 'l10n.hu.plus.wizard',
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-        }
-
-    def action_l10n_hu_wizard_currency_exchange(self):
-        """ Open the HU+ wizard to calculate the document rate """
-        self.ensure_one()
-        exchange_amount_from = self.amount_total
-        if self.l10n_hu_document_rate != 0.0:
-            exchange_rate = self.l10n_hu_document_rate
-        else:
-            exchange_rate = self.l10n_hu_currency_rate
-        if exchange_rate != 0.0:
-            exchange_amount_to = exchange_amount_from * exchange_rate
-        else:
-            exchange_amount_to = 0.0
-        return {
-            'name': _("HU+ Wizard"),
-            'context': {
-                'default_action_type': 'currency_exchange',
-                'default_action_type_visible': False,
-                'default_exchange_action': 'custom_currency',
-                'default_exchange_amount_from': exchange_amount_from,
-                'default_exchange_amount_to': exchange_amount_to,
-                'default_exchange_currency_from': self.currency_id.id,
-                'default_exchange_currency_to': self.company_id.currency_id.id,
-                'default_exchange_rate': exchange_rate,
             },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
@@ -548,6 +563,14 @@ class L10nHuPlusAccountMove(models.Model):
 
     # Business methods
     ## SUPER
+    def _get_invoice_currency_rate_date(self):
+        self.ensure_one()
+        result = super()._get_invoice_currency_rate_date()
+        if (self.country_code == 'HU' and self.delivery_date and self.invoice_date
+                and self.delivery_date > self.invoice_date):
+            return self.invoice_date
+        return result
+
     def _get_report_base_filename(self) -> str:
         """ Get the filename for proforma"""
         if self.state == 'draft' and self.l10n_hu_proforma_name:
@@ -594,8 +617,8 @@ class L10nHuPlusAccountMove(models.Model):
         # Customer tax number
         ## NOTES: temporary workaround until Odoo S.A. fix, see https://github.com/hungarodo/odoohu-plus/issues/31
         customer = result.get('customer', None)
-        if customer and customer.is_company and customer.vat and customer.country_code != 'HU' \
-                and self.fiscal_position_id and self.fiscal_position_id.l10n_hu_vat_status == 'domestic':
+        if (customer and customer.is_company and customer.vat and customer.country_code != 'HU'
+                and self.fiscal_position_id and self.fiscal_position_id.l10n_hu_vat_status == 'domestic'):
             result.update({
                 'customer_vat_data': {
                     'tax_number': customer.l10n_hu_group_vat or customer.vat,
@@ -618,1047 +641,12 @@ class L10nHuPlusAccountMove(models.Model):
         result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_valid_actions()
 
         # No action when EDI sending is disabled on the journal (eg: externally issued invoices, OSS)
-        if self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted' \
-                and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled':
+        if (self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted'
+                and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled'):
             result = []
         return result
 
-    ## HU+
-    @api.model
-    def l10n_hu_do_send_edi(self):
-        """ Shorthand method to send invoice to EDI (NAV Online Szamla) without user interaction
-
-        :return: boolean
-        """
-        if self.l10n_hu_get_send_edi_allowed():
-            if self.journal_id.l10n_hu_edi_sending == 'auto_edi_email':
-                mail_template = self.l10n_hu_get_invoice_mail_template()
-                self.env['account.move.send']._generate_and_send_invoices(self, sending_methods=['email'], mail_template=mail_template)
-            else:
-                self.env['account.move.send']._generate_and_send_invoices(self, sending_methods=[])
-            return True
-        else:
-            return False
-
-    @api.model
-    def l10n_hu_get_cash_accounting(self):
-        """ Use cash accounting for this invoice or not
-
-        :return: boolean
-        """
-        # Initialize variables
-        result = False
-
-        # Set result
-        if self.is_invoice(True) and self.state == 'draft':
-            if self.move_type in ['in_invoice', 'in_refund'] \
-                    and self.partner_id \
-                    and self.partner_id.property_account_position_id \
-                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
-                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca':
-                result = True
-            elif self.move_type in ['out_invoice', 'out_refund'] \
-                    and self.partner_id \
-                    and self.partner_id.property_account_position_id \
-                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic' \
-                    and self.company_id.l10n_hu_tax_regime == 'ca':
-                result = True
-            else:
-                pass
-        else:
-            pass
-
-        # Return result
-        return result
-
-    @api.model
-    def l10n_hu_get_delivery_date_default(self, values):
-        """ Get delivery date default
-
-        :param values: dictionary
-
-        :return date or False
-        """
-        # Initialize variables
-        journal = values.get('journal', None)
-        if not journal and not self.journal_id:
-            return False
-        elif not journal and self.journal_id:
-            journal = self.journal_id
-        else:
-            pass
-
-        # Get journal setting
-        journal_setting = journal.l10n_hu_delivery_date_default
-
-        # Process options
-        if journal_setting == 'none':
-            result = False
-        elif journal_setting == 'today':
-            result = fields.Date.today()
-        elif journal_setting == 'first_day_of_this_month':
-            # Get today
-            today = datetime.date.today()
-
-            # Replace day to first day of this month
-            result = today.replace(day=1)
-        elif journal_setting == 'last_day_of_this_month':
-            # Get today
-            today = datetime.date.today()
-
-            # Get close to the end of this month and add 4 days to 'roll it over'
-            next_month = today.replace(day=28) + datetime.timedelta(days=4)
-
-            # Set the day to 1 gives us the start of next month
-            first_day_of_next_month = next_month.replace(day=1)
-
-            # Remove one day to get last day of this month
-            result = first_day_of_next_month - datetime.timedelta(days=1)
-        elif journal_setting == 'last_day_of_last_month':
-            # Get today
-            today = datetime.date.today()
-
-            # Replace day to first day of this month
-            first_day_of_this_month = today.replace(day=1)
-
-            # Remove one day to get last day of last month
-            result = first_day_of_this_month - datetime.timedelta(days=1)
-        elif journal_setting == 'first_day_of_next_month':
-            # Get today
-            today = datetime.date.today()
-
-            # Get close to the end of this month and add 4 days to 'roll it over'
-            next_month = today.replace(day=28) + datetime.timedelta(days=4)
-
-            # Set the day to 1 gives us the first day of next month
-            result = next_month.replace(day=1)
-        else:
-            result = False
-
-        # Return result
-        return result
-
-    @api.model
-    def l10n_hu_get_delivery_period_data(self, values):
-        """ Get delivery period data
-
-        NOTES:
-        - This method computes special hungarian rules
-        - Specification: 2007. CXXVII. 58.§ (1)
-        - NJT: https://njt.hu/jogszabaly/2007-127-00-00
-
-        :param values: dictionary
-
-        :return: dictionary
-        """
-        # raise exceptions.UserError("l10n_hu_get_delivery_period_data BEGIN" + str(values))
-
-        # Initialize variables
-        debug_list = []
-        error_list = []
-        info_list = []
-        period_legal = ""
-        period_summary = ""
-        result = {}
-        warning_list = []
-
-        # Set journal
-        if values.get('journal_id'):
-            journal = self.env['account.journal'].sudo().browse(values['journal_id'])
-        elif values.get('journal'):
-            journal = values['journal']
-        elif len(self) == 1 and self.id and self.journal_id:
-            journal = self.journal_id
-        else:
-            journal = None
-            error_list.append("journal not set")
-
-        # Is hungarian company
-        if journal and journal.company_id.partner_id.country_id.code == 'HU':
-            is_hungarian_company = True
-        else:
-            is_hungarian_company = False
-
-        # Is invoice journal
-        if journal and journal.type in ['purchase', 'sale']:
-            is_invoice_journal = True
-        else:
-            is_invoice_journal = False
-
-        # Period start and end
-        if values.get('period_start'):
-            period_start = values['period_start']
-            if isinstance(period_start, datetime.date):
-                pass
-            elif isinstance(period_start, str):
-                try:
-                    date_string = period_start
-                    date_format = "%Y-%m-%d"
-                    period_start = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    period_start = False
-            else:
-                period_start = False
-        elif self.l10n_hu_delivery_period_start:
-            period_start = self.l10n_hu_delivery_period_start
-        else:
-            period_start = None
-
-        if values.get('period_end'):
-            period_end = values['period_end']
-            if isinstance(period_end, datetime.date):
-                pass
-            elif isinstance(period_end, str):
-                try:
-                    date_string = period_end
-                    date_format = "%Y-%m-%d"
-                    period_end = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    period_end = False
-            else:
-                period_end = False
-        elif self.l10n_hu_delivery_period_end:
-            period_end = self.l10n_hu_delivery_period_end
-        else:
-            period_end = False
-
-        # is_periodic_settlement
-        if is_invoice_journal and period_start and period_end:
-            is_periodic_settlement = True
-        else:
-            is_periodic_settlement = False
-
-        # Default delivery date
-        delivery_date_default = self.l10n_hu_get_delivery_date_default({})
-
-        # Set today
-        date_today = fields.Date.today()
-
-        # Set invoice date
-        if values.get('invoice_date'):
-            invoice_date = values['invoice_date']
-            if isinstance(invoice_date, datetime.date):
-                pass
-            elif isinstance(invoice_date, str):
-                try:
-                    date_string = invoice_date
-                    date_format = "%Y-%m-%d"
-                    invoice_date = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    invoice_date = None
-            else:
-                invoice_date = False
-        elif self.invoice_date:
-            invoice_date = self.invoice_date
-        elif self.state == 'draft':
-            invoice_date = date_today
-        else:
-            invoice_date = False
-
-        # Set invoice due date
-        if values.get('invoice_date_due'):
-            invoice_date_due = values['invoice_date_due']
-            if isinstance(invoice_date_due, datetime.date):
-                pass
-            elif isinstance(invoice_date_due, str):
-                try:
-                    date_string = invoice_date_due
-                    date_format = "%Y-%m-%d"
-                    invoice_date_due = datetime.datetime.strptime(date_string, date_format).date()
-                except:
-                    invoice_date_due = False
-            else:
-                invoice_date_due = False
-        elif self.invoice_payment_term_id:
-            # NOTES: using a payment term needs a recompute, see _compute_invoice_date_due()
-            context_today = fields.Date.context_today(self)
-            invoice_date_due = self.needed_terms and max(
-                (k['date_maturity'] for k in self.needed_terms.keys() if k),
-                default=False,
-            ) or self.invoice_date_due or context_today
-        elif self.invoice_date_due:
-            invoice_date_due = self.invoice_date_due
-        else:
-            invoice_date_due = False
-
-        # Set last day of delivery period month
-        if period_end:
-            # Get close to the end of the month and add 4 days to 'roll it over'
-            period_next_month = period_end.replace(day=28) + datetime.timedelta(days=4)
-
-            # Set the day to 1 gives us the start of next month
-            period_first_day_of_next_month = period_next_month.replace(day=1)
-
-            # Remove one day to get last day of this month
-            period_month_last_day = period_first_day_of_next_month - datetime.timedelta(days=1)
-        else:
-            period_month_last_day = False
-
-        # Set 60 days from period_end
-        if period_end:
-            period_end_plus_60 = period_end + datetime.timedelta(days=60)
-        else:
-            period_end_plus_60 = False
-
-        # NAV SCENARIOS
-        # 0) DEFAULT
-        if delivery_date_default:
-            scenario = '0_default'
-            delivery_date = delivery_date_default
-        else:
-            scenario = '0_no_default'
-            delivery_date = False
-
-        # 1) PERIOD END
-        # Rule: period_end is set
-        # Value: delivery_period_end
-        if period_end:
-            scenario = '1_period_end'
-            delivery_date = period_end
-
-        # 2) INVOICE DATE
-        # Rule: BOTH invoice_date_due AND invoice_date are BEFORE period_end
-        # Value: invoice_date
-        if invoice_date and invoice_date_due and period_end  \
-                and invoice_date_due < period_end \
-                and invoice_date < period_end:
-            scenario = '1a_invoice_date'
-            delivery_date = invoice_date
-
-        # 3) INVOICE DATE DUE (MAX 60)
-        # Rule: invoice_date_due is AFTER period_end
-        # Value: invoice_date_due (BUT max 60 days from period_end)
-        if invoice_date_due and period_end \
-                and invoice_date_due > period_end:
-            if invoice_date_due <= period_end_plus_60:
-                scenario = '1b_invoice_date_due'
-                delivery_date = invoice_date_due
-            else:
-                scenario = '1b_invoice_date_due_max_60'
-                delivery_date = period_end_plus_60
-
-        # Period text
-        if is_hungarian_company and is_periodic_settlement:
-            # period_summary
-            period_summary += _("Delivery period") + ": "
-            period_summary += str(period_start) + " - " + str(period_end)
-
-            # period_legal
-            period_legal = "2007. CXXVII. 58.§"
-            if scenario == '1a_invoice_date':
-                period_legal += " (1) a)"
-            elif scenario == '1b_invoice_date_due':
-                period_legal += " (1) b)"
-            elif scenario == '1b_invoice_date_due_max_60':
-                period_legal += " (1) b) 60+ " + _("day")
-            else:
-                pass
-
-        # Update result
-        result.update({
-            'debug_list': debug_list,
-            'delivery_date': delivery_date,
-            'error_list': error_list,
-            'info_list': info_list,
-            'invoice_date': invoice_date,
-            'invoice_date_due': invoice_date_due,
-            'is_periodic_settlement': is_periodic_settlement,
-            'period_end': period_end,
-            'period_end_plus_60': period_end_plus_60,
-            'period_legal': period_legal,
-            'period_month_last_day': period_month_last_day,
-            'period_start': period_start,
-            'period_summary': period_summary,
-            'scenario': scenario,
-            'warning_list': warning_list,
-        })
-
-        # Return result
-        # raise exceptions.UserError("l10n_hu_get_delivery_period_data" + "\n" + str(result))
-        return result
-
-    @api.model
-    def l10n_hu_get_field_values(self, values):
-        """ Get field values for HU accounting
-
-        NOTES:
-        - This method takes care of special hungarian fields
-
-        :param values: dictionary
-
-        :return: dictionary
-        """
-        # raise exceptions.UserError("l10n_hu_get_field_values BEGIN" + str(values))
-
-        # Initialize variables
-        debug_list = []
-        error_list = []
-        field_values = {}
-        info_list = []
-        result = {}
-        warning_list = []
-
-        # HU+ enabled
-        if self.journal_id and self.journal_id.l10n_hu_plus_enabled:
-            debug_list.append("HU+ enabled journal check passed")
-        else:
-            error_list.append("HU+ enabled journal check failed")
-
-        # Check move type
-        if len(self) == 1 and self.id and self.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
-            debug_list.append("move type check passed")
-        else:
-            error_list.append("invalid account move type")
-
-        # Check state
-        if self.state == 'draft':
-            debug_list.append("state check passed")
-        else:
-            error_list.append("invalid state, only draft is allowed")
-
-        # currency_huf
-        currency_huf = self.env.ref('base.HUF')
-
-        # Get last_accounting_rate
-        ## Company ccy != invoice ccy
-        if self.date and self.currency_id != self.company_currency_id:
-            last_accounting_rate = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', self.currency_id.id),
-                ('name', '<=', self.date)
-            ], limit=1)
-            if last_accounting_rate:
-                debug_list.append("last_accounting_rate found")
-            else:
-                error_list.append("last_accounting_rate not found")
-        else:
-            last_accounting_rate = None
-            debug_list.append("last_accounting_rate skipped")
-
-        # Get last_huf_rate
-        ## Company HUF AND invoice HUF
-        if self.company_currency_id.name == 'HUF' and self.currency_id.name == 'HUF':
-            last_huf_rate = None
-        ## Company HUF and invoice NOT HUF
-        elif self.date and self.company_currency_id.name == 'HUF' and self.currency_id.name != 'HUF':
-            last_huf_rate = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', self.currency_id.id),
-                ('name', '<=', self.date)
-            ], limit=1)
-            if last_huf_rate:
-                debug_list.append("last_huf_rate found")
-            else:
-                error_list.append("last_huf_rate not found for company HUF and invoice NOT HUF")
-        ## Company NOT HUF
-        elif self.date and self.company_currency_id.name != 'HUF':
-            last_huf_rate = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', currency_huf.id),
-                ('name', '<=', self.date)
-            ], limit=1)
-            if last_huf_rate:
-                debug_list.append("last_huf_rate found for company NOT HUF")
-            else:
-                error_list.append("last_huf_rate not found")
-        else:
-            last_huf_rate = None
-            debug_list.append("last_huf_rate else scenario, probably date not set")
-
-        # Check storno by amount residual
-        ## NOTES: https://github.com/odoo/odoo/commit/5214296e8be76663ffdb6647c91645c66501121d
-        base_invoice = self._l10n_hu_get_chain_base()
-        if self.move_type == 'out_refund' and self != base_invoice and base_invoice.amount_residual == 0:
-            is_storno = True
-        else:
-            is_storno = False
-
-        # Special document types
-        modification_document_type = self.env['l10n.hu.plus.tag'].search([
-            ('company', '=', self.company_id.id),
-            ('tag_type', '=', 'document_type'),
-            ('technical_name', '=', 'invoice_modification'),
-        ], limit=1)
-        storno_document_type = self.env['l10n.hu.plus.tag'].search([
-            ('company', '=', self.company_id.id),
-            ('tag_type', '=', 'document_type'),
-            ('technical_name', '=', 'invoice_storno'),
-        ], limit=1)
-
-        # Process field values
-        if len(error_list) == 0:
-            # date
-            if values.get('date') and self.state == 'draft':
-                field_values.update({'date': values['date']})
-                debug_list.append("date set from values: " + str(values['date']))
-            else:
-                pass
-
-            # delivery_period, delivery_date
-            if values.get('delivery_period_start'):
-                delivery_period_start = values['delivery_period_start']
-            elif self.l10n_hu_delivery_period_start:
-                delivery_period_start = self.l10n_hu_delivery_period_start
-            else:
-                delivery_period_start = None
-            if values.get('delivery_period_end'):
-                delivery_period_end = values['delivery_period_end']
-            elif self.l10n_hu_delivery_period_end:
-                delivery_period_end = self.l10n_hu_delivery_period_end
-            else:
-                delivery_period_end = None
-
-            ## automation only for outgoing invoices
-            if delivery_period_start and delivery_period_end and self.move_type in ['out_invoice', 'out_refund']:
-                delivery_period_result = self.l10n_hu_get_delivery_period_data({
-                    'period_end': delivery_period_end,
-                    'period_start': delivery_period_start,
-                })
-                delivery_date = delivery_period_result.get('delivery_date', None)
-            ## manual for any invoice
-            elif values.get('delivery_date'):
-                delivery_date = values['delivery_date']
-                debug_list.append("delivery_date set from values: " + str(values['delivery_date']))
-            else:
-                delivery_date = self.delivery_date
-            field_values.update({'delivery_date': delivery_date})
-            field_values.update({'l10n_hu_delivery_period_end': delivery_period_end})
-            field_values.update({'l10n_hu_delivery_period_start': delivery_period_start})
-
-            # invoice_origin
-            if values.get('invoice_origin') and len(values['invoice_origin']) > 0:
-                field_values.update({'invoice_origin': values['invoice_origin']})
-                debug_list.append("invoice_origin set from values: " + str(values['invoice_origin']))
-            else:
-                pass
-
-            # l10n_hu_cash_accounting
-            if values.get('l10n_hu_cash_accounting') is not None:
-                field_values.update({'l10n_hu_cash_accounting': values['l10n_hu_cash_accounting']})
-                debug_list.append("l10n_hu_cash_accounting set from values: " + str(values['l10n_hu_cash_accounting']))
-            else:
-                pass
-
-            # l10n_hu_document_rate
-            if values.get('l10n_hu_document_rate') and self.move_type in ['in_invoice', 'in_refund']:
-                field_values.update({'l10n_hu_document_rate': values['l10n_hu_document_rate']})
-                debug_list.append("l10n_hu_document_rate set from values: " + str(values['l10n_hu_document_rate']))
-            elif self.currency_id == self.company_currency_id and self.l10n_hu_document_rate != 1.0:
-                field_values.update({'l10n_hu_document_rate': 1.0})
-                debug_list.append("l10n_hu_document_rate set to 1.0")
-            elif self.l10n_hu_document_rate in [0, 1] and last_accounting_rate:
-                l10n_hu_document_rate = last_accounting_rate.inverse_company_rate
-                field_values.update({'l10n_hu_document_rate': l10n_hu_document_rate})
-                debug_list.append("l10n_hu_document_rate set from last accounting rate: " + str(l10n_hu_document_rate))
-            else:
-                debug_list.append("l10n_hu_document_rate passed")
-
-            # l10n_hu_document_type
-            if values.get('l10n_hu_document_type'):
-                field_values.update({'l10n_hu_document_type': values['l10n_hu_document_type'].id})
-            elif not self.l10n_hu_document_type and self.move_type == 'out_invoice':
-                l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
-                if l10n_hu_document_type:
-                    field_values.update({'l10n_hu_document_type': l10n_hu_document_type.id})
-                else:
-                    pass
-            elif not self.l10n_hu_document_type and self.move_type == 'out_refund':
-                if is_storno and storno_document_type:
-                    field_values.update({'l10n_hu_document_type': storno_document_type.id})
-                elif modification_document_type:
-                    field_values.update({'l10n_hu_document_type': modification_document_type.id})
-                else:
-                    pass
-            else:
-                pass
-
-            # l10n_hu_huf_rate
-            if self.company_currency_id.name != 'HUF' and values.get('l10n_hu_huf_rate'):
-                field_values.update({'l10n_hu_huf_rate': values['l10n_hu_huf_rate']})
-                debug_list.append("l10n_hu_huf_rate set from values: " + str(values['l10n_hu_huf_rate']))
-            elif last_huf_rate:
-                l10n_hu_last_huf_rate = last_huf_rate.company_rate
-                field_values.update({'l10n_hu_huf_rate': l10n_hu_last_huf_rate})
-                debug_list.append("l10n_hu_huf_rate set last_huf_rate: " + str(l10n_hu_last_huf_rate))
-            else:
-                field_values.update({'l10n_hu_huf_rate': 1.0})
-
-            # l10n_hu_payment_mode
-            if values.get('l10n_hu_payment_mode'):
-                field_values.update({'l10n_hu_payment_mode': values['l10n_hu_payment_mode']})
-                debug_list.append("l10n_hu_payment_mode set from values: " + str(values['l10n_hu_payment_mode']))
-            elif not self.l10n_hu_payment_mode and self.invoice_payment_term_id \
-                    and self.invoice_payment_term_id.l10n_hu_nav_method:
-                l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method
-                field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_2})
-                debug_list.append("l10n_hu_payment_mode set from payment term: " + str(l10n_hu_payment_mode_2))
-            elif not self.l10n_hu_payment_mode and self.journal_id.l10n_hu_nav_payment_method:
-                l10n_hu_payment_mode_3 = self.journal_id.l10n_hu_nav_payment_method
-                field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_3})
-                debug_list.append("l10n_hu_payment_mode set from journal: " + str(l10n_hu_payment_mode_3))
-            else:
-                pass
-
-            # l10n_hu_vat_date
-            if values.get('l10n_hu_vat_date') is not None:
-                field_values.update({'l10n_hu_vat_date': values['l10n_hu_vat_date']})
-                debug_list.append("l10n_hu_vat_date set from values: " + str(values['l10n_hu_vat_date']))
-            else:
-                pass
-            # l10n_hu_vat_status
-            if values.get('l10n_hu_vat_status') is not None:
-                field_values.update({'l10n_hu_vat_status': values['l10n_hu_vat_status']})
-                debug_list.append("l10n_hu_vat_status set from values: " + str(values['l10n_hu_vat_status']))
-            else:
-                pass
-        else:
-            debug_list.append("processing skipped due to previous errors")
-
-        # Update result
-        result.update({
-            'debug_list': debug_list,
-            'error_list': error_list,
-            'field_values': field_values,
-            'info_list': info_list,
-            'warning_list': warning_list,
-        })
-
-        # Return result
-        # raise exceptions.UserError("l10n_hu_get_field_values END" + str(result))
-        return result
-
-    @api.model
-    def l10n_hu_get_invoice_mail_template(self):
-        """ Get mail template to send out invoice email"""
-        return self.env.ref('account.email_template_edi_invoice')
-
-    @api.model
-    def l10n_hu_get_plus_status(self):
-        """ Get HU+ status
-
-        NOTES:
-        - meant to be used by automations
-        - meant to be overridden by super for customizations
-
-        :return: dictionary
-        """
-        # Do not modify closed and other
-        if self.l10n_hu_plus_status in ['closed', 'other']:
-            return self.l10n_hu_plus_status
-        else:
-            # Run checklist and determine status
-            checklist_result = self.l10n_hu_get_plus_status_checklist()
-            error_list = checklist_result.get('error_list', [])
-            # info_list = checklist_result.get('info_list', [])
-            success_list = checklist_result.get('success_list', [])
-            warning_list = checklist_result.get('warning_list', [])
-            if len(error_list) > 0:
-                return 'error'
-            elif len(warning_list) > 0:
-                return 'warning'
-            elif len(success_list) > 0:
-                return 'success'
-            else:
-                return None
-
-    @api.model
-    def l10n_hu_get_plus_status_checklist(self):
-        """ Get HU+ status checklist
-
-        NOTES:
-        - we run here a lot of status checks
-        - Odoo _l10n_hu_edi_check_invoices() method is not included as it returns only errors when posting
-
-        :return: dictionary
-        """
-        # Initialize variables
-        debug_list = []
-        error_list = []
-        info_list = []
-        result = {}
-        success_list = []
-        warning_list = []
-
-        # Odoo errors (actually, no need to include, it returns only errors for invoice issue)
-        """
-        l10n_hu_edi_error_dict = self._l10n_hu_edi_check_invoices()
-        for check, values in l10n_hu_edi_error_dict.items():
-            l10n_hu_edi_error = {
-                'action_text': values.get('action_text', ""),
-                'code': check,
-                'description': values.get('message', ""),
-                'records': values.get('records', None),
-                'result': 'error'
-            }
-            error_list.append(l10n_hu_edi_error)
-        """
-
-        # HU+1: document type
-        if self.l10n_hu_document_type:
-            success_list.append({
-                'action_text': None,
-                'code': 'HU+1',
-                'description': _("Document type set") + ": " + str(self.l10n_hu_document_type.display_name),
-                'records': self.l10n_hu_document_type,
-                'result': 'ok',
-            })
-        else:
-            warning_list.append({
-                'action_text': None,
-                'code': 'HU+1',
-                'description': _("Document type not set"),
-                'records': None,
-                'result': 'warning',
-            })
-
-        # HU+2: account move fiscal position
-        if self.fiscal_position_id:
-            success_list.append({
-                'action_text': None,
-                'code': 'HU+2',
-                'description': _("Invoice fiscal position set") + ": " + str(self.fiscal_position_id.display_name),
-                'records': self.filtered(lambda am: am.fiscal_position_id),
-                'result': 'ok',
-            })
-        else:
-            warning_list.append({
-                'action_text': None,
-                'code': 'HU+2',
-                'description': _("Invoice fiscal position not set"),
-                'records': self.filtered(lambda am: not am.fiscal_position_id),
-                'result': 'warning',
-            })
-
-        # HU+3: partner fiscal position
-        if self.partner_id.property_account_position_id:
-            success_list.append({
-                'action_text': None,
-                'code': 'HU+3',
-                'description': _("Partner fiscal position set") + ": " + self.partner_id.property_account_position_id.display_name,
-                'records': self.partner_id.commercial_partner_id.filtered(lambda p: p.property_account_position_id),
-                'result': 'ok',
-            })
-        else:
-            warning_list.append({
-                'action_text': None,
-                'code': 'HU+3',
-                'description': _("Partner fiscal position not set"),
-                'records': self.partner_id.commercial_partner_id.filtered(lambda p: not p.property_account_position_id),
-                'result': 'warning',
-            })
-
-        # HU+4: delivery date
-        if self.delivery_date:
-            success_list.append({
-                'action_text': None,
-                'code': 'HU+4',
-                'description': _("Delivery date set") + ": " + str(self.delivery_date),
-                'records': self,
-                'result': 'ok',
-            })
-        else:
-            error_list.append({
-                'action_text': None,
-                'code': 'HU+4',
-                'description': _("Delivery date not set"),
-                'records': self,
-                'result': 'error',
-            })
-
-        # HU+5: delivery period
-        hu_5_description = str(self.l10n_hu_delivery_period_start)
-        hu_5_description += " - "
-        hu_5_description += str(self.l10n_hu_delivery_period_end)
-        if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
-            ## for outgoing invoices
-            if self.move_type in ['out_invoice', 'out_refund']:
-                hu_5_description += " (" + self.l10n_hu_delivery_period_legal + ")"
-            success_list.append({
-                'action_text': None,
-                'code': 'HU+5',
-                'description': _("Delivery period set") + ": " + hu_5_description,
-                'records': self,
-                'result': 'info',
-            })
-        elif self.l10n_hu_delivery_period_start and not self.l10n_hu_delivery_period_end:
-            error_list.append({
-                'action_text': None,
-                'code': 'HU+5',
-                'description': _("Delivery period not set") + ": " + hu_5_description,
-                'records': self,
-                'result': 'error',
-            })
-        elif not self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
-            error_list.append({
-                'action_text': None,
-                'code': 'HU+5',
-                'description': _("Delivery period not set") + ": " + hu_5_description,
-                'records': self,
-                'result': 'error',
-            })
-        else:
-            info_list.append({
-                'action_text': None,
-                'code': 'HU+5',
-                'description': _("Delivery period not set"),
-                'records': self,
-                'result': 'info',
-            })
-
-        # Update result
-        result.update({
-            'debug_list': debug_list,
-            'error_list': error_list,
-            'info_list': info_list,
-            'success_list': success_list,
-            'warning_list': warning_list,
-        })
-
-        # Return result
-        return result
-
-    @api.model
-    def l10n_hu_get_plus_status_overview(self):
-        """ Get HU+ status overview as an HTML table
-
-        NOTES:
-        - we return status check results
-        - we also return an overview html table assembled by a different method
-
-        @return: string (HTML syntax)
-        """
-        # Initialize variables
-        result = ""
-
-        # Run status check
-        checklist_result = self.l10n_hu_get_plus_status_checklist()
-        error_list = checklist_result.get('error_list', [])
-        info_list = checklist_result.get('info_list', [])
-        success_list = checklist_result.get('success_list', [])
-        warning_list = checklist_result.get('warning_list', [])
-
-        # Counts
-        error_count = len(error_list)
-        info_count = len(info_list)
-        success_count = len(success_list)
-        warning_count = len(warning_list)
-        total_count = error_count + info_count + success_count + warning_count
-        if total_count > 0:
-            error_rate = error_count / total_count
-            info_rate = info_count / total_count
-            success_rate = success_count / total_count
-            warning_rate = warning_count / total_count
-            bad_count = error_count + (warning_count * 0.5)
-            health_rate = int(round(((total_count - bad_count) / total_count * 100), 0))
-        else:
-            error_rate = 0
-            info_rate = 0
-            success_rate = 0
-            warning_rate = 0
-            health_rate = 0
-
-        # Assemble table
-        ### TITLE
-        result += '<h2 class="text-center mt-4">'
-        result += str(self.display_name)
-        result += '</h2>'
-        ### SUBTITLE
-        result += '<div class="fw-bold text-center mb-2">'
-        result += _("HU+ check result")
-        result += " " + str(fields.Datetime.now())
-        result += " " + str(health_rate) + "%"
-        result += '</div>'
-        ### STATS
-        result += '<div class="row p-1 mt-2 mb-2">'  # div row BEGIN
-        result += '<div class="col-3 text-center text-uppercase text-danger">'
-        result += '<span class="fa fa-exclamation-circle text-danger pe-1"/>'
-        result += '<span class="fw-bold">' + _("Error") + ": " + str(error_count) + '</span>'
-        # result += '<span class="fst-italic text-muted">' + str(error_rate) + '</span>'
-        result += '</div>'
-        result += '<div class="col-3 text-center text-uppercase text-warning">'
-        result += '<span class="fa fa-exclamation-triangle text-warning pe-1"/>'
-        result += '<span class="fw-bold">' + _("Warning") + ": " + str(warning_count) + '</span>'
-        # result += '<span class="fst-italic ps-1 text-muted">' + str(warning_rate) + '</span>'
-        result += '</div>'
-        result += '<div class="col-3 text-center text-uppercase text-success">'
-        result += '<span class="fa fa-check text-success pe-1"/>'
-        result += '<span class="fw-bold">' + _("Success") + ": " + str(success_count) + '</span>'
-        # result += '<span class="fst-italic ps-1 text-muted">' + str(success_rate) + '</span>'
-        result += '</div>'
-        result += '<div class="col-3 text-center text-uppercase text-info">'
-        result += '<span class="fa fa-info-circle text-info pe-1"/>'
-        result += '<span class="fw-bold">' + _("Information") + ": " + str(info_count) + '</span>'
-        # result += '<span class="fst-italic ps-1 text-muted">' + str(info_rate) + '</span>'
-        result += '</div>'
-        result += '</div>'  # div row END
-        ## TABLE BEGIN
-        result += '<table class="table table-bordered table-sm" style="width:100%;">'
-        ## THEAD BEGIN
-        result += '<thead>'
-        ### TH COLUMN NAMES
-        result += '<tr>'
-        result += '<th class="text-center" style="width:10%;">'
-        result += _("Result")  # Result (eg: error, info, ok, other, warning)
-        result += '</th>'
-        result += '<th class="text-center" style="width:10%;">'
-        result += _("Code")  # Code
-        result += '</th>'
-        result += '<th class="text-center" style="width:80%;">'
-        result += _("Description")  # Description
-        result += '</th>'
-        result += '</tr>'
-        ## THEAD END
-        result += '</thead>'
-        ## TBODY BEGIN
-        result += '<tbody>'
-        ### 1) errors
-        for error_item in error_list:
-            result += '<tr>'
-            result += '<td class="text-center">'
-            result += '<span class="fa fa-exclamation-circle text-danger me-2"/>'
-            result += '</td>'
-            result += '<td>'
-            result += error_item.get('code', "-")
-            result += '</td>'
-            result += '<td>'
-            result += error_item.get('description', "-")
-            result += '</td>'
-            result += '<tr>'
-        ### 2) warnings
-        for warning_item in warning_list:
-            result += '<tr>'
-            result += '<td class="text-center">'
-            result += '<span class="fa fa-exclamation-triangle text-warning me-2"/>'
-            result += '</td>'
-            result += '<td>'
-            result += warning_item.get('code', "-")
-            result += '</td>'
-            result += '<td>'
-            result += warning_item.get('description', "-")
-            result += '</td>'
-            result += '<tr>'
-        ### 3) success
-        for success_item in success_list:
-            result += '<tr>'
-            result += '<td class="text-center">'
-            result += '<span class="fa fa-check text-success me-2"/>'
-            result += '</td>'
-            result += '<td>'
-            result += success_item.get('code', "-")
-            result += '</td>'
-            result += '<td>'
-            result += success_item.get('description', "-")
-            result += '</td>'
-            result += '<tr>'
-        ### 4) info
-        for info_item in info_list:
-            result += '<tr>'
-            result += '<td class="text-center">'
-            result += '<span class="fa fa-info-circle text-info me-2"/>'
-            result += '</td>'
-            result += '<td>'
-            result += info_item.get('code', "-")
-            result += '</td>'
-            result += '<td>'
-            result += info_item.get('description', "-")
-            result += '</td>'
-            result += '<tr>'
-        ## TBODY END
-        result += '</tbody>'
-        ## TABLE END
-        result += '</table>'
-
-        # Return result
-        return result
-
-    @api.model
-    def l10n_hu_get_send_edi_allowed(self):
-        """ Determine if EDI send is allowed for an account move
-
-        NOTES:
-        - we have a method because it is too complex to be handled by a domain
-        - you can override with super if you want to check more conditions
-        - we collect points, if all collected, it is allowed
-
-        :return: boolean
-        """
-        # Initialize variables
-        points = 0
-
-        # 1) Company NAV connection configured
-        if self.company_id.l10n_hu_edi_server_mode and self.company_id.l10n_hu_edi_server_mode in ['production', 'test']:
-            points += 1
-
-        # 2) Journal EDI automation is enabled
-        if self.journal_id.l10n_hu_edi_sending in ['auto_edi', 'auto_edi_email']:
-            points += 1
-
-        # 3) Journal type
-        if self.journal_id.type == 'sale':
-            points += 1
-
-        # 4) Move EDI state
-        if not self.l10n_hu_edi_state:
-            points += 1
-
-        # 5) Move HU+ status
-        if self.l10n_hu_plus_status != 'closed':
-            points += 1
-
-        # 6) Move type
-        if self.move_type in ['out_invoice', 'out_refund']:
-            points += 1
-
-        # 7) Move state
-        if self.state == 'posted':
-            points += 1
-
-        # 8) Move invoice date today
-        if self.invoice_date == fields.Date.today():
-            points += 1
-
-        # Return
-        if points == 8:
-            return True
-        else:
-            return False
-
-    @api.model
-    def l10n_hu_get_storno_allowed(self):
-        """ Determine if storno is allowed for an account move
-
-        NOTES:
-        - in certain cases (eg: issued to wrong partner) storno must be used instead of modification
-        - we collect points, if all collected, storno is allowed
-
-        :return: boolean
-        """
-        # Initialize variables
-        points = 0
-
-        # 1) Company: NAV connection configured
-        if self.company_id.l10n_hu_edi_server_mode and self.company_id.l10n_hu_edi_server_mode in ['production', 'test']:
-            points += 1
-
-        # 2) Company: Storno document type
-        storno_document_type = self.env['l10n.hu.plus.tag'].search([
-            ('company', '=', self.company_id.id),
-            ('tag_type', '=', 'document_type'),
-            ('technical_name', '=', 'invoice_storno'),
-        ], limit=1)
-        if storno_document_type:
-            points += 1
-
-        # 3) Account move: posted out_invoice
-        if self.move_type == 'out_invoice' and self.state == 'posted':
-            points += 1
-
-        # Return result
-        if points == 3:
-            return True
-        else:
-            return False
-
+    ## HU+ CRON
     @api.model
     def l10n_hu_run_account_move_cron(self):
         """ Meant to be called by cron
@@ -1782,6 +770,1304 @@ class L10nHuPlusAccountMove(models.Model):
             'error_list': error_list,
             'log_ids': log_ids,
         })
+
+        # Return result
+        return result
+
+    ## HU+ DATA
+    @api.model
+    def l10n_hu_plus_get_data(self, values):
+        """ Get relevant HU+ related data
+
+        NOTES:
+        - central method to collect and compute hungarian localization data
+        - some fields are computed by calling other methods
+        - this method also prepares write operation compatible values for special hungarian fields
+        - there should be no CRUD operation here, keep it in mind when using super()
+        
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_plus_get_data BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        field_values = {}
+        info_list = []
+        result = {}
+        warning_list = []
+
+        # HU+ enabled
+        if self.journal_id and self.journal_id.l10n_hu_plus_enabled:
+            debug_list.append("HU+ enabled journal check passed")
+        else:
+            error_list.append("HU+ enabled journal check failed")
+
+        # Check move type
+        if self.move_type in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']:
+            debug_list.append("move type check passed")
+        else:
+            error_list.append("invalid account move type")
+
+        # Collect data using dedicated methods
+        ## DELIVERY
+        delivery_data = self.l10n_hu_plus_get_delivery_data(values)
+        delivery_date = delivery_data.get('delivery_date')
+        invoice_date_due = delivery_data.get('invoice_date_due')
+        l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end')
+        l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start')
+        error_list += delivery_data.get('error_list', [])
+        warning_list += delivery_data.get('warning_list', [])
+
+        ## DOCUMENT
+        document_data = self.l10n_hu_plus_get_document_data(values)
+        error_list += document_data.get('error_list', [])
+        warning_list += document_data.get('warning_list', [])
+
+        ## RATE - NOTES: do this after date
+        rate_values = values
+        rate_values.update({'delivery_date': delivery_date})
+        rate_data = self.l10n_hu_plus_get_rate_data(rate_values)
+        error_list += rate_data.get('error_list', [])
+        warning_list += rate_data.get('warning_list', [])
+
+        ## VAT - NOTES: do this at last, we need to prepare values before this
+        vat_values = values
+        vat_values.update({'delivery_date': delivery_date})
+        vat_data = self.l10n_hu_plus_get_vat_data(vat_values)
+        error_list += vat_data.get('error_list', [])
+        warning_list += vat_data.get('warning_list', [])
+
+        # Process field values
+        if len(error_list) == 0:
+            # DUE DATE
+            ## NOTES: we need this because payment term may change the due date
+            if invoice_date_due and invoice_date_due != self.invoice_date_due:
+                debug_list.append(f"invoice_date_due updated: {self.invoice_date_due}->{invoice_date_due}")
+                field_values.update({'invoice_date_due': invoice_date_due})
+
+            # DELIVERY
+            ## NOTES: write on delivery date triggers recompute of currency rate date! Update it only when necessary!
+            if delivery_date and delivery_date != self.delivery_date:
+                delivery_date_update = True
+            else:
+                delivery_date_update = False
+            if self.state == 'draft' and delivery_date_update:
+                debug_list.append(f"delivery date updated: {self.delivery_date}->{delivery_date}")
+                field_values.update({'delivery_date': delivery_date})
+            if self.state == 'draft' and l10n_hu_delivery_period_end:
+                field_values.update({'l10n_hu_delivery_period_end': l10n_hu_delivery_period_end})
+            if self.state == 'draft' and l10n_hu_delivery_period_start:
+                field_values.update({'l10n_hu_delivery_period_start': l10n_hu_delivery_period_start})
+
+            # DOCUMENT
+            if document_data.get('l10n_hu_document_type'):
+                field_values.update({'l10n_hu_document_type': document_data['l10n_hu_document_type'].id})
+            l10n_hu_document_vat_huf = document_data.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
+            l10n_hu_document_rate = document_data.get('l10n_hu_document_rate', self.l10n_hu_document_rate)
+            field_values.update({
+                'l10n_hu_document_rate': l10n_hu_document_rate,
+                'l10n_hu_document_vat_huf': l10n_hu_document_vat_huf,
+            })
+
+            # RATE
+            field_values.update({
+                'l10n_hu_huf_currency': rate_data.get('l10n_hu_huf_currency'),
+                'l10n_hu_document_rate': rate_data.get('l10n_hu_document_rate', 0.0),
+                'l10n_hu_huf_rate': rate_data.get('l10n_hu_huf_rate', 0.0),
+                'l10n_hu_invoice_currency_rate_date': rate_data.get('l10n_hu_invoice_currency_rate_date'),
+                'l10n_hu_invoice_currency_rate_inverse': rate_data.get('l10n_hu_invoice_currency_rate_inverse', 0.0),
+            })
+            # Only update invoice currency rate if delivery date has changed
+            if delivery_date_update:
+                if rate_data.get('invoice_currency_rate') != self.invoice_currency_rate:
+                    field_values.update({'invoice_currency_rate': rate_data['invoice_currency_rate']})
+                    debug_list.append(f"invoice_currency_rate update: {rate_data['invoice_currency_rate']}")
+                if rate_data.get('l10n_hu_invoice_currency_rate_date') != self.l10n_hu_invoice_currency_rate_date:
+                    field_values.update({'l10n_hu_invoice_currency_rate_date': rate_data['l10n_hu_invoice_currency_rate_date']})
+                    debug_list.append(f"l10n_hu_invoice_currency_rate_date update: {rate_data['l10n_hu_invoice_currency_rate_date']}")
+                if rate_data.get('l10n_hu_invoice_currency_rate_inverse') != self.l10n_hu_invoice_currency_rate_inverse:
+                    field_values.update({'l10n_hu_invoice_currency_rate_inverse': rate_data['l10n_hu_invoice_currency_rate_inverse']})
+                    debug_list.append(f"l10n_hu_invoice_currency_rate_inverse update: {rate_data['l10n_hu_invoice_currency_rate_inverse']}")
+            else:
+                pass
+
+            # VAT
+            field_values.update({
+                'l10n_hu_cash_accounting': vat_data.get('l10n_hu_cash_accounting', False),
+                'l10n_hu_vat_date': vat_data.get('l10n_hu_vat_date', self.l10n_hu_vat_date),
+                'l10n_hu_vat_status': vat_data.get('l10n_hu_vat_status', self.l10n_hu_vat_status),
+            })
+
+            # l10n_hu_payment_mode
+            if values.get('l10n_hu_payment_mode'):
+                field_values.update({'l10n_hu_payment_mode': values['l10n_hu_payment_mode'].upper()})
+                debug_list.append("l10n_hu_payment_mode set from values: " + str(values['l10n_hu_payment_mode']))
+            elif self.l10n_hu_payment_mode:
+                field_values.update({'l10n_hu_payment_mode': self.l10n_hu_payment_mode})
+                debug_list.append("l10n_hu_payment_mode set from self: " + str(self.l10n_hu_payment_mode))
+            elif (not self.l10n_hu_payment_mode and self.invoice_payment_term_id
+                  and self.invoice_payment_term_id.l10n_hu_nav_method):
+                l10n_hu_payment_mode_2 = self.invoice_payment_term_id.l10n_hu_nav_method.upper()
+                field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_2})
+                debug_list.append("l10n_hu_payment_mode set from payment term: " + str(l10n_hu_payment_mode_2))
+            elif not self.l10n_hu_payment_mode and self.journal_id.l10n_hu_nav_payment_method:
+                l10n_hu_payment_mode_3 = self.journal_id.l10n_hu_nav_payment_method.upper()
+                field_values.update({'l10n_hu_payment_mode': l10n_hu_payment_mode_3})
+                debug_list.append("l10n_hu_payment_mode set from journal: " + str(l10n_hu_payment_mode_3))
+            else:
+                pass
+        else:
+            debug_list.append("processing skipped due to previous errors")
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'delivery_data': delivery_data,
+            'document_data': document_data,
+            'error_list': error_list,
+            'field_values': field_values,
+            'info_list': info_list,
+            'rate_data': rate_data,
+            'vat_data': vat_data,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_get_data END" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_plus_get_delivery_data(self, values):
+        """ Get date data considering special hungarian rules
+
+        NOTES:
+        - This method only collects data, can be called by various other methods
+        - Periodic delivery specification: 2007. CXXVII. 58.§ (1) https://njt.hu/jogszabaly/2007-127-00-00
+        - MOPSZ 18.0 documentation: https://mopsz18.hungarodo.hu/odoo/knowledge/78
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        warning_list = []
+
+        # dates
+        accounting_date = values.get('date', self.date)
+        delivery_date = values.get('delivery_date', self.delivery_date)
+        invoice_date = values.get('invoice_date', self.invoice_date)
+        period_end = values.get('l10n_hu_delivery_period_end', self.l10n_hu_delivery_period_end)
+        period_start = values.get('l10n_hu_delivery_period_start', self.l10n_hu_delivery_period_start)
+
+        # delivery_date_default
+        if not delivery_date and self.move_type in ['in_invoice', 'in_refund'] and invoice_date:
+            delivery_date_default = invoice_date
+        elif not delivery_date and self.journal_id:
+            delivery_date_default = self.journal_id.l10n_hu_get_default_delivery_date()
+        else:
+            delivery_date_default = None
+            debug_list.append("delivery_date_default not set, this is a valid scenario")
+
+        # period_enabled
+        if period_start and period_end and self.state == 'draft' and self.move_type in ['out_invoice', 'out_refund']:
+            period_enabled = True
+        else:
+            period_enabled = False
+
+        # invoice_date_due
+        if values.get('invoice_date_due'):
+            invoice_date_due = values['invoice_date_due']
+            debug_list.append(f"invoice_date_due set from values: {invoice_date_due}")
+        elif self.invoice_payment_term_id:
+            # NOTES: using a payment term needs a recompute, see _compute_invoice_date_due()
+            if self.state == 'draft':
+                self._compute_needed_terms()
+            debug_list.append(f"needed_terms: {self.needed_terms}")
+            invoice_date_due = self.needed_terms and max(
+                (k['date_maturity'] for k in self.needed_terms.keys() if k),
+                default=False,
+            ) or self.invoice_date_due or fields.Date.context_today(self)
+            debug_list.append(f"invoice_date_due set from invoice_payment_term_id: {invoice_date_due}")
+        else:
+            invoice_date_due = self.invoice_date_due
+            debug_list.append(f"invoice_date_due set from self: {invoice_date_due}")
+
+        # Set last day of delivery period month
+        if period_enabled and period_end:
+            # Get close to the end of the month and add 4 days to 'roll it over'
+            period_next_month = period_end.replace(day=28) + datetime.timedelta(days=4)
+            # Set the day to 1 gives us the start of next month
+            period_first_day_of_next_month = period_next_month.replace(day=1)
+            # Remove one day to get last day of this month
+            period_month_last_day = period_first_day_of_next_month - datetime.timedelta(days=1)
+        else:
+            period_month_last_day = None
+
+        # Set 60 days from period_end
+        if period_enabled and period_end:
+            period_end_plus_60 = period_end + datetime.timedelta(days=60)
+        else:
+            period_end_plus_60 = None
+
+        # NAV SCENARIOS
+        # 0) DEFAULT
+        if delivery_date:
+            scenario = '0_already_set'
+        elif not delivery_date and delivery_date_default:
+            scenario = '0_use_default'
+            delivery_date = delivery_date_default
+        else:
+            scenario = '0_no_default'
+        debug_list.append(f"delivery_date scenario 0: {scenario} - {delivery_date}")
+
+        # 1) PERIOD END
+        # Rule: period_end is set
+        # Value: delivery_period_end
+        if period_enabled and period_end:
+            scenario = '1_period_end'
+            delivery_date = period_end
+        debug_list.append(f"delivery_date scenario 1: {scenario} - {delivery_date}")
+
+        # 2) INVOICE DATE
+        # Rule: BOTH invoice_date_due AND invoice_date are BEFORE period_end
+        # Value: invoice_date
+        if (period_enabled and invoice_date and invoice_date_due and period_end
+                and invoice_date_due < period_end and invoice_date < period_end):
+            scenario = '1a_invoice_date'
+            delivery_date = invoice_date
+        debug_list.append(f"delivery_date scenario 2: {scenario} - {delivery_date}")
+
+        # 3) INVOICE DATE DUE (MAX 60)
+        # Rule: invoice_date_due is AFTER period_end
+        # Value: invoice_date_due (BUT max 60 days from period_end)
+        if period_enabled and invoice_date_due and period_end and invoice_date_due > period_end:
+            if invoice_date_due <= period_end_plus_60:
+                scenario = '1b_invoice_date_due'
+                delivery_date = invoice_date_due
+            else:
+                scenario = '1b_invoice_date_due_max_60'
+                delivery_date = period_end_plus_60
+        debug_list.append(f"delivery_date scenario 3: {scenario} - {delivery_date}")
+
+        # period_summary
+        period_summary = f"{_('Delivery period')}: {period_start} - {period_end}"
+
+        # period_legal
+        period_legal = "2007. CXXVII. 58.§"
+        if scenario == '1a_invoice_date':
+            period_legal += " (1) a)"
+        elif scenario == '1b_invoice_date_due':
+            period_legal += " (1) b)"
+        elif scenario == '1b_invoice_date_due_max_60':
+            period_legal += " (1) b) 60+ " + _("day")
+        else:
+            pass
+
+        # Update result
+        result.update({
+            'accounting_date': accounting_date,
+            'debug_list': debug_list,
+            'delivery_date': delivery_date,
+            'delivery_date_default': delivery_date_default,
+            'error_list': error_list,
+            'info_list': info_list,
+            'invoice_date': invoice_date,
+            'invoice_date_due': invoice_date_due,
+            'l10n_hu_delivery_period_end': period_end,
+            'l10n_hu_delivery_period_start': period_start,
+            'period_enabled': period_enabled,
+            'period_end_plus_60': period_end_plus_60,
+            'period_legal': period_legal,
+            'period_month_last_day': period_month_last_day,
+            'period_scenario': scenario,
+            'period_summary': period_summary,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_get_delivery_data" + "\n" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_plus_get_document_data(self, values):
+        """ Get document related data considering special hungarian rules
+
+        NOTES:
+        - This method only collects data, can be called by various other methods
+        - is_storno_allowed: determine if storno is allowed for an account move
+            - in certain cases (eg: issued to wrong partner) storno must be used instead of modification
+            - we collect points, if all collected, storno is allowed
+        - is_storno_invoice: determine if an account move is a storno invoice
+            - Check storno by amount residual as suggested by Odoo
+            - Odoo logic for storno: https://github.com/odoo/odoo/commit/5214296e8be76663ffdb6647c91645c66501121d
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_plus_get_document_data BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        warning_list = []
+
+        ## HUF VAT, document rate and amounts
+        ### NOTES: document rate is NOT THE same as Odoo's invoice_currency_rate!
+        ###        Odoo's invoice_currency_rate is used for accounting
+        ###        Document rate is needed for VAT and can be a different rate
+        ###        For example: vendor bill issuer might use different rate than our company for the same date
+        huf_currency = self.env.ref('base.HUF')
+        huf_rounding = huf_currency.decimal_places
+        l10n_hu_document_vat_huf = values.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
+        rate_rounding = 2
+
+        ### CUSTOMER INVOICE - we issued it (Odoo or externally), so we reported the data, so we must use accounting
+        if (self.move_type in ['out_invoice', 'out_refund'] and self.invoice_currency_rate != 0
+                and self.company_id.currency_id.name == 'HUF'):
+            l10n_hu_document_rate = 1 / self.invoice_currency_rate
+            l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
+        ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
+        elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
+            l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
+        elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total != 0
+              and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
+            l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
+        elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0
+              and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
+            l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
+        else:
+            l10n_hu_document_rate = 1.0
+        l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
+        l10n_hu_document_gross_huf = l10n_hu_document_vat_huf + l10n_hu_document_net_huf
+
+        # HUF AMOUNT DIFF AND SUMMARY
+        accounting_amount_untaxed = abs(self.amount_untaxed_signed)
+        accounting_amount_tax = abs(self.amount_tax_signed)
+        accounting_amount_total = abs(self.amount_total_signed)
+        huf_amount_diff = 0
+        huf_amount_gross_diff = 0
+        huf_amount_net_diff = 0
+        huf_amount_vat_diff = 0
+        huf_amount_summary = None
+        if self.company_id.currency_id.name == 'HUF':
+            huf_amount_net_diff = tools.float_round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
+            huf_amount_vat_diff = tools.float_round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
+            huf_amount_gross_diff = tools.float_round(accounting_amount_total - l10n_hu_document_gross_huf, huf_rounding)
+            if huf_amount_net_diff != 0 or huf_amount_vat_diff != 0 or huf_amount_gross_diff != 0:
+                huf_amount_diff = True
+            if self.company_id.currency_id.name == 'HUF':
+                huf_amount_summary = (f"{_('Document HUF amounts')}: "
+                f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed}-{self.l10n_hu_document_net_huf});"
+                f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax}-{self.l10n_hu_document_vat_huf});"
+                f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total}-{self.l10n_hu_document_gross_huf})")
+
+        # MODIFICATION
+        modification_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_modification'),
+        ], limit=1)
+
+        # STORNO
+        ## Storno document type
+        storno_document_type = self.env['l10n.hu.plus.tag'].search([
+            ('company', '=', self.company_id.id),
+            ('tag_type', '=', 'document_type'),
+            ('technical_name', '=', 'invoice_storno'),
+        ], limit=1)
+
+        ## is_storno_invoice
+        base_invoice = self._l10n_hu_get_chain_base()
+        if self.move_type == 'out_refund' and self != base_invoice and base_invoice.amount_residual == 0:
+            is_storno_invoice = True
+        else:
+            is_storno_invoice = False
+
+        ## is_storno_allowed
+        if (storno_document_type and self.move_type == 'out_invoice' and self.state == 'posted'
+                and not self.reversed_entry_id and not self.l10n_hu_original_invoice_number):
+            is_storno_allowed = True
+        else:
+            is_storno_allowed = False
+
+        # DOCUMENT TYPE
+        l10n_hu_document_type = values.get('l10n_hu_document_type', self.l10n_hu_document_type)
+        if not l10n_hu_document_type and self.move_type in ['in_invoice', 'out_invoice']:
+            l10n_hu_document_type = self.journal_id.l10n_hu_get_default_document_type()
+        elif not l10n_hu_document_type and self.move_type == 'out_refund' and is_storno_invoice and storno_document_type:
+            l10n_hu_document_type = storno_document_type
+        elif not l10n_hu_document_type and self.move_type == 'out_refund' and modification_document_type:
+            l10n_hu_document_type = modification_document_type
+        else:
+            pass
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'huf_amount_diff': huf_amount_diff,
+            'huf_amount_gross_diff': huf_amount_gross_diff,
+            'huf_amount_net_diff': huf_amount_net_diff,
+            'huf_amount_vat_diff': huf_amount_vat_diff,
+            'huf_amount_summary': huf_amount_summary,
+            'info_list': info_list,
+            'is_storno_allowed': is_storno_allowed,
+            'is_storno_invoice': is_storno_invoice,
+            'l10n_hu_document_gross_huf': l10n_hu_document_gross_huf,
+            'l10n_hu_document_net_huf': l10n_hu_document_net_huf,
+            'l10n_hu_document_rate': l10n_hu_document_rate,
+            'l10n_hu_document_type': l10n_hu_document_type,
+            'l10n_hu_document_vat_huf': l10n_hu_document_vat_huf,
+            'modification_document_type': modification_document_type,
+            'storno_document_type': storno_document_type,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_get_document_data" + "\n" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_plus_get_rate_data(self, values):
+        """ Get currency related data considering special hungarian rules
+
+        NOTES:
+        - This method only collects data, can be called by various other methods
+        - we collect all HU relevant information (currencies, rates, etc..)
+        - TODO write documentation:
+            - expected_rate (accounting_rate) vs invoice_currency_rate (document rate)
+            - issue_date vs delivery_date vs currency_rate_date
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_plus_get_rate_data BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        warning_list = []
+
+        # CURRENCIES
+        company_currency = self.company_id.currency_id
+        huf_currency = self.env.ref('base.HUF')
+        invoice_currency = self.currency_id
+        rate_rounding = 2
+
+        # DATES
+        delivery_date = values.get('delivery_date', self.delivery_date)
+        invoice_date = values.get('invoice_date', self.invoice_date)
+
+        ## currency_rate_date
+        ## NOTES: if the invoice was issued before the delivery date then
+        ##        that means that the rate for the delivery date did nto exist yet
+        ##        so we use the rate for the issue date
+        if delivery_date and invoice_date and delivery_date > invoice_date:
+            currency_rate_date = invoice_date
+        elif delivery_date:
+            currency_rate_date = delivery_date
+        else:
+            currency_rate_date = fields.Date.today()
+
+        # Float rates
+        ## Odoo rates
+        expected_currency_rate = self.expected_currency_rate
+        invoice_currency_rate = values.get('invoice_currency_rate', self.invoice_currency_rate)
+
+        ## Inverse rates
+        if invoice_currency_rate != 0:
+            l10n_hu_invoice_currency_rate_inverse = 1 / invoice_currency_rate
+        else:
+            l10n_hu_invoice_currency_rate_inverse = 0.0
+        if expected_currency_rate != 0:
+            expected_currency_rate_inverse = 1 / expected_currency_rate
+        else:
+            expected_currency_rate_inverse = 0.0
+
+        ## HU+ document rate
+        document_rate = values.get('l10n_hu_document_rate', self.l10n_hu_document_rate)
+
+        # Rate objects (res.currency.rate)
+        ## HU+ delivery_date_rcr
+        if delivery_date:
+            delivery_date_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', invoice_currency.id),
+                ('name', '<=', delivery_date)
+            ], limit=1)
+        else:
+            delivery_date_rcr = None
+
+        ## HU+ invoice_date_rcr
+        if invoice_date:
+            invoice_date_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', invoice_currency.id),
+                ('name', '<=', invoice_date)
+            ], limit=1)
+        else:
+            invoice_date_rcr = None
+
+        ## HU+ accounting_rate
+        accounting_date = currency_rate_date
+        accounting_rate = 1.0
+        accounting_rcr = None
+        if currency_rate_date and company_currency != invoice_currency:
+            accounting_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', invoice_currency.id),
+                ('name', '<=', accounting_date)
+            ], limit=1)
+            debug_list.append("accounting_rcr set for foreign currency")
+            if accounting_rcr:
+                accounting_rate = accounting_rcr.company_rate
+                debug_list.append("accounting_rate set: " + str(accounting_rate))
+        else:
+            debug_list.append("accounting_rcr not set, invoice and company has same currency")
+
+        ## HU+ huf_rate
+        huf_rate = 0.0
+        ### Company HUF
+        if company_currency.name == 'HUF':
+            huf_rate = 1.0
+            debug_list.append("huf_rate is 1.0 for company HUF")
+        ## Company NOT HUF
+        elif company_currency.name != 'HUF' and currency_rate_date:
+            huf_rate_rcr = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', huf_currency.id),
+                ('name', '<=', currency_rate_date)
+            ], limit=1)
+            if huf_rate_rcr:
+                huf_rate = huf_rate_rcr.company_rate
+                debug_list.append("huf_rate found for company NOT HUF")
+            else:
+                error_list.append("huf_rate not found")
+        else:
+            debug_list.append("huf_rate else scenario, probably delivery_date is not set")
+
+        ## SPECIAL CASE: invoice_date < delivery_date (periodic delivery)
+        ## - customer invoice issued externally and downloaded
+        ## - vendor bill
+        ## NOTES: we need to do accounting for the invoice_date
+        if (self.move_type in ['in_invoice', 'in_refund'] and invoice_date and delivery_date
+                and invoice_date < delivery_date):
+            invoice_currency_rate = invoice_date_rcr.company_rate
+            debug_list.append(f"inbound invoice special: {invoice_date}<{delivery_date} = {invoice_currency_rate}")
+
+        # l10n_hu_invoice_currency_rate_date
+        l10n_hu_invoice_currency_rate_date = self._get_invoice_currency_rate_date()
+        if l10n_hu_invoice_currency_rate_date > currency_rate_date:
+            l10n_hu_invoice_currency_rate_date = currency_rate_date
+
+        # document_rate_diff
+        document_rate_diff = tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) - tools.float_round(document_rate, rate_rounding)
+
+        # currency_summary
+        if company_currency == invoice_currency:
+            currency_summary = _("This document uses the company currency")
+        else:
+            currency_summary = (f"{_('Currency rate')}: {l10n_hu_invoice_currency_rate_date}"
+            f" {tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
+            f" {company_currency.name}/{invoice_currency.name} ({_('Accounting')})")
+            if tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) != tools.float_round(expected_currency_rate_inverse, rate_rounding):
+                currency_summary += (f" {tools.float_round(expected_currency_rate_inverse, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name} ({_('Expected')}) ")
+            if self.move_type in ['in_invoice', 'in_refund']:
+                currency_summary += (f" {tools.float_round(document_rate, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name} ({_('Document')})")
+            if document_rate_diff != 0:
+                currency_summary += f"{_('Rate difference')}: {tools.float_round(document_rate_diff, rate_rounding)}"
+            if company_currency.name != 'HUF':
+                currency_summary += (f" {tools.float_round(huf_rate, rate_rounding)} "
+                                     f" {huf_currency.name}/{company_currency.name} ({_('HUF rate')})")
+
+        # Update result
+        result.update({
+            'accounting_rate': accounting_rate,
+            'currency_summary': currency_summary,
+            'debug_list': debug_list,
+            'delivery_date': delivery_date,
+            'document_rate_diff': document_rate_diff,
+            'error_list': error_list,
+            'expected_currency_rate': expected_currency_rate,
+            'expected_currency_rate_inverse': expected_currency_rate_inverse,
+            'info_list': info_list,
+            'invoice_currency_rate': invoice_currency_rate,
+            'invoice_date': invoice_date,
+            'l10n_hu_document_rate': document_rate,
+            'l10n_hu_huf_currency': huf_currency,
+            'l10n_hu_huf_rate': huf_rate,
+            'l10n_hu_invoice_currency_rate_date': l10n_hu_invoice_currency_rate_date,
+            'l10n_hu_invoice_currency_rate_inverse': l10n_hu_invoice_currency_rate_inverse,
+            'res_currency_rate_accounting': accounting_rcr,
+            'res_currency_rate_invoice_date': invoice_date_rcr,
+            'res_currency_rate_delivery_date': delivery_date_rcr,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_get_rate_data" + "\n" + str(result))
+        return result
+
+    @api.model
+    def l10n_hu_plus_get_vat_data(self, values):
+        """ Collect vat related data
+
+        NOTES:
+        - cash_accounting_summary: text summary for cash accounting
+        - is_cash_accounting: cash accounting is relevant or not
+        - l10n_hu_cash_accounting: value for the account move field
+        - l10n_hu_vat_date: date of next VAT declaration
+        - l10n_hu_vat_status: VAT status of the document
+
+        :param values: dictionary
+
+        :return: dictionary
+        """
+        # raise exceptions.UserError("l10n_hu_plus_get_vat_data BEGIN" + str(values))
+
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        warning_list = []
+
+        # delivery_date
+        delivery_date = values.get('delivery_date', self.delivery_date)
+
+        # is_cash_accounting
+        is_cash_accounting = False
+        cash_accounting_summary = _("Cash accounting is not applicable for the invoice")
+        if self.is_invoice(True) and self.state == 'draft':
+            if (self.move_type in ['in_invoice', 'in_refund'] and self.partner_id
+                    and self.partner_id.property_account_position_id
+                    and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic'
+                    and self.partner_id.property_account_position_id.l10n_hu_tax_regime == 'ca'):
+                is_cash_accounting = True
+                cash_accounting_summary = _("Domestic invoice issuer applies cash accounting")
+            elif (self.partner_id and self.partner_id.property_account_position_id
+                  and self.partner_id.property_account_position_id.l10n_hu_trade_position == 'domestic'
+                  and self.company_id.l10n_hu_tax_regime == 'ca'):
+                is_cash_accounting = True
+                cash_accounting_summary = _("Domestic partner and company applies cash accounting")
+            else:
+                pass
+        else:
+            pass
+
+        # l10n_hu_cash_accounting
+        if self.state == 'draft' and is_cash_accounting:
+            l10n_hu_cash_accounting = is_cash_accounting
+        else:
+            l10n_hu_cash_accounting = self.l10n_hu_cash_accounting
+
+        # Taxes
+        ## In case of cash accounting we check if the applied taxes are set to use cash accounting
+        cash_accounting_taxes = []
+        taxes = []
+        vat_taxes = []
+        if l10n_hu_cash_accounting:
+            for invoice_line in self.invoice_line_ids:
+                if invoice_line.product_id:
+                    for tax in invoice_line.tax_ids:
+                        if tax not in taxes:
+                            taxes.append(tax)
+                        if tax.l10n_hu_tax_type == 'VAT':
+                            if tax not in vat_taxes:
+                                vat_taxes.append(tax)
+                            if tax.tax_exigibility == 'on_payment' and tax not in cash_accounting_taxes:
+                                cash_accounting_taxes.append(tax)
+
+        # l10n_hu_vat_status
+        l10n_hu_vat_status = values.get('l10n_hu_vat_status', self.l10n_hu_vat_status)
+        if not l10n_hu_vat_status and not is_cash_accounting:
+            l10n_hu_vat_status = 'to_declare'
+
+        # l10n_hu_vat_date
+        l10n_hu_vat_date = values.get('l10n_hu_vat_date', self.l10n_hu_vat_date)
+        if not l10n_hu_vat_date and not is_cash_accounting and l10n_hu_vat_status == 'to_declare':
+            l10n_hu_vat_date = delivery_date
+
+        # Update result
+        result.update({
+            'cash_accounting_summary': cash_accounting_summary,
+            'cash_accounting_taxes': cash_accounting_taxes,
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'is_cash_accounting': is_cash_accounting,
+            'l10n_hu_cash_accounting': l10n_hu_cash_accounting,
+            'l10n_hu_vat_date': l10n_hu_vat_date,
+            'l10n_hu_vat_status': l10n_hu_vat_status,
+            'taxes': taxes,
+            'vat_taxes': vat_taxes,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        # raise exceptions.UserError("l10n_hu_plus_get_vat_data END" + str(result))
+        return result
+
+    ## HU+ EDI
+    @api.model
+    def l10n_hu_do_send_edi(self):
+        """ Shorthand method to send invoice to EDI (NAV Online Szamla) without user interaction
+
+        :return: boolean
+        """
+        if self.l10n_hu_get_send_edi_allowed():
+            if self.journal_id.l10n_hu_edi_sending == 'auto_edi_email':
+                mail_template = self.l10n_hu_get_send_invoice_mail_template()
+                self.env['account.move.send']._generate_and_send_invoices(self, sending_methods=['email'], mail_template=mail_template)
+            else:
+                self.env['account.move.send']._generate_and_send_invoices(self, sending_methods=[])
+            return True
+        else:
+            return False
+
+    @api.model
+    def l10n_hu_get_send_edi_allowed(self):
+        """ Determine if EDI send is allowed for an account move
+
+        NOTES:
+        - we have a method because it is too complex to be handled by a domain
+        - you can override with super if you want to check more conditions
+        - we collect points, if all collected, it is allowed
+
+        :return: boolean
+        """
+        # Initialize variables
+        points = 0
+
+        # 1) Company NAV connection configured
+        if self.company_id.l10n_hu_edi_server_mode and self.company_id.l10n_hu_edi_server_mode in ['production', 'test']:
+            points += 1
+
+        # 2) Journal EDI automation is enabled
+        if self.journal_id.l10n_hu_edi_sending in ['auto_edi', 'auto_edi_email']:
+            points += 1
+
+        # 3) Journal type
+        if self.journal_id.type == 'sale':
+            points += 1
+
+        # 4) Move EDI state
+        if not self.l10n_hu_edi_state:
+            points += 1
+
+        # 5) Move HU+ status
+        if self.l10n_hu_plus_status != 'closed':
+            points += 1
+
+        # 6) Move type
+        if self.move_type in ['out_invoice', 'out_refund']:
+            points += 1
+
+        # 7) Move state
+        if self.state == 'posted':
+            points += 1
+
+        # 8) Move invoice date today
+        if self.invoice_date == fields.Date.today():
+            points += 1
+
+        # Return
+        if points == 8:
+            return True
+        else:
+            return False
+
+    @api.model
+    def l10n_hu_get_send_invoice_mail_template(self):
+        """ Get mail template to send out invoice email"""
+        return self.env.ref('account.email_template_edi_invoice')
+
+    ## HU+ STATUS
+    @api.model
+    def l10n_hu_get_plus_status(self):
+        """ Get HU+ status
+
+        NOTES:
+        - meant to be used by automations
+        - meant to be overridden by super for customizations
+
+        :return: dictionary
+        """
+        # Do not modify closed and other
+        if self.l10n_hu_plus_status in ['closed', 'other']:
+            return self.l10n_hu_plus_status
+        else:
+            # Run checklist and determine status
+            checklist_result = self.l10n_hu_get_plus_status_checklist()
+            error_list = checklist_result.get('error_list', [])
+            # info_list = checklist_result.get('info_list', [])
+            success_list = checklist_result.get('success_list', [])
+            warning_list = checklist_result.get('warning_list', [])
+            if len(error_list) > 0:
+                return 'error'
+            elif len(warning_list) > 0:
+                return 'warning'
+            elif len(success_list) > 0:
+                return 'ok'
+            else:
+                return None
+
+    @api.model
+    def l10n_hu_get_plus_status_checklist(self):
+        """ Get HU+ status checklist
+
+        NOTES:
+        - we run here a lot of status checks
+        - Odoo _l10n_hu_edi_check_invoices() method is not included as it returns only errors when posting
+
+        :return: dictionary
+        """
+        # Initialize variables
+        debug_list = []
+        error_list = []
+        info_list = []
+        result = {}
+        success_list = []
+        warning_list = []
+
+        # Odoo errors (actually, no need to include, it returns only errors for invoice issue)
+        """
+        l10n_hu_edi_error_dict = self._l10n_hu_edi_check_invoices()
+        for check, values in l10n_hu_edi_error_dict.items():
+            l10n_hu_edi_error = {
+                'action_text': values.get('action_text', ""),
+                'code': check,
+                'description': values.get('message', ""),
+                'records': values.get('records', None),
+                'result': 'error'
+            }
+            error_list.append(l10n_hu_edi_error)
+        """
+        
+        # HU+0: collect data using dedicated methods
+        delivery_data = self.l10n_hu_plus_get_delivery_data({})
+        document_data = self.l10n_hu_plus_get_document_data({})
+        rate_data = self.l10n_hu_plus_get_rate_data({})
+        vat_data = self.l10n_hu_plus_get_vat_data({})
+
+        # HU+1: document type
+        if self.l10n_hu_document_type:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+1',
+                'description': _("Document type set") + ": " + str(self.l10n_hu_document_type.display_name),
+                'records': self.l10n_hu_document_type,
+                'result': 'ok',
+            })
+        else:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+1',
+                'description': _("Document type not set"),
+                'records': None,
+                'result': 'warning',
+            })
+
+        # HU+2: account move fiscal position
+        if self.fiscal_position_id:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+2',
+                'description': _("Invoice fiscal position set") + ": " + str(self.fiscal_position_id.display_name),
+                'records': self.filtered(lambda am: am.fiscal_position_id),
+                'result': 'ok',
+            })
+        else:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+2',
+                'description': _("Invoice fiscal position not set"),
+                'records': self.filtered(lambda am: not am.fiscal_position_id),
+                'result': 'warning',
+            })
+
+        # HU+3: partner fiscal position
+        if self.partner_id.property_account_position_id:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+3',
+                'description': _("Partner fiscal position set") + ": " + self.partner_id.property_account_position_id.display_name,
+                'records': self.partner_id.commercial_partner_id.filtered(lambda p: p.property_account_position_id),
+                'result': 'ok',
+            })
+        else:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+3',
+                'description': _("Partner fiscal position not set"),
+                'records': self.partner_id.commercial_partner_id.filtered(lambda p: not p.property_account_position_id),
+                'result': 'warning',
+            })
+
+        # HU+4: delivery date
+        if self.delivery_date:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+4',
+                'description': _("Delivery date set") + ": " + str(self.delivery_date),
+                'records': self,
+                'result': 'ok',
+            })
+        else:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+4',
+                'description': _("Delivery date not set"),
+                'records': self,
+                'result': 'error',
+            })
+
+        # HU+5: delivery period
+        l10n_hu_delivery_period_end = delivery_data.get('l10n_hu_delivery_period_end', None)
+        l10n_hu_delivery_period_start = delivery_data.get('l10n_hu_delivery_period_start', None)
+        period_legal = delivery_data.get('period_legal', None)
+        hu_5_description = str(l10n_hu_delivery_period_start)
+        hu_5_description += " - "
+        hu_5_description += str(l10n_hu_delivery_period_end)
+        if l10n_hu_delivery_period_start and l10n_hu_delivery_period_end:
+            ## for outgoing invoices
+            if self.move_type in ['out_invoice', 'out_refund'] and period_legal:
+                hu_5_description += f" ({period_legal})"
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period set") + ": " + hu_5_description,
+                'records': self,
+                'result': 'info',
+            })
+        elif l10n_hu_delivery_period_start and not l10n_hu_delivery_period_end:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period not set") + ": " + hu_5_description,
+                'records': self,
+                'result': 'error',
+            })
+        elif not l10n_hu_delivery_period_start and l10n_hu_delivery_period_end:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period not set") + ": " + hu_5_description,
+                'records': self,
+                'result': 'error',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+5',
+                'description': _("Delivery period not set"),
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+6: taxes
+        no_tax_lines = []
+        for line in self.invoice_line_ids:
+            if line.product_id and not line.tax_ids:
+                no_tax_lines.append(line)
+        if len(no_tax_lines) == 0:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+6',
+                'description': _("Tax is set on all invoice lines"),
+                'records': self,
+                'result': 'success',
+            })
+        else:
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+6',
+                'description': _("Tax must be set on all invoice lines"),
+                'records': self,
+                'result': 'error',
+            })
+
+        # HU+7: Document rate amounts
+        if rate_data.get('document_rate_diff') and rate_data['document_rate_diff'] != 0:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+7',
+                'description': str(rate_data.get('currency_summary', "")),
+                'records': self,
+                'result': 'warning',
+            })
+        elif rate_data.get('document_rate_diff') and rate_data['document_rate_diff'] == 0:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+7',
+                'description': str(rate_data.get('currency_summary', "")),
+                'records': self,
+                'result': 'success',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+7',
+                'description': str(rate_data.get('currency_summary', "")),
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+8: Document HUF amounts
+        if document_data.get('huf_amount_diff'):
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+8',
+                'description': str(document_data.get('huf_amount_summary', "")),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+8',
+                'description': str(document_data.get('huf_amount_summary', "")),
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+9: Cash accounting setting
+        if vat_data.get('l10n_hu_cash_accounting') != self.l10n_hu_cash_accounting:
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+9',
+                'description': _("Cash accounting setting for document is inconsistent with partner settings"),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            hu_9_info_text = _("Document cash accounting setting") + ": "
+            if self.l10n_hu_cash_accounting:
+                hu_9_info_text += _("Yes")
+            else:
+                hu_9_info_text += _("No")
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+9',
+                'description': hu_9_info_text,
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+10: Cash accounting taxes
+        cash_accounting_taxes = vat_data.get('cash_accounting_taxes', [])
+        vat_taxes = vat_data.get('vat_taxes', [])
+        if vat_data.get('l10n_hu_cash_accounting') and len(cash_accounting_taxes) == len(vat_taxes):
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+10',
+                'description': _("Cash accounting is set and all applied VAT taxes are set to on payment"),
+                'records': self,
+                'result': 'warning',
+            })
+        elif vat_data.get('l10n_hu_cash_accounting') and len(cash_accounting_taxes) != len(vat_taxes):
+            warning_list.append({
+                'action_text': None,
+                'code': 'HU+10',
+                'description': _("Cash accounting is set, but not all applied VAT taxes are set to on payment"),
+                'records': self,
+                'result': 'warning',
+            })
+        else:
+            info_list.append({
+                'action_text': None,
+                'code': 'HU+10',
+                'description': _("Cash accounting is not set, on payment tax check skipped"),
+                'records': self,
+                'result': 'info',
+            })
+
+        # HU+11: cash accounting summary
+        info_list.append({
+            'action_text': None,
+            'code': 'HU+11',
+            'description': str(vat_data.get('cash_accounting_summary', "")),
+            'records': self,
+            'result': 'info',
+        })
+
+        # Update result
+        result.update({
+            'debug_list': debug_list,
+            'error_list': error_list,
+            'info_list': info_list,
+            'success_list': success_list,
+            'warning_list': warning_list,
+        })
+
+        # Return result
+        return result
+
+    @api.model
+    def l10n_hu_get_plus_status_overview(self):
+        """ Get HU+ status overview as an HTML table
+
+        NOTES:
+        - we return status check results
+        - we also return an overview html table assembled by a different method
+
+        @return: string (HTML syntax)
+        """
+        # Initialize variables
+        result = ""
+
+        # Run status check
+        checklist_result = self.l10n_hu_get_plus_status_checklist()
+        error_list = checklist_result.get('error_list', [])
+        info_list = checklist_result.get('info_list', [])
+        success_list = checklist_result.get('success_list', [])
+        warning_list = checklist_result.get('warning_list', [])
+
+        # Counts
+        error_count = len(error_list)
+        info_count = len(info_list)
+        success_count = len(success_list)
+        warning_count = len(warning_list)
+        total_count = error_count + info_count + success_count + warning_count
+        if total_count > 0:
+            error_rate = error_count / total_count
+            info_rate = info_count / total_count
+            success_rate = success_count / total_count
+            warning_rate = warning_count / total_count
+            bad_count = error_count + (warning_count * 0.5)
+            health_rate = int(tools.float_round(((total_count - bad_count) / total_count * 100), 0))
+        else:
+            error_rate = 0
+            info_rate = 0
+            success_rate = 0
+            warning_rate = 0
+            health_rate = 0
+
+        # Assemble table
+        ### TITLE
+        result += '<h2 class="text-center mt-4">'
+        result += str(self.display_name)
+        result += '</h2>'
+        ### SUBTITLE
+        result += '<div class="fw-bold text-center mb-2">'
+        result += _("HU+ check result")
+        result += " " + str(fields.Datetime.now())
+        result += " " + str(health_rate) + "%"
+        result += '</div>'
+        ### STATS
+        result += '<div class="row p-1 mt-2 mb-2">'  # div row BEGIN
+        result += '<div class="col-3 text-center text-uppercase text-danger">'
+        result += '<span class="fa fa-exclamation-circle text-danger pe-1"/>'
+        result += '<span class="fw-bold">' + _("Error") + ": " + str(error_count) + '</span>'
+        # result += '<span class="fst-italic text-muted">' + str(error_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-3 text-center text-uppercase text-warning">'
+        result += '<span class="fa fa-exclamation-triangle text-warning pe-1"/>'
+        result += '<span class="fw-bold">' + _("Warning") + ": " + str(warning_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(warning_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-3 text-center text-uppercase text-success">'
+        result += '<span class="fa fa-check text-success pe-1"/>'
+        result += '<span class="fw-bold">' + _("Success") + ": " + str(success_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(success_rate) + '</span>'
+        result += '</div>'
+        result += '<div class="col-3 text-center text-uppercase text-info">'
+        result += '<span class="fa fa-info-circle text-info pe-1"/>'
+        result += '<span class="fw-bold">' + _("Information") + ": " + str(info_count) + '</span>'
+        # result += '<span class="fst-italic ps-1 text-muted">' + str(info_rate) + '</span>'
+        result += '</div>'
+        result += '</div>'  # div row END
+        ## TABLE BEGIN
+        result += '<table class="table table-bordered table-sm" style="width:100%;">'
+        ## THEAD BEGIN
+        result += '<thead>'
+        ### TH COLUMN NAMES
+        result += '<tr>'
+        result += '<th class="text-center" style="width:10%;">'
+        result += _("Result")  # Result (eg: error, info, ok, other, warning)
+        result += '</th>'
+        result += '<th class="text-center" style="width:10%;">'
+        result += _("Code")  # Code
+        result += '</th>'
+        result += '<th class="text-center" style="width:80%;">'
+        result += _("Description")  # Description
+        result += '</th>'
+        result += '</tr>'
+        ## THEAD END
+        result += '</thead>'
+        ## TBODY BEGIN
+        result += '<tbody>'
+        ### 1) errors
+        for error_item in error_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-exclamation-circle text-danger me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += error_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += error_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ### 2) warnings
+        for warning_item in warning_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-exclamation-triangle text-warning me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += warning_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += warning_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ### 3) success
+        for success_item in success_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-check text-success me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += success_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += success_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ### 4) info
+        for info_item in info_list:
+            result += '<tr>'
+            result += '<td class="text-center">'
+            result += '<span class="fa fa-info-circle text-info me-2"/>'
+            result += '</td>'
+            result += '<td>'
+            result += info_item.get('code', "-")
+            result += '</td>'
+            result += '<td>'
+            result += info_item.get('description', "-")
+            result += '</td>'
+            result += '<tr>'
+        ## TBODY END
+        result += '</tbody>'
+        ## TABLE END
+        result += '</table>'
 
         # Return result
         return result

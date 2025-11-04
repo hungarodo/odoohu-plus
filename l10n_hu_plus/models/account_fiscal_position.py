@@ -10,7 +10,7 @@ from odoo import _, api, exceptions, fields, models  # alphabetically ordered
 
 
 # Class
-class L10nHuPlusFiscalPosition(models.Model):
+class L10nHuPlusAccountFiscalPosition(models.Model):
     # Private attributes
     _inherit = 'account.fiscal.position'
 

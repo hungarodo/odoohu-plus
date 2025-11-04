@@ -34,22 +34,25 @@
                     </div>
                     <div name="l10n_hu_banner_end" class="d-inline float-end">
                         <span name="l10n_hu_update_fields" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'draft'">
-                            <button name="action_l10n_hu_update_fields" class="btn-primary" data-hotkey="shift+w" icon="fa-bolt" title="Update fields" type="object"/>
+                            <button name="action_l10n_hu_update_fields" class="btn-primary" data-hotkey="d" icon="fa-bolt" title="Update fields" type="object"/>
+                        </span>
+                        <span name="l10n_hu_uncheck" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'posted' or not checked">
+                            <button name="action_l10n_hu_uncheck" class="btn-secondary text-success" data-hotkey="d" icon="fa-check-square-o" title="Set to not checked" type="object"/>
                         </span>
                         <span name="l10n_hu_hu_wizard_accounting" class="ms-2" groups="l10n_hu_plus.user_group" invisible="state != 'draft'">
-                            <button name="action_l10n_hu_wizard_accounting" class="btn-secondary" data-hotkey="a" icon="fa-book" title="Accounting" type="object"/>
+                            <button name="action_l10n_hu_wizard_accounting" class="btn-secondary" data-hotkey="f" icon="fa-book" title="Accounting" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_error" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'error'">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-danger" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-danger" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_info" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status not in [False, 'other']">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-info" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-info" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_success" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status not in ['closed', 'ok']">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-success" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-success" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <span name="l10n_hu_plus_status_warning" class="ms-2" groups="l10n_hu_plus.user_group" invisible="l10n_hu_plus_status != 'warning'">
-                            <button name="action_l10n_hu_wizard_check_status" class="btn-warning text-white" data-hotkey="y" icon="fa-heartbeat" title="Check status" type="object"/>
+                            <button name="action_l10n_hu_wizard_check_status" class="btn-warning text-white" data-hotkey="e" icon="fa-heartbeat" title="Check status" type="object"/>
                         </span>
                         <div name="l10n_hu_banner_dropdown" class="btn-group ms-2">
                             <a id="l10nHuDropdownMenuLink" name="l10n_hu_banner_dropdown_button" class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -60,9 +63,6 @@
                                     <button name="action_l10n_hu_send_proforma" class="dropdown-item" icon="fa-send" string="Proforma Send" type="object"/>
                                 </li>
                                 <li name="l10n_hu_send_proforma_divider" class="dropdown-divider" invisible="state != 'draft' or not l10n_hu_proforma_sequence"/>
-                                <li name="l10n_hu_wizard_currency_exchange" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
-                                    <button name="action_l10n_hu_wizard_currency_exchange" class="dropdown-item" icon="fa-calculator" string="Currency Exchange" type="object"/>
-                                </li>
                                 <li name="l10n_hu_view_currency_rates" groups="l10n_hu_plus.user_group" invisible="currency_id == company_currency_id">
                                     <button name="action_l10n_hu_view_currency_rates" class="dropdown-item" icon="fa-area-chart" string="Currency Rates" type="object"/>
                                 </li>
@@ -83,15 +83,42 @@
                     </div>
                 </div>
             </xpath>
+            <!-- HU+ invoice currency rate inverse -->
+            <xpath expr="//div[@name='currency_conversion_div']" position="after">
+                <div name="l10n_hu_invoice_currency_rate_inverse_div" class="d-flex gap-1 text-muted" invisible="currency_id == company_currency_id or l10n_hu_company_currency_name != 'HUF'">
+                    <span>1</span>
+                    <field name="currency_id" readonly="True" options="{'no_open': True}" class="w-auto"/>
+                    <span>=</span>
+                    <field name="l10n_hu_invoice_currency_rate_inverse" digits="[12,2]" readonly="state != 'draft'"/>
+                    <field name="company_currency_id" readonly="True" options="{'no_open': True}" class="w-auto"/>
+                </div>
+            </xpath>
             <!-- HU+ fields -->
             <xpath expr="//page[@name='aml_tab']" position="after">
                 <page name="l10n_hu_plus" invisible="not l10n_hu_plus_enabled" string="HU+">
                     <group name="l10n_hu_plus">
                         <group name="l10n_hu_plus_1" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
-                            <!-- Document type -->
-                            <field name="l10n_hu_document_type" domain="[('company', '=', company_id), ('tag_type', '=', 'document_type')]" options="{'no_create': True,}" readonly="state != 'draft' and checked" string="Document Type"/>
+                            <!-- Document type-->
+                            <field name="l10n_hu_document_type" domain="[('company', '=', company_id), ('tag_type', '=', 'document_type')]" options="{'no_create': True,}" placeholder="Document type..." readonly="state != 'draft' and checked" string="Document Type"/>
                             <field name="l10n_hu_document_type_code" invisible="1"/>
                             <field name="l10n_hu_document_type_technical_name" invisible="1"/>
+                            <!-- Document HUF -->
+                            <label name="l10n_hu_document_huf_label" for="l10n_hu_document_vat_huf" invisible="move_type not in ['in_invoice', 'in_refund']" string="Document HUF"/>
+                            <div name="l10n_hu_document_huf_div"  invisible="move_type not in ['in_invoice', 'in_refund']">
+                                <div name="l10n_hu_document_huf_div_1" class="d-flex gap-1 justify-content-start">
+                                    <field name="l10n_hu_document_net_huf" class="text-muted w-auto"/>
+                                    <span class="text-muted w-auto">+</span>
+                                    <field name="l10n_hu_document_vat_huf" class="w-auto" readonly="state != 'draft' and checked"/>
+                                    <span class="text-muted w-auto">=</span>
+                                    <field name="l10n_hu_document_gross_huf" class="text-muted w-auto"/>
+                                </div>
+                                <div name="l10n_hu_document_huf_div_2" class="d-flex gap-1 justify-content-start" invisible="currency_id == company_currency_id or move_type not in ['in_invoice', 'in_refund']">
+                                    <field name="l10n_hu_document_rate" class="text-muted w-auto" digits="[12,2]"/>
+                                    <field name="company_currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
+                                    <span class="text-muted w-auto">/</span>
+                                    <field name="currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
+                                </div>
+                            </div>
                             <!-- Original invoice -->
                             <label name="l10n_hu_original_invoice" for="l10n_hu_original_invoice_number" invisible="l10n_hu_document_type_technical_name in ['invoice_normal']" string="Original Invoice Number"/>
                             <div name="l10n_hu_original_invoice" invisible="l10n_hu_document_type_technical_name in ['invoice_normal']">
@@ -99,32 +126,28 @@
                                 <field name="l10n_hu_original_invoice_number" class="oe_inline" invisible="reversed_entry_id" readonly="state != 'draft' and checked"/>
                                 <button name="action_l10n_hu_view_original_invoice" class="oe_inline btn-sm btn-link" icon="fa-folder-open" invisible="reversed_entry_id or not l10n_hu_original_invoice_number" string="View" type="object"/>
                             </div>
-                            <!-- Currency -->
-                            <field name="l10n_hu_company_currency_name" invisible="1"/>
-                            <label name="l10n_hu_accounting_rate" for="l10n_hu_currency_rate" string="Accounting Rate"/>
-                            <div name="currency_exchange_ignored" class="fst-italic text-muted" invisible="currency_id != company_currency_id">
-                                This document uses the company currency
-                            </div>
-                            <div name="l10n_hu_accounting_rate" invisible="currency_id == company_currency_id">
-                                <field name="l10n_hu_currency_rate" class="oe_inline"/>
-                                <field name="l10n_hu_currency_name" class="oe_inline ps-2 pe-2"/>
-                                <field name="l10n_hu_currency_date" class="oe_inline"/>
-                            </div>
-                            <label name="l10n_hu_document_rate" for="l10n_hu_document_rate" invisible="currency_id == company_currency_id" string="Document Rate"/>
-                            <div name="l10n_hu_document_rate" invisible="currency_id == company_currency_id">
-                                <field name="l10n_hu_document_rate" class="oe_inline" readonly="(state != 'draft' and checked) or currency_id == company_currency_id"/>
-                                <field name="l10n_hu_document_rate_difference" class="oe_inline ms-2 fst-italic text-muted" invisible="currency_id == company_currency_id"/>
-                            </div>
-                            <field name="l10n_hu_huf_rate" invisible="l10n_hu_company_currency_name == 'HUF'" string="HUF Rate"/>
-                            <div name="l10n_hu_currency_actions" colspan="2" invisible="l10n_hu_banner_enabled or (l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF')">
-                                <button name="action_l10n_hu_wizard_currency_exchange" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-calculator" invisible="state != 'draft' and checked" string="Currency Exchange" type="object"/>
-                                <button name="action_l10n_hu_view_currency_rates" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
+                            <!-- Delivery period -->
+                            <label name="l10n_hu_delivery_period_label" for="l10n_hu_delivery_period_start" string="Delivery Period"/>
+                            <div name="l10n_hu_delivery_period_div" class="d-flex d-row gap-1 justify-content-start">
+                                <field name="l10n_hu_delivery_period_start" class="text-end w-25" placeholder="Start date..." readonly="state != 'draft' and checked"/>
+                                <span class="text-muted w-auto">-</span>
+                                <field name="l10n_hu_delivery_period_end" class="text-start w-25" placeholder="End date..." readonly="state != 'draft' and checked"/>
                             </div>
                             <!-- Proforma -->
-                            <field name="l10n_hu_proforma_name" invisible="l10n_hu_journal_type not in ['purchase', 'sale'] or (l10n_hu_journal_type == 'sale' and not l10n_hu_proforma_sequence)" readonly="state != 'draft' and checked" string="Proforma Name"/>
-                            <field name="l10n_hu_proforma_date" invisible="l10n_hu_journal_type not in ['purchase', 'sale'] or (l10n_hu_journal_type == 'sale' and not l10n_hu_proforma_sequence)" readonly="state != 'draft' and checked" string="Proforma Date"/>
-                            <div name="l10n_hu_proforma_actions" colspan="2" invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence or l10n_hu_banner_enabled">
-                                <button name="action_l10n_hu_send_proforma" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-send" invisible="state != 'draft' or not l10n_hu_proforma_sequence" string="Proforma Send" type="object"/>
+                            <label name="l10n_hu_proforma_label" for="l10n_hu_proforma_name" invisible="l10n_hu_journal_type == 'sale' and not l10n_hu_proforma_sequence" string="Proforma"/>
+                            <div name="l10n_hu_proforma_div" class="d-flex d-row gap-1 justify-content-start" invisible="l10n_hu_journal_type == 'sale' and not l10n_hu_proforma_sequence">
+                                <field name="l10n_hu_proforma_name" class="w-auto" placeholder="Proforma name..." readonly="state != 'draft' and checked"/>
+                                <field name="l10n_hu_proforma_date" class="w-auto" placeholder="Proforma date..." readonly="state != 'draft' and checked"/>
+                                <div name="l10n_hu_proforma_actions" invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence or l10n_hu_banner_enabled">
+                                    <button name="action_l10n_hu_send_proforma" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-send" invisible="state != 'draft' or not l10n_hu_proforma_sequence" string="Proforma Send" type="object"/>
+                                </div>
+                            </div>
+                            <!-- Currency -->
+                            <field name="l10n_hu_company_currency_name" invisible="1"/>
+                            <field name="l10n_hu_huf_currency" invisible="1"/>
+                            <field name="l10n_hu_huf_rate" invisible="l10n_hu_company_currency_name == 'HUF'"/>
+                            <div name="l10n_hu_currency_actions" colspan="2" invisible="l10n_hu_banner_enabled or (l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF')">
+                                <button name="action_l10n_hu_view_currency_rates" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
                             </div>
                             <!-- HU+ Tags -->
                             <field name="l10n_hu_plus_tag" context="{'default_tag_type': 'account_move'}" domain="[('company', '=', company_id), ('tag_type', 'in', ['account_move', 'general'])]" groups="l10n_hu_plus.user_group" invisible="l10n_hu_banner_enabled" options="{'color_field': 'color'}" string="Tags" widget="many2many_tags"/>
@@ -143,16 +166,9 @@
                         </group>
                         <group name="l10n_hu_plus_2" invisible="l10n_hu_journal_type not in ['purchase', 'sale']">
                             <!-- VAT -->
-                            <field name="l10n_hu_cash_accounting" force_save="1" readonly="state != 'draft' and checked" string="Cash Accounting"/>
-                            <field name="l10n_hu_vat_date" readonly="state != 'draft' and checked" string="VAT Date"/>
                             <field name="l10n_hu_vat_status" readonly="state != 'draft' and checked" string="VAT Status"/>
-                        </group>
-                        <!-- Delivery period -->
-                        <group name="l10n_hu_delivery_period" string="Delivery Period">
-                            <field name="l10n_hu_delivery_period_start" placeholder="Start date..." readonly="state != 'draft' and checked" string="Period Start"/>
-                            <field name="l10n_hu_delivery_period_end" placeholder="End date..." readonly="state != 'draft' and checked" string="Period End"/>
-                            <field name="l10n_hu_delivery_period_summary" class="fst-italic text-muted" invisible="1"/>
-                            <field name="l10n_hu_delivery_period_legal" class="fst-italic text-muted" invisible="l10n_hu_journal_type != 'sale' or l10n_hu_delivery_period_legal in [False, '']"/>
+                            <field name="l10n_hu_vat_date" readonly="state != 'draft' and checked" string="VAT Date"/>
+                            <field name="l10n_hu_cash_accounting" force_save="1" readonly="state != 'draft' and checked" string="Cash Accounting"/>
                         </group>
                         <!-- Partner -->
                         <group name="l10n_hu_plus_partner" invisible="l10n_hu_journal_type not in ['purchase', 'sale']" string="Partner">

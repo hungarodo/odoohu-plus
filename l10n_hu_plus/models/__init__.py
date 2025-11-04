@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from . import account_cash_rounding
 from . import account_fiscal_position
 from . import account_journal
 from . import account_move
