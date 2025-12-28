@@ -9,6 +9,7 @@ from odoo import _, api, exceptions, fields, models, tools  # alphabetically ord
 
 # 3 : imports from odoo modules
 from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L10nHuEdiConnection, L10nHuEdiConnectionError
+from odoo.tools import formatLang
 
 # 4 : variable declarations
 
@@ -644,6 +645,26 @@ class L10nHuPlusAccountMove(models.Model):
         if (self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted'
                 and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled'):
             result = []
+        return result
+
+    def _l10n_hu_get_invoice_totals_for_report(self):
+        """ Super for original method in l10n_hu_edi app
+
+        NOTES:
+        - super result is a dictionary
+        - we manage here the case when accounting is not done in HUF but accounting country is HU
+        """
+        # Execute super
+        result = super()._l10n_hu_get_invoice_totals_for_report()
+
+        # HUF VAT amount currency rate
+        if (self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name != 'HUF'
+                and self.company_id.account_fiscal_country_id.code == 'HU'):
+            currency_huf = self.env.ref('base.HUF')
+            result['total_vat_amount_in_huf'] = result['total_vat_amount_in_huf'] * self.l10n_hu_huf_rate
+            result['formatted_total_vat_amount_in_huf'] = formatLang(
+                self.env, result['total_vat_amount_in_huf'], currency_obj=currency_huf
+            )
         return result
 
     ## HU+ CRON
@@ -1343,7 +1364,7 @@ class L10nHuPlusAccountMove(models.Model):
         ### Company HUF
         if company_currency.name == 'HUF':
             huf_rate = 1.0
-            debug_list.append("huf_rate is 1.0 for company HUF")
+            debug_list.append("huf_rate is 1.0 for HUF company currency")
         ## Company NOT HUF
         elif company_currency.name != 'HUF' and currency_rate_date:
             huf_rate_rcr = self.env['res.currency.rate'].search([
@@ -1351,9 +1372,10 @@ class L10nHuPlusAccountMove(models.Model):
                 ('currency_id', '=', huf_currency.id),
                 ('name', '<=', currency_rate_date)
             ], limit=1)
-            if huf_rate_rcr:
-                huf_rate = huf_rate_rcr.company_rate
-                debug_list.append("huf_rate found for company NOT HUF")
+            if huf_rate_rcr and accounting_rcr:
+                # NOTE: we need to calculate HUF rate compared to the invoice currency, not the accounting currency
+                huf_rate = huf_rate_rcr.company_rate * accounting_rcr.inverse_company_rate
+                debug_list.append(f"huf_rate set for NOT HUF company currency: {huf_rate}")
             else:
                 error_list.append("huf_rate not found")
         else:
@@ -1420,7 +1442,7 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_plus_get_rate_data" + "\n" + str(result))
+        # raise exceptions.UserError(f"l10n_hu_plus_get_rate_data\n{result}")
         return result
 
     @api.model
