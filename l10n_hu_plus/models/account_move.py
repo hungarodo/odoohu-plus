@@ -657,14 +657,19 @@ class L10nHuPlusAccountMove(models.Model):
         # Execute super
         result = super()._l10n_hu_get_invoice_totals_for_report()
 
-        # HUF VAT amount currency rate
+        # HU+
         if (self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name != 'HUF'
                 and self.company_id.account_fiscal_country_id.code == 'HU'):
+            # HUF VAT amount currency rate
             currency_huf = self.env.ref('base.HUF')
             result['total_vat_amount_in_huf'] = result['total_vat_amount_in_huf'] * self.l10n_hu_huf_rate
             result['formatted_total_vat_amount_in_huf'] = formatLang(
                 self.env, result['total_vat_amount_in_huf'], currency_obj=currency_huf
             )
+            # Hide tax detail table in company currency
+            result['display_in_company_currency'] = False
+
+        # Return result
         return result
 
     ## HU+ CRON
