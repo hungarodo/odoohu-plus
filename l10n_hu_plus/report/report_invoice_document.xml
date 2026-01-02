@@ -62,7 +62,7 @@
                 <span t-field="o.l10n_hu_invoice_currency_rate_date" class="ms-1"/>
             </div>
             <!-- HUF rate -->
-            <div name="l10n_hu_huf_rate" class="mb-3" t-if="o.company_currency_id.name != 'HUF' and o.company_id.account_fiscal_country_id.code == 'HU'">
+            <div name="l10n_hu_huf_rate" class="mb-3" t-if="o.company_currency_id.name != 'HUF' and o.currency_id.name != 'HUF' and o.company_id.account_fiscal_country_id.code == 'HU'">
                 HUF Rate:
                 <span t-field="o.l10n_hu_huf_rate" class="ms-1 me-1" t-options="{'widget': 'float', 'precision': 2}"/>
                 HUF/

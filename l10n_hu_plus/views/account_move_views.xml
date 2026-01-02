@@ -112,9 +112,9 @@
                                     <span class="text-muted w-auto">=</span>
                                     <field name="l10n_hu_document_gross_huf" class="text-muted w-auto"/>
                                 </div>
-                                <div name="l10n_hu_document_huf_div_2" class="d-flex gap-1 justify-content-start" invisible="currency_id == company_currency_id or move_type not in ['in_invoice', 'in_refund']">
+                                <div name="l10n_hu_document_huf_div_2" class="d-flex gap-1 justify-content-start">
                                     <field name="l10n_hu_document_rate" class="text-muted w-auto" digits="[12,2]"/>
-                                    <field name="company_currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
+                                    <field name="l10n_hu_huf_currency" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
                                     <span class="text-muted w-auto">/</span>
                                     <field name="currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
                                 </div>
@@ -144,7 +144,6 @@
                             </div>
                             <!-- Currency -->
                             <field name="l10n_hu_company_currency_name" invisible="1"/>
-                            <field name="l10n_hu_huf_currency" invisible="1"/>
                             <field name="l10n_hu_huf_rate" invisible="l10n_hu_company_currency_name == 'HUF'"/>
                             <div name="l10n_hu_currency_actions" colspan="2" invisible="l10n_hu_banner_enabled or (l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF')">
                                 <button name="action_l10n_hu_view_currency_rates" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
