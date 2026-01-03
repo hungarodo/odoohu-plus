@@ -1844,7 +1844,7 @@ class L10nHuPlusAccountMove(models.Model):
         # HU+6: taxes
         no_tax_lines = []
         for line in self.invoice_line_ids:
-            if line.product_id and not line.tax_ids:
+            if line.account_id and not line.tax_ids:
                 no_tax_lines.append(line)
         if len(no_tax_lines) == 0:
             success_list.append({
