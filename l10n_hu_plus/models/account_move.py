@@ -1176,12 +1176,15 @@ class L10nHuPlusAccountMove(models.Model):
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
         elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
             l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
+            debug_list.append(f"document rate vendor bill VAT HUF != 0 and amount_tax != 0: {l10n_hu_document_rate}")
         elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total != 0
               and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
             l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
+            debug_list.append(f"document rate vendor bill HUF company amount total!=0: {l10n_hu_document_rate}")
         elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0
               and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
             l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
+            debug_list.append(f"document rate vendor bill HUF company HUF ccy amount_total==0: {l10n_hu_document_rate}")
         else:
             l10n_hu_document_rate = 1.0
         l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
@@ -1379,12 +1382,12 @@ class L10nHuPlusAccountMove(models.Model):
         ## HU+ huf_rate
         # NOTE: we need 4 digits precision to keep computed amounts close to what is displayed on the PDF
         huf_rate = 0.0000
-        ### Company HUF
-        if company_currency.name == 'HUF':
+        ### Company HUF AND invoice HUF
+        if company_currency.name == 'HUF' and invoice_currency.name == 'HUF':
             huf_rate = 1.0000
-            debug_list.append("huf_rate is 1.0000 for HUF company currency")
-        ## Company NOT HUF
-        elif company_currency.name != 'HUF' and currency_rate_date:
+            debug_list.append("huf_rate is 1.0000 for HUF invoice currency and HUF company currency")
+        ## Company NOT HUF or invoice NOT HUF
+        elif (company_currency.name != 'HUF' or invoice_currency.name != 'HUF') and currency_rate_date:
             huf_rate_rcr = self.env['res.currency.rate'].search([
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', huf_currency.id),
