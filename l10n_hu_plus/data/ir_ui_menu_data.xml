@@ -3,7 +3,7 @@
     <!-- HU+ -->
     <record id="hu_plus_menu" model="ir.ui.menu">
         <field name="name">HU+</field>
-        <field name="groups_id" eval="[(4, ref('l10n_hu_plus.user_group'))]"/>
+        <field name="group_ids" eval="[(4, ref('l10n_hu_plus.user_group'))]"/>
         <field name="sequence">3636</field>
         <field name="web_icon">l10n_hu_plus,static/description/l10n_hu_plus_menu.png</field>
     </record>
@@ -77,7 +77,7 @@
     <!-- HU+ > Reporting > Technical -->
     <record id="reporting_technical_menu" model="ir.ui.menu">
         <field name="name">Technical</field>
-        <field name="groups_id" eval="[(4, ref('l10n_hu_plus.manager_group'))]"/>
+        <field name="group_ids" eval="[(4, ref('l10n_hu_plus.manager_group'))]"/>
         <field name="parent_id" ref="reporting_menu"/>
         <field name="sequence">96</field>
     </record>
@@ -221,7 +221,7 @@
     <!-- HU+ > Configuration > Technical -->
     <record id="configuration_technical_menu" model="ir.ui.menu">
         <field name="name">Technical</field>
-        <field name="groups_id" eval="[(4, ref('l10n_hu_plus.manager_group'))]"/>
+        <field name="group_ids" eval="[(4, ref('l10n_hu_plus.manager_group'))]"/>
         <field name="parent_id" ref="configuration_menu"/>
         <field name="sequence">128</field>
     </record>

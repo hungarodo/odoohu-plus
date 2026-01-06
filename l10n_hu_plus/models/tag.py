@@ -62,7 +62,7 @@ class L10nHuPlusTag(models.Model):
         tracking=True,
     )
     name = fields.Char(
-        index=True,
+        index="trigram",
         required=True,
         string="Name",
         translate=True,

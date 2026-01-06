@@ -31,15 +31,16 @@ class L10nHuPlusAccountMoveLine(models.Model):
         string="HU Price Refund",
     )
     l10n_hu_move_trade_position = fields.Selection(
-        related='move_id.l10n_hu_trade_position',
         index=True,
-        store=True,
+        selection=[
+            ('domestic', "Domestic"),
+            ('eu', "EU"),
+            ('other', "Other"),
+        ],
         string="HU Trade Position",
     )
     l10n_hu_move_vat_date = fields.Date(
-        related='move_id.l10n_hu_vat_date',
         index=True,
-        store=True,
         string="HU VAT Date",
     )
     l10n_hu_vat_reason = fields.Char(

@@ -18,9 +18,7 @@ class L10nHuPlusResCompany(models.Model):
 
     # Default methods
 
-    # Field declarations    
-    check_account_audit_trail = fields.Boolean(default=True)
-
+    # Field declarations
     ## API
     l10n_hu_plus_api_enabled = fields.Boolean(
         copy=False,
@@ -664,7 +662,7 @@ class L10nHuPlusResCompany(models.Model):
                 info_list.append(_("Document type configuration skipped"))
             # 2) AUDIT TRAIL
             if values.get('audit_trail'):
-                company.write({'check_account_audit_trail': True})
+                company.write({'restrictive_audit_trail': True})
                 operations.append({'model_name': 'res.company', 'record_id': company.id, 'operation': 'write'})
                 success_list.append(_("Audit trail configured"))
             else:

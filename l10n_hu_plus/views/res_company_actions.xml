@@ -3,7 +3,7 @@
     <!-- Window action -->
     <record id="res_company_action" model="ir.actions.act_window">
         <field name="name">Companies</field>
-        <field name="domain">[('country_code', '=', 'HU')]</field>
+        <field name="domain">[('account_fiscal_country_id.code', '=', 'HU')]</field>
         <field name="res_model">res.company</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">list,kanban,form</field>

@@ -8,9 +8,11 @@
         <field name="priority">36</field>
         <field name="arch" type="xml">
             <!-- HU field -->
-            <xpath expr="//field[@name='rounding']" position="after">
-                <field name="l10n_hu_plus_api_enabled" string="HU+ API" widget="boolean_toggle"/>
-                <field name="l10n_hu_plus_technical_name" string="HU+ Technical Name"/>
+            <xpath expr="//group[@name='uom_details']" position="after">
+                <group name="l10n_hu_plus" string="HU+">
+                    <field name="l10n_hu_plus_api_enabled" string="HU+ API" widget="boolean_toggle"/>
+                    <field name="l10n_hu_plus_technical_name" string="HU+ Technical Name"/>
+                </group>
             </xpath>
         </field>
     </record>
@@ -22,7 +24,7 @@
         <field name="priority">36</field>
         <field name="arch" type="xml">
             <!-- HU field -->
-            <xpath expr="//field[@name='uom_type']" position="after">
+            <xpath expr="//field[@name='relative_uom_id']" position="after">
                 <field name="l10n_hu_plus_api_enabled" string="HU+ API" optional="hide"/>
                 <field name="l10n_hu_plus_technical_name" optional="hide" string="HU+ Technical Name"/>
             </xpath>

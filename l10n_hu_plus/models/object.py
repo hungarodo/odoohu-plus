@@ -75,7 +75,7 @@ class L10nHuPlusObject(models.Model):
     )
     html_content = fields.Html(
         copy=False,
-        index=True,
+        index="trigram",
         sanitize_attributes=False,
         sanitize_form=False,
         string="HTML Content",
@@ -98,7 +98,7 @@ class L10nHuPlusObject(models.Model):
     )
     name = fields.Char(
         copy=False,
-        index=True,
+        index="trigram",
         string="Name",
         translate=True,
     )
