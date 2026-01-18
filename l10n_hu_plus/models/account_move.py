@@ -1164,14 +1164,23 @@ class L10nHuPlusAccountMove(models.Model):
 
         ### CUSTOMER INVOICE - we issued it (Odoo or externally) so we must use accounting
         if self.move_type in ['out_invoice', 'out_refund']:
-            # Currency rate not 0 and HUF accounting
-            if self.invoice_currency_rate != 0 and self.company_id.currency_id.name == 'HUF':
+            # HUF invoice and HUF accounting
+            if self.currency_id.name == 'HUF' and self.company_id.currency_id.name == 'HUF':
+                l10n_hu_document_rate = 1.0
+                l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
+            # NOT HUF invoice and HUF accounting
+            elif (self.currency_id.name != 'HUF' and self.company_id.currency_id.name == 'HUF'
+                    and self.invoice_currency_rate != 0):
                 l10n_hu_document_rate = 1 / self.invoice_currency_rate
                 l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
-            # Currency rate not 0 and NOT HUF accounting
-            elif self.invoice_currency_rate != 0 and self.company_id.currency_id.name != 'HUF':
+            # HUF invoice and NOT HUF accounting
+            elif self.currency_id.name == 'HUF' and self.company_id.currency_id.name != 'HUF':
                 l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
-                l10n_hu_document_vat_huf = abs(self.amount_tax_signed) * l10n_hu_document_rate
+                l10n_hu_document_vat_huf = abs(self.amount_tax) * l10n_hu_document_rate
+            # NOT HUF invoice and NOT HUF accounting
+            elif self.currency_id.name != 'HUF' and self.company_id.currency_id.name != 'HUF':
+                l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
+                l10n_hu_document_vat_huf = abs(self.amount_tax) * l10n_hu_document_rate
             else:
                 pass
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
