@@ -37,7 +37,7 @@ class L10nHuPlusIrAttachment(models.Model):
             attachment.res_model == 'account.move'
             and attachment.res_id
             and attachment.raw
-            and attachment.company_id.check_account_audit_trail
+            and attachment.company_id.restrictive_audit_trail
             and guess_mimetype(attachment.raw) in (
                 'application/pdf',
                 'application/xml',
@@ -73,7 +73,7 @@ class L10nHuPlusIrAttachment(models.Model):
             attachment.res_model == 'account.move'
             and attachment.res_id
             and attachment.res_field in ('invoice_pdf_report_file', 'ubl_cii_xml_file')
-            and attachment.company_id.check_account_audit_trail
+            and attachment.company_id.restrictive_audit_trail
             and attachment.company_id.account_fiscal_country_id.code == 'HU'
         )
         if invoice_pdf_attachments:
