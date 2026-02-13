@@ -103,8 +103,8 @@
                             <field name="l10n_hu_document_type_code" invisible="1"/>
                             <field name="l10n_hu_document_type_technical_name" invisible="1"/>
                             <!-- Document HUF -->
-                            <label name="l10n_hu_document_huf_label" for="l10n_hu_document_vat_huf" invisible="move_type not in ['in_invoice', 'in_refund']" string="Document HUF"/>
-                            <div name="l10n_hu_document_huf_div"  invisible="move_type not in ['in_invoice', 'in_refund']">
+                            <label name="l10n_hu_document_huf_label" for="l10n_hu_document_vat_huf" string="Document HUF"/>
+                            <div name="l10n_hu_document_huf_div">
                                 <div name="l10n_hu_document_huf_div_1" class="d-flex gap-1 justify-content-start">
                                     <field name="l10n_hu_document_net_huf" class="text-muted w-auto"/>
                                     <span class="text-muted w-auto">+</span>
@@ -118,6 +118,12 @@
                                     <span class="text-muted w-auto">/</span>
                                     <field name="currency_id" class="text-muted w-auto" options="{'no_open': True}" readonly="True"/>
                                 </div>
+                            </div>
+                            <!-- Currency -->
+                            <field name="l10n_hu_company_currency_name" invisible="1"/>
+                            <field name="l10n_hu_huf_rate" invisible="l10n_hu_company_currency_name == 'HUF'"/>
+                            <div name="l10n_hu_currency_actions" colspan="2" invisible="l10n_hu_banner_enabled or (l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF')">
+                                <button name="action_l10n_hu_view_currency_rates" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
                             </div>
                             <!-- Original invoice -->
                             <label name="l10n_hu_original_invoice" for="l10n_hu_original_invoice_number" invisible="l10n_hu_document_type_technical_name in ['invoice_normal']" string="Original Invoice Number"/>
@@ -141,12 +147,6 @@
                                 <div name="l10n_hu_proforma_actions" invisible="l10n_hu_journal_type != 'sale' or not l10n_hu_proforma_sequence or l10n_hu_banner_enabled">
                                     <button name="action_l10n_hu_send_proforma" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-send" invisible="state != 'draft' or not l10n_hu_proforma_sequence" string="Proforma Send" type="object"/>
                                 </div>
-                            </div>
-                            <!-- Currency -->
-                            <field name="l10n_hu_company_currency_name" invisible="1"/>
-                            <field name="l10n_hu_huf_rate" invisible="l10n_hu_company_currency_name == 'HUF'"/>
-                            <div name="l10n_hu_currency_actions" colspan="2" invisible="l10n_hu_banner_enabled or (l10n_hu_company_currency_name == 'HUF' and l10n_hu_currency_name == 'HUF')">
-                                <button name="action_l10n_hu_view_currency_rates" class="btn-secondary m-1" groups="l10n_hu_plus.user_group" icon="fa-area-chart" string="Currency Rates" type="object"/>
                             </div>
                             <!-- HU+ Tags -->
                             <field name="l10n_hu_plus_tag" context="{'default_tag_type': 'account_move'}" domain="[('company', '=', company_id), ('tag_type', 'in', ['account_move', 'general'])]" groups="l10n_hu_plus.user_group" invisible="l10n_hu_banner_enabled" options="{'color_field': 'color'}" string="Tags" widget="many2many_tags"/>
