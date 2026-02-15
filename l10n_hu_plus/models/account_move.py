@@ -1160,34 +1160,38 @@ class L10nHuPlusAccountMove(models.Model):
         huf_rounding = huf_currency.decimal_places
         l10n_hu_document_rate = 1.0
         l10n_hu_document_vat_huf = values.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
+        if self.move_type in ['in_refund', 'out_refund'] and l10n_hu_document_vat_huf > 0:
+            l10n_hu_document_vat_huf = l10n_hu_document_vat_huf * -1
         rate_rounding = 2
 
         ### CUSTOMER INVOICE - we issued it (Odoo or externally) so we must use accounting
         if self.move_type in ['out_invoice', 'out_refund']:
+            amount_sign = -1 if self.move_type == 'out_refund' else 1
             # HUF invoice and HUF accounting
             if self.currency_id.name == 'HUF' and self.company_id.currency_id.name == 'HUF':
                 l10n_hu_document_rate = 1.0
-                l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
+                l10n_hu_document_vat_huf = self.amount_tax_signed
             # NOT HUF invoice and HUF accounting
             elif (self.currency_id.name != 'HUF' and self.company_id.currency_id.name == 'HUF'
                     and self.invoice_currency_rate != 0):
                 l10n_hu_document_rate = 1 / self.invoice_currency_rate
-                l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
+                l10n_hu_document_vat_huf = self.amount_tax_signed
             # HUF invoice and NOT HUF accounting
             elif self.currency_id.name == 'HUF' and self.company_id.currency_id.name != 'HUF':
                 l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
-                l10n_hu_document_vat_huf = abs(self.amount_tax) * l10n_hu_document_rate
+                l10n_hu_document_vat_huf = self.amount_tax * l10n_hu_document_rate * amount_sign
             # NOT HUF invoice and NOT HUF accounting
             elif self.currency_id.name != 'HUF' and self.company_id.currency_id.name != 'HUF':
                 l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
-                l10n_hu_document_vat_huf = abs(self.amount_tax) * l10n_hu_document_rate
+                l10n_hu_document_vat_huf = self.amount_tax * l10n_hu_document_rate * amount_sign
             else:
                 pass
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
         elif self.move_type in ['in_invoice', 'in_refund']:
+            amount_sign = -1 if self.move_type == 'in_refund' else 1
             # amount_tax and is l10n_hu_document_vat_huf not 0
             if l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
-                l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
+                l10n_hu_document_rate = l10n_hu_document_vat_huf / self.amount_tax * amount_sign
                 debug_list.append(f"document rate vendor bill VAT HUF != 0 and amount_tax != 0: {l10n_hu_document_rate}")
             # amount_total not 0 and foreign ccy and HUF accounting
             elif self.amount_total != 0 and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
@@ -1204,16 +1208,16 @@ class L10nHuPlusAccountMove(models.Model):
             else:
                 pass
         else:
-            pass
+            amount_sign = 1
 
         # HUF document net and gross
-        l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
+        l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate * amount_sign
         l10n_hu_document_gross_huf = l10n_hu_document_vat_huf + l10n_hu_document_net_huf
 
         # HUF AMOUNT DIFF AND SUMMARY
-        accounting_amount_untaxed = abs(self.amount_untaxed_signed)
-        accounting_amount_tax = abs(self.amount_tax_signed)
-        accounting_amount_total = abs(self.amount_total_signed)
+        accounting_amount_untaxed = self.amount_untaxed * l10n_hu_document_rate * amount_sign
+        accounting_amount_tax = self.amount_tax * l10n_hu_document_rate * amount_sign
+        accounting_amount_total = self.amount_total * l10n_hu_document_rate * amount_sign
         huf_amount_diff = False
         huf_amount_gross_diff = 0
         huf_amount_net_diff = 0
@@ -1225,9 +1229,9 @@ class L10nHuPlusAccountMove(models.Model):
             if huf_amount_net_diff != 0 or huf_amount_vat_diff != 0 or huf_amount_gross_diff != 0:
                 huf_amount_diff = True
             huf_amount_summary = (f"{_('Document HUF amounts')}: "
-            f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed}-{self.l10n_hu_document_net_huf});"
-            f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax}-{self.l10n_hu_document_vat_huf});"
-            f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total}-{self.l10n_hu_document_gross_huf})")
+            f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed} - {self.l10n_hu_document_net_huf});"
+            f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax} - {self.l10n_hu_document_vat_huf});"
+            f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total} - {self.l10n_hu_document_gross_huf})")
         else:
             huf_amount_summary = (f"{_('Document HUF amounts')}: "
                                   f" {_('Net difference')} {huf_amount_net_diff} ({self.l10n_hu_document_net_huf});"
