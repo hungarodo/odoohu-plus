@@ -41,6 +41,11 @@ class L10nHuPlusResPartner(models.Model):
         copy=False,
         string="HU VPID",
     )
+    ## FELIR
+    l10n_hu_felir = fields.Char(
+        copy=False,
+        string="HU FELIR",
+    )
     ## FISCAL POSITION
     l10n_hu_incorporation = fields.Selection(
         copy=False,
