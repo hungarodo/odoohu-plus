@@ -66,7 +66,7 @@
     'depends': [  # Include only direct dependencies
         'l10n_hu_edi',
     ],
-    'description': "Hungarian localization improvements",
+    'description': "",
     'images': [  # Odoo Marketplace banner
         'static/description/l10n_hu_plus_banner.png',
     ],
