@@ -630,6 +630,14 @@ class L10nHuPlusAccountMove(models.Model):
                 'customerVatStatus': 'DOMESTIC'
             })
 
+        # Exchange rate override for manually modified rates
+        ## NOTES: l10n_hu_edi calculates exchangeRate from the rate table via _l10n_hu_get_currency_rate(), ignoring manual
+        ## rate changes.  When the user has modified invoice_currency_rate (differs from expected_currency_rate), we must use
+        ## the actual invoice rate (l10n_hu_invoice_currency_rate_inverse) in the NAV XML.
+        if (self.currency_id != self.company_id.currency_id
+                and self.invoice_currency_rate and self.invoice_currency_rate != self.expected_currency_rate):
+            result['exchangeRate'] = self.l10n_hu_invoice_currency_rate_inverse
+
         # Return result
         return result
 
