@@ -20,7 +20,7 @@ class L10nHuPlusAccountMove(models.Model):
     _inherit = 'account.move'
 
     # Default methods
-    
+
     # Field declarations
     ## ODOO
     invoice_pdf_report_id = fields.Many2one(
@@ -566,6 +566,33 @@ class L10nHuPlusAccountMove(models.Model):
 
     # Business methods
     ## SUPER
+    def _l10n_hu_get_currency_rate(self):
+        """Override: use manually modified invoice currency rate for NAV XML.
+
+        :return: currency conversion rate (invoice_ccy → HUF)
+        :rtype: float
+
+        The original l10n_hu_edi method always reads from the res.currency.rate table, ignoring manual rate changes on the invoice.  When
+        the user has manually modified invoice_currency_rate (i.e. it differs from expected_currency_rate), the NAV XML must reflect the
+        actual rate.
+
+        Guards:
+        - is_invoice: payment moves have no computed invoice_currency_rate
+        - company_currency == HUF: for non-HUF companies 1/invoice_currency_rate
+          gives invoice_ccy→company_ccy, NOT invoice_ccy→HUF
+        - currency != company_currency: HUF→HUF needs no rate
+        - invoice_currency_rate > 0: safety against division by zero
+        - invoice_currency_rate != expected_currency_rate: only override when
+          manually changed
+        """
+        if (self.is_invoice(include_receipts=True)
+                and self.company_id.currency_id == self.env.ref("base.HUF")
+                and self.currency_id != self.company_id.currency_id
+                and self.invoice_currency_rate
+                and self.invoice_currency_rate != self.expected_currency_rate):
+            return 1 / self.invoice_currency_rate
+        return super()._l10n_hu_get_currency_rate()
+
     def _get_invoice_currency_rate_date(self):
         self.ensure_one()
         result = super()._get_invoice_currency_rate_date()
@@ -629,14 +656,6 @@ class L10nHuPlusAccountMove(models.Model):
                 },
                 'customerVatStatus': 'DOMESTIC'
             })
-
-        # Exchange rate override for manually modified rates
-        ## NOTES: l10n_hu_edi calculates exchangeRate from the rate table via _l10n_hu_get_currency_rate(), ignoring manual
-        ## rate changes.  When the user has modified invoice_currency_rate (differs from expected_currency_rate), we must use
-        ## the actual invoice rate (l10n_hu_invoice_currency_rate_inverse) in the NAV XML.
-        if (self.currency_id != self.company_id.currency_id
-                and self.invoice_currency_rate and self.invoice_currency_rate != self.expected_currency_rate):
-            result['exchangeRate'] = self.l10n_hu_invoice_currency_rate_inverse
 
         # Return result
         return result
@@ -822,7 +841,7 @@ class L10nHuPlusAccountMove(models.Model):
         - some fields are computed by calling other methods
         - this method also prepares write operation compatible values for special hungarian fields
         - there should be no CRUD operation here, keep it in mind when using super()
-        
+
         :param values: dictionary
 
         :return: dictionary
@@ -1746,7 +1765,7 @@ class L10nHuPlusAccountMove(models.Model):
             }
             error_list.append(l10n_hu_edi_error)
         """
-        
+
         # HU+0: collect data using dedicated methods
         delivery_data = self.l10n_hu_plus_get_delivery_data({})
         document_data = self.l10n_hu_plus_get_document_data({})
