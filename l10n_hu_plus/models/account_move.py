@@ -590,6 +590,24 @@ class L10nHuPlusAccountMove(models.Model):
         # Execute super
         result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_invoice_values()
 
+        # fix invoice summary rounding: derive totals from per-VAT-rate values
+        # to avoid INCORRECT_SUMMARY_CALCULATION NAV warnings (see #76)
+        currency_huf = self.env.ref("base.HUF")
+        total_net = self.currency_id.round(
+            sum(tv["vatRateNetAmount"] for tv in result["tax_summary"])
+        )
+        total_net_huf = currency_huf.round(
+            sum(tv["vatRateNetAmountHUF"] for tv in result["tax_summary"])
+        )
+        total_vat = result["invoiceVatAmount"]
+        total_vat_huf = result["invoiceVatAmountHUF"]
+        result.update({
+            "invoiceNetAmount": total_net,
+            "invoiceNetAmountHUF": total_net_huf,
+            "invoiceGrossAmount": self.currency_id.round(total_net + total_vat),
+            "invoiceGrossAmountHUF": currency_huf.round(total_net_huf + total_vat_huf),
+        })
+
         # accounting_delivery_date
         if self.l10n_hu_delivery_period_start and self.l10n_hu_delivery_period_end:
             accounting_delivery_date = self.l10n_hu_delivery_period_end
