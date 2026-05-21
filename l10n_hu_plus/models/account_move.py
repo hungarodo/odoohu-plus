@@ -233,6 +233,12 @@ class L10nHuPlusAccountMove(models.Model):
             if move.country_code == 'HU':
                 move.show_delivery_date = True
 
+    @api.depends('delivery_date')
+    def _compute_invoice_currency_rate(self):
+        # EXTENDS 'account' — recompute invoice_currency_rate when delivery_date changes
+        # mirrors l10n_hu_edi's pattern for _compute_expected_currency_rate (see #77)
+        return super()._compute_invoice_currency_rate()
+
     ## HU+
     @api.depends('currency_id', 'invoice_date', 'delivery_date')
     def _compute_l10n_hu_currency(self):
