@@ -596,20 +596,36 @@ class L10nHuPlusAccountMove(models.Model):
         # Execute super
         result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_invoice_values()
 
-        # fix invoice summary rounding: derive totals from per-VAT-rate values
-        # to avoid INCORRECT_SUMMARY_CALCULATION NAV warnings (see #76)
+        # fix invoice summary rounding: derive all HUF totals from EUR values * NAV exchange rate
+        # to avoid INCORRECT_SUMMARY_CALCULATION / INCORRECT_SUMMARY_DATA NAV warnings (see #76)
+        # The original code uses -line.balance (Odoo's accounting rate) for vatRateVatAmountHUF,
+        # but the NAV validates: vatRateVatAmount * exchangeRate == vatRateVatAmountHUF
+        # When delivery_date rate ≠ invoice_date rate, these diverge.
         currency_huf = self.env.ref("base.HUF")
+        currency_rate = self._l10n_hu_get_currency_rate()
+        # recalculate vatRateVatAmountHUF from EUR VAT * NAV rate
+        for tax_vals in result["tax_summary"]:
+            tax_vals["vatRateVatAmountHUF"] = currency_huf.round(
+                tax_vals["vatRateVatAmount"] * currency_rate
+            )
+        # derive all summary totals from per-VAT-rate values
         total_net = self.currency_id.round(
             sum(tv["vatRateNetAmount"] for tv in result["tax_summary"])
         )
         total_net_huf = currency_huf.round(
             sum(tv["vatRateNetAmountHUF"] for tv in result["tax_summary"])
         )
-        total_vat = result["invoiceVatAmount"]
-        total_vat_huf = result["invoiceVatAmountHUF"]
+        total_vat = self.currency_id.round(
+            sum(tv["vatRateVatAmount"] for tv in result["tax_summary"])
+        )
+        total_vat_huf = currency_huf.round(
+            sum(tv["vatRateVatAmountHUF"] for tv in result["tax_summary"])
+        )
         result.update({
             "invoiceNetAmount": total_net,
             "invoiceNetAmountHUF": total_net_huf,
+            "invoiceVatAmount": total_vat,
+            "invoiceVatAmountHUF": total_vat_huf,
             "invoiceGrossAmount": self.currency_id.round(total_net + total_vat),
             "invoiceGrossAmountHUF": currency_huf.round(total_net_huf + total_vat_huf),
         })

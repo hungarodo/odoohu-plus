@@ -32,9 +32,18 @@ class TestNavInvoiceSummaryConsistency(L10nHuEdiTestCommon):
     def _assert_nav_summary_consistency(self, invoice_values: dict) -> None:
         """Assert that NAV summary totals are internally consistent with per-VAT-rate values.
 
+        Checks all conditions validated by NAV:
+        - invoiceNetAmount == sum(vatRateNetAmount)
+        - invoiceVatAmount == sum(vatRateVatAmount)
+        - vatRateVatAmount * exchangeRate == vatRateVatAmountHUF (per tax group)
+        - invoiceVatAmount * exchangeRate == invoiceVatAmountHUF
+        - invoiceGrossAmount == net + vat
+
         :param dict invoice_values: result of _l10n_hu_edi_get_invoice_values()
         """
         tax_summary = invoice_values["tax_summary"]
+        currency_huf = self.env.ref("base.HUF")
+        exchange_rate = invoice_values["exchangeRate"]
         sum_net = sum(tv["vatRateNetAmount"] for tv in tax_summary)
         sum_net_huf = sum(tv["vatRateNetAmountHUF"] for tv in tax_summary)
         sum_vat = sum(tv["vatRateVatAmount"] for tv in tax_summary)
@@ -47,8 +56,29 @@ class TestNavInvoiceSummaryConsistency(L10nHuEdiTestCommon):
             invoice_values["invoiceNetAmountHUF"], sum_net_huf,
             "invoiceNetAmountHUF must equal sum of vatRateNetAmountHUF values"
         )
+        self.assertEqual(
+            invoice_values["invoiceVatAmount"], invoice_values["invoice"].currency_id.round(sum_vat),
+            "invoiceVatAmount must equal sum of vatRateVatAmount values"
+        )
+        self.assertEqual(
+            invoice_values["invoiceVatAmountHUF"], currency_huf.round(sum_vat_huf),
+            "invoiceVatAmountHUF must equal sum of vatRateVatAmountHUF values"
+        )
+        # NAV check: vatRateVatAmount * exchangeRate == vatRateVatAmountHUF
+        for tv in tax_summary:
+            expected_vat_huf = currency_huf.round(tv["vatRateVatAmount"] * exchange_rate)
+            self.assertEqual(
+                tv["vatRateVatAmountHUF"], expected_vat_huf,
+                "vatRateVatAmountHUF must equal vatRateVatAmount * exchangeRate"
+            )
+        # NAV check: invoiceVatAmount * exchangeRate == invoiceVatAmountHUF
+        expected_invoice_vat_huf = currency_huf.round(invoice_values["invoiceVatAmount"] * exchange_rate)
+        self.assertEqual(
+            invoice_values["invoiceVatAmountHUF"], expected_invoice_vat_huf,
+            "invoiceVatAmountHUF must equal invoiceVatAmount * exchangeRate"
+        )
         expected_gross = invoice_values["invoice"].currency_id.round(sum_net + sum_vat)
-        expected_gross_huf = self.env.ref("base.HUF").round(sum_net_huf + sum_vat_huf)
+        expected_gross_huf = currency_huf.round(sum_net_huf + sum_vat_huf)
         self.assertEqual(
             invoice_values["invoiceGrossAmount"], expected_gross,
             "invoiceGrossAmount must equal net + vat"
@@ -129,6 +159,38 @@ class TestNavInvoiceSummaryConsistency(L10nHuEdiTestCommon):
         """Verify invoice summary consistency holds for a normal posted invoice (no mock)."""
         with freeze_time("2024-02-01"):
             invoice = self.create_invoice_simple()
+            invoice.action_post()
+            result = invoice._l10n_hu_edi_get_invoice_values()
+            self._assert_nav_summary_consistency(result)
+
+    def test_vat_huf_consistent_when_delivery_date_rate_differs(self) -> None:
+        """Verify vatRateVatAmountHUF uses NAV rate even when accounting rate differs."""
+        with freeze_time("2024-02-01"):
+            currency_eur = self.env.ref("base.EUR")
+            # delivery_date = yesterday (rate 377.66), invoice_date = today (rate 380.77)
+            # Odoo accounting entries use invoice_date rate, but NAV XML must use delivery_date rate
+            invoice = self.env["account.move"].create({
+                "move_type": "out_invoice",
+                "journal_id": self.company_data["default_journal_sale"].id,
+                "currency_id": currency_eur.id,
+                "partner_id": self.partner_company.id,
+                "invoice_date": self.today,
+                "delivery_date": self.yesterday,
+                "invoice_line_ids": [
+                    (0, 0, {
+                        "product_id": self.product_a.id,
+                        "price_unit": 261.60,
+                        "quantity": 1,
+                        "tax_ids": [(6, 0, self.tax_vat.ids)],
+                    }),
+                    (0, 0, {
+                        "product_id": self.product_service.id,
+                        "price_unit": 9.00,
+                        "quantity": 1,
+                        "tax_ids": [(6, 0, self.tax_vat.ids)],
+                    }),
+                ],
+            })
             invoice.action_post()
             result = invoice._l10n_hu_edi_get_invoice_values()
             self._assert_nav_summary_consistency(result)
