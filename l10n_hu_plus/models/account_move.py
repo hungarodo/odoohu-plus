@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 1 : imports of python lib
+from collections import defaultdict
 import base64
 import datetime
 import json
@@ -603,6 +604,36 @@ class L10nHuPlusAccountMove(models.Model):
         # When delivery_date rate ≠ invoice_date rate, these diverge.
         currency_huf = self.env.ref("base.HUF")
         currency_rate = self._l10n_hu_get_currency_rate()
+        is_company_huf = self.company_id.currency_id == currency_huf
+
+        # aggregate VAT amounts by tax to handle multiple tax lines for the same VAT rate
+        # (e.g. different analytic distribution / rounding splits)
+        aggregated_tax_amounts = defaultdict(lambda: {
+            "vatRateVatAmount": 0.0,
+            "vatRateVatAmountHUF": 0.0,
+        })
+        for line in self.line_ids.filtered(lambda record: record.tax_line_id.l10n_hu_tax_type):
+            vat_tax = line.tax_line_id
+            aggregated_tax_amounts[vat_tax]["vatRateVatAmount"] += -line.amount_currency
+            if is_company_huf:
+                aggregated_tax_amounts[vat_tax]["vatRateVatAmountHUF"] += -line.balance
+            else:
+                aggregated_tax_amounts[vat_tax]["vatRateVatAmountHUF"] += currency_huf.round(-line.amount_currency * currency_rate)
+
+        for vat_tax in aggregated_tax_amounts:
+            aggregated_tax_amounts[vat_tax]["vatRateVatAmount"] = self.currency_id.round(
+                aggregated_tax_amounts[vat_tax]["vatRateVatAmount"]
+            )
+            aggregated_tax_amounts[vat_tax]["vatRateVatAmountHUF"] = currency_huf.round(
+                aggregated_tax_amounts[vat_tax]["vatRateVatAmountHUF"]
+            )
+
+        # replace super tax VAT amounts with aggregated values before summary recomputation
+        for tax_vals in result["tax_summary"]:
+            vat_tax = tax_vals["vat_tax"]
+            if vat_tax in aggregated_tax_amounts:
+                tax_vals["vatRateVatAmount"] = aggregated_tax_amounts[vat_tax]["vatRateVatAmount"]
+
         # recalculate vatRateVatAmountHUF from EUR VAT * NAV rate
         for tax_vals in result["tax_summary"]:
             tax_vals["vatRateVatAmountHUF"] = currency_huf.round(
