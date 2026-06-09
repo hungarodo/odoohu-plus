@@ -87,6 +87,10 @@ class TestNavInvoiceSummaryConsistency(L10nHuEdiTestCommon):
             invoice_values["invoiceGrossAmountHUF"], expected_gross_huf,
             "invoiceGrossAmountHUF must equal netHUF + vatHUF"
         )
+        self.assertEqual(
+            invoice_values["invoiceVatAmount"], invoice_values["invoice"].currency_id.round(invoice_values["invoice"].amount_tax),
+            "invoiceVatAmount must equal invoice.amount_tax"
+        )
 
     # -------------------------------------------------------------------------
     # TEST: SUMMARY CONSISTENCY WITH SIMULATED ROUNDING MISMATCH
@@ -193,4 +197,47 @@ class TestNavInvoiceSummaryConsistency(L10nHuEdiTestCommon):
             })
             invoice.action_post()
             result = invoice._l10n_hu_edi_get_invoice_values()
+            self._assert_nav_summary_consistency(result)
+
+    def test_summary_consistent_with_multiple_tax_lines_same_tax(self) -> None:
+        """Verify summary VAT remains correct when one VAT tax is split into multiple tax lines."""
+        with freeze_time("2024-02-01"):
+            analytic_account_a = self.env["account.analytic.account"].create({"name": "NAV Split A"})
+            analytic_account_b = self.env["account.analytic.account"].create({"name": "NAV Split B"})
+            invoice = self.env["account.move"].create({
+                "move_type": "out_invoice",
+                "journal_id": self.company_data["default_journal_sale"].id,
+                "currency_id": self.company_data["company"].currency_id.id,
+                "partner_id": self.partner_company.id,
+                "invoice_date": self.today,
+                "delivery_date": self.today,
+                "invoice_line_ids": [
+                    (0, 0, {
+                        "product_id": self.product_a.id,
+                        "price_unit": 1000.0,
+                        "quantity": 3,
+                        "tax_ids": [(6, 0, self.tax_vat.ids)],
+                        "analytic_distribution": {str(analytic_account_a.id): 100.0},
+                    }),
+                    (0, 0, {
+                        "product_id": self.product_b.id,
+                        "price_unit": 2000.0,
+                        "quantity": 2,
+                        "tax_ids": [(6, 0, self.tax_vat.ids)],
+                        "analytic_distribution": {str(analytic_account_b.id): 100.0},
+                    }),
+                ],
+            })
+            invoice.action_post()
+            tax_lines = invoice.line_ids.filtered(lambda line: line.tax_line_id == self.tax_vat)
+            self.assertGreaterEqual(
+                len(tax_lines), 2,
+                "test setup must produce multiple tax lines for the same VAT tax"
+            )
+            result = invoice._l10n_hu_edi_get_invoice_values()
+            summary_line = next(tv for tv in result["tax_summary"] if tv["vat_tax"] == self.tax_vat)
+            self.assertEqual(
+                summary_line["vatRateVatAmount"], invoice.currency_id.round(invoice.amount_tax),
+                "summary VAT amount must match posted invoice VAT when tax is split into multiple tax lines"
+            )
             self._assert_nav_summary_consistency(result)
