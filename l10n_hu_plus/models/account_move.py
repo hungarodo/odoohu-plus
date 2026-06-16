@@ -2,11 +2,13 @@
 # 1 : imports of python lib
 from collections import defaultdict
 import base64
+import copy
 import datetime
 import json
 
 # 2 : imports of odoo
 from odoo import _, api, exceptions, fields, models, tools  # alphabetically ordered
+from odoo.tools import formatLang
 
 # 3 : imports from odoo modules
 from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L10nHuEdiConnection, L10nHuEdiConnectionError
@@ -18,6 +20,8 @@ from odoo.addons.l10n_hu_edi.models.l10n_hu_edi_connection import format_bool, L
 class L10nHuPlusAccountMove(models.Model):
     # Private attributes
     _inherit = 'account.move'
+
+    L10N_HU_DOCUMENT_HUF_ZERO_CLAMP = 0.10
 
     # Default methods
     
@@ -584,6 +588,93 @@ class L10nHuPlusAccountMove(models.Model):
             return str(self.company_id.vat) + "_" + str(self.l10n_hu_proforma_name).replace('/', '_')
         else:
             return super()._get_report_base_filename()
+
+    @api.model
+    def _l10n_hu_zero_clamp_huf_amount(self, amount, threshold=None):
+        """Return 0 for technical HUF residuals below the document display threshold."""
+        if amount is None:
+            return amount
+        threshold = self.L10N_HU_DOCUMENT_HUF_ZERO_CLAMP if threshold is None else threshold
+        return 0.0 if abs(amount) < threshold else amount
+
+    @api.model
+    def _l10n_hu_is_within_document_huf_tolerance(self, diff, threshold=None):
+        threshold = self.L10N_HU_DOCUMENT_HUF_ZERO_CLAMP if threshold is None else threshold
+        return abs(diff) < threshold
+
+    def _l10n_hu_get_document_huf_rate(self):
+        """Return the NAV/document HUF rate for foreign-currency customer invoices."""
+        self.ensure_one()
+        if self.invoice_currency_rate:
+            return 1 / self.invoice_currency_rate
+        if self.l10n_hu_invoice_currency_rate_inverse:
+            return self.l10n_hu_invoice_currency_rate_inverse
+        return 1.0
+
+    def _l10n_hu_get_company_currency_tax_totals_for_report(self):
+        """Return company-currency tax totals using document/NAV rate and zero-clamp."""
+        self.ensure_one()
+        tax_totals = copy.deepcopy(self.tax_totals or {})
+        if not tax_totals.get('display_in_company_currency'):
+            return tax_totals
+
+        currency_huf = self.env.ref('base.HUF')
+        if self.company_id.currency_id != currency_huf or self.currency_id == currency_huf:
+            return tax_totals
+        if not self.invoice_currency_rate:
+            return tax_totals
+
+        document_rate = self._l10n_hu_get_document_huf_rate()
+
+        def _document_huf(amount_currency):
+            return self._l10n_hu_zero_clamp_huf_amount(
+                currency_huf.round(amount_currency * document_rate)
+            )
+
+        amount_pairs = (
+            ('base_amount', 'base_amount_currency'),
+            ('tax_amount', 'tax_amount_currency'),
+            ('total_amount', 'total_amount_currency'),
+        )
+        for huf_field, currency_field in amount_pairs:
+            if currency_field in tax_totals:
+                tax_totals[huf_field] = _document_huf(tax_totals[currency_field])
+
+        for subtotal in tax_totals.get('subtotals', []):
+            for huf_field, currency_field in amount_pairs[:2]:
+                if currency_field in subtotal:
+                    subtotal[huf_field] = _document_huf(subtotal[currency_field])
+            for tax_group in subtotal.get('tax_groups', []):
+                for huf_field, currency_field in (
+                    ('base_amount', 'base_amount_currency'),
+                    ('tax_amount', 'tax_amount_currency'),
+                    ('display_base_amount', 'display_base_amount_currency'),
+                ):
+                    if currency_field in tax_group and tax_group[currency_field] is not None:
+                        tax_group[huf_field] = _document_huf(tax_group[currency_field])
+
+        return tax_totals
+
+    def _l10n_hu_get_invoice_totals_for_report(self):
+        """Use document/NAV HUF VAT totals on foreign-currency invoices for reports."""
+        tax_totals = super()._l10n_hu_get_invoice_totals_for_report()
+        if not tax_totals:
+            return tax_totals
+
+        self.ensure_one()
+        currency_huf = self.env.ref('base.HUF')
+        if (self.company_id.currency_id == currency_huf
+                and self.currency_id != currency_huf
+                and self.invoice_currency_rate):
+            document_rate = self._l10n_hu_get_document_huf_rate()
+            vat_huf = self._l10n_hu_zero_clamp_huf_amount(
+                currency_huf.round(abs(self.amount_tax) * document_rate)
+            )
+            tax_totals['total_vat_amount_in_huf'] = vat_huf
+            tax_totals['formatted_total_vat_amount_in_huf'] = formatLang(
+                self.env, vat_huf, currency_obj=currency_huf
+            )
+        return tax_totals
 
     def _l10n_hu_edi_get_invoice_values(self):
         """ Super for original method in l10n_hu_edi app
@@ -1202,11 +1293,11 @@ class L10nHuPlusAccountMove(models.Model):
         l10n_hu_document_vat_huf = values.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
         rate_rounding = 2
 
-        ### CUSTOMER INVOICE - we issued it (Odoo or externally), so we reported the data, so we must use accounting
+        ### CUSTOMER INVOICE - document/NAV rate for HUF document amounts on foreign currency invoices
         if (self.move_type in ['out_invoice', 'out_refund'] and self.invoice_currency_rate != 0
                 and self.company_id.currency_id.name == 'HUF'):
             l10n_hu_document_rate = 1 / self.invoice_currency_rate
-            l10n_hu_document_vat_huf = abs(self.amount_tax_signed)
+            l10n_hu_document_vat_huf = huf_currency.round(abs(self.amount_tax) * l10n_hu_document_rate)
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
         elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
             l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
@@ -1218,7 +1309,7 @@ class L10nHuPlusAccountMove(models.Model):
             l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
         else:
             l10n_hu_document_rate = 1.0
-        l10n_hu_document_net_huf = self.amount_untaxed * l10n_hu_document_rate
+        l10n_hu_document_net_huf = huf_currency.round(self.amount_untaxed * l10n_hu_document_rate)
         l10n_hu_document_gross_huf = l10n_hu_document_vat_huf + l10n_hu_document_net_huf
 
         # HUF AMOUNT DIFF AND SUMMARY
@@ -1234,7 +1325,9 @@ class L10nHuPlusAccountMove(models.Model):
             huf_amount_net_diff = tools.float_round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
             huf_amount_vat_diff = tools.float_round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
             huf_amount_gross_diff = tools.float_round(accounting_amount_total - l10n_hu_document_gross_huf, huf_rounding)
-            if huf_amount_net_diff != 0 or huf_amount_vat_diff != 0 or huf_amount_gross_diff != 0:
+            if (not self._l10n_hu_is_within_document_huf_tolerance(huf_amount_net_diff)
+                    or not self._l10n_hu_is_within_document_huf_tolerance(huf_amount_vat_diff)
+                    or not self._l10n_hu_is_within_document_huf_tolerance(huf_amount_gross_diff)):
                 huf_amount_diff = True
             if self.company_id.currency_id.name == 'HUF':
                 huf_amount_summary = (f"{_('Document HUF amounts')}: "
