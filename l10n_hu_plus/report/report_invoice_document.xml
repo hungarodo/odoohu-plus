@@ -69,7 +69,7 @@
                 <span t-field="o.l10n_hu_invoice_currency_rate_date" class="ms-1"/>
             </div>
         </xpath>
-        <xpath expr="//div[@name='total']/t[@t-if='print_with_payments']" position="attributes">
+        <xpath expr="//t[@t-if='print_with_payments']" position="attributes">
             <attribute name="t-if">print_with_payments and o.move_type not in ['out_refund', 'in_refund']</attribute>
         </xpath>
     </template>
