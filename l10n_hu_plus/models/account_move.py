@@ -24,7 +24,7 @@ class L10nHuPlusAccountMove(models.Model):
     L10N_HU_DOCUMENT_HUF_ZERO_CLAMP = 0.10
 
     # Default methods
-    
+
     # Field declarations
     ## ODOO
     invoice_pdf_report_id = fields.Many2one(
@@ -53,7 +53,7 @@ class L10nHuPlusAccountMove(models.Model):
     )
     l10n_hu_huf_rate = fields.Float(
         compute='_compute_l10n_hu_currency',
-        string="HU HUF Rate",
+        string="HUF Rate",
     )
     l10n_hu_invoice_currency_rate_date = fields.Date(
         compute='_compute_l10n_hu_currency',
@@ -235,7 +235,7 @@ class L10nHuPlusAccountMove(models.Model):
         # EXTENDS 'account'
         super()._compute_show_delivery_date()
         for move in self:
-            if move.country_code == 'HU':
+            if move.company_id.account_fiscal_country_id.code == 'HU':
                 move.show_delivery_date = True
 
     @api.depends('delivery_date')
@@ -545,6 +545,7 @@ class L10nHuPlusAccountMove(models.Model):
                 'default_action_type': 'account_move',
                 'default_action_type_visible': False,
                 'default_account_move_action': 'update_fields',
+                'default_company': self.company_id.id,
             },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
@@ -565,6 +566,7 @@ class L10nHuPlusAccountMove(models.Model):
                 'default_account_move_action': 'check_status',
                 'default_account_move_action_visible': False,
                 'default_account_move_plus_overview': status_overview,
+                'default_company': self.company_id.id,
             },
             'res_model': 'l10n.hu.plus.wizard',
             'target': 'new',
@@ -574,10 +576,37 @@ class L10nHuPlusAccountMove(models.Model):
 
     # Business methods
     ## SUPER
+    def _l10n_hu_get_currency_rate(self):
+        """Override: use manually modified invoice currency rate for NAV XML.
+
+        :return: currency conversion rate (invoice_ccy → HUF)
+        :rtype: float
+
+        The original l10n_hu_edi method always reads from the res.currency.rate table, ignoring manual rate changes on the invoice.  When
+        the user has manually modified invoice_currency_rate (i.e. it differs from expected_currency_rate), the NAV XML must reflect the
+        actual rate.
+
+        Guards:
+        - is_invoice: payment moves have no computed invoice_currency_rate
+        - company_currency == HUF: for non-HUF companies 1/invoice_currency_rate
+          gives invoice_ccy→company_ccy, NOT invoice_ccy→HUF
+        - currency != company_currency: HUF→HUF needs no rate
+        - invoice_currency_rate > 0: safety against division by zero
+        - invoice_currency_rate != expected_currency_rate: only override when
+          manually changed
+        """
+        if (self.is_invoice(include_receipts=True)
+                and self.company_id.currency_id == self.env.ref("base.HUF")
+                and self.currency_id != self.company_id.currency_id
+                and self.invoice_currency_rate
+                and self.invoice_currency_rate != self.expected_currency_rate):
+            return 1 / self.invoice_currency_rate
+        return super()._l10n_hu_get_currency_rate()
+
     def _get_invoice_currency_rate_date(self):
         self.ensure_one()
         result = super()._get_invoice_currency_rate_date()
-        if (self.country_code == 'HU' and self.delivery_date and self.invoice_date
+        if (self.company_id.account_fiscal_country_id.code == 'HU' and self.delivery_date and self.invoice_date
                 and self.delivery_date > self.invoice_date):
             return self.invoice_date
         return result
@@ -656,13 +685,22 @@ class L10nHuPlusAccountMove(models.Model):
         return tax_totals
 
     def _l10n_hu_get_invoice_totals_for_report(self):
-        """Use document/NAV HUF VAT totals on foreign-currency invoices for reports."""
-        tax_totals = super()._l10n_hu_get_invoice_totals_for_report()
-        if not tax_totals:
-            return tax_totals
+        """ Super for original method in l10n_hu_edi app
+
+        NOTES:
+        - super result is a dictionary
+        - company HUF and foreign invoice currency: use document/NAV rate with zero-clamp (see #3832)
+        - company NOT HUF and HU fiscal country: convert VAT to HUF via l10n_hu_huf_rate (TASK-166)
+        """
+        # Execute super
+        result = super()._l10n_hu_get_invoice_totals_for_report()
+        if not result:
+            return result
 
         self.ensure_one()
         currency_huf = self.env.ref('base.HUF')
+
+        # Company HUF, foreign invoice currency: document/NAV rate HUF VAT with zero-clamp
         if (self.company_id.currency_id == currency_huf
                 and self.currency_id != currency_huf
                 and self.invoice_currency_rate):
@@ -670,11 +708,23 @@ class L10nHuPlusAccountMove(models.Model):
             vat_huf = self._l10n_hu_zero_clamp_huf_amount(
                 currency_huf.round(abs(self.amount_tax) * document_rate)
             )
-            tax_totals['total_vat_amount_in_huf'] = vat_huf
-            tax_totals['formatted_total_vat_amount_in_huf'] = formatLang(
+            result['total_vat_amount_in_huf'] = vat_huf
+            result['formatted_total_vat_amount_in_huf'] = formatLang(
                 self.env, vat_huf, currency_obj=currency_huf
             )
-        return tax_totals
+        # Company NOT HUF, HU fiscal country: convert VAT to HUF via huf_rate
+        elif self.company_id.currency_id.name != 'HUF' and self.company_id.account_fiscal_country_id.code == 'HU':
+            huf_vat = result['total_vat_amount_in_huf']
+            huf_rate = self.l10n_hu_huf_rate
+            result['total_vat_amount_in_huf'] = huf_vat * huf_rate
+            result['formatted_total_vat_amount_in_huf'] = formatLang(
+                self.env, result['total_vat_amount_in_huf'], currency_obj=currency_huf
+            )
+            # Hide tax detail table in company currency
+            result['display_in_company_currency'] = False
+
+        # Return result
+        return result
 
     def _l10n_hu_edi_get_invoice_values(self):
         """ Super for original method in l10n_hu_edi app
@@ -803,8 +853,8 @@ class L10nHuPlusAccountMove(models.Model):
         result = super(L10nHuPlusAccountMove, self)._l10n_hu_edi_get_valid_actions()
 
         # No action when EDI sending is disabled on the journal (eg: externally issued invoices, OSS)
-        if (self.country_code == 'HU' and self.is_sale_document() and self.state == 'posted'
-                and self.journal_id and self.journal_id.l10n_hu_edi_sending == 'disabled'):
+        if (self.company_id.account_fiscal_country_id.code == 'HU' and self.journal_id and self.state == 'posted'
+                and self.is_sale_document() and self.journal_id.l10n_hu_edi_sending == 'disabled'):
             result = []
         return result
 
@@ -946,7 +996,7 @@ class L10nHuPlusAccountMove(models.Model):
         - some fields are computed by calling other methods
         - this method also prepares write operation compatible values for special hungarian fields
         - there should be no CRUD operation here, keep it in mind when using super()
-        
+
         :param values: dictionary
 
         :return: dictionary
@@ -1290,37 +1340,70 @@ class L10nHuPlusAccountMove(models.Model):
         ###        For example: vendor bill issuer might use different rate than our company for the same date
         huf_currency = self.env.ref('base.HUF')
         huf_rounding = huf_currency.decimal_places
+        l10n_hu_document_rate = 1.0
         l10n_hu_document_vat_huf = values.get('l10n_hu_document_vat_huf', self.l10n_hu_document_vat_huf)
+        if self.move_type in ['in_refund', 'out_refund'] and l10n_hu_document_vat_huf > 0:
+            l10n_hu_document_vat_huf = l10n_hu_document_vat_huf * -1
         rate_rounding = 2
 
-        ### CUSTOMER INVOICE - document/NAV rate for HUF document amounts on foreign currency invoices
-        if (self.move_type in ['out_invoice', 'out_refund'] and self.invoice_currency_rate != 0
-                and self.company_id.currency_id.name == 'HUF'):
-            l10n_hu_document_rate = 1 / self.invoice_currency_rate
-            l10n_hu_document_vat_huf = huf_currency.round(abs(self.amount_tax) * l10n_hu_document_rate)
+        ### CUSTOMER INVOICE - we issued it (Odoo or externally) so we must use accounting
+        if self.move_type in ['out_invoice', 'out_refund']:
+            amount_sign = -1 if self.move_type == 'out_refund' else 1
+            # HUF invoice and HUF accounting
+            if self.currency_id.name == 'HUF' and self.company_id.currency_id.name == 'HUF':
+                l10n_hu_document_rate = 1.0
+                l10n_hu_document_vat_huf = self.amount_tax_signed
+            # NOT HUF invoice and HUF accounting: derive document VAT HUF from NAV rate (see #76, #3832)
+            elif (self.currency_id.name != 'HUF' and self.company_id.currency_id.name == 'HUF'
+                    and self.invoice_currency_rate != 0):
+                l10n_hu_document_rate = 1 / self.invoice_currency_rate
+                l10n_hu_document_vat_huf = huf_currency.round(self.amount_tax * l10n_hu_document_rate * amount_sign)
+            # HUF invoice and NOT HUF accounting
+            elif self.currency_id.name == 'HUF' and self.company_id.currency_id.name != 'HUF':
+                l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
+                l10n_hu_document_vat_huf = huf_currency.round(self.amount_tax * l10n_hu_document_rate * amount_sign)
+            # NOT HUF invoice and NOT HUF accounting
+            elif self.currency_id.name != 'HUF' and self.company_id.currency_id.name != 'HUF':
+                l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
+                l10n_hu_document_vat_huf = huf_currency.round(self.amount_tax * l10n_hu_document_rate * amount_sign)
+            else:
+                pass
         ### VENDOR BILL - we received it from vendor, we want to record the vendor's data
-        elif self.move_type in ['in_invoice', 'in_refund'] and l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
-            l10n_hu_document_rate = l10n_hu_document_vat_huf / abs(self.amount_tax)
-        elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total != 0
-              and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
-            l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
-        elif (self.move_type in ['in_invoice', 'in_refund'] and self.amount_total == 0
-              and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF'):
-            l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
+        elif self.move_type in ['in_invoice', 'in_refund']:
+            amount_sign = -1 if self.move_type == 'in_refund' else 1
+            # amount_tax and is l10n_hu_document_vat_huf not 0
+            if l10n_hu_document_vat_huf != 0 and self.amount_tax != 0:
+                l10n_hu_document_rate = l10n_hu_document_vat_huf / self.amount_tax * amount_sign
+                debug_list.append(f"document rate vendor bill VAT HUF != 0 and amount_tax != 0: {l10n_hu_document_rate}")
+            # amount_total not 0 and foreign ccy and HUF accounting
+            elif self.amount_total != 0 and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
+                l10n_hu_document_rate = abs(self.amount_total_signed) / abs(self.amount_total)
+                debug_list.append(f"document rate vendor bill HUF company amount total!=0: {l10n_hu_document_rate}")
+            # amount_total 0 and foreign ccy and HUF accounting
+            elif self.amount_total == 0 and self.currency_id != self.company_id.currency_id and self.company_id.currency_id.name == 'HUF':
+                l10n_hu_document_rate = tools.float_round(self.l10n_hu_invoice_currency_rate_inverse, rate_rounding)
+                debug_list.append(f"document rate vendor bill HUF company HUF ccy amount_total==0: {l10n_hu_document_rate}")
+            # NOT HUF accounting
+            elif self.company_id.currency_id.name != 'HUF':
+                l10n_hu_document_rate = self._l10n_hu_get_currency_rate()
+                debug_list.append(f"document rate vendor bill NOT HUF company: {l10n_hu_document_rate}")
+            else:
+                pass
         else:
-            l10n_hu_document_rate = 1.0
-        l10n_hu_document_net_huf = huf_currency.round(self.amount_untaxed * l10n_hu_document_rate)
+            amount_sign = 1
+
+        # HUF document net and gross
+        l10n_hu_document_net_huf = huf_currency.round(self.amount_untaxed * l10n_hu_document_rate * amount_sign)
         l10n_hu_document_gross_huf = l10n_hu_document_vat_huf + l10n_hu_document_net_huf
 
         # HUF AMOUNT DIFF AND SUMMARY
-        accounting_amount_untaxed = abs(self.amount_untaxed_signed)
-        accounting_amount_tax = abs(self.amount_tax_signed)
-        accounting_amount_total = abs(self.amount_total_signed)
-        huf_amount_diff = 0
+        accounting_amount_untaxed = self.amount_untaxed * l10n_hu_document_rate * amount_sign
+        accounting_amount_tax = self.amount_tax * l10n_hu_document_rate * amount_sign
+        accounting_amount_total = self.amount_total * l10n_hu_document_rate * amount_sign
+        huf_amount_diff = False
         huf_amount_gross_diff = 0
         huf_amount_net_diff = 0
         huf_amount_vat_diff = 0
-        huf_amount_summary = None
         if self.company_id.currency_id.name == 'HUF':
             huf_amount_net_diff = tools.float_round(accounting_amount_untaxed - l10n_hu_document_net_huf, huf_rounding)
             huf_amount_vat_diff = tools.float_round(accounting_amount_tax - l10n_hu_document_vat_huf, huf_rounding)
@@ -1329,11 +1412,15 @@ class L10nHuPlusAccountMove(models.Model):
                     or not self._l10n_hu_is_within_document_huf_tolerance(huf_amount_vat_diff)
                     or not self._l10n_hu_is_within_document_huf_tolerance(huf_amount_gross_diff)):
                 huf_amount_diff = True
-            if self.company_id.currency_id.name == 'HUF':
-                huf_amount_summary = (f"{_('Document HUF amounts')}: "
-                f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed}-{self.l10n_hu_document_net_huf});"
-                f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax}-{self.l10n_hu_document_vat_huf});"
-                f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total}-{self.l10n_hu_document_gross_huf})")
+            huf_amount_summary = (f"{_('Document HUF amounts')}: "
+            f" {_('Net difference')} {huf_amount_net_diff} ({accounting_amount_untaxed} - {self.l10n_hu_document_net_huf});"
+            f" {_('VAT difference')} {huf_amount_vat_diff} ({accounting_amount_tax} - {self.l10n_hu_document_vat_huf});"
+            f" {_('Gross difference')} {huf_amount_gross_diff} ({accounting_amount_total} - {self.l10n_hu_document_gross_huf})")
+        else:
+            huf_amount_summary = (f"{_('Document HUF amounts')}: "
+                                  f" {_('Net difference')} {huf_amount_net_diff} ({self.l10n_hu_document_net_huf});"
+                                  f" {_('VAT difference')} {huf_amount_vat_diff} ({self.l10n_hu_document_vat_huf});"
+                                  f" {_('Gross difference')} {huf_amount_gross_diff} ({self.l10n_hu_document_gross_huf})")
 
         # MODIFICATION
         modification_document_type = self.env['l10n.hu.plus.tag'].search([
@@ -1487,41 +1574,42 @@ class L10nHuPlusAccountMove(models.Model):
 
         ## HU+ accounting_rate
         accounting_date = currency_rate_date
-        accounting_rate = 1.0
-        accounting_rcr = None
-        if currency_rate_date and company_currency != invoice_currency:
-            accounting_rcr = self.env['res.currency.rate'].search([
-                ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', invoice_currency.id),
-                ('name', '<=', accounting_date)
-            ], limit=1)
-            debug_list.append("accounting_rcr set for foreign currency")
-            if accounting_rcr:
-                accounting_rate = accounting_rcr.company_rate
-                debug_list.append("accounting_rate set: " + str(accounting_rate))
+        accounting_rcr = self.env['res.currency.rate'].search([
+            ('company_id', '=', self.company_id.id),
+            ('currency_id', '=', invoice_currency.id),
+            ('name', '<=', accounting_date)
+        ], limit=1)
+        debug_list.append("accounting_rcr set for foreign currency")
+        if accounting_rcr:
+            accounting_rate = accounting_rcr.company_rate
+            debug_list.append(f"accounting_rate set: {accounting_rate}")
         else:
-            debug_list.append("accounting_rcr not set, invoice and company has same currency")
+            accounting_rate = 0.0
+            debug_list.append("accounting_rcr not found, it is set to default 0.0")
 
         ## HU+ huf_rate
         huf_rate = 0.0
-        ### Company HUF
-        if company_currency.name == 'HUF':
+        ### Company HUF AND invoice HUF
+        if company_currency.name == 'HUF' and invoice_currency.name == 'HUF':
             huf_rate = 1.0
-            debug_list.append("huf_rate is 1.0 for company HUF")
-        ## Company NOT HUF
-        elif company_currency.name != 'HUF' and currency_rate_date:
+            debug_list.append("huf_rate is 1.0000 for HUF invoice currency and HUF company currency")
+        ## Company NOT HUF or invoice NOT HUF
+        elif (company_currency.name != 'HUF' or invoice_currency.name != 'HUF') and currency_rate_date:
             huf_rate_rcr = self.env['res.currency.rate'].search([
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', huf_currency.id),
                 ('name', '<=', currency_rate_date)
             ], limit=1)
+            debug_list.append(f"huf_rate_rcr: {huf_rate_rcr}")
             if huf_rate_rcr:
-                huf_rate = huf_rate_rcr.company_rate
-                debug_list.append("huf_rate found for company NOT HUF")
-            else:
-                error_list.append("huf_rate not found")
+                debug_list.append(f"huf_rate_rcr company_rate: {huf_rate_rcr.company_rate}")
+                debug_list.append(f"huf_rate_rcr inverse_company_rate: {huf_rate_rcr.inverse_company_rate}")
+
+            # NOTES: we use the same method as in l10n_hu_edi app
+            huf_rate = self._l10n_hu_get_currency_rate()
+            debug_list.append(f"huf_rate _l10n_hu_get_currency_rate: {huf_rate}")
         else:
-            debug_list.append("huf_rate else scenario, probably delivery_date is not set")
+            debug_list.append("huf_rate else scenario, probably currency_rate_date is not set")
 
         ## SPECIAL CASE: invoice_date < delivery_date (periodic delivery)
         ## - customer invoice issued externally and downloaded
@@ -1544,20 +1632,32 @@ class L10nHuPlusAccountMove(models.Model):
         if company_currency == invoice_currency:
             currency_summary = _("This document uses the company currency")
         else:
-            currency_summary = (f"{_('Currency rate')}: {l10n_hu_invoice_currency_rate_date}"
-            f" {tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
-            f" {company_currency.name}/{invoice_currency.name} ({_('Accounting')})")
+            currency_summary = (f"{_('Currency rate')}: {l10n_hu_invoice_currency_rate_date}")
+
+            # Currency rate
+            if company_currency.name == 'HUF':
+                currency_summary += f" {tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding)}"
+            else:
+                currency_summary += f" {invoice_currency_rate}"
+
+            # Expected rate
             if tools.float_round(l10n_hu_invoice_currency_rate_inverse, rate_rounding) != tools.float_round(expected_currency_rate_inverse, rate_rounding):
-                currency_summary += (f" {tools.float_round(expected_currency_rate_inverse, rate_rounding)}"
-                                     f" {company_currency.name}/{invoice_currency.name} ({_('Expected')}) ")
+                currency_summary += (f" {_('Expected')}: {tools.float_round(expected_currency_rate_inverse, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name}")
+
+            # Document HUF
             if self.move_type in ['in_invoice', 'in_refund']:
-                currency_summary += (f" {tools.float_round(document_rate, rate_rounding)}"
-                                     f" {company_currency.name}/{invoice_currency.name} ({_('Document')})")
+                currency_summary += (f" {_('Document')}: {tools.float_round(document_rate, rate_rounding)}"
+                                     f" {company_currency.name}/{invoice_currency.name}")
+
+            # Rate difference
             if document_rate_diff != 0:
-                currency_summary += f"{_('Rate difference')}: {tools.float_round(document_rate_diff, rate_rounding)}"
-            if company_currency.name != 'HUF':
-                currency_summary += (f" {tools.float_round(huf_rate, rate_rounding)} "
-                                     f" {huf_currency.name}/{company_currency.name} ({_('HUF rate')})")
+                currency_summary += f" {_('Rate difference')}: {tools.float_round(document_rate_diff, rate_rounding)}"
+
+        # HUF rate
+        if company_currency.name != 'HUF' or invoice_currency.name != 'HUF':
+            currency_summary += (f" {_('HUF rate')}: {tools.float_round(huf_rate, rate_rounding)} "
+                                 f" {huf_currency.name}/{invoice_currency.name}")
 
         # Update result
         result.update({
@@ -1584,7 +1684,7 @@ class L10nHuPlusAccountMove(models.Model):
         })
 
         # Return result
-        # raise exceptions.UserError("l10n_hu_plus_get_rate_data" + "\n" + str(result))
+        # raise exceptions.UserError(f"l10n_hu_plus_get_rate_data\n{result}")
         return result
 
     @api.model
@@ -1822,7 +1922,7 @@ class L10nHuPlusAccountMove(models.Model):
             }
             error_list.append(l10n_hu_edi_error)
         """
-        
+
         # HU+0: collect data using dedicated methods
         delivery_data = self.l10n_hu_plus_get_delivery_data({})
         document_data = self.l10n_hu_plus_get_document_data({})
@@ -1947,7 +2047,7 @@ class L10nHuPlusAccountMove(models.Model):
         # HU+6: taxes
         no_tax_lines = []
         for line in self.invoice_line_ids:
-            if line.product_id and not line.tax_ids:
+            if line.account_id and not line.tax_ids:
                 no_tax_lines.append(line)
         if len(no_tax_lines) == 0:
             success_list.append({
@@ -2069,6 +2169,37 @@ class L10nHuPlusAccountMove(models.Model):
             'records': self,
             'result': 'info',
         })
+
+        # HU+12: customer address
+        address_error_text = f""
+        if not self.partner_id:
+            address_error_text += f"{_('Customer is not set!')} "
+        if self.partner_id and not self.partner_id.zip:
+            address_error_text += f"{_('Postal code is empty!')} "
+        if self.partner_id and not self.partner_id.country_id:
+            address_error_text += f"{_('Country is empty!')} "
+        if self.partner_id and not self.partner_id.city:
+            address_error_text += f"{_('City is empty!')} "
+        if self.partner_id and not self.partner_id.street:
+            address_error_text += f"{_('Street is empty!')} "
+
+        if len(address_error_text) > 0:
+            address_error_text = f"{_('Customer address error!')} " + address_error_text
+            error_list.append({
+                'action_text': None,
+                'code': 'HU+12',
+                'description': address_error_text,
+                'records': self,
+                'result': 'error',
+            })
+        else:
+            success_list.append({
+                'action_text': None,
+                'code': 'HU+12',
+                'description': f"{_('Customer address details ok')}",
+                'records': self,
+                'result': 'success',
+            })
 
         # Update result
         result.update({

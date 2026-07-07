@@ -420,23 +420,18 @@ class L10nHuPlusWizard(models.TransientModel):
     @api.onchange('accounting_delivery_period_end', 'accounting_delivery_period_start')
     def onchange_accounting_delivery_period(self):
         # Check delivery date sanity
-        if self.accounting_delivery_period_enabled \
-                and self.accounting_delivery_period_end \
-                and self.accounting_delivery_period_start \
-                and self.accounting_delivery_period_end < self.accounting_delivery_period_start:
+        if (self.accounting_delivery_period_enabled and self.accounting_delivery_period_end
+                and self.accounting_delivery_period_start
+                and self.accounting_delivery_period_end < self.accounting_delivery_period_start):
             raise exceptions.ValidationError(_("Period end date must be after period start date!"))
         else:
             pass
 
         # Recompute delivery date (when only one record in account_move m2m and action is reasonable)
-        if self.account_move \
-                and len(self.account_move) == 1 \
-                and self.account_move[0].move_type in ['out_invoice', 'out_refund'] \
-                and self.action_type == 'account_move' \
-                and self.accounting_delivery_period_enabled \
-                and self.accounting_delivery_period_end \
-                and self.accounting_delivery_period_start \
-                and self.account_move_action == 'update_fields':
+        if (self.account_move and len(self.account_move) == 1 and self.action_type == 'account_move'
+                and self.account_move[0].move_type in ['out_invoice', 'out_refund']
+                and self.accounting_delivery_period_enabled and self.accounting_delivery_period_end
+                and self.accounting_delivery_period_start and self.account_move_action == 'update_fields'):
             # Get delivery data
             delivery_data = self.account_move[0].l10n_hu_plus_get_delivery_data({
                 'l10n_hu_delivery_period_end': self.accounting_delivery_period_end,
@@ -514,6 +509,15 @@ class L10nHuPlusWizard(models.TransientModel):
     # CRUD methods (and display_name, name_search, ...) overrides
 
     # Action methods
+    def action_debug(self):
+        self.ensure_one()
+        if self.action_type == 'account_move' and len(self.account_move) == 1:
+            data_result = self.account_move[0].l10n_hu_plus_get_data({})
+            data_display = json.dumps(data_result, default=str, indent=4)
+            raise exceptions.UserError(f"l10n_hu_plus_get_data\n{data_display}")
+        else:
+            raise exceptions.UserError(_("Debug not available for this action!"))
+
     def action_execute(self):
         # Ensure one
         self.ensure_one()

@@ -66,7 +66,7 @@
     'depends': [  # Include only direct dependencies
         'l10n_hu_edi',
     ],
-    'description': "Hungarian localization improvements",
+    'description': "",
     'images': [  # Odoo Marketplace banner
         'static/description/l10n_hu_plus_banner.png',
     ],
@@ -75,6 +75,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "18.0.1.9.19",
+    'version': "18.0.1.11.10",
     'website': "https://mopsz.odoo.com",
 }
