@@ -202,8 +202,16 @@ class TestNavInvoiceSummaryConsistency(L10nHuEdiTestCommon):
     def test_summary_consistent_with_multiple_tax_lines_same_tax(self) -> None:
         """Verify summary VAT remains correct when one VAT tax is split into multiple tax lines."""
         with freeze_time("2024-02-01"):
-            analytic_account_a = self.env["account.analytic.account"].create({"name": "NAV Split A"})
-            analytic_account_b = self.env["account.analytic.account"].create({"name": "NAV Split B"})
+            # Tax lines only inherit the base line analytic_distribution (and thus split
+            # into separate tax lines per distribution) when the tax is analytic.
+            self.tax_vat.analytic = True
+            analytic_plan = self.env["account.analytic.plan"].create({"name": "NAV Split Plan"})
+            analytic_account_a = self.env["account.analytic.account"].create(
+                {"name": "NAV Split A", "plan_id": analytic_plan.id}
+            )
+            analytic_account_b = self.env["account.analytic.account"].create(
+                {"name": "NAV Split B", "plan_id": analytic_plan.id}
+            )
             invoice = self.env["account.move"].create({
                 "move_type": "out_invoice",
                 "journal_id": self.company_data["default_journal_sale"].id,
