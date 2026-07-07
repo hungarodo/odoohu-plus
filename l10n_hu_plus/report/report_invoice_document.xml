@@ -72,5 +72,9 @@
         <xpath expr="//t[@t-if='print_with_payments']" position="attributes">
             <attribute name="t-if">print_with_payments and o.move_type not in ['out_refund', 'in_refund']</attribute>
         </xpath>
+        <!-- Document/NAV company-currency tax totals for foreign currency invoices -->
+        <xpath expr="//t[@t-if=&quot;o.tax_totals.get('display_in_company_currency')&quot;]/t[@t-set='tax_totals']" position="attributes">
+            <attribute name="t-value">o._l10n_hu_get_company_currency_tax_totals_for_report()</attribute>
+        </xpath>
     </template>
 </odoo>
