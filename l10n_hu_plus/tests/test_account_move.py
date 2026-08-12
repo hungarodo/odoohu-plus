@@ -57,6 +57,41 @@ class TestAccountMoveComputedFields(L10nHuPlusTestCommon):
         self.assertIsNotNone(invoice.l10n_hu_document_net_huf, "Document net HUF should not be None")
         self.assertIsNotNone(invoice.l10n_hu_document_gross_huf, "Document gross HUF should not be None")
 
+    def test_document_vat_huf_synced_on_customer_invoice_without_update_fields(self) -> None:
+        """Customer HUF invoice stores document VAT from tax without update_fields."""
+        invoice: L10nHuPlusAccountMove = self._create_hu_invoice(amount=10000.0)
+        self.assertTrue(invoice.amount_tax, "Test invoice must have tax amount")
+        self.assertEqual(
+            invoice.l10n_hu_document_vat_huf,
+            invoice.amount_tax_signed,
+            "Document VAT HUF must match amount_tax_signed without action_l10n_hu_update_fields",
+        )
+        self.assertEqual(
+            invoice.l10n_hu_document_net_huf + invoice.l10n_hu_document_vat_huf,
+            invoice.l10n_hu_document_gross_huf,
+            "Document HUF net + VAT must equal gross",
+        )
+        invoice.action_post()
+        self.assertEqual(
+            invoice.l10n_hu_document_vat_huf,
+            invoice.amount_tax_signed,
+            "Document VAT HUF must stay synced after posting",
+        )
+        self.assertEqual(
+            invoice.l10n_hu_document_net_huf + invoice.l10n_hu_document_vat_huf,
+            invoice.l10n_hu_document_gross_huf,
+            "Document HUF net + VAT must equal gross after posting",
+        )
+
+    def test_document_vat_huf_manual_on_vendor_bill(self) -> None:
+        """Vendor bill keeps manually entered document VAT HUF."""
+        bill: L10nHuPlusAccountMove = self._create_hu_invoice(move_type="in_invoice", amount=10000.0)
+        bill.write({"l10n_hu_document_vat_huf": 1234.0})
+        self.assertEqual(bill.l10n_hu_document_vat_huf, 1234.0, "Manual document VAT HUF must be kept on vendor bill")
+        # amount change must not overwrite vendor document VAT
+        bill.invoice_line_ids[0].price_unit = 20000.0
+        self.assertEqual(bill.l10n_hu_document_vat_huf, 1234.0, "Vendor document VAT HUF must survive line amount change")
+
 
 @tagged("l10n_hu_plus", "post_install_l10n", "post_install", "-at_install")
 class TestAccountMoveOnchange(L10nHuPlusTestCommon):
@@ -96,10 +131,11 @@ class TestAccountMoveOnchange(L10nHuPlusTestCommon):
     def test_onchange_currency_rate_inverse_positive(self) -> None:
         """Positive currency rate inverse should update the invoice_currency_rate."""
         invoice: L10nHuPlusAccountMove = self._create_hu_invoice(currency=self.currency_eur)
-        invoice.l10n_hu_invoice_currency_rate_inverse = 380.0
+        # Use a distinctive rate so the assert cannot pass from the default computed inverse alone.
+        invoice.l10n_hu_invoice_currency_rate_inverse = 250.0
         invoice.onchange_l10n_hu_invoice_currency_rate_inverse()
-        expected_rate = 1.0 / 380.0
-        self.assertAlmostEqual(invoice.invoice_currency_rate, expected_rate, places=6, msg="Invoice currency rate should be 1/380")
+        expected_rate = 1.0 / 250.0
+        self.assertAlmostEqual(invoice.invoice_currency_rate, expected_rate, places=6, msg="Invoice currency rate should be 1/250")
 
     def test_onchange_currency_rate_negative(self) -> None:
         """Negative currency rate should raise ValidationError."""
