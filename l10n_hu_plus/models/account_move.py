@@ -60,7 +60,9 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Currency Date",
     )
     l10n_hu_invoice_currency_rate_inverse = fields.Float(
-        compute='_compute_l10n_hu_currency',
+        compute='_compute_l10n_hu_invoice_currency_rate_inverse',
+        store=True,
+        readonly=False,
         string="HU Invoice Currency Rate Inverse",
     )
     ## DELIVERY PERIOD
@@ -112,6 +114,10 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Document Type Technical Name",
     )
     l10n_hu_document_vat_huf = fields.Monetary(
+        compute='_compute_l10n_hu_document_vat_huf',
+        inverse='_inverse_l10n_hu_document_vat_huf',
+        store=True,
+        readonly=False,
         copy=False,
         currency_field='l10n_hu_huf_currency',
         help="VAT amount in HUF as indicated on the invoice document",
@@ -252,7 +258,15 @@ class L10nHuPlusAccountMove(models.Model):
             record.l10n_hu_invoice_currency_rate_date = rate_data.get('l10n_hu_invoice_currency_rate_date', None)
             record.l10n_hu_huf_currency = rate_data.get('l10n_hu_huf_currency', None)
             record.l10n_hu_huf_rate = rate_data.get('l10n_hu_huf_rate', 0.0)
-            record.l10n_hu_invoice_currency_rate_inverse = rate_data.get('l10n_hu_invoice_currency_rate_inverse', None)
+
+    @api.depends('invoice_currency_rate')
+    def _compute_l10n_hu_invoice_currency_rate_inverse(self):
+        """Keep the editable inverse rate in sync with invoice_currency_rate."""
+        for record in self:
+            if record.invoice_currency_rate:
+                record.l10n_hu_invoice_currency_rate_inverse = 1.0 / record.invoice_currency_rate
+            else:
+                record.l10n_hu_invoice_currency_rate_inverse = 0.0
 
     def _compute_l10n_hu_delivery_period_text(self):
         for record in self:
@@ -271,6 +285,31 @@ class L10nHuPlusAccountMove(models.Model):
             record.l10n_hu_document_gross_huf = data_result.get('l10n_hu_document_gross_huf', 0)
             record.l10n_hu_document_net_huf = data_result.get('l10n_hu_document_net_huf', 0)
             record.l10n_hu_document_rate = data_result.get('l10n_hu_document_rate', 0)
+
+    @api.depends(
+        'amount_tax',
+        'amount_tax_signed',
+        'currency_id',
+        'company_id.currency_id',
+        'move_type',
+        'invoice_currency_rate',
+    )
+    def _compute_l10n_hu_document_vat_huf(self):
+        """Sync document VAT HUF from accounting on customer invoices.
+
+        Vendor bills keep the manually entered document VAT (used to derive the document rate).
+        """
+        for record in self:
+            if record.move_type in ['out_invoice', 'out_refund']:
+                data_result = record.l10n_hu_plus_get_document_data({})
+                record.l10n_hu_document_vat_huf = data_result.get('l10n_hu_document_vat_huf', 0)
+            else:
+                # keep manually entered / imported document VAT on vendor and other moves
+                record.l10n_hu_document_vat_huf = record.l10n_hu_document_vat_huf
+
+    def _inverse_l10n_hu_document_vat_huf(self):
+        """Allow writing document VAT HUF (vendor bills and draft customer invoices)."""
+        pass
 
     # Constraints and onchanges
     @api.onchange('l10n_hu_delivery_period_end', 'l10n_hu_delivery_period_start')

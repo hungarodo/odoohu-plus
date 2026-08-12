@@ -75,6 +75,6 @@
     'price': 36,
     'summary': "Hungary plus",
     'test': [],
-    'version': "18.0.1.11.10",
+    'version': "18.0.1.11.11",
     'website': "https://mopsz.odoo.com",
 }
