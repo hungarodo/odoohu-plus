@@ -50,8 +50,11 @@ class L10nHuPlusAccountMove(models.Model):
         string="HU Currency Rate",
     )
     l10n_hu_document_rate = fields.Float(
+        compute='_compute_l10n_hu_currency',
         copy=False,
         default=0,
+        readonly=False,
+        store=True,
         string="HU Document Rate",
     )
     l10n_hu_document_rate_difference = fields.Float(
@@ -204,6 +207,7 @@ class L10nHuPlusAccountMove(models.Model):
         for record in self:
             record.l10n_hu_cash_accounting = record.l10n_hu_get_cash_accounting()
 
+    @api.depends('company_id', 'currency_id', 'date', 'delivery_date', 'invoice_date')
     def _compute_l10n_hu_currency(self):
         for record in self:
             if record.delivery_date:
@@ -226,12 +230,14 @@ class L10nHuPlusAccountMove(models.Model):
                     ('name', '<=', record.date)
                 ], limit=1)
             if last_rate:
-                record.l10n_hu_currency_date = currency_date
-                record.l10n_hu_currency_rate = last_rate.inverse_company_rate
+                currency_rate = last_rate.inverse_company_rate
+                document_rate = record.l10n_hu_document_rate or currency_rate
             else:
-                record.l10n_hu_currency_date = currency_date
-                record.l10n_hu_currency_rate = 1.0
-                record.l10n_hu_document_rate = 1.0
+                currency_rate = 1.0
+                document_rate = 1.0
+            record.l10n_hu_currency_date = currency_date
+            record.l10n_hu_currency_rate = currency_rate
+            record.l10n_hu_document_rate = document_rate
 
     def _compute_l10n_hu_delivery_period_text(self):
         for record in self:
